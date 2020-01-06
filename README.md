@@ -1,7 +1,7 @@
-# helse-sputnik
+# helse-spleis-faketestdata
 
 ## Beskrivelse
-Sputnik aggregerer og persisterer informasjon fra eksterne systemer for å løse behov fra spleis.
+Oppretter og manipulerer testdata for spleis.
 
 ## Kjøretidsavhengigheter
 

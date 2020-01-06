@@ -37,9 +37,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 
-    testImplementation("no.nav:kafka-embedded-env:2.2.3")
-    testImplementation("org.awaitility:awaitility:4.0.1")
-
     testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion")
     testImplementation("io.mockk:mockk:1.9.3")
 }
@@ -57,7 +54,7 @@ tasks.named<Jar>("jar") {
     archiveBaseName.set("app")
 
     manifest {
-        attributes["Main-Class"] = "no.nav.helse.sputnik.AppKt"
+        attributes["Main-Class"] = "no.nav.helse.testdata.AppKt"
         attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
             it.name
         }

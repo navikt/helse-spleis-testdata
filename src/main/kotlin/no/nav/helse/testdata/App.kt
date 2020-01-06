@@ -16,20 +16,22 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import javax.sql.DataSource
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 
 @FlowPreview
 fun main() = runBlocking {
-    val serviceUser = readServiceUserCredentials()
     val environment = setUpEnvironment()
 
-    launchApplication()
+    val dataSourceBuilder = DataSourceBuilder(environment)
+
+    launchApplication(dataSourceBuilder.getDataSource())
 }
 
 @FlowPreview
-fun launchApplication() {
+fun launchApplication(dataSource: DataSource) {
     val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
     val exceptionHandler = CoroutineExceptionHandler { context, e ->
         log.error("Feil i lytter", e)

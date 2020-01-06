@@ -17,25 +17,25 @@ class PersonServiceTest {
 
     companion object {
         private lateinit var personService: PersonService
-        private lateinit var embeddedPostgres: EmbeddedPostgres
-        private lateinit var postgresConnection: Connection
-        private lateinit var hikariConfig: HikariConfig
     }
+
+    private lateinit var embeddedPostgres: EmbeddedPostgres
+    private lateinit var postgresConnection: Connection
+    private lateinit var hikariConfig: HikariConfig
 
     @BeforeEach
     fun `start postgres`() {
         embeddedPostgres = EmbeddedPostgres.builder().start()
-        runMigration()
 
         postgresConnection = embeddedPostgres.postgresDatabase.connection
         hikariConfig = createHikariConfig(embeddedPostgres.getJdbcUrl("postgres", "postgres"))
 
+        runMigration()
         personService = PersonService(embeddedPostgres.postgresDatabase)
     }
 
     @AfterEach
     fun `stop postgres`() {
-        postgresConnection.close()
         embeddedPostgres.close()
     }
 
@@ -69,13 +69,13 @@ class PersonServiceTest {
 
     private fun opprettPerson(aktørId: String) {
         using(sessionOf(embeddedPostgres.postgresDatabase), {
-            it.run(queryOf("insert into person (aktor_id, data) values (?, ?)", aktørId, "{}").asUpdate)
+            it.run(queryOf("insert into person (aktor_id, data) values (?, (to_json(?::json)))", aktørId, "{}").asUpdate)
         })
     }
 
     private fun antallRader(aktørId: String): Int {
         return using(sessionOf(embeddedPostgres.postgresDatabase), { session ->
-            session.run(queryOf("select * from person where aktor_id = '?'", aktørId).map {
+            session.run(queryOf("select * from person where aktor_id = ?", aktørId).map {
                 it.string("aktor_id")
             }.asList).size
         })

@@ -9,7 +9,7 @@ class PersonService(val dataSource: DataSource) {
 
     fun slett(aktørId: String) {
         using(sessionOf(dataSource), {
-            it.run(queryOf("delete from person where aktor_id = '?'", aktørId).asUpdate)
+            it.run(queryOf("delete from person where aktor_id = ?", aktørId).asUpdate)
         })
     }
 

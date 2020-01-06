@@ -18,7 +18,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-val log: Logger = LoggerFactory.getLogger("spleis-faketestdata")
+val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 
 @FlowPreview
 fun main() = runBlocking {

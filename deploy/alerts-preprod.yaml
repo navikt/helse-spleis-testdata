@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1alpha1
 kind: Alert
 metadata:
-  name: spleis-faketestdata-alerts
+  name: spleis-testdata-alerts
   labels:
     team: tbd
 spec:
@@ -9,10 +9,10 @@ spec:
     slack:
       channel: '#team-bømlo-alerts'
   alerts:
-    - alert: spleis-faketestdata-har-ingen-aktive-pods
-      expr: up{app=~"spleis-faketestdata",job="kubernetes-pods"} == 0
+    - alert: spleis-testdata-har-ingen-aktive-pods
+      expr: up{app=~"spleis-testdata",job="kubernetes-pods"} == 0
       for: 2m
-      description: spleis-faketestdata mangler aktive pods i preprod!
+      description: spleis-testdata mangler aktive pods i preprod!
       action: Se `kubectl describe pod {{ $labels.kubernetes_pod_name }}` for events,
         og `kubectl logs {{ $labels.kubernetes_pod_name }}` for logger
       sla: respond within 1h, during office hours

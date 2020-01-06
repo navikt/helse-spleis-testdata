@@ -1,4 +1,4 @@
-# helse-spleis-faketestdata
+# helse-spleis-testdata
 
 ## Beskrivelse
 Oppretter og manipulerer testdata for spleis.

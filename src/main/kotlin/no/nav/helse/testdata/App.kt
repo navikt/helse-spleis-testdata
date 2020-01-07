@@ -3,11 +3,11 @@ package no.nav.helse.testdata
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.*
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.delete
-import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -16,6 +16,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.lang.IllegalArgumentException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -33,7 +34,6 @@ fun main() = runBlocking {
     launchApplication(dataSourceBuilder.getDataSource())
 }
 
-@FlowPreview
 fun launchApplication(dataSource: DataSource) {
     val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
     val exceptionHandler = CoroutineExceptionHandler { context, e ->
@@ -51,6 +51,12 @@ fun launchApplication(dataSource: DataSource) {
             routing {
                 registerHealthApi({ true }, { true }, meterRegistry)
                 registerPersonApi(personService)
+
+                static("/") {
+                    staticRootFolder = File("public")
+                    file("styles.css")
+                    default("index.html")
+                }
             }
         }.start(wait = false)
 

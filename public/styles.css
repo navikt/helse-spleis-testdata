@@ -1,0 +1,8 @@
+
+body {
+    background: red;
+}
+
+input[type="submit"] {
+    height: 30px;
+}

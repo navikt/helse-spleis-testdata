@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <form id="delete-form">
+        <input id="delete-input" type="text" placeholder="aktørid">
+        <input type="submit" value="slett">
+    </form>
+
+    <script type="application/javascript">
+        const form = document.getElementById('delete-form');
+
+        form.addEventListener("submit", async e => {
+            e.preventDefault();
+
+            const aktørId = document.getElementById('delete-input').value;
+
+            if (aktørId) {
+                const result = await fetch(`/person/${aktørId}`, { method: 'delete' })
+                console.log(result.status);
+            }
+        })
+    </script>
+</body>
+</html>

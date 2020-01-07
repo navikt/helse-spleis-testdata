@@ -2,7 +2,6 @@ package no.nav.helse.testdata
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
 import io.ktor.routing.routing
@@ -11,7 +10,6 @@ import io.ktor.server.testing.handleRequest
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,9 +34,8 @@ class AppTest {
         embeddedPostgres = EmbeddedPostgres.builder().start()
 
         postgresConnection = embeddedPostgres.postgresDatabase.connection
-        hikariConfig = createHikariConfig(embeddedPostgres.getJdbcUrl("postgres", "postgres"))
 
-        runMigration()
+        runMigration(embeddedPostgres)
         personService = PersonService(embeddedPostgres.postgresDatabase)
     }
 
@@ -64,22 +61,6 @@ class AppTest {
             }
         }
     }
-
-    private fun runMigration() =
-        Flyway.configure()
-            .dataSource(HikariDataSource(hikariConfig))
-            .load()
-            .migrate()
-
-    private fun createHikariConfig(jdbcUrl: String) =
-        HikariConfig().apply {
-            this.jdbcUrl = jdbcUrl
-            maximumPoolSize = 3
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
-        }
 
     private fun opprettPerson(aktørId: String) {
         using(sessionOf(embeddedPostgres.postgresDatabase), {

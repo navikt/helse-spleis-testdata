@@ -1,15 +1,17 @@
 package no.nav.helse.testdata
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import com.zaxxer.hikari.HikariConfig
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
 import io.ktor.routing.routing
-import io.ktor.server.testing.withTestApplication
 import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
+import io.ktor.server.testing.withTestApplication
+import io.mockk.mockk
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +29,7 @@ class AppTest {
 
     private lateinit var embeddedPostgres: EmbeddedPostgres
     private lateinit var postgresConnection: Connection
-    private lateinit var hikariConfig: HikariConfig
+    private var producerMock = mockk<KafkaProducer<String, String>>(relaxed = true)
 
     @BeforeEach
     fun `start postgres`() {
@@ -62,9 +64,42 @@ class AppTest {
         }
     }
 
+    @Test
+    fun `opprett vedtak`() {
+        withTestApplication({
+            installJacksonFeature()
+            routing {
+                registerVedtaksperiodeApi(producerMock)
+            }
+        }) {
+            with(handleRequest(HttpMethod.Post, "vedtaksperiode") {
+                addHeader("Content-Type", "application/json")
+                setBody(
+                    """
+                    {
+                        "aktørId": "123",
+                        "fnr": "fnr",
+                        "orgnummer": "orgnummer",
+                        "sykdomFom": "2020-01-10",
+                        "sykdomTom": "2020-01-30"
+                    }
+                    """
+                )
+            }) {
+                assertTrue(response.status()!!.isSuccess())
+            }
+        }
+    }
+
     private fun opprettPerson(aktørId: String) {
         using(sessionOf(embeddedPostgres.postgresDatabase), {
-            it.run(queryOf("insert into person (aktor_id, data) values (?, (to_json(?::json)))", aktørId, "{}").asUpdate)
+            it.run(
+                queryOf(
+                    "insert into person (aktor_id, data) values (?, (to_json(?::json)))",
+                    aktørId,
+                    "{}"
+                ).asUpdate
+            )
         })
     }
 

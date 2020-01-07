@@ -6,24 +6,50 @@
     <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-    <form id="delete-form">
-        <input id="delete-input" type="text" placeholder="aktørid">
-        <input type="submit" value="slett">
-    </form>
+<form id="delete-form">
+    <input id="delete-input" type="text" placeholder="aktørid">
+    <input type="submit" value="slett">
+</form>
+<form id="vedtak-form">
+    <input id="vedtak-aktørid" type="text" placeholder="aktørid">
+    <input id="vedtak-fnr" type="text" placeholder="fødselsnummer">
+    <input id="vedtak-orgnummer" type="text" placeholder="orgnummer">
+    <input id="vedtak-sykdomFom" type="text" placeholder="fom">
+    <input id="vedtak-sykdomTom" type="text" placeholder="tom">
+    <input type="submit" value="opprett-vedtak">
+</form>
 
-    <script type="application/javascript">
-        const form = document.getElementById('delete-form');
+<script type="application/javascript">
+    const slettPerson = document.getElementById('delete-form');
 
-        form.addEventListener("submit", async e => {
-            e.preventDefault();
+    slettPerson.addEventListener("submit", async e => {
+        e.preventDefault();
 
-            const aktørId = document.getElementById('delete-input').value;
+        const aktørId = document.getElementById('delete-input').value;
 
-            if (aktørId) {
-                const result = await fetch(`/person/${aktørId}`, { method: 'delete' })
-                console.log(result.status);
-            }
-        })
-    </script>
+        if (aktørId) {
+            const result = await fetch(`/person/${aktørId}`, { method: 'delete' })
+            console.log(result.status);
+        }
+    });
+
+    const opprettVedtak = document.getElementById('vedtak-form');
+
+    opprettVedtak.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const aktørId = document.getElementById('vedtak-aktørid').value;
+        const fnr = document.getElementById('vedtak-fnr').value;
+        const orgnummer = document.getElementById('vedtak-orgnummer').value;
+        const sykdomFom = document.getElementById('vedtak-sykdomFom').value;
+        const sykdomTom = document.getElementById('vedtak-sykdomTom').value;
+        const vedtak = { aktørId, fnr, orgnummer, sykdomFom, sykdomTom };
+
+        if (aktørId) {
+            const result = await fetch(`/vedtaksperiode/`, { method: 'post', body: JSON.stringify(vedtak), headers: { "Content-Type": "application/json"} });
+            console.log(result.status);
+        }
+    })
+</script>
 </body>
 </html>

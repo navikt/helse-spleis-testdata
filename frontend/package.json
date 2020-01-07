@@ -1,0 +1,28 @@
+{
+  "name": "helse-spleis-testdata",
+  "version": "1.0.0",
+  "description": "Frontend for helse-spleis-testdata",
+  "main": "index.js",
+  "browserslist": [
+    "last 1 chrome versions"
+  ],
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html --out-dir ../public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/navikt/helse-spleis-testdata.git"
+  },
+  "author": "Stephen Ramthun <stephen.ramthun@nav.no>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/navikt/helse-spleis-testdata/issues"
+  },
+  "homepage": "https://github.com/navikt/helse-spleis-testdata#readme",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-svelte": "^4.0.5",
+    "svelte": "^3.16.7"
+  }
+}

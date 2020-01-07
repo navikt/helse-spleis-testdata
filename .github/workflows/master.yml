@@ -24,6 +24,11 @@ jobs:
       env:
         ORG_GRADLE_PROJECT_githubUser: ${{ github.repository }}
         ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+    - name: build frontend
+      run: |
+        cd frontend
+        npm run build
+        cd ..
     - name: build docker imagex
       run: docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
     - name: push docker image

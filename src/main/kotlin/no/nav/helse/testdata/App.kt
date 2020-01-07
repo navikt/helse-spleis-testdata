@@ -7,10 +7,7 @@ import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.default
-import io.ktor.http.content.file
-import io.ktor.http.content.static
-import io.ktor.http.content.staticRootFolder
+import io.ktor.http.content.*
 import io.ktor.jackson.jackson
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.receive
@@ -77,7 +74,7 @@ fun launchApplication(
 
                 static("/") {
                     staticRootFolder = File("public")
-                    file("styles.css")
+                    files("")
                     default("index.html")
                 }
             }

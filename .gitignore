@@ -3,3 +3,10 @@
 build/
 .DS_Store
 .gradle/
+public/
+out/
+
+frontend/node_modules
+frontend/dist
+frontend/.cache
+frontend/.env

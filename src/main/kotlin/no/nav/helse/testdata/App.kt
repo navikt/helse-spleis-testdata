@@ -1,11 +1,13 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.http.HttpStatusCode
 import io.ktor.metrics.micrometer.MicrometerMetrics
+import io.ktor.response.respond
+import io.ktor.routing.Routing
+import io.ktor.routing.delete
+import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -14,6 +16,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.IllegalArgumentException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
@@ -37,6 +40,8 @@ fun launchApplication(dataSource: DataSource) {
         log.error("Feil i lytter", e)
         context.cancel(CancellationException("Feil i lytter", e))
     }
+    val personService = PersonService(dataSource)
+
     runBlocking(exceptionHandler + applicationContext) {
         val server = embeddedServer(Netty, 8080) {
             install(MicrometerMetrics) {
@@ -45,6 +50,7 @@ fun launchApplication(dataSource: DataSource) {
 
             routing {
                 registerHealthApi({ true }, { true }, meterRegistry)
+                registerPersonApi(personService)
             }
         }.start(wait = false)
 
@@ -52,5 +58,12 @@ fun launchApplication(dataSource: DataSource) {
             server.stop(10, 10, TimeUnit.SECONDS)
             applicationContext.close()
         })
+    }
+}
+
+fun Routing.registerPersonApi(personService: PersonService) {
+    delete("person/{aktørId}") {
+        personService.slett(call.parameters["aktørId"] ?: throw IllegalArgumentException("Mangler aktørid"))
+        call.respond(HttpStatusCode.OK)
     }
 }

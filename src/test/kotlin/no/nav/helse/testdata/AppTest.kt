@@ -3,20 +3,28 @@ package no.nav.helse.testdata
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.http.HttpMethod
+import io.ktor.http.isSuccess
+import io.ktor.routing.routing
+import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.handleRequest
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.Connection
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class PersonServiceTest {
+class AppTest {
 
     companion object {
         private lateinit var personService: PersonService
+        private const val aktør1 = "123"
+        private const val aktør2 = "456"
     }
 
     private lateinit var embeddedPostgres: EmbeddedPostgres
@@ -40,15 +48,21 @@ class PersonServiceTest {
     }
 
     @Test
-    internal fun `slett person`() {
-        val aktørId = "123456789"
+    fun `slett person`() {
+        opprettPerson(aktør1)
+        opprettPerson(aktør2)
 
-        opprettPerson(aktørId)
-        assertEquals(1, antallRader(aktørId))
-
-        personService.slett(aktørId)
-
-        assertEquals(0, antallRader(aktørId))
+        withTestApplication({
+            routing {
+                registerPersonApi(personService)
+            }
+        }) {
+            with(handleRequest(HttpMethod.Delete, "person/$aktør1")) {
+                assertTrue(response.status()!!.isSuccess())
+                assertEquals(0, antallRader(aktør1))
+                assertEquals(1, antallRader(aktør2))
+            }
+        }
     }
 
     private fun runMigration() =

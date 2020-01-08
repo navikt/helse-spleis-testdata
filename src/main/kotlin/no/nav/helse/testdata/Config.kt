@@ -1,10 +1,7 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.JsonNode
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.serialization.Serializer
-import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import java.nio.file.Files
 import java.nio.file.Path
@@ -23,15 +20,19 @@ fun setUpEnvironment() =
     Environment(
         kafkaBootstrapServers = System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: error("Mangler env var KAFKA_BOOTSTRAP_SERVERS"),
         databaseName = System.getenv("DATABASE_NAME") ?: error("Mangler env var DATABASE_NAME"),
-        databaseUrl = System.getenv("DATABASE_JDBC_URL") ?: error("Mangler env var DATABASE_JDBC_URL"),
+        databaseHost = System.getenv("DATABASE_HOST") ?: error("Mangler env var DATABASE_HOST"),
+        databasePort = System.getenv("DATABASE_PORT") ?: error("Mangler env var DATABASE_PORT"),
         vaultMountPath = System.getenv("VAULT_MOUNTPATH") ?: error("Mangler env var VAULT_MOUNTPATH"),
-        serviceUser = readServiceUserCredentials()
+        serviceUser = readServiceUserCredentials(),
+        databaseUsername = System.getenv("DATABASE_USERNAME")
     )
 
 data class Environment(
     val kafkaBootstrapServers: String,
     val databaseName: String,
-    val databaseUrl: String,
+    val databaseHost: String,
+    val databasePort: String,
+    val databaseUsername: String?,
     val vaultMountPath: String,
     val serviceUser: ServiceUser
 )

@@ -13,7 +13,12 @@ internal class DataSourceBuilder(env: Environment) {
     // username and password is only needed when vault is not enabled,
     // since we rotate credentials automatically when vault is enabled
     private val hikariConfig = HikariConfig().apply {
-        jdbcUrl = env.databaseUrl
+        jdbcUrl = String.format(
+            "jdbc:postgresql://%s:%s/%s%s",
+            requireNotNull(env.databaseHost) { "database host must be set if jdbc url is not provided" },
+            requireNotNull(env.databasePort) { "database port must be set if jdbc url is not provided" },
+            requireNotNull(env.databaseName) { "database name must be set if jdbc url is not provided" },
+            env.databaseUsername?.let { "?user=$it" } ?: "")
         username = env.serviceUser.username
         password = env.serviceUser.password
 

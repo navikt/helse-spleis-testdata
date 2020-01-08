@@ -3,6 +3,8 @@ FROM navikt/java:12
 COPY build/libs/*.jar ./
 COPY public ./
 
+EXPOSE 8080
+
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 \
                -XX:+HeapDumpOnOutOfMemoryError \
                -XX:HeapDumpPath=/oom-dump.hprof"

@@ -13,5 +13,5 @@
 </script>
 
 <Form onSubmit={onSubmit} submitText="Slett person">
-    <TextInput bind:value={aktørId} placeholder="aktørid" label="Slett person"/>
+    <TextInput bind:value={aktørId} placeholder="Arbeidstakers aktør-id" label="Aktør-id"/>
 </Form>

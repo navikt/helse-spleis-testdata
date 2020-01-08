@@ -19,7 +19,6 @@
     }
     input {
         margin: 0.25rem 0 1rem 0;
-        max-width: 20rem;
         appearance: none;
         padding: 0.5rem;
         background-color: #FFF;
@@ -29,11 +28,10 @@
         line-height: 1.375rem;
     }
     input:hover {
-        border-color: #0067C5;
-        transition: border-color 200ms cubic-bezier(0.465, 0.183, 0.153, 0.946);
+        border-color: var(--active-color);
     }
     input:focus {
         outline: 0;
-        box-shadow: 0 0 0 3px #254b6d;
+        box-shadow: 0 0 0 3px var(--active-color-dark);
     }
 </style>

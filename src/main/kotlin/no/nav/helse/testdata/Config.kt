@@ -6,7 +6,8 @@ import org.apache.kafka.common.serialization.StringSerializer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
+import java.util.Base64
+import java.util.Properties
 
 const val vaultBase = "/var/run/secrets/nais.io/vault"
 val vaultBasePath: Path = Paths.get(vaultBase)
@@ -18,11 +19,13 @@ fun readServiceUserCredentials() = ServiceUser(
 
 fun setUpEnvironment() =
     Environment(
-        kafkaBootstrapServers = System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: error("Mangler env var KAFKA_BOOTSTRAP_SERVERS"),
+        kafkaBootstrapServers = System.getenv("KAFKA_BOOTSTRAP_SERVERS")
+            ?: error("Mangler env var KAFKA_BOOTSTRAP_SERVERS"),
         databaseName = System.getenv("DATABASE_NAME") ?: error("Mangler env var DATABASE_NAME"),
         databaseHost = System.getenv("DATABASE_HOST") ?: error("Mangler env var DATABASE_HOST"),
         databasePort = System.getenv("DATABASE_PORT") ?: error("Mangler env var DATABASE_PORT"),
         vaultMountPath = System.getenv("VAULT_MOUNTPATH") ?: error("Mangler env var VAULT_MOUNTPATH"),
+        inntektRestUrl = "https://app-q1.adeo.no/inntektskomponenten-ws/rs",
         serviceUser = readServiceUserCredentials(),
         databaseUsername = System.getenv("DATABASE_USERNAME")
     )
@@ -34,13 +37,16 @@ data class Environment(
     val databasePort: String,
     val databaseUsername: String?,
     val vaultMountPath: String,
+    val inntektRestUrl: String,
     val serviceUser: ServiceUser
 )
 
 data class ServiceUser(
     val username: String,
     val password: String
-)
+) {
+    val basicAuth = "Basic ${Base64.getEncoder().encodeToString("$username:$password".toByteArray())}"
+}
 
 fun loadBaseConfig(env: Environment): Properties = Properties().also {
     it.load(Environment::class.java.getResourceAsStream("/kafka_base.properties"))

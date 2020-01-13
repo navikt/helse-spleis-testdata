@@ -12,7 +12,7 @@ fun main() {
     val producer: KafkaProducer<String, String> = mockk(relaxed = true)
 
     runMigration(embeddedPostgres)
-    launchApplication(embeddedPostgres.postgresDatabase, producer)
+    launchApplication(embeddedPostgres.postgresDatabase, mockk(), producer)
 }
 
 fun runMigration(embeddedPostgres: EmbeddedPostgres) =

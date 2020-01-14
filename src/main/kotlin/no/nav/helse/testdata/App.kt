@@ -122,7 +122,7 @@ fun Routing.registerPersonApi(personService: PersonService) {
 fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/person/inntekt/{aktørId}") {
     val aktørId = requireNotNull(call.parameters["aktørId"]) { "Mangler aktørId" }
     val end = YearMonth.now().minusMonths(1)
-    val start = end.minusMonths(12)
+    val start = end.minusMonths(11)
     val inntekter = inntektRestClient.hentInntektsliste(
         aktørId = aktørId,
         fom = start,

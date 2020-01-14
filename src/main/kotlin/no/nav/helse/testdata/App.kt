@@ -9,6 +9,8 @@ import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
 import io.ktor.features.ContentNegotiation
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.*
@@ -53,7 +55,14 @@ fun main() = runBlocking {
     val producer = KafkaProducer<String, String>(loadBaseConfig(environment).toProducerConfig())
 
     val stsRestClient = StsRestClient("http://security-token-service", environment.serviceUser)
-    val inntektRestClient = InntektRestClient(environment.inntektRestUrl, HttpClient(CIO), stsRestClient)
+    val inntektRestClient = InntektRestClient(environment.inntektRestUrl, HttpClient(CIO) {
+        install(JsonFeature) {
+            serializer = JacksonSerializer {
+                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                registerModule(JavaTimeModule())
+            }
+        }
+    }, stsRestClient)
 
     launchApplication(
         dataSourceBuilder.getDataSource(),
@@ -114,7 +123,13 @@ fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/pe
     val aktørId = requireNotNull(call.parameters["aktørId"]) { "Mangler aktørId" }
     val end = YearMonth.now().minusMonths(1)
     val start = end.minusMonths(12)
-    val inntekter = inntektRestClient.hentInntektsliste(aktørId, start, end, "8-30", UUID.randomUUID().toString())
+    val inntekter = inntektRestClient.hentInntektsliste(
+        aktørId = aktørId,
+        fom = start,
+        tom = end,
+        filter = "8-30",
+        callId = UUID.randomUUID().toString()
+    )
     val beregnetÅrsinntekt = inntekter.flatMap { it.inntektsliste }.sumByDouble { it.beløp }
     val beregnetMånedsinntekt = beregnetÅrsinntekt / 12
     call.respond(mapOf(

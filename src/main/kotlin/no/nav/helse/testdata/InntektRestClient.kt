@@ -28,7 +28,7 @@ class InntektRestClient(
         httpClient.request<HttpResponse>("$baseUrl/api/v1/hentinntektliste") {
             method = HttpMethod.Post
             header("Authorization", "Bearer ${stsRestClient.token()}")
-            header("Nav-Consumer-Id", "srvsparkelinntekt")
+            header("Nav-Consumer-Id", "srvspleistestdata")
             header("Nav-Call-Id", callId)
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)

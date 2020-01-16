@@ -24,7 +24,7 @@ npm i
 npm start
 ````
 
-Skal du teste frontenden i sammenheng med backenden må du først bygge appen slik at de bundlede filene kan serves av backenden fra `public`-mappen:
+Skal du teste frontenden sammen med backenden må du først bygge appen slik at de bundlede filene kan serves av backenden fra `public`-mappen:
 
 ```shell script
 # Kjøres fra frontend-mappen:

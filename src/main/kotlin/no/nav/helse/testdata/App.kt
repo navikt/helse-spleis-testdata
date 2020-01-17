@@ -13,7 +13,10 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.features.ContentNegotiation
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.*
+import io.ktor.http.content.default
+import io.ktor.http.content.files
+import io.ktor.http.content.static
+import io.ktor.http.content.staticRootFolder
 import io.ktor.jackson.jackson
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.receive
@@ -42,10 +45,10 @@ import javax.sql.DataSource
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
-val spleisTopic = "privat-helse-sykepenger-rapid"
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
+val spleisTopic = "privat-helse-sykepenger-rapid-v1"
 
 
 fun main() = runBlocking {
@@ -145,9 +148,9 @@ fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>) {
         val søknad = søknad(vedtak)
         val inntektsmelding = inntektsmelding(vedtak)
 
-        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, sykmelding))
-        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, søknad))
-        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, inntektsmelding))
+        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, sykmelding)).get()
+        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, søknad)).get()
+        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, inntektsmelding)).get()
 
         call.respond(HttpStatusCode.OK)
     }

@@ -5,10 +5,11 @@
     export let label = '';
     export let placeholder = '';
     export let value = '';
+    export let invalid = false;
 </script>
 
 <label for={id}>{label}</label>
-<input bind:value={value} placeholder={placeholder} id={id}>
+<input bind:value={value} placeholder={placeholder} id={id} class={invalid ? "invalid" : ""}>
 
 <style>
     label {
@@ -27,6 +28,7 @@
         box-sizing: border-box;
         line-height: 1.375rem;
     }
+    .invalid { border-color: red }
     input:hover {
         border-color: var(--active-color);
     }

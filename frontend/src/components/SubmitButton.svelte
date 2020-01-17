@@ -1,5 +1,6 @@
 <script>
     export let value = '';
+    export let disabled = false;
 </script>
 
 <input type="submit" value={value} />

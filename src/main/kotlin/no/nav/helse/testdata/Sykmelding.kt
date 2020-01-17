@@ -7,7 +7,7 @@ fun sykmelding(
 ) : String {
     return """
         {
-                      "id":${UUID.randomUUID()}",
+                      "id":"${UUID.randomUUID()}",
                       "type":"ARBEIDSTAKERE",
                       "status":"NY",
                       "aktorId":"${vedtak.aktørId}",
@@ -46,7 +46,7 @@ fun sykmelding(
                       ],
                       "sporsmal":null,
                       "hendelseId":"${UUID.randomUUID()}"
-                    }   
+        }   
     """
 }
 

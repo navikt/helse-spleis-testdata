@@ -7,7 +7,7 @@ fun søknad(
 ) : String {
     return """
         {
-                      "id":${UUID.randomUUID()}",
+                      "id":"${UUID.randomUUID()}",
                       "type":"ARBEIDSTAKERE",
                       "status":"SENDT",
                       "aktorId":"${vedtak.aktørId}",

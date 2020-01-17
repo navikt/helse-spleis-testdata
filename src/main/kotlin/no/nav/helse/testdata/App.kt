@@ -153,6 +153,7 @@ fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>) {
         producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, inntektsmelding)).get()
 
         call.respond(HttpStatusCode.OK)
+            .also { log.info("produsert data for vedtak på aktør: ${vedtak.aktørId}") }
     }
 }
 

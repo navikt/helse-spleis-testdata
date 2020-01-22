@@ -1,25 +1,18 @@
 <script>
-    import Form from "./Form.svelte";
-    import TextInput from "./TextInput.svelte";
+    import Form from "./form/Form.svelte";
+    import Input from "./form/Input.svelte";
 
-    let invalid = false;
     let inntektField;
     let aktørId = '';
     let inntekt = {};
 
     const onSubmit = async () => {
-        if (aktørId) {
-            invalid = false;
-            const result = await fetch(`/person/inntekt/${aktørId}`, {
-                method: 'get',
-                headers: {"Content-Type": "application/json", "Accept": "application/json"}
-            });
-            inntekt = await result.json();
-            return result
-        } else {
-            invalid = true;
-            throw Error()
-        }
+        const result = await fetch(`/person/inntekt/${aktørId}`, {
+            method: 'get',
+            headers: {"Content-Type": "application/json", "Accept": "application/json"}
+        });
+        inntekt = await result.json();
+        return result
     };
 
     const copy = () => {
@@ -31,24 +24,26 @@
         clipboardTextarea.remove();
     };
 </script>
+
 <Form onSubmit={onSubmit} submitText="Hent inntekt">
-    <TextInput bind:value={aktørId} label="Aktør-id" placeholder="Arbeidstakers aktør-id" invalid={invalid} />
+    <Input bind:value={aktørId} label="Aktør-id" placeholder="Arbeidstakers aktør-id" required />
 </Form>
-<p class="response">
+<p>
     {#if inntekt.beregnetMånedsinntekt}
         Beregnet månedsinntekt:
-        <span class="response__result" on:click={copy}>{inntekt.beregnetMånedsinntekt} <i
-            class="material-icons-outlined">file_copy</i></span>
+        <span on:click={copy}>{inntekt.beregnetMånedsinntekt}
+            <i class="material-icons-outlined">file_copy</i>
+        </span>
     {/if}
 </p>
 
 <style>
-    .response {
+    a {
         padding-top: 1.5rem;
         padding-left: 1.5rem;
     }
 
-    .response__result:hover {
+    span:hover {
         cursor: pointer;
     }
 

@@ -26,7 +26,7 @@
         onClick={() => activeSection = Section.OPPRETT_VEDTAKSPERIODE}
     />
     <SectionButton
-        label="Hent inntekt"
+        label="hent inntekt"
         isActive={activeSection === Section.HENT_INNTEKT}
         onClick={() => activeSection = Section.HENT_INNTEKT}
     />

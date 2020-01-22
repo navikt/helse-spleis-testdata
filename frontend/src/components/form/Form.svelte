@@ -22,7 +22,7 @@
                         return res;
                     } else throw Error("Invalid status code")
                 })
-                .catch(err => status = ERROR)
+                .catch(_ => status = ERROR)
 
     }
 </script>
@@ -39,6 +39,6 @@
         flex-direction: column;
         padding: 2rem;
         flex: 1;
-        max-width: 30rem;
+        max-width: 50rem;
     }
 </style>

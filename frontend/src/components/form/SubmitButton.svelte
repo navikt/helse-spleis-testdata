@@ -3,7 +3,7 @@
     export let disabled = false;
 </script>
 
-<input type="submit" value={value} />
+<input type="submit" value={value} disabled={disabled} />
 
 <style>
     input {
@@ -27,5 +27,9 @@
         background: white;
         color: var(--active-color-dark);
         box-shadow: 0 0 0 0.125rem var(--active-color-dark);
+    }
+    input:disabled {
+        background: var(--disabled-color);
+        box-shadow: none;
     }
 </style>

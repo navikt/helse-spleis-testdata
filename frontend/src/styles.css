@@ -2,6 +2,7 @@
     font-family: 'Source Sans Pro', sans-serif;
     --active-color: #00b58a;
     --active-color-dark: #006E54;
+    --disabled-color: #c2c2c2;
 }
 
 body {

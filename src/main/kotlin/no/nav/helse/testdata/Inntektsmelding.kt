@@ -18,7 +18,7 @@ fun inntektsmelding(
                   "beregnetInntekt":"10000.01",
                   "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                   "refusjon":{
-                    "beloepPrMnd":null,
+                    "beloepPrMnd":0,
                     "opphoersdato":null
                   },
                   "endringIRefusjoner":[],
@@ -30,9 +30,12 @@ fun inntektsmelding(
                       "tom":"${vedtak.sykdomFom.plusDays(15)}"
                     }
                   ],
+                  "ferieperioder":[],
                   "status":"GYLDIG",
                   "arkivreferanse":"ENARKIVREFERANSE",
-                  "hendelseId":"${UUID.randomUUID()}"
+                  "hendelseId":"${UUID.randomUUID()}",
+                  "foersteFravaersdag":"${vedtak.sykdomFom}",
+                  "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"
                 } 
     """
 }

@@ -9,7 +9,7 @@ fun sykmelding(
         {
                       "id":"${UUID.randomUUID()}",
                       "type":"ARBEIDSTAKERE",
-                      "fnr":"${vedtak.fnr}"
+                      "fnr":"${vedtak.fnr}",
                       "status":"NY",
                       "aktorId":"${vedtak.aktørId}",
                       "sykmeldingId":"${UUID.randomUUID()}",

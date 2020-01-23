@@ -13,6 +13,7 @@
 <span>
     <input
         id={id}
+        type="text"
         class:invalid
         bind:value={value}
         required={required}

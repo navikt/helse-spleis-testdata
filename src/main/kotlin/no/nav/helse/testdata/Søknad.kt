@@ -8,6 +8,7 @@ fun søknad(
     return """
         {
                       "id":"${UUID.randomUUID()}",
+                      "fnr":"${vedtak.fnr}",
                       "type":"ARBEIDSTAKERE",
                       "status":"SENDT",
                       "aktorId":"${vedtak.aktørId}",

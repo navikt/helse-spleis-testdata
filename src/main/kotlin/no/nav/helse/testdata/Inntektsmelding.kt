@@ -18,7 +18,7 @@ fun inntektsmelding(
                   "beregnetInntekt":"10000.01",
                   "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                   "refusjon":{
-                    "beloepPrMnd":0,
+                    "beloepPrMnd":"10000.01",
                     "opphoersdato":null
                   },
                   "endringIRefusjoner":[],

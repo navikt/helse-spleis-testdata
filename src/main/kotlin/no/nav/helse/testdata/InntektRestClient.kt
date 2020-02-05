@@ -37,7 +37,7 @@ class InntektRestClient(
             body = mapOf(
                 "ident" to mapOf(
                     "identifikator" to aktørId,
-                    "aktoerType" to "AKTOER_ID"
+                    "aktoerType" to "NATURLIG_IDENT"
                 ),
                 "ainntektsfilter" to filter,
                 // TODO: Bruker Foreldrepenger midlertidig på grunn av mangel på tilgang til 8-28 og 8-30 som Sykepenger
@@ -48,8 +48,8 @@ class InntektRestClient(
         }
             .let {
                 when {
-                    it.status.isSuccess() -> Result.ok(toMånedListe(objectMapper.readValue(it.readText())))
-                    else -> Result.error(ResponseFailure(it.status, it.readText()))
+                    it.status.isSuccess() -> Result.Ok(toMånedListe(objectMapper.readValue(it.readText())))
+                    else -> Result.Error(ResponseFailure(it.status, it.readText()))
                 }
             }
 }

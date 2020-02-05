@@ -30,7 +30,11 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
@@ -138,9 +142,11 @@ fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/pe
         is Result.Ok -> {
             val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumByDouble { it.beløp }
             val beregnetMånedsinntekt = beregnetÅrsinntekt / 12
-            call.respond(mapOf(
-                "beregnetMånedsinntekt" to beregnetMånedsinntekt
-            ))
+            call.respond(
+                mapOf(
+                    "beregnetMånedsinntekt" to beregnetMånedsinntekt
+                )
+            )
         }
         is Result.Error -> call.respond(inntekterResult.error.statusCode, inntekterResult.error.response)
     }

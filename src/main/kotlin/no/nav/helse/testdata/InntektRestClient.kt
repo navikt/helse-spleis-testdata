@@ -10,7 +10,9 @@ import io.ktor.client.response.HttpResponse
 import io.ktor.client.response.readText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import java.time.YearMonth
 
 class InntektRestClient(
@@ -24,7 +26,7 @@ class InntektRestClient(
         tom: YearMonth,
         filter: String,
         callId: String
-    ) =
+    ): Result<List<Måned>, ResponseFailure> =
         httpClient.request<HttpResponse>("$baseUrl/api/v1/hentinntektliste") {
             method = HttpMethod.Post
             header("Authorization", "Bearer ${stsRestClient.token()}")
@@ -44,8 +46,16 @@ class InntektRestClient(
                 "maanedTom" to tom
             )
         }
-            .let { toMånedListe(objectMapper.readValue(it.readText())) }
+            .let {
+                when {
+                    it.status.isSuccess() -> Result.ok(toMånedListe(objectMapper.readValue(it.readText())))
+                    else -> Result.error(ResponseFailure(it.status, it.readText()))
+                }
+            }
 }
+
+class ResponseFailure(val statusCode: HttpStatusCode, val response: String) :
+    Exception("Failed to execute http call, responded with status code $statusCode")
 
 private fun toMånedListe(node: JsonNode) = node["arbeidsInntektMaaned"].map(::tilMåned)
 
@@ -70,6 +80,7 @@ data class Måned(
     val årMåned: YearMonth,
     val inntektsliste: List<Inntekt>
 )
+
 data class Inntekt(
     val beløp: Double,
     val inntektstype: Inntektstype,

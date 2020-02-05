@@ -59,6 +59,7 @@ fun main() = runBlocking {
 
     val stsRestClient = StsRestClient("http://security-token-service", environment.serviceUser)
     val inntektRestClient = InntektRestClient(environment.inntektRestUrl, HttpClient(CIO) {
+        expectSuccess = false
         install(JsonFeature) {
             serializer = JacksonSerializer {
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -126,18 +127,23 @@ fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/pe
     val aktørId = requireNotNull(call.parameters["aktørId"]) { "Mangler aktørId" }
     val end = YearMonth.now().minusMonths(1)
     val start = end.minusMonths(11)
-    val inntekter = inntektRestClient.hentInntektsliste(
+    val inntekterResult = inntektRestClient.hentInntektsliste(
         aktørId = aktørId,
         fom = start,
         tom = end,
         filter = "8-30",
         callId = UUID.randomUUID().toString()
     )
-    val beregnetÅrsinntekt = inntekter.flatMap { it.inntektsliste }.sumByDouble { it.beløp }
-    val beregnetMånedsinntekt = beregnetÅrsinntekt / 12
-    call.respond(mapOf(
-        "beregnetMånedsinntekt" to beregnetMånedsinntekt
-    ))
+    when (inntekterResult) {
+        is Result.Ok -> {
+            val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumByDouble { it.beløp }
+            val beregnetMånedsinntekt = beregnetÅrsinntekt / 12
+            call.respond(mapOf(
+                "beregnetMånedsinntekt" to beregnetMånedsinntekt
+            ))
+        }
+        is Result.Error -> call.respond(inntekterResult.error.statusCode, inntekterResult.error.response)
+    }
 }
 
 fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>) {

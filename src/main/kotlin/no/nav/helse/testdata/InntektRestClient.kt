@@ -21,7 +21,7 @@ class InntektRestClient(
     private val stsRestClient: StsRestClient
 ) {
     suspend fun hentInntektsliste(
-        aktørId: String,
+        fnr: String,
         fom: YearMonth,
         tom: YearMonth,
         filter: String,
@@ -36,7 +36,7 @@ class InntektRestClient(
             accept(ContentType.Application.Json)
             body = mapOf(
                 "ident" to mapOf(
-                    "identifikator" to aktørId,
+                    "identifikator" to fnr,
                     "aktoerType" to "NATURLIG_IDENT"
                 ),
                 "ainntektsfilter" to filter,
@@ -57,7 +57,7 @@ class InntektRestClient(
 class ResponseFailure(val statusCode: HttpStatusCode, val response: String) :
     Exception("Failed to execute http call, responded with status code $statusCode")
 
-private fun toMånedListe(node: JsonNode) = node["arbeidsInntektMaaned"].map(::tilMåned)
+private fun toMånedListe(node: JsonNode) = node.path("arbeidsInntektMaaned").map(::tilMåned)
 
 private fun toInntekt(node: JsonNode) = Inntekt(
     beløp = node["beloep"].asDouble(),

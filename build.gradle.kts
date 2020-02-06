@@ -8,7 +8,7 @@ val vaultJdbcVersion = "1.3.1"
 val kotliqueryVersion = "1.3.0"
 
 plugins {
-    kotlin("jvm") version "1.3.50"
+    kotlin("jvm") version "1.3.60"
 }
 
 group = "no.nav.helse"

@@ -19,6 +19,7 @@ import io.ktor.http.content.static
 import io.ktor.http.content.staticRootFolder
 import io.ktor.jackson.jackson
 import io.ktor.metrics.micrometer.MicrometerMetrics
+import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Routing
@@ -127,12 +128,13 @@ fun Routing.registerPersonApi(personService: PersonService) {
     }
 }
 
-fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/person/inntekt/{aktørId}") {
-    val aktørId = requireNotNull(call.parameters["aktørId"]) { "Mangler aktørId" }
+fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/person/inntekt") {
+
+    val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
     val end = YearMonth.now().minusMonths(1)
     val start = end.minusMonths(11)
     val inntekterResult = inntektRestClient.hentInntektsliste(
-        aktørId = aktørId,
+        fnr = fnr,
         fom = start,
         tom = end,
         filter = "8-30",

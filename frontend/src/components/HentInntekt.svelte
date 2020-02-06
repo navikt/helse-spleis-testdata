@@ -3,13 +3,17 @@
     import Input from "./form/Input.svelte";
 
     let inntektField;
-    let aktørId = '';
+    let fnr = '';
     let inntekt = {};
 
     const onSubmit = async () => {
-        const result = await fetch(`/person/inntekt/${aktørId}`, {
+        const result = await fetch(`/person/inntekt`, {
             method: 'get',
-            headers: {"Content-Type": "application/json", "Accept": "application/json"}
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "ident": fnr
+            }
         });
         inntekt = await result.json();
         return result
@@ -26,7 +30,7 @@
 </script>
 
 <Form onSubmit={onSubmit} submitText="Hent inntekt">
-    <Input bind:value={aktørId} label="Aktør-id" placeholder="Arbeidstakers aktør-id" required />
+    <Input bind:value={fnr} label="Fnr" placeholder="Arbeidstakers fnr" required />
 </Form>
 <p>
     {#if inntekt.beregnetMånedsinntekt}

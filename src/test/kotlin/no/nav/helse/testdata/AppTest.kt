@@ -3,6 +3,7 @@ package no.nav.helse.testdata
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
+import io.ktor.request.header
 import io.ktor.routing.routing
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
@@ -23,8 +24,8 @@ class AppTest {
 
     companion object {
         private lateinit var personService: PersonService
-        private const val aktør1 = "123"
-        private const val aktør2 = "456"
+        private const val fnr1 = "123"
+        private const val fnr2 = "456"
     }
 
     private lateinit var embeddedPostgres: EmbeddedPostgres
@@ -48,18 +49,21 @@ class AppTest {
 
     @Test
     fun `slett person`() {
-        opprettPerson(aktør1)
-        opprettPerson(aktør2)
+        opprettPerson(fnr1)
+        opprettPerson(fnr2)
 
         withTestApplication({
             routing {
                 registerPersonApi(personService)
             }
         }) {
-            with(handleRequest(HttpMethod.Delete, "person/$aktør1")) {
+            with(handleRequest(HttpMethod.Delete, "person"){
+                addHeader("ident", fnr1)
+            }) {
+
                 assertTrue(response.status()!!.isSuccess())
-                assertEquals(0, antallRader(aktør1))
-                assertEquals(1, antallRader(aktør2))
+                assertEquals(0, antallRader(fnr1))
+                assertEquals(1, antallRader(fnr2))
             }
         }
     }
@@ -91,22 +95,22 @@ class AppTest {
         }
     }
 
-    private fun opprettPerson(aktørId: String) {
+    private fun opprettPerson(fnr: String) {
         using(sessionOf(embeddedPostgres.postgresDatabase), {
             it.run(
                 queryOf(
-                    "insert into person (aktor_id, data) values (?, (to_json(?::json)))",
-                    aktørId,
+                    "insert into person (aktor_id, fnr, skjema_versjon, data) values ('aktørId', ?, 4, (to_json(?::json)))",
+                    fnr,
                     "{}"
                 ).asUpdate
             )
         })
     }
 
-    private fun antallRader(aktørId: String): Int {
+    private fun antallRader(fnr: String): Int {
         return using(sessionOf(embeddedPostgres.postgresDatabase), { session ->
-            session.run(queryOf("select * from person where aktor_id = ?", aktørId).map {
-                it.string("aktor_id")
+            session.run(queryOf("select * from person where fnr = ?", fnr).map {
+                it.string("fnr")
             }.asList).size
         })
     }

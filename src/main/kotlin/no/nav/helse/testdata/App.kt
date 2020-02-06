@@ -122,8 +122,9 @@ fun launchApplication(
 }
 
 fun Routing.registerPersonApi(personService: PersonService) {
-    delete("person/{aktørId}") {
-        personService.slett(call.parameters["aktørId"] ?: throw IllegalArgumentException("Mangler aktørid"))
+    delete("person") {
+        val fnr = call.request.header("ident")
+        personService.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
         call.respond(HttpStatusCode.OK)
     }
 }

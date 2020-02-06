@@ -3,13 +3,14 @@ package no.nav.helse.testdata
 import java.util.*
 
 fun inntektsmelding(
-    vedtak: Vedtak
+    vedtak: Vedtak,
+    aktørId: String
 ): String {
     return """
         {
                   "inntektsmeldingId":"${(Math.random() * 10000000).toInt()}",
                   "arbeidstakerFnr":"${vedtak.fnr}",
-                  "arbeidstakerAktorId":"${vedtak.aktørId}",
+                  "arbeidstakerAktorId":"$aktørId",
                   "virksomhetsnummer":"${vedtak.orgnummer}",
                   "arbeidsgiverFnr":"Don't care",
                   "arbeidsgiverAktorId":"Don't care",

@@ -3,7 +3,8 @@ package no.nav.helse.testdata
 import java.util.*
 
 fun sykmelding(
-    vedtak: Vedtak
+    vedtak: Vedtak,
+    aktørId: String
 ) : String {
     return """
         {
@@ -11,7 +12,7 @@ fun sykmelding(
                       "type":"ARBEIDSTAKERE",
                       "fnr":"${vedtak.fnr}",
                       "status":"NY",
-                      "aktorId":"${vedtak.aktørId}",
+                      "aktorId":"$aktørId",
                       "sykmeldingId":"${UUID.randomUUID()}",
                       "arbeidsgiver":{
                         "navn":"Nærbutikken AS",

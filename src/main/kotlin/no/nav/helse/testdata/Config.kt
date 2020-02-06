@@ -27,7 +27,8 @@ fun setUpEnvironment() =
         vaultMountPath = System.getenv("VAULT_MOUNTPATH") ?: error("Mangler env var VAULT_MOUNTPATH"),
         inntektRestUrl = "https://app-q1.adeo.no/inntektskomponenten-ws/rs",
         serviceUser = readServiceUserCredentials(),
-        databaseUsername = System.getenv("DATABASE_USERNAME")
+        databaseUsername = System.getenv("DATABASE_USERNAME"),
+        aktørRestUrl = "https://app-q1.adeo.no/aktoerregister/api/v1"
     )
 
 data class Environment(
@@ -38,6 +39,7 @@ data class Environment(
     val databaseUsername: String?,
     val vaultMountPath: String,
     val inntektRestUrl: String,
+    val aktørRestUrl: String,
     val serviceUser: ServiceUser
 )
 

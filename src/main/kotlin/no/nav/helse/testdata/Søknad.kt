@@ -3,7 +3,8 @@ package no.nav.helse.testdata
 import java.util.*
 
 fun søknad(
-    vedtak: Vedtak
+    vedtak: Vedtak,
+    aktørId: String
 ) : String {
     return """
         {
@@ -11,7 +12,7 @@ fun søknad(
                       "fnr":"${vedtak.fnr}",
                       "type":"ARBEIDSTAKERE",
                       "status":"SENDT",
-                      "aktorId":"${vedtak.aktørId}",
+                      "aktorId":"$aktørId",
                       "sykmeldingId":"${UUID.randomUUID()}",
                       "arbeidsgiver":{
                         "navn":"Nærbutikken AS",

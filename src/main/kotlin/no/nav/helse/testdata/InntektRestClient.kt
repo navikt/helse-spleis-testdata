@@ -54,9 +54,6 @@ class InntektRestClient(
             }
 }
 
-class ResponseFailure(val statusCode: HttpStatusCode, val response: String) :
-    Exception("Failed to execute http call, responded with status code $statusCode")
-
 private fun toMånedListe(node: JsonNode) = node.path("arbeidsInntektMaaned").map(::tilMåned)
 
 private fun toInntekt(node: JsonNode) = Inntekt(

@@ -4,14 +4,14 @@
     import DateInput from './form/DateInput.svelte';
 
     let invalid = false;
-    let aktørId = '';
     let fnr = '';
     let orgnummer = '';
     let sykdomFom = '';
     let sykdomTom = '';
+    let inntekt = '';
 
     const onSubmit = async () => {
-        const vedtak = { aktørId, fnr, orgnummer, sykdomFom, sykdomTom };
+        const vedtak = { fnr, orgnummer, sykdomFom, sykdomTom };
 
         return await fetch(`/vedtaksperiode/`, {
             method: 'post',
@@ -19,12 +19,28 @@
             headers: { "Content-Type": "application/json" }
         });
     };
+
+    const hentInntekt = async (event) => {
+        event.preventDefault();
+        const result = await fetch(`/person/inntekt`, {
+            method: 'get',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "ident": fnr
+            }
+        });
+        let respons = await result.json();
+        inntekt = respons.beregnetMånedsinntekt;
+    }
 </script>
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
-    <Input bind:value={aktørId} label="Aktør-id" placeholder="Arbeidstakers aktør-id" invalid={invalid} required />
     <Input bind:value={fnr} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer" required />
     <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required />
+    <Input class="input" bind:value={inntekt} label="Inntekt" placeholder="0" required />
+    <button class="henteknapp" on:click={hentInntekt} style="width: max-content">Hent inntekt</button>
+
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." placeholder="F.eks. 2020-01-01" required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." placeholder="F.eks. 2020-01-30" required />
 </Form>

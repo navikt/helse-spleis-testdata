@@ -7,17 +7,19 @@ import io.ktor.routing.routing
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
+import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.Connection
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class AppTest {
 
@@ -72,7 +74,9 @@ class AppTest {
         withTestApplication({
             installJacksonFeature()
             routing {
-                registerVedtaksperiodeApi(producerMock)
+                registerVedtaksperiodeApi(
+                    producer = producerMock,
+                    aktørRestClient =  mockk { every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId")) })
             }
         }) {
             with(handleRequest(HttpMethod.Post, "/vedtaksperiode") {
@@ -80,11 +84,11 @@ class AppTest {
                 setBody(
                     """
                     {
-                        "aktørId": "123",
                         "fnr": "fnr",
                         "orgnummer": "orgnummer",
                         "sykdomFom": "2020-01-10",
-                        "sykdomTom": "2020-01-30"
+                        "sykdomTom": "2020-01-30",
+                        "inntekt": 0.0
                     }
                     """
                 )

@@ -56,14 +56,15 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
 val spleisTopic = "privat-helse-sykepenger-rapid-v1"
 
 
+
+
 fun main() = runBlocking {
     val environment = setUpEnvironment()
 
     val dataSourceBuilder = DataSourceBuilder(environment)
     val producer = KafkaProducer<String, String>(loadBaseConfig(environment).toProducerConfig())
 
-    val stsRestClient = StsRestClient("http://security-token-service", environment.serviceUser)
-    val inntektRestClient = InntektRestClient(environment.inntektRestUrl, HttpClient(CIO) {
+    val httpClient = HttpClient(CIO) {
         expectSuccess = false
         install(JsonFeature) {
             serializer = JacksonSerializer {
@@ -71,18 +72,24 @@ fun main() = runBlocking {
                 registerModule(JavaTimeModule())
             }
         }
-    }, stsRestClient)
+    }
+
+    val stsRestClient = StsRestClient("http://security-token-service", environment.serviceUser)
+    val inntektRestClient = InntektRestClient(environment.inntektRestUrl, httpClient, stsRestClient)
+    val aktørRestClient = AktørRestClient(environment.aktørRestUrl, httpClient, stsRestClient)
 
     launchApplication(
         dataSourceBuilder.getDataSource(),
         inntektRestClient,
+        aktørRestClient,
         producer
     )
 }
 
-fun launchApplication(
+internal fun launchApplication(
     dataSource: DataSource,
     inntektRestClient: InntektRestClient,
+    aktørRestClient: AktørRestClient,
     producer: KafkaProducer<String, String>
 ) {
     val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
@@ -103,7 +110,7 @@ fun launchApplication(
             routing {
                 registerHealthApi({ true }, { true }, meterRegistry)
                 registerPersonApi(personService)
-                registerVedtaksperiodeApi(producer)
+                registerVedtaksperiodeApi(producer, aktørRestClient)
                 registerInntektsApi(inntektRestClient)
 
                 static("/") {
@@ -155,20 +162,28 @@ fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/pe
     }
 }
 
-fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>) {
+internal fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>, aktørRestClient: AktørRestClient) {
     post("/vedtaksperiode") {
         val vedtak = call.receive<Vedtak>()
+        val aktørIdResult = aktørRestClient.hentAktørId(vedtak.fnr)
 
-        val sykmelding = sykmelding(vedtak)
-        val søknad = søknad(vedtak)
-        val inntektsmelding = inntektsmelding(vedtak)
+        if(aktørIdResult is Result.Error) {
+            call.respond(HttpStatusCode.InternalServerError, aktørIdResult.error.message!!)
+            return@post
+        }
 
-        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, sykmelding)).get()
-        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, søknad)).get()
-        producer.send(ProducerRecord(spleisTopic, vedtak.aktørId, inntektsmelding)).get()
+        val aktørId = aktørIdResult.unwrap()
+
+        val sykmelding = sykmelding(vedtak, aktørId)
+        val søknad = søknad(vedtak, aktørId)
+        val inntektsmelding = inntektsmelding(vedtak, aktørId)
+
+        producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
+        producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
+        producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
 
         call.respond(HttpStatusCode.OK)
-            .also { log.info("produsert data for vedtak på aktør: ${vedtak.aktørId}") }
+            .also { log.info("produsert data for vedtak på aktør: $aktørId") }
     }
 }
 
@@ -182,9 +197,9 @@ internal fun Application.installJacksonFeature() {
 }
 
 data class Vedtak(
-    val aktørId: String,
     val fnr: String,
     val orgnummer: String,
     val sykdomFom: LocalDate,
-    val sykdomTom: LocalDate
+    val sykdomTom: LocalDate,
+    val inntekt: Double
 )

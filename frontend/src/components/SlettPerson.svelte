@@ -5,7 +5,12 @@
     let fnr = '';
 
     const onSubmit = async () => {
-        return await fetch(`/person`, { method: 'delete' });
+        return await fetch(`/person`, {
+            method: 'delete',
+            headers: {
+                'ident': fnr
+            }
+        });
     };
 </script>
 

@@ -122,7 +122,7 @@ fun launchApplication(
 }
 
 fun Routing.registerPersonApi(personService: PersonService) {
-    delete("person") {
+    delete("/person") {
         val fnr = call.request.header("ident")
         personService.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
         call.respond(HttpStatusCode.OK)
@@ -156,7 +156,7 @@ fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/pe
 }
 
 fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>) {
-    post("vedtaksperiode") {
+    post("/vedtaksperiode") {
         val vedtak = call.receive<Vedtak>()
 
         val sykmelding = sykmelding(vedtak)

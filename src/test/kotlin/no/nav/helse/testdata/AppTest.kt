@@ -3,7 +3,6 @@ package no.nav.helse.testdata
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
-import io.ktor.request.header
 import io.ktor.routing.routing
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
@@ -57,7 +56,7 @@ class AppTest {
                 registerPersonApi(personService)
             }
         }) {
-            with(handleRequest(HttpMethod.Delete, "person"){
+            with(handleRequest(HttpMethod.Delete, "/person"){
                 addHeader("ident", fnr1)
             }) {
 
@@ -76,7 +75,7 @@ class AppTest {
                 registerVedtaksperiodeApi(producerMock)
             }
         }) {
-            with(handleRequest(HttpMethod.Post, "vedtaksperiode") {
+            with(handleRequest(HttpMethod.Post, "/vedtaksperiode") {
                 addHeader("Content-Type", "application/json")
                 setBody(
                     """

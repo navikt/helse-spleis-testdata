@@ -8,7 +8,6 @@ import io.ktor.client.request.header
 import io.ktor.client.response.HttpResponse
 import io.ktor.client.response.readText
 import io.ktor.http.ContentType
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 /**
@@ -19,12 +18,13 @@ class StsRestClient(
     private val serviceUser: ServiceUser,
     private val httpClient: HttpClient = HttpClient()
 ) {
-    private var cachedOidcToken: Token = runBlocking { fetchToken() }
+    private var cachedOidcToken: Token? = null
 
-    suspend fun token(): String {
-        if (cachedOidcToken.expired) cachedOidcToken = fetchToken()
-        return cachedOidcToken.access_token
-    }
+    suspend fun token() = getToken().access_token
+
+    private suspend fun getToken() = cachedOidcToken
+        ?.takeUnless { it.expired }
+        ?: fetchToken().also { cachedOidcToken = it }
 
     private suspend fun fetchToken(): Token = httpClient.get<HttpResponse>(
         "$baseUrl/rest/v1/sts/token?grant_type=client_credentials&scope=openid"

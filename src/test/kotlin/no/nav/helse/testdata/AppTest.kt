@@ -1,7 +1,13 @@
 package no.nav.helse.testdata
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
 import io.ktor.http.HttpMethod
+import io.ktor.http.fullPath
 import io.ktor.http.isSuccess
 import io.ktor.routing.routing
 import io.ktor.server.testing.handleRequest
@@ -14,13 +20,12 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import java.sql.Connection
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppTest {
 
     companion object {
@@ -58,7 +63,7 @@ class AppTest {
                 registerPersonApi(personService)
             }
         }) {
-            with(handleRequest(HttpMethod.Delete, "/person"){
+            with(handleRequest(HttpMethod.Delete, "/person") {
                 addHeader("ident", fnr1)
             }) {
 
@@ -76,7 +81,7 @@ class AppTest {
             routing {
                 registerVedtaksperiodeApi(
                     producer = producerMock,
-                    aktørRestClient =  mockk { every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId")) })
+                    aktørRestClient = mockk { every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId")) })
             }
         }) {
             with(handleRequest(HttpMethod.Post, "/vedtaksperiode") {
@@ -97,6 +102,47 @@ class AppTest {
             }
         }
     }
+
+    @Test
+    fun `slå opp inntekt`() {
+        withTestApplication({
+            installJacksonFeature()
+            routing {
+                registerInntektsApi(inntektRestClient)
+            }
+        }) {
+            with(handleRequest(HttpMethod.Get, "/person/inntekt") {
+                addHeader("Content-Type", "application/json")
+                addHeader("Accept", "application/json")
+                addHeader("ident", "fnr")
+            }) {
+                assertTrue(response.status()!!.isSuccess())
+            }
+        }
+    }
+
+    private val inntektRestClient = InntektRestClient(
+        "http://localhost.no", HttpClient(MockEngine) {
+            install(JsonFeature) {
+                this.serializer = JacksonSerializer()
+            }
+            engine {
+                addHandler { request ->
+                    if (request.url.fullPath.startsWith("/api/v1/hentinntektliste")) {
+                        respond("""{
+                                "ident": {
+                                "identifikator": "fnr",
+                                "aktoerType": "NATURLIG_IDENT"
+                            }
+                        }""")
+                    } else {
+                        error("Endepunktet finnes ikke ${request.url.fullPath}")
+                    }
+                }
+            }
+        },
+        mockk { every { runBlocking { token() } }.returns("token") }
+    )
 
     private fun opprettPerson(fnr: String) {
         using(sessionOf(embeddedPostgres.postgresDatabase), {

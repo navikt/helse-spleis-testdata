@@ -16,10 +16,10 @@ fun inntektsmelding(
                   "arbeidsgiverAktorId":"Don't care",
                   "arbeidsgivertype":"VIRKSOMHET",
                   "arbeidsforholdId":"42",
-                  "beregnetInntekt":"10000.01",
+                  "beregnetInntekt":"${vedtak.inntekt}",
                   "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                   "refusjon":{
-                    "beloepPrMnd":"10000.01",
+                    "beloepPrMnd":"${vedtak.inntekt}",
                     "opphoersdato":null
                   },
                   "endringIRefusjoner":[],

@@ -11,7 +11,7 @@
     let inntekt = '';
 
     const onSubmit = async () => {
-        const vedtak = { fnr, orgnummer, sykdomFom, sykdomTom };
+        const vedtak = { fnr, inntekt, orgnummer, sykdomFom, sykdomTom };
 
         return await fetch(`/vedtaksperiode/`, {
             method: 'post',

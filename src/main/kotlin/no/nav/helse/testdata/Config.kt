@@ -59,7 +59,7 @@ fun loadBaseConfig(env: Environment): Properties = Properties().also {
 
 fun Properties.toProducerConfig(): Properties = Properties().also {
     it.putAll(this)
-    it[ConsumerConfig.GROUP_ID_CONFIG] = "spleis-testdata-producer"
+    it[ConsumerConfig.GROUP_ID_CONFIG] = "spleis-testdata-v1"
     it[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
     it[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
 }

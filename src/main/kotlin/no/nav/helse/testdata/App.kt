@@ -53,7 +53,7 @@ val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
-val spleisTopic = "privat-helse-sykepenger-rapid-v1"
+val spleisTopic = "helse-rapid-v1"
 
 
 

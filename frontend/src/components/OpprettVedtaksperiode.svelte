@@ -6,8 +6,8 @@
     let invalid = false;
     let fnr = '';
     let orgnummer = '';
-    let sykdomFom = '';
-    let sykdomTom = '';
+    let sykdomFom = '2020-01-01';
+    let sykdomTom = '2020-01-31';
     let inntekt = '';
 
     const onSubmit = async () => {
@@ -40,6 +40,6 @@
     <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required />
     <Input class="input" bind:value={inntekt} label="Inntekt" placeholder="0" required />
 
-    <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." placeholder="F.eks. 2020-01-01" required />
-    <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." placeholder="F.eks. 2020-01-30" required />
+    <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
+    <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />
 </Form>

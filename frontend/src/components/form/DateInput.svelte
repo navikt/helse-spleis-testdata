@@ -4,7 +4,6 @@
 
     export let label = '';
     export let placeholder = '';
-    export let value = new Date();
     export let invalid = false;
     export let required = false
 </script>
@@ -17,7 +16,6 @@
         class:invalid
         bind:value={value}
         required={required}
-        placeholder={placeholder}
     />
     {#if invalid}
         <p>Ugyldig verdi</p>

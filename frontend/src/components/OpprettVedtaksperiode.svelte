@@ -36,10 +36,9 @@
 </script>
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
-    <Input bind:value={fnr} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer" required />
+    <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer" required />
     <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required />
     <Input class="input" bind:value={inntekt} label="Inntekt" placeholder="0" required />
-    <button class="henteknapp" on:click={hentInntekt} style="width: max-content">Hent inntekt</button>
 
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." placeholder="F.eks. 2020-01-01" required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." placeholder="F.eks. 2020-01-30" required />

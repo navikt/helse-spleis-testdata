@@ -5,6 +5,7 @@
     export let label;
     export let placeholder;
     export let value;
+    export let onblur = () => {};
     export let invalid = false;
     export let required = false;
 </script>
@@ -16,6 +17,7 @@
         type="text"
         class:invalid
         bind:value={value}
+        on:blur={onblur}
         required={required}
         placeholder={placeholder}
     />

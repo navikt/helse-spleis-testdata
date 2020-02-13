@@ -3,6 +3,7 @@
     const id = uuid();
 
     export let label = '';
+    export let value;
     export let placeholder = '';
     export let invalid = false;
     export let required = false

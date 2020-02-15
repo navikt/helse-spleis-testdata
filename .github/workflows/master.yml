@@ -46,4 +46,3 @@ jobs:
         cluster: dev-fss
         team: tbd
         resources: deploy/preprod.yaml
-        rawresources: deploy/alerts-preprod.yaml

@@ -93,7 +93,8 @@ class AppTest {
                         "orgnummer": "orgnummer",
                         "sykdomFom": "2020-01-10",
                         "sykdomTom": "2020-01-30",
-                        "inntekt": 0.0
+                        "inntekt": 0.0,
+                        "harAndreInntektskilder": true
                     }
                     """
                 )

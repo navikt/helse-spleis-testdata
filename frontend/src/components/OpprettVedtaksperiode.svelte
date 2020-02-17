@@ -9,9 +9,10 @@
     let sykdomFom = '2020-01-01';
     let sykdomTom = '2020-01-31';
     let inntekt = '';
+    let harAndreInntektskilder = false;
 
     const onSubmit = async () => {
-        const vedtak = { fnr, inntekt, orgnummer, sykdomFom, sykdomTom };
+        const vedtak = { fnr, inntekt, orgnummer, sykdomFom, sykdomTom, harAndreInntektskilder };
 
         return await fetch(`/vedtaksperiode/`, {
             method: 'post',
@@ -39,6 +40,8 @@
     <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer" required />
     <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required />
     <Input class="input" bind:value={inntekt} label="Inntekt" placeholder="0" required />
+    <label>Har andre inntektskilder:</label>
+    <input type=checkbox bind:checked={harAndreInntektskilder}>
 
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />

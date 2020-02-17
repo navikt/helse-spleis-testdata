@@ -201,5 +201,6 @@ data class Vedtak(
     val orgnummer: String,
     val sykdomFom: LocalDate,
     val sykdomTom: LocalDate,
-    val inntekt: Double
+    val inntekt: Double,
+    val harAndreInntektskilder: Boolean = false
 )

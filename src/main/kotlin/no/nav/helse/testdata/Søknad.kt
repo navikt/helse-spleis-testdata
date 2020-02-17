@@ -4,7 +4,8 @@ import java.util.*
 
 fun søknad(
     vedtak: Vedtak,
-    aktørId: String
+    aktørId: String,
+    andreInntektskilder: Boolean = false
 ) : String {
     return """
         {
@@ -34,7 +35,7 @@ fun søknad(
                       "egenmeldinger":[],
                       "papirsykmeldinger":null,
                       "fravar":[],
-                      "andreInntektskilder":[],
+                      "andreInntektskilder":[${if(andreInntektskilder) { return "{\"type\": \"Arbeid\", \"sykmeldt\": true }"} else {""}}],
                       "soknadsperioder":[
                         {
                           "fom":"${vedtak.sykdomFom}",

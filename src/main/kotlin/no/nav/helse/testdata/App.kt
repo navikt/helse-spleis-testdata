@@ -109,7 +109,7 @@ internal fun launchApplication(
 
             routing {
                 registerHealthApi({ true }, { true }, meterRegistry)
-                registerPersonApi(personService)
+                registerPersonApi(personService, aktørRestClient)
                 registerVedtaksperiodeApi(producer, aktørRestClient)
                 registerInntektsApi(inntektRestClient)
 
@@ -128,15 +128,24 @@ internal fun launchApplication(
     }
 }
 
-fun Routing.registerPersonApi(personService: PersonService) {
+internal fun Routing.registerPersonApi(personService: PersonService, aktørRestClient: AktørRestClient) {
     delete("/person") {
         val fnr = call.request.header("ident")
         personService.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
         call.respond(HttpStatusCode.OK)
     }
+    get("/person/aktorid") {
+        val fnr = call.request.header("ident")
+            ?: return@get call.respond(HttpStatusCode.BadRequest, "Mangler ident i requesten")
+
+        return@get when(val res = aktørRestClient.hentAktørId(fnr)) {
+            is Result.Ok -> call.respond(HttpStatusCode.OK, res.value)
+            is Result.Error -> call.respond(HttpStatusCode.InternalServerError, "Feil")
+        }
+    }
 }
 
-fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/person/inntekt") {
+internal fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/person/inntekt") {
 
     val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
     val end = YearMonth.now().minusMonths(1)

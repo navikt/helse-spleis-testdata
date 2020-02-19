@@ -3,11 +3,13 @@
     import OpprettVedtaksperiode from './OpprettVedtaksperiode.svelte';
     import SectionButton from './SectionButton.svelte';
     import HentInntekt from "./HentInntekt.svelte";
+    import HentAktørId from "./HentAktørid.svelte";
 
     const Section = {
         SLETT_PERSON: 'slettperson',
         OPPRETT_VEDTAKSPERIODE: 'opprettvedtaksperiode',
-        HENT_INNTEKT: "hentinntekt"
+        HENT_INNTEKT: "hentinntekt",
+        HENT_AKTØRID: "hentaktørid"
     };
 
     let activeSection = Section.SLETT_PERSON;
@@ -30,6 +32,11 @@
         isActive={activeSection === Section.HENT_INNTEKT}
         onClick={() => activeSection = Section.HENT_INNTEKT}
     />
+    <SectionButton
+            label="hent aktørId"
+            isActive={activeSection === Section.HENT_AKTØRID}
+            onClick={() => activeSection = Section.HENT_AKTØRID}
+    />
 </header>
 <hr>
 {#if activeSection === Section.SLETT_PERSON}
@@ -38,6 +45,8 @@
     <OpprettVedtaksperiode />
 {:else if activeSection === Section.HENT_INNTEKT}
     <HentInntekt />
+{:else if activeSection === Section.HENT_AKTØRID}
+    <HentAktørId />
 {/if}
 
 <style>

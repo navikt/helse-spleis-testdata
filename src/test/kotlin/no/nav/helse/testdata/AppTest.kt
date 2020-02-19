@@ -8,6 +8,7 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.http.HttpMethod
 import io.ktor.http.fullPath
+import io.ktor.http.headersOf
 import io.ktor.http.isSuccess
 import io.ktor.routing.routing
 import io.ktor.server.testing.handleRequest
@@ -60,7 +61,7 @@ class AppTest {
 
         withTestApplication({
             routing {
-                registerPersonApi(personService)
+                registerPersonApi(personService, aktørRestClient)
             }
         }) {
             with(handleRequest(HttpMethod.Delete, "/person") {
@@ -122,28 +123,23 @@ class AppTest {
         }
     }
 
-    private val inntektRestClient = InntektRestClient(
-        "http://localhost.no", HttpClient(MockEngine) {
-            install(JsonFeature) {
-                this.serializer = JacksonSerializer()
+    @Test
+    fun `slå opp aktørId`() {
+        withTestApplication({
+            installJacksonFeature()
+            routing {
+                registerPersonApi(personService, aktørRestClient)
             }
-            engine {
-                addHandler { request ->
-                    if (request.url.fullPath.startsWith("/api/v1/hentinntektliste")) {
-                        respond("""{
-                                "ident": {
-                                "identifikator": "fnr",
-                                "aktoerType": "NATURLIG_IDENT"
-                            }
-                        }""")
-                    } else {
-                        error("Endepunktet finnes ikke ${request.url.fullPath}")
-                    }
-                }
+        }) {
+            with(handleRequest(HttpMethod.Get, "/person/aktorid") {
+                addHeader("Content-Type", "application/json")
+                addHeader("Accept", "application/json")
+                addHeader("ident", "fnr")
+            }) {
+                assertTrue(response.status()!!.isSuccess())
             }
-        },
-        mockk { every { runBlocking { token() } }.returns("token") }
-    )
+        }
+    }
 
     private fun opprettPerson(fnr: String) {
         using(sessionOf(embeddedPostgres.postgresDatabase), {

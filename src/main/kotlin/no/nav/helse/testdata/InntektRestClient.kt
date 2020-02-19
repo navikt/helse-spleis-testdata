@@ -14,7 +14,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import java.time.YearMonth
 
-class InntektRestClient(
+internal class InntektRestClient(
     private val baseUrl: String,
     private val httpClient: HttpClient,
     private val stsRestClient: StsRestClient

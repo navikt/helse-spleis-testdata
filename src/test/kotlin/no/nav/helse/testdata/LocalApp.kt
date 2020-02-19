@@ -25,7 +25,7 @@ fun main() {
                 }
             )
         )
-    }, mockk(), producer)
+    }, mockk { every { runBlocking { hentAktørId(any())}} .returns( Result.Ok("aktørId")) }, producer)
 }
 
 fun runMigration(embeddedPostgres: EmbeddedPostgres) =

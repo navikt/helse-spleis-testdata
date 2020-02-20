@@ -8,7 +8,7 @@ fun inntektsmelding(
 ): String {
     return """
         {
-                  "inntektsmeldingId":"${(Math.random() * 10000000).toInt()}",
+                  "inntektsmeldingId":"${UUID.randomUUID()}",
                   "arbeidstakerFnr":"${vedtak.fnr}",
                   "arbeidstakerAktorId":"$aktørId",
                   "virksomhetsnummer":"${vedtak.orgnummer}",

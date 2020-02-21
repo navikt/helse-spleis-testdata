@@ -10,7 +10,7 @@
     let sykdomTom = '2020-01-31';
     let inntekt = '';
     let harAndreInntektskilder = false;
-    let gjenopprett = true;
+    let gjenopprett = false;
 
     const onSubmit = async () => {
         const vedtak = { fnr, inntekt, orgnummer, sykdomFom, sykdomTom, harAndreInntektskilder };

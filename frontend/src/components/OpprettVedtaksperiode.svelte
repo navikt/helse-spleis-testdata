@@ -10,10 +10,17 @@
     let sykdomTom = '2020-01-31';
     let inntekt = '';
     let harAndreInntektskilder = false;
+    let gjenopprett = true;
 
     const onSubmit = async () => {
         const vedtak = { fnr, inntekt, orgnummer, sykdomFom, sykdomTom, harAndreInntektskilder };
 
+        if (gjenopprett) {
+            await fetch(`/person`, {
+                method: 'delete',
+                headers: { 'ident': fnr }
+            });
+        }
         return await fetch(`/vedtaksperiode/`, {
             method: 'post',
             body: JSON.stringify(vedtak),
@@ -38,10 +45,17 @@
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
     <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer" required />
+    <span class=checkbox-row>
+        <label for=gjenopprett>Slett og gjenskap data for personen:
+            <input type=checkbox id=gjenopprett bind:checked={gjenopprett} />
+        </label>
+    </span>
     <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required />
-    <Input class="input" bind:value={inntekt} label="Inntekt" placeholder="0" required />
-    <label>Har andre inntektskilder:</label>
-    <input type=checkbox bind:checked={harAndreInntektskilder}>
+    <Input bind:value={inntekt} label="Inntekt" placeholder="0" required />
+    <span class=checkbox-row>
+        <label for=inntekstkilder>Har andre inntektskilder:
+        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder} /></label>
+    </span>
 
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />

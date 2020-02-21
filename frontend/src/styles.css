@@ -31,6 +31,13 @@ input[type="date"], input[type="text"] {
     transition: box-shadow 0.2s;
 }
 
+.checkbox-row {
+    display: flex;
+}
+.checkbox-row input[type="checkbox"] {
+    margin-left: 0.5rem
+}
+
 input:hover { border-color: var(--active-color); }
 
 input:focus {

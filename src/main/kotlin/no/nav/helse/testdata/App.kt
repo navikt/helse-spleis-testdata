@@ -22,20 +22,12 @@ import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
-import io.ktor.routing.Routing
-import io.ktor.routing.delete
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.routing
+import io.ktor.routing.*
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
@@ -43,7 +35,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
@@ -54,8 +46,6 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
 val spleisTopic = "helse-rapid-v1"
-
-
 
 
 fun main() = runBlocking {
@@ -138,7 +128,7 @@ internal fun Routing.registerPersonApi(personService: PersonService, aktørRestC
         val fnr = call.request.header("ident")
             ?: return@get call.respond(HttpStatusCode.BadRequest, "Mangler ident i requesten")
 
-        return@get when(val res = aktørRestClient.hentAktørId(fnr)) {
+        return@get when (val res = aktørRestClient.hentAktørId(fnr)) {
             is Result.Ok -> call.respond(HttpStatusCode.OK, res.value)
             is Result.Error -> call.respond(HttpStatusCode.InternalServerError, "Feil")
         }
@@ -171,12 +161,15 @@ internal fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) =
     }
 }
 
-internal fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, String>, aktørRestClient: AktørRestClient) {
+internal fun Routing.registerVedtaksperiodeApi(
+    producer: KafkaProducer<String, String>,
+    aktørRestClient: AktørRestClient
+) {
     post("/vedtaksperiode") {
         val vedtak = call.receive<Vedtak>()
         val aktørIdResult = aktørRestClient.hentAktørId(vedtak.fnr)
 
-        if(aktørIdResult is Result.Error) {
+        if (aktørIdResult is Result.Error) {
             call.respond(HttpStatusCode.InternalServerError, aktørIdResult.error.message!!)
             return@post
         }
@@ -185,11 +178,13 @@ internal fun Routing.registerVedtaksperiodeApi(producer: KafkaProducer<String, S
 
         val sykmelding = sykmelding(vedtak, aktørId)
         val søknad = søknad(vedtak, aktørId)
-        val inntektsmelding = inntektsmelding(vedtak, aktørId)
 
         producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
         producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
-        producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
+        if (vedtak.skalSendeInntektsmelding) {
+            val inntektsmelding = inntektsmelding(vedtak, aktørId)
+            producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
+        }
 
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for vedtak på aktør: $aktørId") }
@@ -211,5 +206,6 @@ data class Vedtak(
     val sykdomFom: LocalDate,
     val sykdomTom: LocalDate,
     val inntekt: Double,
-    val harAndreInntektskilder: Boolean = false
+    val harAndreInntektskilder: Boolean = false,
+    val skalSendeInntektsmelding: Boolean = true
 )

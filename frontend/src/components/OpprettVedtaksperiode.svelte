@@ -11,20 +11,29 @@
     let inntekt = '';
     let harAndreInntektskilder = false;
     let gjenopprett = false;
+    let skalSendeInntektsmelding = true;
 
     const onSubmit = async () => {
-        const vedtak = { fnr, inntekt, orgnummer, sykdomFom, sykdomTom, harAndreInntektskilder };
+        const vedtak = {
+            fnr,
+            inntekt,
+            orgnummer,
+            sykdomFom,
+            sykdomTom,
+            harAndreInntektskilder,
+            skalSendeInntektsmelding
+        };
 
         if (gjenopprett) {
             await fetch(`/person`, {
                 method: 'delete',
-                headers: { 'ident': fnr }
+                headers: {'ident': fnr}
             });
         }
         return await fetch(`/vedtaksperiode/`, {
             method: 'post',
             body: JSON.stringify(vedtak),
-            headers: { "Content-Type": "application/json" }
+            headers: {"Content-Type": "application/json"}
         });
     };
 
@@ -44,19 +53,24 @@
 </script>
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
-    <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer" required />
+    <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer"
+           required/>
     <span class=checkbox-row>
         <label for=gjenopprett>Slett og gjenskap data for personen:
-            <input type=checkbox id=gjenopprett bind:checked={gjenopprett} />
+            <input type=checkbox id=gjenopprett bind:checked={gjenopprett}/>
         </label>
     </span>
-    <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required />
-    <Input bind:value={inntekt} label="Inntekt" placeholder="0" required />
+    <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required/>
+    <Input bind:value={inntekt} label="Inntekt" placeholder="0" required/>
+    <span class="checkbox-row">
+        <label for=sendInntektsmelding>Send inntektsmelding:
+            <input type="checkbox" id=sendInntektsmelding bind:checked={skalSendeInntektsmelding}/></label>
+    </span>
     <span class=checkbox-row>
         <label for=inntekstkilder>Har andre inntektskilder:
-        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder} /></label>
+        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder}/></label>
     </span>
 
-    <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
-    <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />
+    <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required/>
+    <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required/>
 </Form>

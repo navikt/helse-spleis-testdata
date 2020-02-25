@@ -3,7 +3,15 @@ set -o pipefail
 tmp_dir=/tmp/istub-cli
 authdataFile=$tmp_dir/authdata
 tokens=$tmp_dir/tokens
-STUB_API=https://app-q1.adeo.no/inntektstub/api/v1
+STUB_BASE_URL=https://app-q1.adeo.no
+STUB_API=${STUB_BASE_URL}/inntektstub/api/v1
+
+function checkConnectivity {
+    if ! curl -Is ${STUB_BASE_URL} > /dev/null; then
+        msg Tilgang til ${STUB_BASE_URL} ser ikke ut til å være på plass
+        return 1
+    fi
+}
 
 function auth {
     mkdir -p $tmp_dir
@@ -16,8 +24,11 @@ function auth {
     echo USER_CREDS=$(echo -n $username:$password | base64) >> $tokens
 
     curl -s -D $authdataFile "${STUB_API}/user" -H "Authorization: Basic $(basic_auth)" | jq -e '.token' > /dev/null
-    if [[ $? -ne 0 ]]; then msg Fikk feil ved auth mot iStubben, prøv på nytt && return 1; fi
-    
+    if [[ $? -ne 0 ]]; then
+        checkConnectivity && msg Fikk feil ved auth mot iStubben, prøv på nytt
+        return 1
+    fi
+
     echo JSESSIONID=$(getCookieValue JSESSION) >> $tokens
     echo BIGIP=$(getCookieValue BIGip) >> $tokens
     echo XSRF=$(getCookieValue XSRF) >> $tokens
@@ -111,7 +122,6 @@ function _slett_inntekt {
             -H 'Accept: application/json' \
             -H "X-XSRF-TOKEN: ${XSRF}" \
             -H 'Content-Type: application/json;charset=UTF-8' \
-            -H 'Origin: https://app-q1.adeo.no' \
             -H "Cookie: JSESSIONID=${JSESSIONID}; \
                 XSRF-TOKEN=${XSRF}; \
                 BIGipServer~AutoProv~pool_pp_inntektstub_q1_https_auto=${BIGIP}" \
@@ -132,3 +142,5 @@ function getCookieValue {
 function msg {
     echo -e "\n$@\n"
 }
+
+checkConnectivity

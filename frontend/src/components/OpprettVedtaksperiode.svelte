@@ -55,21 +55,25 @@
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
     <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer"
            required/>
-    <span class=checkbox-row>
-        <label for=gjenopprett>Slett og gjenskap data for personen:
+        <label class="switch" for=gjenopprett>Slett og gjenskap data for personen
             <input type=checkbox id=gjenopprett bind:checked={gjenopprett}/>
+            <span class="slider"></span>
         </label>
-    </span>
+    <br/>
     <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required/>
-    <Input bind:value={inntekt} label="Inntekt" placeholder="0" required/>
-    <span class="checkbox-row">
-        <label for=sendInntektsmelding>Send inntektsmelding:
-            <input type="checkbox" id=sendInntektsmelding bind:checked={skalSendeInntektsmelding}/></label>
-    </span>
-    <span class=checkbox-row>
-        <label for=inntekstkilder>Har andre inntektskilder:
-        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder}/></label>
-    </span>
+    <br/>
+    <Input bind:value={inntekt} label="Inntekt" placeholder="0" required={skalSendeInntektsmelding}
+           disabled={!skalSendeInntektsmelding}/>
+
+    <label class="switch" for=sendInntektsmelding>Send inntektsmelding
+        <input type="checkbox" id=sendInntektsmelding bind:checked={skalSendeInntektsmelding}/>
+    <span class="slider"></span></label>
+
+        <label class="switch" for=inntekstkilder>Har andre inntektskilder
+        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder}/>
+        <span class="slider"></span> </label>
+
+    <br/>
 
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required/>
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required/>

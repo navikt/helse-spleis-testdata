@@ -8,6 +8,7 @@
     export let onblur = () => {};
     export let invalid = false;
     export let required = false;
+    export let disabled = false;
 </script>
 
 <label for={id}>{label}</label>
@@ -16,10 +17,12 @@
         id={id}
         type="text"
         class:invalid
+        class={disabled ? "hide" : ""}
         bind:value={value}
         on:blur={onblur}
         required={required}
         placeholder={placeholder}
+        disabled={disabled}
     />
     {#if invalid}
         <p>Ugyldig verdi</p>

@@ -12,6 +12,8 @@
     let harAndreInntektskilder = false;
     let gjenopprett = false;
     let skalSendeInntektsmelding = true;
+    let skalSendeSykmelding = true;
+    let skalSendeSøknad = true;
 
     const onSubmit = async () => {
         const vedtak = {
@@ -21,7 +23,9 @@
             sykdomFom,
             sykdomTom,
             harAndreInntektskilder,
-            skalSendeInntektsmelding
+            skalSendeInntektsmelding,
+            skalSendeSykmelding,
+            skalSendeSøknad
         };
 
         if (gjenopprett) {
@@ -54,27 +58,56 @@
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
     <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer"
-           required/>
-        <label class="switch" for=gjenopprett>Slett og gjenskap data for personen
-            <input type=checkbox id=gjenopprett bind:checked={gjenopprett}/>
-            <span class="slider"></span>
-        </label>
-    <br/>
-    <Input bind:value={orgnummer} label="Organisasjonsnummer" placeholder="Arbeidsgivers organisasjonsnummer" required/>
-    <br/>
-    <Input bind:value={inntekt} label="Inntekt" placeholder="0" required={skalSendeInntektsmelding}
-           disabled={!skalSendeInntektsmelding}/>
+           required />
+    <label class="switch" for=gjenopprett>Slett og gjenskap data for personen
+        <input type=checkbox id=gjenopprett bind:checked={gjenopprett} />
+        <span class="slider"></span>
+    </label>
+    <br />
+    <Input
+        bind:value={orgnummer}
+        label="Organisasjonsnummer"
+        placeholder="Arbeidsgivers
+        organisasjonsnummer"
+        required
+    />
+    <br />
+    <Input
+        bind:value={inntekt}
+        label="Inntekt"
+        placeholder="0"
+        required={skalSendeInntektsmelding}
+        disabled={!skalSendeInntektsmelding}
+    />
 
+    <label class="switch" for=sendSykmelding>Send sykmelding
+        <input type="checkbox" id=sendSykmelding bind:checked={skalSendeSykmelding} />
+        <span class="slider"></span>
+    </label>
+    <label class="switch" for=sendSøknad>Send søknad
+        <input type="checkbox" id=sendSøknad bind:checked={skalSendeSøknad} />
+        <span class="slider"></span>
+    </label>
     <label class="switch" for=sendInntektsmelding>Send inntektsmelding
-        <input type="checkbox" id=sendInntektsmelding bind:checked={skalSendeInntektsmelding}/>
-    <span class="slider"></span></label>
+        <input type="checkbox" id=sendInntektsmelding bind:checked={skalSendeInntektsmelding} />
+        <span class="slider"></span>
+    </label>
 
-        <label class="switch" for=inntekstkilder>Har andre inntektskilder
-        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder}/>
-        <span class="slider"></span> </label>
+    <label class="switch" for=inntekstkilder>Har andre inntektskilder
+        <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder} />
+        <span class="slider"></span>
+    </label>
 
-    <br/>
+    <br />
 
-    <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required/>
-    <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required/>
+    <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
+    <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />
+
+    <label>
+        Dette er en slider!
+        <br/>
+        mort <input type="range"> mortest
+    </label>
 </Form>
+]
+

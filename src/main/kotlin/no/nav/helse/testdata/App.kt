@@ -22,12 +22,20 @@ import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
-import io.ktor.routing.*
+import io.ktor.routing.Routing
+import io.ktor.routing.delete
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
@@ -35,7 +43,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
@@ -178,9 +186,12 @@ internal fun Routing.registerVedtaksperiodeApi(
 
         val sykmelding = sykmelding(vedtak, aktørId)
         val søknad = søknad(vedtak, aktørId)
-
-        producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
-        producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
+        if (vedtak.skalSendeSykmelding) {
+            producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
+        }
+        if (vedtak.skalSendeSøknad) {
+            producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
+        }
         if (vedtak.skalSendeInntektsmelding) {
             val inntektsmelding = inntektsmelding(vedtak, aktørId)
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
@@ -207,5 +218,7 @@ data class Vedtak(
     val sykdomTom: LocalDate,
     val inntekt: Double,
     val harAndreInntektskilder: Boolean = false,
-    val skalSendeInntektsmelding: Boolean = true
+    val skalSendeInntektsmelding: Boolean = true,
+    val skalSendeSykmelding: Boolean = true,
+    val skalSendeSøknad: Boolean = true
 )

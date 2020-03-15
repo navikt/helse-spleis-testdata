@@ -2,6 +2,7 @@
     import Input from './form/Input.svelte';
     import Form from './form/Form.svelte';
     import DateInput from './form/DateInput.svelte';
+    import NumberInput from "./form/NumberInput.svelte";
 
     let invalid = false;
     let fnr = '';
@@ -14,6 +15,8 @@
     let skalSendeInntektsmelding = true;
     let skalSendeSykmelding = true;
     let skalSendeSøknad = true;
+    let sendtNav = '2020-02-01';
+    let sykmeldingsgrad = 100;
 
     const onSubmit = async () => {
         const vedtak = {
@@ -25,7 +28,9 @@
             harAndreInntektskilder,
             skalSendeInntektsmelding,
             skalSendeSykmelding,
-            skalSendeSøknad
+            skalSendeSøknad,
+            sendtNav,
+            sykmeldingsgrad
         };
 
         if (gjenopprett) {
@@ -67,8 +72,7 @@
     <Input
         bind:value={orgnummer}
         label="Organisasjonsnummer"
-        placeholder="Arbeidsgivers
-        organisasjonsnummer"
+        placeholder="Arbeidsgivers organisasjonsnummer"
         required
     />
     <br />
@@ -103,11 +107,15 @@
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />
 
+    <DateInput bind:value={sendtNav} label="Søknad sendt NAV" required />
+
+    <NumberInput bind:value={sykmeldingsgrad} label="Sykmeldingsgrad" placeholder="Sykdomsgrad på sykmeldingen" required min=0 max=100 />
+
     <label>
         Dette er en slider!
         <br/>
         mort <input type="range"> mortest
     </label>
+
 </Form>
-]
 

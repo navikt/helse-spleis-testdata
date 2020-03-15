@@ -42,6 +42,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -220,5 +221,7 @@ data class Vedtak(
     val harAndreInntektskilder: Boolean = false,
     val skalSendeInntektsmelding: Boolean = true,
     val skalSendeSykmelding: Boolean = true,
-    val skalSendeSøknad: Boolean = true
+    val skalSendeSøknad: Boolean = true,
+    val sykmeldingsgrad: Int = 100,
+    val sendtNav: LocalDate = sykdomTom.plusDays(1)
 )

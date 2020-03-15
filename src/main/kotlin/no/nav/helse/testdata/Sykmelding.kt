@@ -41,7 +41,7 @@ fun sykmelding(
             {
               "fom":"${vedtak.sykdomFom}",
               "tom":"${vedtak.sykdomTom}",
-              "sykmeldingsgrad":100,
+              "sykmeldingsgrad":${vedtak.sykmeldingsgrad},
               "faktiskGrad":null,
               "avtaltTimer":null,
               "faktiskTimer":null,

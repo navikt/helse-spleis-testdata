@@ -31,7 +31,7 @@ fun søknad(
             "arbeidGjenopptatt":null,
             "sykmeldingSkrevet":"${vedtak.sykdomFom.atStartOfDay()}",
             "opprettet":"${vedtak.sykdomFom.atStartOfDay()}",
-            "sendtNav":"${vedtak.sykdomTom.plusDays(1).atStartOfDay()}",
+            "sendtNav":"${vedtak.sendtNav.atStartOfDay()}",
             "sendtArbeidsgiver":"${vedtak.sykdomTom.plusDays(1).atStartOfDay()}",
             "egenmeldinger":[],
             "papirsykmeldinger":null,
@@ -41,7 +41,7 @@ fun søknad(
             {
               "fom":"${vedtak.sykdomFom}",
               "tom":"${vedtak.sykdomTom}",
-              "sykmeldingsgrad":100,
+              "sykmeldingsgrad":${vedtak.sykmeldingsgrad},
               "faktiskGrad":null,
               "avtaltTimer":null,
               "faktiskTimer":null,

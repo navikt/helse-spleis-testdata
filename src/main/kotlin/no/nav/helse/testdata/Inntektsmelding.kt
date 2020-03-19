@@ -7,7 +7,7 @@ fun inntektsmelding(
     aktørId: String
 ): String {
     val førstefraværsdag = vedtak.førstefraværsdag ?: vedtak.sykdomFom
-    val arbeidsgiverperiode = vedtak.arbeidsgiverperiode.takeIf { it.isNotEmpty() } ?: listOf(Periode(førstefraværsdag, førstefraværsdag.plusDays(15)))
+    val arbeidsgiverperioder = vedtak.arbeidsgiverperiode.takeIf { it.isNotEmpty() } ?: listOf(Periode(førstefraværsdag, førstefraværsdag.plusDays(15)))
 
     return """
         {
@@ -30,9 +30,7 @@ fun inntektsmelding(
             "endringIRefusjoner":[],
             "opphoerAvNaturalytelser":[],
             "gjenopptakelseNaturalytelser":[],
-            "arbeidsgiverperioder":[
-            ${arbeidsgiverperiode.map { """{"fom": "${it.fom}", "tom":"${it.tom}"}""" }}
-            ],
+            "arbeidsgiverperioder": ${arbeidsgiverperioder.map { """{"fom": "${it.fom}", "tom":"${it.tom}"}""" }},
             "ferieperioder":[],
             "status":"GYLDIG",
             "arkivreferanse":"ENARKIVREFERANSE",

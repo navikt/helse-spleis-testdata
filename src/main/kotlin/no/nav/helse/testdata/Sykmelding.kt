@@ -1,5 +1,6 @@
 package no.nav.helse.testdata
 
+import java.time.LocalDateTime
 import java.util.*
 
 fun sykmelding(
@@ -10,6 +11,7 @@ fun sykmelding(
         {
             "@event_name": "ny_søknad",
             "@id":"${UUID.randomUUID()}",
+            "@opprettet":"${LocalDateTime.now()}",
             "id":"${UUID.randomUUID()}",
             "type":"ARBEIDSTAKERE",
             "fnr":"${vedtak.fnr}",
@@ -51,6 +53,6 @@ fun sykmelding(
             "sporsmal":null,
             "hendelseId":"${UUID.randomUUID()}"
         }   
-    """
+    """.also { assertValidJson(it) }
 }
 

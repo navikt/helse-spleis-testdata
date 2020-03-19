@@ -41,8 +41,9 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.IOException
+import java.lang.RuntimeException
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -182,16 +183,16 @@ internal fun Routing.registerVedtaksperiodeApi(
             call.respond(HttpStatusCode.InternalServerError, aktørIdResult.error.message!!)
             return@post
         }
-
         val aktørId = aktørIdResult.unwrap()
-        val sykmelding = sykmelding(vedtak, aktørId)
-        val søknad = søknad(vedtak, aktørId)
+
         if (vedtak.skalSendeSykmelding) {
             log.info("produserer sykmelding på aktør: $aktørId")
+            val sykmelding = sykmelding(vedtak, aktørId)
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
         }
         if (vedtak.skalSendeSøknad) {
             log.info("produserer søknad på aktør: $aktørId")
+            val søknad = søknad(vedtak, aktørId)
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
         }
         if (vedtak.skalSendeInntektsmelding) {
@@ -203,6 +204,16 @@ internal fun Routing.registerVedtaksperiodeApi(
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for vedtak på aktør: $aktørId") }
     }
+}
+
+fun assertValidJson(json: String) {
+    try {
+        objectMapper.readTree(json)
+    } catch (e: IOException) {
+        log.error("meldingen inneholder ugyldig JSON")
+        throw RuntimeException("meldingen inneholder ugyldig JSON")
+    }
+
 }
 
 internal fun Application.installJacksonFeature() {

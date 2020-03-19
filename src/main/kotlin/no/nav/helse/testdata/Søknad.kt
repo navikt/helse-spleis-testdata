@@ -1,5 +1,6 @@
 package no.nav.helse.testdata
 
+import java.time.LocalDateTime
 import java.util.*
 
 fun søknad(
@@ -10,6 +11,7 @@ fun søknad(
         {
             "@event_name": "sendt_søknad",
             "@id":"${UUID.randomUUID()}",
+            "@opprettet":"${LocalDateTime.now()}",
             "id":"${UUID.randomUUID()}",
             "fnr":"${vedtak.fnr}",
             "type":"ARBEIDSTAKERE",
@@ -51,6 +53,6 @@ fun søknad(
             "sporsmal":null,
             "hendelseId":"${UUID.randomUUID()}"
             }   
-    """
+    """.also { assertValidJson(it) }
 }
 

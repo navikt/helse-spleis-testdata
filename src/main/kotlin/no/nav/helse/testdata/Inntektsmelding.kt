@@ -1,5 +1,6 @@
 package no.nav.helse.testdata
 
+import java.time.LocalDateTime
 import java.util.*
 
 fun inntektsmelding(
@@ -13,6 +14,7 @@ fun inntektsmelding(
         {
             "@event_name": "inntektsmelding",
             "@id":"${UUID.randomUUID()}",
+            "@opprettet":"${LocalDateTime.now()}",
             "inntektsmeldingId":"${UUID.randomUUID()}",
             "arbeidstakerFnr":"${vedtak.fnr}",
             "arbeidstakerAktorId":"$aktørId",
@@ -38,5 +40,5 @@ fun inntektsmelding(
             "foersteFravaersdag":"$førstefraværsdag",
             "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"
             } 
-    """
+    """.also { assertValidJson(it) }
 }

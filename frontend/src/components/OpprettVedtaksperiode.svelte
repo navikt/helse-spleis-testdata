@@ -111,16 +111,17 @@
 
     <br />
 
+    <div>
+        <DateInput bind:value={førstefraværsdag} label="Første fraværsdag"/>
+        <span>Legg inn arbeidsgiverperioder: <button on:click|preventDefault={leggTilPeriode}> + </button></span>
+        {#each arbeidsgiverperiode as _, i}
+            <DateInput bind:value={arbeidsgiverperiode[i].fom} label="Arbeidsgiverperiode FOM" required />
+            <DateInput bind:value={arbeidsgiverperiode[i].tom} label="Arbeidsgiverperiode TOM" required />
+        {/each}
+    </div>
+
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />
-
-
-    <DateInput bind:value={førstefraværsdag} label="Første fraværsdag"/>
-    {#each arbeidsgiverperiode as _, i}
-        <DateInput bind:value={arbeidsgiverperiode[i].fom} label="Arbeidsgiverperiode FOM" required />
-        <DateInput bind:value={arbeidsgiverperiode[i].tom} label="Arbeidsgiverperiode TOM" required />
-    {/each}
-
     <DateInput bind:value={sendtNav} label="Søknad sendt NAV" required />
 
     <NumberInput bind:value={sykmeldingsgrad} label="Sykmeldingsgrad" placeholder="Sykdomsgrad på sykmeldingen" required min=0 max=100 />
@@ -132,7 +133,4 @@
     </label>
 
 </Form>
-
-<p>Ekstra arbeidsgiverperiode: </p><button on:click={leggTilPeriode}> + </button>
-
 

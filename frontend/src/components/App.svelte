@@ -12,20 +12,20 @@
         HENT_AKTØRID: "hentaktørid"
     };
 
-    let activeSection = Section.SLETT_PERSON;
+    let activeSection = Section.OPPRETT_VEDTAKSPERIODE;
 </script>
 
 <header>
     <h1>spleis testdata</h1>
     <SectionButton
-        label="slett person"
-        isActive={activeSection === Section.SLETT_PERSON}
-        onClick={() => activeSection = Section.SLETT_PERSON}
+            label="slett person"
+            isActive={activeSection === Section.SLETT_PERSON}
+            onClick={() => activeSection = Section.SLETT_PERSON}
     />
     <SectionButton
-        label="opprett vedtaksperiode"
-        isActive={activeSection === Section.OPPRETT_VEDTAKSPERIODE}
-        onClick={() => activeSection = Section.OPPRETT_VEDTAKSPERIODE}
+            label="opprett vedtaksperiode"
+            isActive={activeSection === Section.OPPRETT_VEDTAKSPERIODE}
+            onClick={() => activeSection = Section.OPPRETT_VEDTAKSPERIODE}
     />
     <SectionButton
         label="hent inntekt"

@@ -3,10 +3,14 @@
 
     export let value = '';
     export let disabled = false;
+    export let theme = 'green';
 </script>
 
 <div class="wrapper">
-    <input type="submit" value={value} disabled={disabled} />
+    <input type="submit" value={value} disabled={disabled} style="
+        --active-color:{theme !== 'green' ? '#ff5666' : '#00b58a'};
+        --active-color-dark:{theme !== 'green' ? '#8D3030' : '#006E54'}
+    " />
     {#if disabled}
         <Spinner />
     {/if}

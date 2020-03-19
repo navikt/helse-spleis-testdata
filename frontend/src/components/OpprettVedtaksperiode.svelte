@@ -68,7 +68,7 @@
         arbeidsgiverperiode = arbeidsgiverperiode.concat({})}
 </script>
 
-<Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
+<Form theme={gjenopprett ? 'red' : 'green'} onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
     <Input bind:value={fnr} onblur={hentInntekt} label="Fødselsnummer" placeholder="Arbeidstakers fødselsnummer"
            required />
     <label class="switch" for=gjenopprett>Slett og gjenskap data for personen

@@ -3,6 +3,7 @@
 
     export let onSubmit;
     export let submitText = 'Submit';
+    export let theme;
 
     const INITIAL = "INITIAL";
     const SENDING = "SENDING";
@@ -29,7 +30,7 @@
 
 <form on:submit={onSubmitWrapper}>
     <slot></slot>
-    <SubmitButton value={submitText} disabled={status === SENDING}/>
+    <SubmitButton value={submitText} disabled={status === SENDING} theme={theme} />
     <p>Status: {status}</p>
 </form>
 

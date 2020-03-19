@@ -4,6 +4,8 @@
     font-family: 'Source Sans Pro', sans-serif;
     --active-color: #00b58a;
     --active-color-dark: #006E54;
+    --danger-color: #ff5666;
+    --danger-color-dark: #8D3030;
     --disabled-color: #c2c2c2;
 }
 

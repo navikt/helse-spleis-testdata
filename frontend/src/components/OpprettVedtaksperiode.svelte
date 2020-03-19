@@ -17,6 +17,8 @@
     let skalSendeSøknad = true;
     let sendtNav = '2020-02-01';
     let sykmeldingsgrad = 100;
+    let arbeidsgiverperiode = [];
+    let førstefraværsdag = '2020-01-01';
 
     const onSubmit = async () => {
         const vedtak = {
@@ -30,7 +32,9 @@
             skalSendeSykmelding,
             skalSendeSøknad,
             sendtNav,
-            sykmeldingsgrad
+            sykmeldingsgrad,
+            førstefraværsdag,
+            arbeidsgiverperiode
         };
 
         if (gjenopprett) {
@@ -58,7 +62,10 @@
         });
         let respons = await result.json();
         inntekt = respons.beregnetMånedsinntekt;
-    }
+    };
+
+    const leggTilPeriode = () =>  {
+        arbeidsgiverperiode = arbeidsgiverperiode.concat({})}
 </script>
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
@@ -107,6 +114,13 @@
     <DateInput bind:value={sykdomFom} label="Sykdom f.o.m." required />
     <DateInput bind:value={sykdomTom} label="Sykdom t.o.m." required />
 
+
+    <DateInput bind:value={førstefraværsdag} label="Første fraværsdag"/>
+    {#each arbeidsgiverperiode as _, i}
+        <DateInput bind:value={arbeidsgiverperiode[i].fom} label="Arbeidsgiverperiode FOM" required />
+        <DateInput bind:value={arbeidsgiverperiode[i].tom} label="Arbeidsgiverperiode TOM" required />
+    {/each}
+
     <DateInput bind:value={sendtNav} label="Søknad sendt NAV" required />
 
     <NumberInput bind:value={sykmeldingsgrad} label="Sykmeldingsgrad" placeholder="Sykdomsgrad på sykmeldingen" required min=0 max=100 />
@@ -118,4 +132,7 @@
     </label>
 
 </Form>
+
+<p>Ekstra arbeidsgiverperiode: </p><button on:click={leggTilPeriode}> + </button>
+
 

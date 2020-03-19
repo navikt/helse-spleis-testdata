@@ -184,7 +184,6 @@ internal fun Routing.registerVedtaksperiodeApi(
         }
 
         val aktørId = aktørIdResult.unwrap()
-
         val sykmelding = sykmelding(vedtak, aktørId)
         val søknad = søknad(vedtak, aktørId)
         if (vedtak.skalSendeSykmelding) {
@@ -223,5 +222,9 @@ data class Vedtak(
     val skalSendeSykmelding: Boolean = true,
     val skalSendeSøknad: Boolean = true,
     val sykmeldingsgrad: Int = 100,
-    val sendtNav: LocalDate = sykdomTom.plusDays(1)
+    val sendtNav: LocalDate = sykdomTom.plusDays(1),
+    val førstefraværsdag: LocalDate?,
+    val arbeidsgiverperiode: List<Periode>
 )
+
+data class Periode(val fom: LocalDate, val tom: LocalDate)

@@ -96,7 +96,9 @@ class AppTest {
                         "sykdomTom": "2020-01-30",
                         "inntekt": 0.0,
                         "harAndreInntektskilder": true,
-                        "skalSendeInntektsmelding": true
+                        "skalSendeInntektsmelding": true,
+                        "førstefraværsdag": "2019-12-31",
+                        "arbeidsgiverperiode": [{"fom": "2019-12-31", "tom": "2020-01-14"}, {"fom": "2019-12-31", "tom": "2020-01-14"}]
                     }
                     """
                 )

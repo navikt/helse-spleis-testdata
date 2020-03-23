@@ -32,13 +32,15 @@ fun inntektsmelding(
             "endringIRefusjoner":[],
             "opphoerAvNaturalytelser":[],
             "gjenopptakelseNaturalytelser":[],
-            "arbeidsgiverperioder": ${arbeidsgiverperioder.map { """{"fom": "${it.fom}", "tom":"${it.tom}"}""" }},
-            "ferieperioder":[],
+            "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},
+            "ferieperioder": ${vedtak.ferieInntektsmelding.tilJson()},
             "status":"GYLDIG",
             "arkivreferanse":"ENARKIVREFERANSE",
             "hendelseId":"${UUID.randomUUID()}",
             "foersteFravaersdag":"$førstefraværsdag",
             "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"
             } 
-    """.also { assertValidJson(it) }
+    """
 }
+
+fun List<Periode>.tilJson(): String = objectMapper.writeValueAsString(this)

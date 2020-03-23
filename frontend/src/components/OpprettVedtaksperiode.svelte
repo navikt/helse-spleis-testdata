@@ -18,6 +18,7 @@
     let sendtNav = '2020-02-01';
     let sykmeldingsgrad = 100;
     let arbeidsgiverperiode = [];
+    let ferieInntektsmelding = [];
     let førstefraværsdag = '2020-01-01';
 
     const onSubmit = async () => {
@@ -34,7 +35,8 @@
             sendtNav,
             sykmeldingsgrad,
             førstefraværsdag,
-            arbeidsgiverperiode
+            arbeidsgiverperiode,
+            ferieInntektsmelding
         };
 
         if (gjenopprett) {
@@ -65,7 +67,9 @@
     };
 
     const leggTilPeriode = () =>  {
-        arbeidsgiverperiode = arbeidsgiverperiode.concat({})}
+        arbeidsgiverperiode = arbeidsgiverperiode.concat({})};
+    const leggTilFerie = () =>  {
+        ferieInntektsmelding = ferieInntektsmelding.concat({})};
 </script>
 
 <Form onSubmit={onSubmit} submitText="Opprett vedtaksperiode">
@@ -103,7 +107,6 @@
         <input type="checkbox" id=sendInntektsmelding bind:checked={skalSendeInntektsmelding} />
         <span class="slider"></span>
     </label>
-
     <label class="switch" for=inntekstkilder>Har andre inntektskilder
         <input type=checkbox id=inntekstkilder bind:checked={harAndreInntektskilder} />
         <span class="slider"></span>
@@ -117,6 +120,14 @@
         {#each arbeidsgiverperiode as _, i}
             <DateInput bind:value={arbeidsgiverperiode[i].fom} label="Arbeidsgiverperiode FOM" required />
             <DateInput bind:value={arbeidsgiverperiode[i].tom} label="Arbeidsgiverperiode TOM" required />
+            <hr>
+        {/each}
+        <br>
+        <span>Legg inn ferie: <button on:click|preventDefault={leggTilFerie}> + </button></span>
+        {#each ferieInntektsmelding as _, i}
+            <DateInput bind:value={ferieInntektsmelding[i].fom} label="Ferie FOM" required />
+            <DateInput bind:value={ferieInntektsmelding[i].tom} label="Ferie TOM" required />
+            <hr>
         {/each}
     </div>
 

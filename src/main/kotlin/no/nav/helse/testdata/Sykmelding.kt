@@ -53,6 +53,6 @@ fun sykmelding(
             "sporsmal":null,
             "hendelseId":"${UUID.randomUUID()}"
         }   
-    """.also { assertValidJson(it) }
+    """
 }
 

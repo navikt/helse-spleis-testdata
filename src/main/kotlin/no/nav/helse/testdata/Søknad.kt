@@ -53,6 +53,6 @@ fun søknad(
             "sporsmal":null,
             "hendelseId":"${UUID.randomUUID()}"
             }   
-    """.also { assertValidJson(it) }
+    """
 }
 

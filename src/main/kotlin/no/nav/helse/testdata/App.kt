@@ -206,15 +206,7 @@ internal fun Routing.registerVedtaksperiodeApi(
     }
 }
 
-fun assertValidJson(json: String) {
-    try {
-        objectMapper.readTree(json)
-    } catch (e: IOException) {
-        log.error("meldingen inneholder ugyldig JSON")
-        throw RuntimeException("meldingen inneholder ugyldig JSON")
-    }
 
-}
 
 internal fun Application.installJacksonFeature() {
     install(ContentNegotiation) {
@@ -238,7 +230,8 @@ data class Vedtak(
     val sykmeldingsgrad: Int = 100,
     val sendtNav: LocalDate = sykdomTom.plusDays(1),
     val førstefraværsdag: LocalDate?,
-    val arbeidsgiverperiode: List<Periode>
+    val arbeidsgiverperiode: List<Periode>,
+    val ferieInntektsmelding: List<Periode>
 )
 
 data class Periode(val fom: LocalDate, val tom: LocalDate)

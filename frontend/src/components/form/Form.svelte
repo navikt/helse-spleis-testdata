@@ -1,13 +1,23 @@
+<style>
+  form {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    flex: 1;
+    max-width: 50rem;
+  }
+</style>
+
 <script>
-  import SubmitButton from "./SubmitButton.svelte";
+  import SubmitButton from './SubmitButton.svelte';
 
   export let onSubmit;
-  export let submitText = "Submit";
+  export let submitText = 'Submit';
 
-  const INITIAL = "INITIAL";
-  const SENDING = "SENDING";
-  const OK = "OK";
-  const ERROR = "ERROR";
+  const INITIAL = 'INITIAL';
+  const SENDING = 'SENDING';
+  const OK = 'OK';
+  const ERROR = 'ERROR';
 
   let status = INITIAL;
 
@@ -20,24 +30,14 @@
         if (res.status < 300 && res.status >= 200) {
           status = OK;
           return res;
-        } else throw Error("Invalid status code");
+        } else throw Error('Invalid status code');
       })
       .catch(_ => (status = ERROR));
   };
 </script>
 
-<style>
-  form {
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    flex: 1;
-    max-width: 50rem;
-  }
-</style>
-
-<form on:submit={onSubmitWrapper}>
+<form on:submit="{onSubmitWrapper}">
   <slot />
-  <SubmitButton value={submitText} disabled={status === SENDING} />
+  <SubmitButton value="{submitText}" disabled="{status === SENDING}" />
   <p>Status: {status}</p>
 </form>

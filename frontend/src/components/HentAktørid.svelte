@@ -1,24 +1,3 @@
-<script>
-  import Form from "./form/Form.svelte";
-  import Input from "./form/Input.svelte";
-
-  let fnr = "";
-  let aktørId = undefined;
-
-  const onSubmit = async () => {
-    const result = await fetch(`/person/aktorid`, {
-      method: "get",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ident: fnr,
-      },
-    });
-    aktørId = await result.text();
-    return result;
-  };
-</script>
-
 <style>
   a {
     padding-top: 1.5rem;
@@ -38,12 +17,34 @@
   }
 </style>
 
+<script>
+  import Form from './form/Form.svelte';
+  import Input from './form/Input.svelte';
+
+  let fnr = '';
+  let aktørId = undefined;
+
+  const onSubmit = async () => {
+    const result = await fetch(`/person/aktorid`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ident: fnr
+      }
+    });
+    aktørId = await result.text();
+    return result;
+  };
+</script>
+
 <Form {onSubmit} submitText="Hent aktørId">
   <Input
-    bind:value={fnr}
+    bind:value="{fnr}"
     label="Fnr"
     placeholder="Arbeidstakers fnr"
-    required />
+    required
+  />
 </Form>
 <p>
   {#if aktørId}AktørId: {aktørId}{/if}

@@ -1,14 +1,3 @@
-<script>
-  import { uuid } from "../../scripts/uuid";
-  const id = uuid();
-
-  export let label = "";
-  export let value;
-  export let placeholder = "";
-  export let invalid = false;
-  export let required = false;
-</script>
-
 <style>
   span {
     width: max-content;
@@ -23,7 +12,18 @@
   }
 </style>
 
-<label for={id}>{label}</label>
+<script>
+  import { uuid } from '../../scripts/uuid';
+  const id = uuid();
+
+  export let label = '';
+  export let value;
+  export let placeholder = '';
+  export let invalid = false;
+  export let required = false;
+</script>
+
+<label for="{id}">{label}</label>
 <span>
   <input {id} type="date" class:invalid bind:value {required} />
   {#if invalid}

@@ -1,10 +1,3 @@
-<script>
-  import Spinner from "../Spinner.svelte";
-
-  export let value = "";
-  export let disabled = false;
-</script>
-
 <style>
   input {
     background: var(--active-color);
@@ -37,6 +30,13 @@
     margin-top: 1rem;
   }
 </style>
+
+<script>
+  import Spinner from '../Spinner.svelte';
+
+  export let value = '';
+  export let disabled = false;
+</script>
 
 <div class="wrapper">
   <input type="submit" {value} {disabled} />

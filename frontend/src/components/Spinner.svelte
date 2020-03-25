@@ -20,5 +20,5 @@
 </style>
 
 <div class="wrapper">
-  <div class="spinner" />
+  <div class="spinner"></div>
 </div>

@@ -1,9 +1,3 @@
-<script>
-  export let label;
-  export let onClick;
-  export let isActive = false;
-</script>
-
 <style>
   button {
     background: white;
@@ -18,7 +12,7 @@
   }
   button:after {
     position: absolute;
-    content: "";
+    content: '';
     height: 5px;
     width: 100%;
     left: 0;
@@ -38,4 +32,10 @@
   }
 </style>
 
-<button class:active={isActive} on:click={onClick}>{label}</button>
+<script>
+  export let label;
+  export let onClick;
+  export let isActive = false;
+</script>
+
+<button class:active="{isActive}" on:click="{onClick}">{label}</button>

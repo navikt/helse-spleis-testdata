@@ -1,20 +1,3 @@
-<script>
-  import SlettPerson from "./SlettPerson.svelte";
-  import OpprettVedtaksperiode from "./OpprettVedtaksperiode.svelte";
-  import SectionButton from "./SectionButton.svelte";
-  import HentInntekt from "./HentInntekt.svelte";
-  import HentAktørId from "./HentAktørid.svelte";
-
-  const Section = {
-    SLETT_PERSON: "slettperson",
-    OPPRETT_VEDTAKSPERIODE: "opprettvedtaksperiode",
-    HENT_INNTEKT: "hentinntekt",
-    HENT_AKTØRID: "hentaktørid"
-  };
-
-  let activeSection = Section.OPPRETT_VEDTAKSPERIODE;
-</script>
-
 <style>
   header {
     padding: 0 1.5rem;
@@ -33,24 +16,45 @@
   }
 </style>
 
+<script>
+  import SlettPerson from './SlettPerson.svelte';
+  import OpprettVedtaksperiode from './OpprettVedtaksperiode.svelte';
+  import SectionButton from './SectionButton.svelte';
+  import HentInntekt from './HentInntekt.svelte';
+  import HentAktørId from './HentAktørid.svelte';
+
+  const Section = {
+    SLETT_PERSON: 'slettperson',
+    OPPRETT_VEDTAKSPERIODE: 'opprettvedtaksperiode',
+    HENT_INNTEKT: 'hentinntekt',
+    HENT_AKTØRID: 'hentaktørid'
+  };
+
+  let activeSection = Section.OPPRETT_VEDTAKSPERIODE;
+</script>
+
 <header>
   <h1>spleis testdata</h1>
   <SectionButton
     label="slett person"
-    isActive={activeSection === Section.SLETT_PERSON}
-    onClick={() => (activeSection = Section.SLETT_PERSON)} />
+    isActive="{activeSection === Section.SLETT_PERSON}"
+    onClick="{() => (activeSection = Section.SLETT_PERSON)}"
+  />
   <SectionButton
     label="opprett vedtaksperiode"
-    isActive={activeSection === Section.OPPRETT_VEDTAKSPERIODE}
-    onClick={() => (activeSection = Section.OPPRETT_VEDTAKSPERIODE)} />
+    isActive="{activeSection === Section.OPPRETT_VEDTAKSPERIODE}"
+    onClick="{() => (activeSection = Section.OPPRETT_VEDTAKSPERIODE)}"
+  />
   <SectionButton
     label="hent inntekt"
-    isActive={activeSection === Section.HENT_INNTEKT}
-    onClick={() => (activeSection = Section.HENT_INNTEKT)} />
+    isActive="{activeSection === Section.HENT_INNTEKT}"
+    onClick="{() => (activeSection = Section.HENT_INNTEKT)}"
+  />
   <SectionButton
     label="hent aktørId"
-    isActive={activeSection === Section.HENT_AKTØRID}
-    onClick={() => (activeSection = Section.HENT_AKTØRID)} />
+    isActive="{activeSection === Section.HENT_AKTØRID}"
+    onClick="{() => (activeSection = Section.HENT_AKTØRID)}"
+  />
 </header>
 <hr />
 {#if activeSection === Section.SLETT_PERSON}

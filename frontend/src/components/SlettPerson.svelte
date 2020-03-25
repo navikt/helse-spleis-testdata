@@ -1,23 +1,24 @@
 <script>
-  import Input from "./form/Input.svelte";
-  import Form from "./form/Form.svelte";
+  import Input from './form/Input.svelte';
+  import Form from './form/Form.svelte';
 
-  let fnr = "";
+  let fnr = '';
 
   const onSubmit = async () => {
     return await fetch(`/person`, {
-      method: "delete",
+      method: 'delete',
       headers: {
-        ident: fnr,
-      },
+        ident: fnr
+      }
     });
   };
 </script>
 
 <Form {onSubmit} submitText="Slett person">
   <Input
-    bind:value={fnr}
+    bind:value="{fnr}"
     placeholder="Arbeidstakers fnr"
     label="fødselsnummer"
-    required />
+    required
+  />
 </Form>

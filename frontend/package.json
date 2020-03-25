@@ -21,8 +21,15 @@
   },
   "homepage": "https://github.com/navikt/helse-spleis-testdata#readme",
   "devDependencies": {
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.9",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-svelte": "^4.0.5",
+    "prettier": "^2.0.2",
+    "prettier-plugin-svelte": "^0.7.0",
     "svelte": "^3.16.7"
+  },
+  "lint-staged": {
+    ".svelte": "prettier --write --plugin-search-dir=."
   }
 }

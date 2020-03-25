@@ -1,18 +1,3 @@
-<style>
-  a {
-    padding-top: 1.5rem;
-    padding-left: 1.5rem;
-  }
-
-  span:hover {
-    cursor: pointer;
-  }
-
-  .material-icons-outlined {
-    font-size: 1rem;
-  }
-</style>
-
 <script>
   import Form from './form/Form.svelte';
   import Input from './form/Input.svelte';
@@ -61,3 +46,18 @@
     </span>
   {/if}
 </p>
+
+<style>
+  a {
+    padding-top: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  span:hover {
+    cursor: pointer;
+  }
+
+  .material-icons-outlined {
+    font-size: 1rem;
+  }
+</style>

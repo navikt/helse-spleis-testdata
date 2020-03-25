@@ -1,21 +1,3 @@
-<style>
-  header {
-    padding: 0 1.5rem;
-  }
-
-  h1 {
-    margin: 1.5rem 0;
-    font-size: 2rem;
-    font-weight: normal;
-  }
-
-  hr {
-    border: none;
-    border-top: 5px solid #dad6d2;
-    margin: 0;
-  }
-</style>
-
 <script>
   import SlettPerson from './SlettPerson.svelte';
   import OpprettVedtaksperiode from './OpprettVedtaksperiode.svelte';
@@ -66,3 +48,21 @@
 {:else if activeSection === Section.HENT_AKTØRID}
   <HentAktørId />
 {/if}
+
+<style>
+  header {
+    padding: 0 1.5rem;
+  }
+
+  h1 {
+    margin: 1.5rem 0;
+    font-size: 2rem;
+    font-weight: normal;
+  }
+
+  hr {
+    border: none;
+    border-top: 5px solid #dad6d2;
+    margin: 0;
+  }
+</style>

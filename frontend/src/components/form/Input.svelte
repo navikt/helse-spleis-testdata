@@ -1,17 +1,3 @@
-<style>
-  span {
-    width: max-content;
-    display: flex;
-  }
-  p {
-    color: red;
-    margin-left: 1rem;
-  }
-  .invalid {
-    border-color: red;
-  }
-</style>
-
 <script>
   import { uuid } from '../../scripts/uuid';
   const id = uuid();
@@ -42,3 +28,17 @@
     <p>Ugyldig verdi</p>
   {/if}
 </span>
+
+<style>
+  span {
+    width: max-content;
+    display: flex;
+  }
+  p {
+    color: red;
+    margin-left: 1rem;
+  }
+  .invalid {
+    border-color: red;
+  }
+</style>

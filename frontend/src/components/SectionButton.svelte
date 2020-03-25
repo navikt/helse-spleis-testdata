@@ -1,3 +1,11 @@
+<script>
+  export let label;
+  export let onClick;
+  export let isActive = false;
+</script>
+
+<button class:active="{isActive}" on:click="{onClick}">{label}</button>
+
 <style>
   button {
     background: white;
@@ -31,11 +39,3 @@
     color: var(--active-color);
   }
 </style>
-
-<script>
-  export let label;
-  export let onClick;
-  export let isActive = false;
-</script>
-
-<button class:active="{isActive}" on:click="{onClick}">{label}</button>

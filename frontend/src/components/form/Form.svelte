@@ -1,13 +1,3 @@
-<style>
-  form {
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    flex: 1;
-    max-width: 50rem;
-  }
-</style>
-
 <script>
   import SubmitButton from './SubmitButton.svelte';
 
@@ -41,3 +31,13 @@
   <SubmitButton value="{submitText}" disabled="{status === SENDING}" />
   <p>Status: {status}</p>
 </form>
+
+<style>
+  form {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    flex: 1;
+    max-width: 50rem;
+  }
+</style>

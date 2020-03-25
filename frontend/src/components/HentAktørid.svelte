@@ -1,22 +1,3 @@
-<style>
-  a {
-    padding-top: 1.5rem;
-    padding-left: 1.5rem;
-  }
-
-  p {
-    margin-left: 2rem;
-  }
-
-  span:hover {
-    cursor: pointer;
-  }
-
-  .material-icons-outlined {
-    font-size: 1rem;
-  }
-</style>
-
 <script>
   import Form from './form/Form.svelte';
   import Input from './form/Input.svelte';
@@ -49,3 +30,22 @@
 <p>
   {#if aktørId}AktørId: {aktørId}{/if}
 </p>
+
+<style>
+  a {
+    padding-top: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  p {
+    margin-left: 2rem;
+  }
+
+  span:hover {
+    cursor: pointer;
+  }
+
+  .material-icons-outlined {
+    font-size: 1rem;
+  }
+</style>

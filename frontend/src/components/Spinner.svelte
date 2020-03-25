@@ -1,3 +1,7 @@
+<div class="wrapper">
+  <div class="spinner"></div>
+</div>
+
 <style>
   .wrapper {
     margin-left: -1.5rem;
@@ -18,7 +22,3 @@
     box-shadow: inset 0 0 0 0.125rem white;
   }
 </style>
-
-<div class="wrapper">
-  <div class="spinner"></div>
-</div>

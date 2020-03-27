@@ -9,7 +9,7 @@ fun søknad(
 ) : String {
     return """
         {
-            "@event_name": "sendt_søknad",
+            "@event_name": "sendt_søknad_nav",
             "@id":"${UUID.randomUUID()}",
             "@opprettet":"${LocalDateTime.now()}",
             "id":"${UUID.randomUUID()}",

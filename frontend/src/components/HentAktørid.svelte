@@ -1,51 +1,42 @@
 <script>
-  import Form from './form/Form.svelte';
-  import Input from './form/Input.svelte';
+    import Form from './form/Form.svelte';
+    import Input from './form/Input.svelte';
+    import Clipboard from './clipboard/Clipboard.svelte';
+    import { getAktørId } from '../io/http';
 
-  let fnr = '';
-  let aktørId = undefined;
+    let fnr = '';
+    let aktørId = undefined;
 
-  const onSubmit = async () => {
-    const result = await fetch(`/person/aktorid`, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ident: fnr
-      }
-    });
-    aktørId = await result.text();
-    return result;
-  };
+    const onSubmit = async () => {
+        return getAktørId({ fnr }).then(async res => {
+            aktørId = await res.text();
+            return Promise.resolve(res);
+        });
+    };
 </script>
 
 <Form {onSubmit} submitText="Hent aktørId">
-  <Input
-    bind:value="{fnr}"
-    label="Fnr"
-    placeholder="Arbeidstakers fnr"
-    required
-  />
+    <Input
+        bind:value="{fnr}"
+        label="Fødselsnummer"
+        placeholder="Arbeidstakers fødselsnummer"
+        required
+    />
 </Form>
-<p>
-  {#if aktørId}AktørId: {aktørId}{/if}
-</p>
+<Clipboard value="{aktørId}" />
 
 <style>
-  a {
-    padding-top: 1.5rem;
-    padding-left: 1.5rem;
-  }
-
-  p {
-    margin-left: 2rem;
-  }
-
-  span:hover {
-    cursor: pointer;
-  }
-
-  .material-icons-outlined {
-    font-size: 1rem;
-  }
+    a {
+        padding-top: 1.5rem;
+        padding-left: 1.5rem;
+    }
+    p {
+        margin-left: 2rem;
+    }
+    span:hover {
+        cursor: pointer;
+    }
+    .material-icons-outlined {
+        font-size: 1rem;
+    }
 </style>

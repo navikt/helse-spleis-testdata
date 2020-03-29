@@ -1,63 +1,56 @@
 <script>
-  import Form from './form/Form.svelte';
-  import Input from './form/Input.svelte';
+    import Form from './form/Form.svelte';
+    import Input from './form/Input.svelte';
+    import { getInntekt } from '../io/http';
+    import Clipboard from './clipboard/Clipboard.svelte';
 
-  let inntektField;
-  let fnr = '';
-  let inntekt = {};
+    let inntektField;
+    let fnr = '';
+    let inntekt = {};
 
-  const onSubmit = async () => {
-    const result = await fetch(`/person/inntekt`, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ident: fnr
-      }
-    });
-    inntekt = await result.json();
-    return result;
-  };
-
-  const copy = () => {
-    let clipboardTextarea = document.createElement('textarea');
-    document.body.appendChild(clipboardTextarea);
-    clipboardTextarea.value = inntekt.beregnetMånedsinntekt;
-    clipboardTextarea.select();
-    document.execCommand('copy');
-    clipboardTextarea.remove();
-  };
+    const onSubmit = async () => {
+        return getInntekt({ fnr }).then(async res => {
+            inntekt = await res.json();
+            return Promise.resolve(res);
+        });
+    };
 </script>
 
 <Form {onSubmit} submitText="Hent inntekt">
-  <Input
-    bind:value="{fnr}"
-    label="Fnr"
-    placeholder="Arbeidstakers fnr"
-    required
-  />
+    <Input
+        bind:value="{fnr}"
+        label="Fødselsnummer"
+        placeholder="Arbeidstakers fødselsnummer"
+        required
+    />
 </Form>
-<p>
-  {#if inntekt.beregnetMånedsinntekt}
-    Beregnet månedsinntekt:
-    <span on:click="{copy}">
-      {inntekt.beregnetMånedsinntekt}
-      <i class="material-icons-outlined">file_copy</i>
-    </span>
-  {/if}
-</p>
+<Clipboard value="{inntekt.beregnetMånedsinntekt}" />
 
 <style>
-  a {
-    padding-top: 1.5rem;
-    padding-left: 1.5rem;
-  }
-
-  span:hover {
-    cursor: pointer;
-  }
-
-  .material-icons-outlined {
-    font-size: 1rem;
-  }
+    button {
+        outline: none;
+        background: none;
+        border: none;
+    }
+    button:hover {
+        cursor: pointer;
+    }
+    .material-icons-outlined {
+        font-size: 1rem;
+    }
+    label.månedsinntekt {
+        color: #3e3832;
+        font-weight: 600;
+        margin: 0.5rem 2rem;
+    }
+    div.månedsinntekt {
+        display: flex;
+        align-items: center;
+        background: #ededed;
+        height: 2rem;
+        width: 20rem;
+        margin: 0 2rem;
+        border-radius: 0.25rem;
+        border: 1px #c2c2c2 dashed;
+    }
 </style>

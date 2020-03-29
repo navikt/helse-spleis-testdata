@@ -1,6 +1,12 @@
 @import url('./animations.css');
 
+/*
+Dette stilarket er kun for globale stiler. Stiler som kun angår enkeltkomponenter
+skal inngå som en del av <style>-taggen til komponentfila.
+*/
+
 * {
+    color: #3e3832;
     font-family: 'Source Sans Pro', sans-serif;
     --active-color: #00b58a;
     --active-color-dark: #006E54;
@@ -16,10 +22,11 @@ label {
     line-height: 1.4;
     margin-bottom: 0.5rem;
     font-size: 1rem;
+    font-weight: 600;
+    color: #3e3832;
 }
 
 input[type="date"], input[type="text"], input[type="number"] {
-    margin: 0.25rem 0 1rem 0;
     appearance: none;
     padding: 0.5rem;
     background-color: #FFF;
@@ -29,17 +36,12 @@ input[type="date"], input[type="text"], input[type="number"] {
     line-height: 1.375rem;
     min-width: 20rem;
     transition: box-shadow 0.2s;
-}
-
-.checkbox-row {
-    display: flex;
-}
-.checkbox-row input[type="checkbox"] {
-    margin-left: 0.5rem
+    font-size: 16px;
 }
 
 input[type="text"].hide  {
-background-color: #c2c2c2}
+    background-color: #c2c2c2
+}
 
 input:hover { border-color: var(--active-color); }
 
@@ -50,60 +52,4 @@ input:focus {
 
 input:-moz-submit-invalid, input:-moz-ui-invalid {
     box-shadow: none;
-}
-
-
-/*Toggle Switch*/
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 32rem;
-    height: 17px;
-    margin-left: 2.5rem;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 3px;
-    left: -40px;
-    right: 522px;
-    bottom: -3px;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 13px;
-    width: 13px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #00b58a;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #00b58a;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(13px);
-    -ms-transform: translateX(13px);
-    transform: translateX(13px);
 }

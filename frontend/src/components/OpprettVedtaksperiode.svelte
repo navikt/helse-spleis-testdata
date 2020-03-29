@@ -1,201 +1,177 @@
 <script>
-  import Input from './form/Input.svelte';
-  import Form from './form/Form.svelte';
-  import DateInput from './form/DateInput.svelte';
-  import NumberInput from './form/NumberInput.svelte';
+    import Input from './form/Input.svelte';
+    import Form from './form/Form.svelte';
+    import DateInput from './form/DateInput.svelte';
+    import NumberInput from './form/NumberInput.svelte';
+    import { deletePerson, getInntekt, postVedtaksperiode } from '../io/http';
+    import Switch from './form/Toggle.svelte';
+    import AddButton from './form/AddButton.svelte';
+    import DateRange from './form/DateRange.svelte';
+    import Mortness from './form/Mortness.svelte';
 
-  let invalid = false;
-  let fnr = '';
-  let orgnummer = '';
-  let sykdomFom = '2020-01-01';
-  let sykdomTom = '2020-01-31';
-  let inntekt = '';
-  let harAndreInntektskilder = false;
-  let gjenopprett = false;
-  let skalSendeInntektsmelding = true;
-  let skalSendeSykmelding = true;
-  let skalSendeSøknad = true;
-  let sendtNav = '2020-02-01';
-  let sykmeldingsgrad = 100;
-  let arbeidsgiverperiode = [];
-  let ferieInntektsmelding = [];
-  let førstefraværsdag = '2020-01-01';
+    let invalid = false;
+    let fnr = '';
+    let orgnummer = '';
+    let sykdomFom = '2020-01-01';
+    let sykdomTom = '2020-01-31';
+    let inntekt = '';
+    let harAndreInntektskilder = false;
+    let gjenopprett = false;
+    let skalSendeInntektsmelding = true;
+    let skalSendeSykmelding = true;
+    let skalSendeSøknad = true;
+    let sendtNav = '2020-02-01';
+    let sykmeldingsgrad = 100;
+    let arbeidsgiverperiode = [];
+    let ferieInntektsmelding = [];
+    let førstefraværsdag = '2020-01-01';
 
-  const onSubmit = async () => {
-    const vedtak = {
-      fnr,
-      inntekt,
-      orgnummer,
-      sykdomFom,
-      sykdomTom,
-      harAndreInntektskilder,
-      skalSendeInntektsmelding,
-      skalSendeSykmelding,
-      skalSendeSøknad,
-      sendtNav,
-      sykmeldingsgrad,
-      førstefraværsdag,
-      arbeidsgiverperiode,
-      ferieInntektsmelding
+    const onSubmit = async () => {
+        const vedtak = {
+            fnr,
+            inntekt,
+            orgnummer,
+            sykdomFom,
+            sykdomTom,
+            harAndreInntektskilder,
+            skalSendeInntektsmelding,
+            skalSendeSykmelding,
+            skalSendeSøknad,
+            sendtNav,
+            sykmeldingsgrad,
+            førstefraværsdag,
+            arbeidsgiverperiode,
+            ferieInntektsmelding
+        };
+
+        if (gjenopprett) await deletePerson({ fnr });
+        return await postVedtaksperiode({ vedtak });
     };
 
-    if (gjenopprett) {
-      await fetch(`/person`, {
-        method: 'delete',
-        headers: { ident: fnr }
-      });
-    }
-    return await fetch(`/vedtaksperiode/`, {
-      method: 'post',
-      body: JSON.stringify(vedtak),
-      headers: { 'Content-Type': 'application/json' }
-    });
-  };
+    const hentInntekt = async event => {
+        event.preventDefault();
+        const respons = await getInntekt({ fnr });
+        respons.json().then(data => (inntekt = data.beregnetMånedsinntekt));
+    };
 
-  const hentInntekt = async event => {
-    event.preventDefault();
-    const result = await fetch(`/person/inntekt`, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ident: fnr
-      }
-    });
-    let respons = await result.json();
-    inntekt = respons.beregnetMånedsinntekt;
-  };
+    const leggTilPeriode = () => {
+        arbeidsgiverperiode = arbeidsgiverperiode.concat({});
+    };
 
-  const leggTilPeriode = () => {
-    arbeidsgiverperiode = arbeidsgiverperiode.concat({});
-  };
-  const leggTilFerie = () => {
-    ferieInntektsmelding = ferieInntektsmelding.concat({});
-  };
+    const fjernPeriode = i => {
+        arbeidsgiverperiode = [
+            ...arbeidsgiverperiode.slice(0, i),
+            ...arbeidsgiverperiode.slice(i + 1)
+        ];
+    };
+
+    const leggTilFerie = () => {
+        ferieInntektsmelding = ferieInntektsmelding.concat({});
+    };
+
+    const fjernFerie = i => {
+        ferieInntektsmelding = [
+            ...ferieInntektsmelding.slice(0, i),
+            ...ferieInntektsmelding.slice(i + 1)
+        ];
+    };
 </script>
 
 <Form {onSubmit} submitText="Opprett vedtaksperiode">
-  <Input
-    bind:value="{fnr}"
-    onblur="{hentInntekt}"
-    label="Fødselsnummer"
-    placeholder="Arbeidstakers fødselsnummer"
-    required
-  />
-  <label class="switch" for="gjenopprett">
-    Slett og gjenskap data for personen
-    <input type="checkbox" id="gjenopprett" bind:checked="{gjenopprett}" />
-    <span class="slider"></span>
-  </label>
-  <br />
-  <Input
-    bind:value="{orgnummer}"
-    label="Organisasjonsnummer"
-    placeholder="Arbeidsgivers organisasjonsnummer"
-    required
-  />
-  <br />
-  <Input
-    bind:value="{inntekt}"
-    label="Inntekt"
-    placeholder="0"
-    required="{skalSendeInntektsmelding}"
-    disabled="{!skalSendeInntektsmelding}"
-  />
-
-  <label class="switch" for="sendSykmelding">
-    Send sykmelding
-    <input
-      type="checkbox"
-      id="sendSykmelding"
-      bind:checked="{skalSendeSykmelding}"
-    />
-    <span class="slider"></span>
-  </label>
-  <label class="switch" for="sendSøknad">
-    Send søknad
-    <input type="checkbox" id="sendSøknad" bind:checked="{skalSendeSøknad}" />
-    <span class="slider"></span>
-  </label>
-  <label class="switch" for="sendInntektsmelding">
-    Send inntektsmelding
-    <input
-      type="checkbox"
-      id="sendInntektsmelding"
-      bind:checked="{skalSendeInntektsmelding}"
-    />
-    <span class="slider"></span>
-  </label>
-  <label class="switch" for="inntekstkilder">
-    Har andre inntektskilder
-    <input
-      type="checkbox"
-      id="inntekstkilder"
-      bind:checked="{harAndreInntektskilder}"
-    />
-    <span class="slider"></span>
-  </label>
-
-  <br />
-
-  <div>
-    <DateInput bind:value="{førstefraværsdag}" label="Første fraværsdag" />
-    <span>
-      Legg inn arbeidsgiverperioder:
-      <button on:click|preventDefault="{leggTilPeriode}">+</button>
+    <span class="form-group">
+        <Input
+            bind:value="{fnr}"
+            onblur="{hentInntekt}"
+            label="Fødselsnummer"
+            placeholder="Arbeidstakers fødselsnummer"
+            required
+        />
+        <Switch label="Slett og gjenskap data for personen" bind:checked="{gjenopprett}" />
     </span>
-    {#each arbeidsgiverperiode as _, i}
-      <DateInput
-        bind:value="{arbeidsgiverperiode[i].fom}"
-        label="Arbeidsgiverperiode FOM"
-        required
-      />
-      <DateInput
-        bind:value="{arbeidsgiverperiode[i].tom}"
-        label="Arbeidsgiverperiode TOM"
-        required
-      />
-      <hr />
-    {/each}
-    <br />
-    <span>
-      Legg inn ferie:
-      <button on:click|preventDefault="{leggTilFerie}">+</button>
+    <span class="form-group">
+        <Input
+            bind:value="{orgnummer}"
+            label="Organisasjonsnummer"
+            placeholder="Arbeidsgivers organisasjonsnummer"
+            required
+        />
     </span>
-    {#each ferieInntektsmelding as _, i}
-      <DateInput
-        bind:value="{ferieInntektsmelding[i].fom}"
-        label="Ferie FOM"
-        required
-      />
-      <DateInput
-        bind:value="{ferieInntektsmelding[i].tom}"
-        label="Ferie TOM"
-        required
-      />
-      <hr />
-    {/each}
-  </div>
+    <span class="form-group">
+        <Switch label="Send sykmelding" bind:checked="{skalSendeSykmelding}" />
+        <Switch label="Send søknad" bind:checked="{skalSendeSøknad}" />
+        <Switch label="Send inntektsmelding" bind:checked="{skalSendeInntektsmelding}" />
+        <Switch label="Har andre inntektskilder" bind:checked="{harAndreInntektskilder}" />
+    </span>
+    <span class="form-group">
+        <DateInput bind:value="{førstefraværsdag}" label="Første fraværsdag" />
+        <DateInput bind:value="{sykdomFom}" label="Sykdom f.o.m." required />
+        <DateInput bind:value="{sykdomTom}" label="Sykdom t.o.m." required />
+    </span>
 
-  <DateInput bind:value="{sykdomFom}" label="Sykdom f.o.m." required />
-  <DateInput bind:value="{sykdomTom}" label="Sykdom t.o.m." required />
-  <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" required />
+    <span class="form-group">
+        <AddButton label="Legg inn arbeidsgiverperioder" onClick="{leggTilPeriode}" />
+        {#each arbeidsgiverperiode as periode, i}
+            <DateRange
+                bind:start="{periode.fom}"
+                startLabel="Arbeidsgiverperiode f.o.m."
+                bind:end="{periode.tom}"
+                endLabel="Arbeidsgiverperiode t.o.m."
+                onRemove="{() => fjernPeriode(i)}"
+            />
+            {#if i !== arbeidsgiverperiode.length - 1}
+                <hr />
+            {/if}
+        {/each}
+        <AddButton label="Legg inn ferie" onClick="{leggTilFerie}" />
+        {#each ferieInntektsmelding as ferie, i}
+            <DateRange
+                bind:start="{ferie.fom}"
+                startLabel="Ferie f.o.m."
+                bind:end="{ferie.tom}"
+                endLabel="Ferie t.o.m."
+                onRemove="{() => fjernFerie(i)}"
+            />
+            {#if i !== ferieInntektsmelding.length - 1}
+                <hr />
+            {/if}
+        {/each}
+    </span>
 
-  <NumberInput
-    bind:value="{sykmeldingsgrad}"
-    label="Sykmeldingsgrad"
-    placeholder="Sykdomsgrad på sykmeldingen"
-    required
-    min="0"
-    max="100"
-  />
-
-  <label>
-    Dette er en slider!
-    <br />
-    mort
-    <input type="range" />
-    mortest
-  </label>
-
+    <span class="form-group">
+        <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" required />
+        <NumberInput
+            bind:value="{sykmeldingsgrad}"
+            label="Sykmeldingsgrad"
+            placeholder="Sykdomsgrad på sykmeldingen"
+            required
+            min="0"
+            max="100"
+        />
+    </span>
+    <span class="form-group">
+        <Input
+            bind:value="{inntekt}"
+            label="Inntekt"
+            placeholder="0"
+            required="{skalSendeInntektsmelding}"
+            disabled="{!skalSendeInntektsmelding}"
+        />
+    </span>
+    <span class="form-group">
+        <Mortness />
+    </span>
 </Form>
+
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+        width: max-content;
+    }
+    hr {
+        border: none;
+        border-top: 1px solid #c2c2c2;
+        padding-bottom: 0.5rem;
+        width: calc(320px - 3.5rem);
+        margin: 0 6.25rem;
+    }
+</style>

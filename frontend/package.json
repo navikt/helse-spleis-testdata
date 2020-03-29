@@ -9,7 +9,8 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html --out-dir ../public",
-    "prettier": "prettier --write --plugin-search-dir=. ./src/**/*.svelte"
+    "prettier": "prettier --write --plugin-search-dir=. ./src/**/*.(svelte|js)",
+    "mock-server": "node mock/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
   },
   "homepage": "https://github.com/navikt/helse-spleis-testdata#readme",
   "devDependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
     "husky": "^4.2.3",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-svelte": "^4.0.5",

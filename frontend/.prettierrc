@@ -2,5 +2,7 @@
   "svelteSortOrder" : "scripts-markup-styles",
   "svelteStrictMode": true,
   "svelteBracketNewLine": true,
-  "singleQuote": true
+  "singleQuote": true,
+  "printWidth": 100,
+  "tabWidth": 4
 }

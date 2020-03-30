@@ -110,31 +110,29 @@
 
     <span class="form-group">
         <AddButton label="Legg inn arbeidsgiverperioder" onClick="{leggTilPeriode}" />
-        {#each arbeidsgiverperiode as periode, i}
-            <DateRange
-                bind:start="{periode.fom}"
-                startLabel="Arbeidsgiverperiode f.o.m."
-                bind:end="{periode.tom}"
-                endLabel="Arbeidsgiverperiode t.o.m."
-                onRemove="{() => fjernPeriode(i)}"
-            />
-            {#if i !== arbeidsgiverperiode.length - 1}
-                <hr />
-            {/if}
-        {/each}
+        <span>
+            {#each arbeidsgiverperiode as periode, i}
+                <DateRange
+                    bind:start="{periode.fom}"
+                    startLabel="Arbeidsgiverperiode f.o.m."
+                    bind:end="{periode.tom}"
+                    endLabel="Arbeidsgiverperiode t.o.m."
+                    onRemove="{() => fjernPeriode(i)}"
+                />
+            {/each}
+        </span>
         <AddButton label="Legg inn ferie" onClick="{leggTilFerie}" />
-        {#each ferieInntektsmelding as ferie, i}
-            <DateRange
-                bind:start="{ferie.fom}"
-                startLabel="Ferie f.o.m."
-                bind:end="{ferie.tom}"
-                endLabel="Ferie t.o.m."
-                onRemove="{() => fjernFerie(i)}"
-            />
-            {#if i !== ferieInntektsmelding.length - 1}
-                <hr />
-            {/if}
-        {/each}
+        <span>
+            {#each ferieInntektsmelding as ferie, i}
+                <DateRange
+                    bind:start="{ferie.fom}"
+                    startLabel="Ferie f.o.m."
+                    bind:end="{ferie.tom}"
+                    endLabel="Ferie t.o.m."
+                    onRemove="{() => fjernFerie(i)}"
+                />
+            {/each}
+        </span>
     </span>
 
     <span class="form-group">
@@ -166,12 +164,5 @@
     .form-group {
         margin-bottom: 1.5rem;
         width: max-content;
-    }
-    hr {
-        border: none;
-        border-top: 1px solid #c2c2c2;
-        padding-bottom: 0.5rem;
-        width: calc(320px - 3.5rem);
-        margin: 0 6.25rem;
     }
 </style>

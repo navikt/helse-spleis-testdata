@@ -13,8 +13,8 @@
     export let min = 0;
 </script>
 
-<label for="{id}">{label}</label>
 <span>
+    <label for="{id}">{label}</label>
     <input
         {id}
         type="number"
@@ -37,6 +37,7 @@
     span {
         width: max-content;
         display: flex;
+        flex-direction: column;
     }
     p {
         color: red;
@@ -47,5 +48,6 @@
     }
     input {
         width: 10rem;
+        margin-bottom: 0.75rem;
     }
 </style>

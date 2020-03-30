@@ -149,8 +149,8 @@
         />
         <NumberInput
                 bind:value="{faktiskgrad}"
-                label="Faktisk grad"
-                placeholder="Faktisk grad i søknad"
+                label="Faktisk arbeidsgrad i søknad"
+                placeholder="Faktisk arbeidsgrad"
                 min
                 max
         />

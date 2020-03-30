@@ -13,16 +13,16 @@
 
 <div class="mortness">
     <hr />
-    <button type="button" on:click="{() => (currentMortness = 0)}" class="{classForMortness(0)}">
+    <button type="button" on:click="{() => (currentMortness = 0)}" class="mort {classForMortness(0)}">
         {mortnessScale[0]}
     </button>
-    <button type="button" on:click="{() => (currentMortness = 1)}" class="{classForMortness(1)}">
+    <button type="button" on:click="{() => (currentMortness = 1)}" class="mortere {classForMortness(1)}">
         {mortnessScale[1]}
     </button>
-    <button type="button" on:click="{() => (currentMortness = 2)}" class="{classForMortness(2)}">
+    <button type="button" on:click="{() => (currentMortness = 2)}" class="enda-mortere {classForMortness(2)}">
         {mortnessScale[2]}
     </button>
-    <button type="button" on:click="{() => (currentMortness = 3)}" class="{classForMortness(3)}">
+    <button type="button" on:click="{() => (currentMortness = 3)}" class="mortest {classForMortness(3)}">
         {mortnessScale[3]}
     </button>
 </div>
@@ -90,5 +90,22 @@
         font-weight: 600;
         color: #3e3832;
         text-decoration: none;
+    }
+
+    @keyframes shake-max {
+        25% { transform: translate3d(-2px, 0, 0); }
+        50% { transform: translate3d(4px, 0, 0); }
+    }
+
+    @keyframes shake-mid {
+        50% { transform: translate3d(2px, 0, 0); }
+    }
+
+    button.equal.mortest {
+        animation: shake-max 0.1s linear both infinite;
+    }
+
+    button.equal.enda-mortere {
+        animation: shake-mid 0.1s linear both infinite;
     }
 </style>

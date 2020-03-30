@@ -44,7 +44,7 @@ fun søknad(
               "fom":"${vedtak.sykdomFom}",
               "tom":"${vedtak.sykdomTom}",
               "sykmeldingsgrad":${vedtak.sykmeldingsgrad},
-              "faktiskGrad":null,
+              "faktiskGrad":${vedtak.faktiskgrad},
               "avtaltTimer":null,
               "faktiskTimer":null,
               "sykmeldingstype":null

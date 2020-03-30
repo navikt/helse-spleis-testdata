@@ -228,6 +228,7 @@ data class Vedtak(
     val skalSendeSykmelding: Boolean = true,
     val skalSendeSøknad: Boolean = true,
     val sykmeldingsgrad: Int = 100,
+    val faktiskgrad: Int? = null,
     val sendtNav: LocalDate = sykdomTom.plusDays(1),
     val førstefraværsdag: LocalDate?,
     val arbeidsgiverperiode: List<Periode>,

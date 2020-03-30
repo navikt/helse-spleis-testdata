@@ -22,6 +22,7 @@
     let skalSendeSøknad = true;
     let sendtNav = '2020-02-01';
     let sykmeldingsgrad = 100;
+    let faktiskgrad = null;
     let arbeidsgiverperiode = [];
     let ferieInntektsmelding = [];
     let førstefraværsdag = '2020-01-01';
@@ -39,6 +40,7 @@
             skalSendeSøknad,
             sendtNav,
             sykmeldingsgrad,
+            faktiskgrad,
             førstefraværsdag,
             arbeidsgiverperiode,
             ferieInntektsmelding
@@ -144,6 +146,13 @@
             required
             min="0"
             max="100"
+        />
+        <NumberInput
+                bind:value="{faktiskgrad}"
+                label="Faktisk grad"
+                placeholder="Faktisk grad i søknad"
+                min
+                max
         />
     </span>
     <span class="form-group">

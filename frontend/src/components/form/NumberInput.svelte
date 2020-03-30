@@ -9,8 +9,8 @@
     export let invalid = false;
     export let required = false;
     export let disabled = false;
-    export let max = 0;
-    export let min = 100;
+    export let max = 100;
+    export let min = 0;
 </script>
 
 <label for="{id}">{label}</label>

@@ -9,7 +9,7 @@ fun søknad(
 ) : String {
     return """
         {
-            "@event_name": "sendt_søknad_nav",
+            "@event_name": "${if (vedtak.sendtNav != null) "sendt_søknad_nav" else "sendt_søknad_arbeidsgiver"}",
             "@id":"${UUID.randomUUID()}",
             "@opprettet":"${LocalDateTime.now()}",
             "id":"${UUID.randomUUID()}",

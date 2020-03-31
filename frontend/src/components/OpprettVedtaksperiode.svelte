@@ -21,6 +21,7 @@
     let skalSendeSykmelding = true;
     let skalSendeSøknad = true;
     let sendtNav = '2020-02-01';
+    let sendtArbeidsgiver = null;
     let sykmeldingsgrad = 100;
     let faktiskgrad = null;
     let arbeidsgiverperiode = [];
@@ -39,6 +40,7 @@
             skalSendeSykmelding,
             skalSendeSøknad,
             sendtNav,
+            sendtArbeidsgiver,
             sykmeldingsgrad,
             faktiskgrad,
             førstefraværsdag,
@@ -138,7 +140,8 @@
     </span>
 
     <span class="form-group">
-        <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" required />
+        <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" />
+        <DateInput bind:value="{sendtArbeidsgiver}" label="Søknad sendt arbeidsgiver" />
         <NumberInput
             bind:value="{sykmeldingsgrad}"
             label="Sykmeldingsgrad"

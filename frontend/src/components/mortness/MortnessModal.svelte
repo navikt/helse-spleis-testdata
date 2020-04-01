@@ -3,13 +3,14 @@
 
     export let onClose = () => null;
     export let onAccept = () => null;
+    export let className = '';
 
     let inputValue = '';
 
     const akseptstring = 'Jeg aksepterer risken';
 </script>
 
-<Modal>
+<Modal className="shake" onClose={onClose}>
     <div class="modalinnhold">
         <h1>🚨🚨🚨🚨🚨</h1>
         <p>

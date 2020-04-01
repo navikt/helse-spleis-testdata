@@ -1,5 +1,10 @@
-<div class="modal">
-    <div class="content">
+<script>
+    export let className = '';
+    export let onClose = () => null;
+</script>
+
+<div class="modal" on:click={onClose}>
+    <div class={`content ${className}`} on:click={event => event.stopPropagation()}>
         <slot />
     </div>
 </div>

@@ -50,6 +50,7 @@
 
 {#if showModal}
     <MortnessModal
+        className="shake"
         onAccept="{() => {
             currentMortness = 3;
             showModal = false;
@@ -125,10 +126,16 @@
 
     @keyframes shake-max {
         25% {
-            transform: translate3d(-2px, 0, 0);
+            transform: translate3d(-2px, 2px, 0);
         }
         50% {
-            transform: translate3d(4px, 0, 0);
+            transform: translate3d(4px, -3px, 0);
+        }
+        75% {
+            transform: translate3d(-5px, -1px, 0);
+        }
+        100% {
+            transform: translate3d(0px, -3px, 0);
         }
     }
 
@@ -137,6 +144,8 @@
             transform: translate3d(2px, 0, 0);
         }
     }
+
+    :global(.shake) { animation: shake-max 0.1s linear both infinite; }
 
     button.equal.mortest {
         animation: shake-max 0.1s linear both infinite;

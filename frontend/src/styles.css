@@ -5,7 +5,7 @@ Dette stilarket er kun for globale stiler. Stiler som kun angår enkeltkomponent
 skal inngå som en del av <style>-taggen til komponentfila.
 */
 
-* {
+*:not(code) {
     color: #3e3832;
     font-family: 'Source Sans Pro', sans-serif;
     --active-color: #00b58a;

@@ -7,7 +7,7 @@
     import Switch from './form/Toggle.svelte';
     import AddButton from './form/AddButton.svelte';
     import DateRange from './form/DateRange.svelte';
-    import Mortness from './form/Mortness.svelte';
+    import Mortness from './mortness/Mortness.svelte';
 
     let invalid = false;
     let fnr = '';
@@ -151,11 +151,11 @@
             max="100"
         />
         <NumberInput
-                bind:value="{faktiskgrad}"
-                label="Faktisk arbeidsgrad i søknad"
-                placeholder="Faktisk arbeidsgrad"
-                min
-                max
+            bind:value="{faktiskgrad}"
+            label="Faktisk arbeidsgrad i søknad"
+            placeholder="Faktisk arbeidsgrad"
+            min
+            max
         />
     </span>
     <span class="form-group">

@@ -20,6 +20,7 @@
                 console.debug(res);
                 status = res.status < 300 && res.status >= 200 ? Status.Suksess : Status.Error;
             })
+            .catch(_ => (status = Status.Error))
             .finally(() => {
                 if (status === Status.Sender) status = null;
             });
@@ -31,10 +32,10 @@
     <div class="flex">
         <SubmitButton value="{submitText}" disabled="{status === Status.Sender}" />
         {#if status === Status.Error}
-            <p class="status error">Noe gikk galt 😢💔</p>
+            <p class="status error">Noe gikk galt 💔</p>
         {/if}
         {#if status === Status.Suksess}
-            <p class="status suksess">Great success! 🥳🎉</p>
+            <p class="status suksess">Huge success! 🎉</p>
         {/if}
     </div>
 </form>

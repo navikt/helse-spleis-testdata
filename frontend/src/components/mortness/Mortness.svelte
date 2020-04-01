@@ -1,7 +1,12 @@
 <script>
+    import Modal from '../Modal.svelte';
+    import MortnessModal from './MortnessModal.svelte';
+
     const mortnessScale = ['Mort', 'Mortere', 'Enda mortere', 'Mortest'];
 
     let currentMortness = 0;
+
+    let showModal = false;
 
     $: classForMortness = mortness =>
         currentMortness > mortness
@@ -13,19 +18,45 @@
 
 <div class="mortness">
     <hr />
-    <button type="button" on:click="{() => (currentMortness = 0)}" class="mort {classForMortness(0)}">
+    <button
+        type="button"
+        on:click="{() => (currentMortness = 0)}"
+        class="mort {classForMortness(0)}"
+    >
         {mortnessScale[0]}
     </button>
-    <button type="button" on:click="{() => (currentMortness = 1)}" class="mortere {classForMortness(1)}">
+    <button
+        type="button"
+        on:click="{() => (currentMortness = 1)}"
+        class="mortere {classForMortness(1)}"
+    >
         {mortnessScale[1]}
     </button>
-    <button type="button" on:click="{() => (currentMortness = 2)}" class="enda-mortere {classForMortness(2)}">
+    <button
+        type="button"
+        on:click="{() => (currentMortness = 2)}"
+        class="enda-mortere {classForMortness(2)}"
+    >
         {mortnessScale[2]}
     </button>
-    <button type="button" on:click="{() => (currentMortness = 3)}" class="mortest {classForMortness(3)}">
+    <button
+        type="button"
+        on:click="{() => showModal = true}"
+        class="mortest {classForMortness(3)}"
+    >
         {mortnessScale[3]}
     </button>
 </div>
+
+{#if showModal}
+    <MortnessModal
+        onAccept="{() => {
+            currentMortness = 3;
+            showModal = false;
+        }}"
+        onClose="{() => showModal = false}"
+    />
+{/if}
 
 <style>
     .mortness {
@@ -93,12 +124,18 @@
     }
 
     @keyframes shake-max {
-        25% { transform: translate3d(-2px, 0, 0); }
-        50% { transform: translate3d(4px, 0, 0); }
+        25% {
+            transform: translate3d(-2px, 0, 0);
+        }
+        50% {
+            transform: translate3d(4px, 0, 0);
+        }
     }
 
     @keyframes shake-mid {
-        50% { transform: translate3d(2px, 0, 0); }
+        50% {
+            transform: translate3d(2px, 0, 0);
+        }
     }
 
     button.equal.mortest {

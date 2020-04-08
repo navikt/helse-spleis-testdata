@@ -1,7 +1,9 @@
 package no.nav.helse.testdata
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.Application
@@ -112,6 +114,7 @@ internal fun launchApplication(
                 registerPersonApi(personService, aktørRestClient)
                 registerVedtaksperiodeApi(producer, aktørRestClient)
                 registerInntektsApi(inntektRestClient)
+                registerBehovApi(producer)
 
                 static("/") {
                     staticRootFolder = File("public")
@@ -203,6 +206,22 @@ internal fun Routing.registerVedtaksperiodeApi(
 
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for vedtak på aktør: $aktørId") }
+    }
+}
+
+internal fun Routing.registerBehovApi(
+    producer: KafkaProducer<String, String>
+) {
+    post("/behov") {
+        val behov = call.receive<ObjectNode>()
+        behov.put("@event_name", "behov")
+        if (!behov.path("@behov").isArray) return@post call.respond(HttpStatusCode.BadRequest)
+        if (!behov.path("fødselsnummer").isArray) return@post call.respond(HttpStatusCode.BadRequest)
+        if (!behov.path("organisasjonsnummer").isArray) return@post call.respond(HttpStatusCode.BadRequest)
+        if (!behov.path("vedtaksperiodeId").isArray) return@post call.respond(HttpStatusCode.BadRequest)
+        producer.send(ProducerRecord(spleisTopic, behov.toString())).get()
+        call.respond(HttpStatusCode.OK)
+            .also { log.info("produsert data for behov: $behov") }
     }
 }
 

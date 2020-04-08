@@ -33,4 +33,9 @@ app.post('/vedtaksperiode', (req, res) => {
   res.status(204).send();
 });
 
+app.post('/behov', (req, res) => {
+  console.log('Oppretter behov med data:', req.body);
+  res.status(204).send();
+});
+
 app.listen(port, () => console.log(`Mock-server kjører på port ${port}`));

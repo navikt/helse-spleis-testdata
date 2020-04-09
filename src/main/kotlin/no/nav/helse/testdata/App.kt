@@ -216,9 +216,9 @@ internal fun Routing.registerBehovApi(
         val behov = call.receive<ObjectNode>()
         behov.put("@event_name", "behov")
         if (!behov.path("@behov").isArray) return@post call.respond(HttpStatusCode.BadRequest)
-        if (!behov.path("fødselsnummer").isArray) return@post call.respond(HttpStatusCode.BadRequest)
-        if (!behov.path("organisasjonsnummer").isArray) return@post call.respond(HttpStatusCode.BadRequest)
-        if (!behov.path("vedtaksperiodeId").isArray) return@post call.respond(HttpStatusCode.BadRequest)
+        if (!behov.path("fødselsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
+        if (!behov.path("organisasjonsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
+        if (!behov.path("vedtaksperiodeId").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         producer.send(ProducerRecord(spleisTopic, behov.toString())).get()
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for behov: $behov") }

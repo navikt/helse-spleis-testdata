@@ -236,6 +236,7 @@ internal fun Application.installJacksonFeature() {
     }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Vedtak(
     val fnr: String,
     val orgnummer: String,
@@ -254,7 +255,7 @@ data class Vedtak(
     val arbeidsgiverperiode: List<Periode>,
     val ferieInntektsmelding: List<Periode>,
     val opphørRefusjon: LocalDate? = null,
-    val endringIRefusjon: List<LocalDate> = emptyList()
+    val endringRefusjon: List<LocalDate> = emptyList()
 )
 
 data class Periode(val fom: LocalDate, val tom: LocalDate)

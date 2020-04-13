@@ -29,7 +29,7 @@ fun inntektsmelding(
                 "beloepPrMnd":"${vedtak.inntekt}",
                 "opphoersdato":${vedtak.opphørRefusjon?.let { "\"$it\"" } ?: "null"}
             },
-            "endringIRefusjoner":[${vedtak.endringIRefusjon.joinToString { "\"$it\"" }}],
+            "endringIRefusjoner":[${vedtak.endringRefusjon.joinToString { "\"$it\"" }}],
             "opphoerAvNaturalytelser":[],
             "gjenopptakelseNaturalytelser":[],
             "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},

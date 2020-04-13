@@ -1,6 +1,6 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -24,30 +24,21 @@ import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.header
 import io.ktor.request.receive
 import io.ktor.response.respond
-import io.ktor.routing.Routing
-import io.ktor.routing.delete
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.routing
+import io.ktor.routing.*
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.util.KtorExperimentalAPI
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.IOException
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
@@ -57,9 +48,10 @@ val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
-val spleisTopic = "helse-rapid-v1"
+const val spleisTopic = "helse-rapid-v1"
 
 
+@KtorExperimentalAPI
 fun main() = runBlocking {
     val environment = setUpEnvironment()
 
@@ -224,7 +216,6 @@ internal fun Routing.registerBehovApi(
             .also { log.info("produsert data for behov: $behov") }
     }
 }
-
 
 
 internal fun Application.installJacksonFeature() {

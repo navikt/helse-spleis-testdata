@@ -13,6 +13,7 @@
     import NumberInput from '../components/form/NumberInput.svelte';
     import SubmitButton from '../components/form/SubmitButton.svelte';
     import ContentColumn from '../components/ContentColumn.svelte';
+    import DeleteButton from '../components/form/DeleteButton.svelte';
 
     let status;
 
@@ -93,7 +94,7 @@
     };
 
     const leggTilEndringRefusjon = () => {
-        endringRefusjon = endringRefusjon.concat({});
+        endringRefusjon = endringRefusjon.concat({ id: uuid() });
     };
 
     const fjernEndring = i => {
@@ -179,12 +180,16 @@
         </span>
         <AddButton label="Legg inn endring i refusjon" onClick="{leggTilEndringRefusjon}" />
         <span class="perioder">
-            {#each endringRefusjon as endring, i}
-                <DateInput
-                    bind:value="{endring}"
-                    startLabel="Dato for endring"
-                    onRemove="{() => fjernEndring(i)}"
-                />
+            {#each endringRefusjon as endring, i (endring.id)}
+                <span class="refusjonsendring">
+                    <Card>
+                        <DateInput
+                            bind:value="{endring}"
+                            label="Dato for endring"
+                        />
+                    </Card>
+                    <DeleteButton onClick="{() => fjernEndring(i)}" />
+                </span>
             {/each}
         </span>
         <Mortness />
@@ -195,5 +200,16 @@
 <style>
     :global(.perioder > *:last-child) {
         margin-bottom: 1.5rem;
+    }
+    .refusjonsendring {
+        display: flex;
+        align-items: center;
+    }
+    .refusjonsendring:not(:last-child) {
+        margin-bottom: 1.5rem;
+    }
+    :global(.refusjonsendring > .card) {
+        margin-bottom: 0;
+        margin-right: 1rem;
     }
 </style>

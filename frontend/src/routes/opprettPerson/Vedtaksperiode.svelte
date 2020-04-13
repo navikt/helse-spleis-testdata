@@ -6,6 +6,7 @@
     import DeleteButton from '../../components/form/DeleteButton.svelte';
     import Toggle from '../../components/form/Toggle.svelte';
     import FormGroup from '../../components/form/FormGroup.svelte';
+    import NumberInput from '../../components/form/NumberInput.svelte';
 
     export let senderSykmelding = true;
     export let senderSøknad = true;
@@ -16,6 +17,11 @@
     export let sykdomFom = '2020-01-01';
     export let sykdomTom = '2020-01-31';
 
+    export let sendtNav = '2020-02-01';
+    export let sendtArbeidsgiver = null;
+    export let sykmeldingsgrad = 100;
+    export let faktiskgrad = null;
+
     export let onRemove = () => null;
 
     const toggleShowDetail = event => {
@@ -24,20 +30,15 @@
     };
 </script>
 
-<span class="vedtaksperiode-container">
+<span class="vedtaksperiode-container" style="--sykmeldingsgrad: {sykmeldingsgrad}">
     <Card>
         <div class="flex">
+            <p>{sykmeldingsgrad}%</p>
             <p>{sykdomFom} - {sykdomTom}</p>
             <div class="dokumenter">
-                {#if senderSykmelding}
-                    <div class="dokument sm">sm</div>
-                {/if}
-                {#if senderSøknad}
-                    <div class="dokument sø">sø</div>
-                {/if}
-                {#if senderInntektsmelding}
-                    <div class="dokument im">im</div>
-                {/if}
+                <div class="dokument sm" class:inactive="{!senderSykmelding}">sm</div>
+                <div class="dokument sø" class:inactive="{!senderSøknad}">sø</div>
+                <div class="dokument im" class:inactive="{!senderInntektsmelding}">im</div>
             </div>
         </div>
         {#if isOpen}
@@ -46,27 +47,40 @@
                 <Toggle label="Send søknad" bind:checked="{senderSøknad}" />
                 <Toggle label="Send inntektsmelding" bind:checked="{senderInntektsmelding}" />
             </FormGroup>
-            <DateInput bind:value="{førsteFraværsdag}" label="Første fraværsdag" />
+
+            <hr />
+            <NumberInput
+                bind:value="{sykmeldingsgrad}"
+                placeholder="Sykdomsgrad"
+                required
+                min="0"
+                max="100"
+            />
             <DateInput bind:value="{sykdomFom}" label="Sykdom f.o.m." required />
             <DateInput bind:value="{sykdomTom}" label="Sykdom t.o.m." required />
+            <DateInput bind:value="{førsteFraværsdag}" label="Første fraværsdag" />
+
+            {#if senderSøknad}
+                <hr />
+                <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" />
+                <DateInput bind:value="{sendtArbeidsgiver}" label="Søknad sendt arbeidsgiver" />
+
+                <NumberInput
+                    bind:value="{faktiskgrad}"
+                    placeholder="Faktisk arbeidsgrad i søknad"
+                    min
+                    max
+                />
+            {/if}
         {/if}
     </Card>
     <span class="buttons">
-        <EditButton size="20" onClick="{toggleShowDetail}"/>
-        <DeleteButton size="20" onClick="{onRemove}"/>
+        <EditButton size="20" onClick="{toggleShowDetail}" />
+        <DeleteButton size="20" onClick="{onRemove}" />
     </span>
 </span>
 
 <style>
-    .vedtaksperiode-button {
-        background: none;
-        border: none;
-        outline: none;
-        font-size: unset;
-        padding: 0;
-        margin: 0;
-        cursor: pointer;
-    }
     .buttons {
         display: flex;
         margin-top: 1.125rem;
@@ -80,6 +94,7 @@
     }
     .vedtaksperiode-container {
         display: flex;
+        position: relative;
     }
     :global(.vedtaksperiode-container .card) {
         margin: 0.5rem 0;
@@ -107,6 +122,7 @@
         font-weight: 600;
         border-radius: 1rem;
         margin-left: 0.5rem;
+        transition: all 0.1s ease;
     }
     .sm {
         box-shadow: 0 0 0 2px #2f00ff;
@@ -119,5 +135,15 @@
     .im {
         box-shadow: 0 0 0 2px #ff008c;
         color: #ff008c;
+    }
+    .dokument.inactive {
+        box-shadow: 0 0 0 2px var(--background-light);
+        color: var(--background-light);
+    }
+    hr {
+        margin: 2rem -1rem 1.5rem;
+        border: none;
+        height: 1px;
+        background: var(--background-light);
     }
 </style>

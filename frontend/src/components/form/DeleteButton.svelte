@@ -12,7 +12,7 @@
     out:fly="{{ x: 20, duration: 200 }}"
     style="--size: {size}px"
 >
-    <svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
+    <svg xmlns="http://www.w3.org/2000/svg" height="{size}" viewBox="0 0 24 24" width="{size}">
         <path d="M0 0h24v24H0V0z" fill="none"></path>
         <path
             class="icon"

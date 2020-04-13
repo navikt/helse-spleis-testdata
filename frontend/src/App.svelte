@@ -27,7 +27,7 @@
 
 <div class="app">
     <div class="main-menu">
-        <h1>Spleis testdata</h1>
+        <h1>🧬 Spleis testdata</h1>
         <nav>
             {#if process.env.NODE_ENV === 'development'}
                 <SectionButton
@@ -118,7 +118,6 @@
         display: flex;
         align-items: center;
         height: 6.5rem;
-        margin-bottom: 1rem;
     }
     h1 {
         font-size: 2rem;

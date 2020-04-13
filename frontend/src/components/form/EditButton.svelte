@@ -14,7 +14,7 @@
     out:fly="{{ x: 20, duration: 200 }}"
     style="--size: {size}px"
 >
-    <EditIcon size="{size}" />
+    <EditIcon {size} />
 </button>
 
 <style>
@@ -34,13 +34,14 @@
         cursor: pointer;
         transition: all 0.1s ease;
     }
-    .edit-button:hover {
+    .edit-button:hover,
+    .edit-button:focus {
         background: var(--font-color);
     }
     .edit-button:active {
         box-shadow: 0 0 0 3px var(--font-color);
     }
-    :global(.edit-button:hover path:first-child) {
+    :global(.edit-button:hover path:first-child, .edit-button:focus path:first-child) {
         fill: #fff;
     }
 </style>

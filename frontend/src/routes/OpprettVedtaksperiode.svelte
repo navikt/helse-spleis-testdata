@@ -1,5 +1,6 @@
 <script>
     import { deletePerson, getInntekt, postVedtaksperiode } from '../io/http';
+    import { uuid } from '../scripts/uuid';
     import Card from '../components/Card.svelte';
     import Form from '../components/form/Form.svelte';
     import Input from '../components/form/Input.svelte';
@@ -70,7 +71,7 @@
     };
 
     const leggTilPeriode = () => {
-        arbeidsgiverperiode = arbeidsgiverperiode.concat({});
+        arbeidsgiverperiode = arbeidsgiverperiode.concat({ id: uuid() });
     };
 
     const fjernPeriode = i => {
@@ -81,7 +82,7 @@
     };
 
     const leggTilFerie = () => {
-        ferieInntektsmelding = ferieInntektsmelding.concat({});
+        ferieInntektsmelding = ferieInntektsmelding.concat({ id: uuid() });
     };
 
     const fjernFerie = i => {
@@ -147,14 +148,14 @@
             <NumberInput
                 bind:value="{faktiskgrad}"
                 placeholder="Faktisk arbeidsgrad i søknad"
-                min
-                max
+                min="0"
+                max="100"
             />
         </Card>
 
         <AddButton label="Legg inn arbeidsgiverperioder" onClick="{leggTilPeriode}" />
         <span class="perioder">
-            {#each arbeidsgiverperiode as periode, i}
+            {#each arbeidsgiverperiode as periode, i (periode.id)}
                 <DateRange
                     bind:start="{periode.fom}"
                     startLabel="Arbeidsgiverperiode f.o.m."
@@ -166,7 +167,7 @@
         </span>
         <AddButton label="Legg inn ferie" onClick="{leggTilFerie}" />
         <span class="perioder">
-            {#each ferieInntektsmelding as ferie, i}
+            {#each ferieInntektsmelding as ferie, i (ferie.id)}
                 <DateRange
                     bind:start="{ferie.fom}"
                     startLabel="Ferie f.o.m."

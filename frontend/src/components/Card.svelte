@@ -1,11 +1,12 @@
 <script>
     import { fly } from 'svelte/transition';
 
+    export let className = '';
     export let title = null;
 </script>
 
 <div
-    class="card"
+    class="{`card ${className}`}"
     in:fly="{{ x: -20, duration: 200, delay: 50 }}"
     out:fly="{{ x: -20, duration: 200 }}"
 >

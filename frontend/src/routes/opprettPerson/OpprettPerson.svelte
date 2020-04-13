@@ -1,4 +1,5 @@
 <script>
+    import { flip } from 'svelte/animate';
     import { uuid } from '../../scripts/uuid';
     import { getInntekt } from '../../io/http';
     import Card from '../../components/Card.svelte';
@@ -6,6 +7,7 @@
     import NumberInput from '../../components/form/NumberInput.svelte';
     import AddButton from '../../components/form/AddButton.svelte';
     import Vedtaksperiode from './Vedtaksperiode.svelte';
+    import InfoCard from '../../components/InfoCard.svelte';
 
     let fnr;
     let inntekt;
@@ -21,7 +23,15 @@
     };
 
     const leggTilVedtaksperiode = () => {
-        vedtaksperioder = [...vedtaksperioder, { id: uuid() }];
+        vedtaksperioder = [
+            ...vedtaksperioder.map(periode => ({ ...periode, isOpen: false })),
+            {
+                id: uuid(),
+                isOpen: true,
+                sykdomFom: '2020-01-01',
+                sykdomTom: '2020-01-31'
+            }
+        ];
     };
 
     const fjernVedtaksperiode = index => {
@@ -32,6 +42,7 @@
 </script>
 
 <div class="opprett-person">
+    <InfoCard>Foreløpig støttes kun én arbeidsgiver pr. person.</InfoCard>
     <Card title="Person">
         <Input bind:value="{fnr}" onBlur="{hentInntekt}" placeholder="Fødselsnummer" required />
         <Input bind:value="{orgnummer}" placeholder="Organisasjonsnummer" required />
@@ -46,16 +57,23 @@
     <AddButton label="Legg til vedtaksperiode/dokument" onClick="{leggTilVedtaksperiode}" />
     <div class="perioder">
         {#each vedtaksperioder as periode, i (periode.id)}
-            <Vedtaksperiode
-                bind:sykdomFom={periode.sykdomFom}
-                bind:sykdomTom={periode.sykdomTom}
-                onRemove="{() => fjernVedtaksperiode(i)}"
-            />
+            <div animate:flip="{{ duration: 300 }}">
+                <Vedtaksperiode
+                    bind:isOpen="{periode.isOpen}"
+                    bind:sykdomFom="{periode.sykdomFom}"
+                    bind:sykdomTom="{periode.sykdomTom}"
+                    onRemove="{() => fjernVedtaksperiode(i)}"
+                />
+            </div>
         {/each}
     </div>
 </div>
 
 <style>
+    .flex {
+        display: flex;
+        align-items: center;
+    }
     .column {
         position: relative;
     }

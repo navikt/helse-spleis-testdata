@@ -26,6 +26,8 @@
     let faktiskgrad = null;
     let arbeidsgiverperiode = [];
     let ferieInntektsmelding = [];
+    let opphørRefusjon = null;
+    let endringRefusjon = [];
     let førstefraværsdag = '2020-01-01';
 
     const onSubmit = async () => {
@@ -45,7 +47,9 @@
             faktiskgrad,
             førstefraværsdag,
             arbeidsgiverperiode,
-            ferieInntektsmelding
+            ferieInntektsmelding,
+            opphørRefusjon,
+            endringRefusjon
         };
 
         if (gjenopprett) await deletePerson({ fnr });
@@ -77,6 +81,17 @@
         ferieInntektsmelding = [
             ...ferieInntektsmelding.slice(0, i),
             ...ferieInntektsmelding.slice(i + 1)
+        ];
+    };
+
+    const leggTilEndringRefusjon = () => {
+        endringRefusjon = endringRefusjon.concat({});
+    };
+
+    const fjernEndring = i => {
+        endringRefusjon = [
+            ...endringRefusjon.slice(0, i),
+            ...endringRefusjon.slice(i + 1)
         ];
     };
 </script>
@@ -137,9 +152,20 @@
                 />
             {/each}
         </span>
+        <AddButton label="Legg inn endring i refusjon" onClick="{leggTilEndringRefusjon}" />
+        <span>
+            {#each endringRefusjon as endring, i}
+                <DateInput
+                    bind:value="{endring}"
+                    startLabel="Dato for endring"
+                    onRemove="{() => fjernEndring(i)}"
+                />
+            {/each}
+        </span>
     </span>
 
     <span class="form-group">
+        <DateInput bind:value="{opphørRefusjon}" label="Opphør refusjon" />
         <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" />
         <DateInput bind:value="{sendtArbeidsgiver}" label="Søknad sendt arbeidsgiver" />
         <NumberInput

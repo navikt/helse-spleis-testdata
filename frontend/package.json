@@ -27,9 +27,9 @@
     "express": "^4.17.1",
     "husky": "^4.2.3",
     "parcel-bundler": "^1.12.4",
-    "parcel-plugin-svelte": "^4.0.5",
+    "parcel-plugin-svelte": "^4.0.6",
     "prettier": "^2.0.2",
     "prettier-plugin-svelte": "^0.7.0",
-    "svelte": "^3.16.7"
+    "svelte": "^3.20.1"
   }
 }

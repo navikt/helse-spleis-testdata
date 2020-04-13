@@ -26,10 +26,10 @@ fun inntektsmelding(
             "beregnetInntekt":"${vedtak.inntekt}",
             "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
             "refusjon":{
-            "beloepPrMnd":"${vedtak.inntekt}",
-            "opphoersdato":null
+                "beloepPrMnd":"${vedtak.inntekt}",
+                "opphoersdato":${vedtak.opphørRefusjon?.let { "\"$it\"" } ?: "null"}
             },
-            "endringIRefusjoner":[],
+            "endringIRefusjoner":[${vedtak.endringIRefusjon.joinToString { "\"$it\"" }}],
             "opphoerAvNaturalytelser":[],
             "gjenopptakelseNaturalytelser":[],
             "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},

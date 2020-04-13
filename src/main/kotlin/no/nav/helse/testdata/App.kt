@@ -202,6 +202,7 @@ internal fun Routing.registerVedtaksperiodeApi(
             val inntektsmelding = inntektsmelding(vedtak, aktørId)
             log.info("produserer inntektsmelding på aktør: $aktørId")
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
+                .also { log.info("produsert inntektsmelding $inntektsmelding") }
         }
 
         call.respond(HttpStatusCode.OK)
@@ -252,7 +253,9 @@ data class Vedtak(
     val sendtArbeidsgiver: LocalDate? = null,
     val førstefraværsdag: LocalDate?,
     val arbeidsgiverperiode: List<Periode>,
-    val ferieInntektsmelding: List<Periode>
+    val ferieInntektsmelding: List<Periode>,
+    val opphørRefusjon: LocalDate? = null,
+    val endringIRefusjon: List<LocalDate> = emptyList()
 )
 
 data class Periode(val fom: LocalDate, val tom: LocalDate)

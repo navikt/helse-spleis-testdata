@@ -35,6 +35,7 @@
         width: max-content;
         padding: 0.5rem 2.5rem;
         font-size: 1rem;
+        transition: all 0.1s ease;
     }
     input:hover,
     input:focus {

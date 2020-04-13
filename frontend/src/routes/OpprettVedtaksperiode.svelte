@@ -113,11 +113,7 @@
                     placeholder="Fødselsnummer"
                     required
                 />
-                <Input
-                    bind:value="{orgnummer}"
-                    placeholder="Organisasjonsnummer"
-                    required
-                />
+                <Input bind:value="{orgnummer}" placeholder="Organisasjonsnummer" required />
                 <NumberInput
                     bind:value="{inntekt}"
                     placeholder="Inntekt"

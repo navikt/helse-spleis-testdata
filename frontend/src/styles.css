@@ -53,6 +53,11 @@ input[type="text"].hide  {
     background-color: #c2c2c2
 }
 
+input:disabled {
+    background: var(--light-disabled-color);
+    color: var(--disabled-color);
+}
+
 input:hover { border-color: var(--active-color); }
 
 input:focus {

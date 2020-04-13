@@ -24,11 +24,7 @@
 <ContentColumn>
     <Card>
         <Form {onSubmit} bind:status>
-            <Input
-                bind:value="{fnr}"
-                placeholder="Arbeidstakers fødselsnummer"
-                required
-            />
+            <Input bind:value="{fnr}" placeholder="Arbeidstakers fødselsnummer" required />
             <SubmitButton value="Hent inntekt" {status} />
         </Form>
     </Card>

@@ -29,7 +29,7 @@
     }
     button:hover,
     button:focus {
-        background: var(--light-background);
+        background: var(--background-light);
     }
     button.active,
     button:active {

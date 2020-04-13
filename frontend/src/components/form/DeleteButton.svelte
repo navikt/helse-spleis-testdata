@@ -2,7 +2,7 @@
     import { fly } from 'svelte/transition';
 
     export let onClick = () => null;
-    export let label = 'Fjern';
+    export let size = 24;
 </script>
 
 <button
@@ -10,8 +10,9 @@
     on:click|preventDefault="{onClick}"
     in:fly="{{ x: 20, duration: 200 }}"
     out:fly="{{ x: 20, duration: 200 }}"
+    style="--size: {size}px"
 >
-    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+    <svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 0 24 24" width={size}>
         <path d="M0 0h24v24H0V0z" fill="none"></path>
         <path
             class="icon"
@@ -29,13 +30,14 @@
         align-items: center;
         justify-content: center;
         background: var(--background);
-        height: 2.5rem;
-        width: 2.5rem;
+        width: calc(var(--size) + 1rem);
+        height: calc(var(--size) + 1rem);
         padding: 0;
         border-radius: 50%;
         border: none;
         cursor: pointer;
         outline: none;
+        transition: all 0.1s ease;
     }
     button:hover,
     button:focus {

@@ -4,7 +4,7 @@
 
     export let className = '';
     export let placeholder;
-    export let value;
+    export let value = null;
     export let onBlur = () => {};
     export let invalid = false;
     export let required = false;

@@ -1,15 +1,15 @@
 <script>
+    import IdIcon from './components/icons/IdIcon.svelte';
+    import MoneyIcon from './components/icons/MoneyIcon.svelte';
+    import DeleteIcon from './components/icons/DeleteIcon.svelte';
     import SlettPerson from './routes/SlettPerson.svelte';
-    import OpprettVedtaksperiode from './routes/OpprettVedtaksperiode.svelte';
-    import SectionButton from './components/SectionButton.svelte';
     import HentInntekt from './routes/HentInntekt.svelte';
     import HentAktørId from './routes/HentAktørid.svelte';
-    import OpprettPerson from './routes/OpprettPerson.svelte';
-    import DeleteIcon from './components/icons/DeleteIcon.svelte';
-    import MoneyIcon from './components/icons/MoneyIcon.svelte';
-    import IdIcon from './components/icons/IdIcon.svelte';
     import CalendarIcon from './components/icons/CalendarIcon.svelte';
+    import SectionButton from './components/SectionButton.svelte';
     import AddPersonIcon from './components/icons/AddPersonIcon.svelte';
+    import OpprettPerson from './routes/opprettPerson/OpprettPerson.svelte';
+    import OpprettVedtaksperiode from './routes/OpprettVedtaksperiode.svelte';
 
     const Section = {
         SLETT_PERSON: 'Slett person',
@@ -19,7 +19,10 @@
         OPPRETT_PERSON: 'Opprett person'
     };
 
-    let activeSection = Section.OPPRETT_VEDTAKSPERIODE;
+    let activeSection =
+        process.env.NODE_ENV === 'development'
+            ? Section.OPPRETT_PERSON
+            : Section.OPPRETT_VEDTAKSPERIODE;
 </script>
 
 <div class="app">

@@ -4,7 +4,7 @@
 
     export let min = null;
     export let max = null;
-    export let value;
+    export let value = null;
     export let placeholder;
     export let className = '';
     export let onBlur = () => {};

@@ -5,27 +5,62 @@
     export let value;
     export let label = '';
     export let className = '';
-    export let placeholder = '';
-    export let invalid = false;
+    export let placeholder = label;
     export let required = false;
+
+    let isActive = false;
 </script>
 
-<span class="date-input">
-    <label for="{id}">{label}</label>
-    <input {id} type="date" class:invalid class="{className}" bind:value {required} />
-</span>
+<div class="input-container" class:isActive>
+    <input
+        {id}
+        on:focus="{() => (isActive = true)}"
+        on:blur="{() => (isActive = false)}"
+        type="date"
+        aria-label="{label}"
+        class="{className}"
+        bind:value
+        {required}
+    />
+    <div class="placeholder" class:isActive>{placeholder}</div>
+</div>
 
 <style>
-    .date-input {
+    .input-container {
+        position: relative;
+        width: max-content;
         display: flex;
         flex-direction: column;
     }
-    input {
-        margin-bottom: 0.75rem;
+    .input-container:before {
+        position: absolute;
+        content: '';
+        background: var(--active-color);
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        z-index: 1000;
+        transition: all 0.2s ease;
     }
-    .invalid {
-        border-color: red;
-        color: red;
-        background: pink;
+    .input-container.isActive:before {
+        left: 0;
+        width: 100%;
+        height: 2px;
+    }
+    .placeholder {
+        user-select: none;
+        pointer-events: none;
+        position: absolute;
+        color: #7f7f7f;
+        transition: all 0.2s ease;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+    .placeholder.isActive {
+        color: var(--active-color);
+    }
+    input {
+        padding: 1.25rem 0.75rem 0.25rem;
     }
 </style>

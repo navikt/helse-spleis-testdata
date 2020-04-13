@@ -41,7 +41,7 @@
     </button>
     <button
         type="button"
-        on:click="{() => showModal = true}"
+        on:click="{() => (showModal = true)}"
         class="mortest {classForMortness(3)}"
     >
         {mortnessScale[3]}
@@ -55,7 +55,7 @@
             currentMortness = 3;
             showModal = false;
         }}"
-        onClose="{() => showModal = false}"
+        onClose="{() => (showModal = false)}"
     />
 {/if}
 
@@ -145,7 +145,9 @@
         }
     }
 
-    :global(.shake) { animation: shake-max 0.1s linear both infinite; }
+    :global(.shake) {
+        animation: shake-max 0.1s linear both infinite;
+    }
 
     button.equal.mortest {
         animation: shake-max 0.1s linear both infinite;

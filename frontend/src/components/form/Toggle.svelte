@@ -40,7 +40,7 @@
         height: 1rem;
         width: 1.5rem;
         border: none;
-        margin-right: 0.5rem;
+        margin: 0 0.5rem 0 0;
         border-radius: 0.5rem;
         background-color: #c2c2c2;
         transition: all 0.1s ease-in-out;

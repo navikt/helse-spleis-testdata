@@ -9,7 +9,7 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html --out-dir ../public",
-    "prettier": "prettier --write --plugin-search-dir=. ./src/**/*.(svelte|js)",
+    "prettier": "prettier --write --plugin-search-dir=. ./src/**/*.svelte",
     "mock-server": "node mock/server.js"
   },
   "repository": {

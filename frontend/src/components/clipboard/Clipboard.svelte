@@ -1,5 +1,6 @@
 <script>
     import { copyContentsToClipboard } from './copy';
+    import CopyIcon from '../icons/CopyIcon.svelte';
 
     export let value = '';
 
@@ -14,7 +15,7 @@
     };
 </script>
 
-<div class="container">
+<div class="clipboard">
     <div class="value" bind:this="{valueContainer}">
         {value}
         {#if copied}
@@ -22,18 +23,17 @@
         {/if}
     </div>
     <button on:click="{copy}" {disabled}>
-        <i class="material-icons-outlined">file_copy</i>
+        <CopyIcon height="20" width="20" />
     </button>
 </div>
 
 <style>
-    .container {
+    .clipboard {
         display: flex;
         align-items: center;
         background: #ededed;
         height: 2rem;
         width: 20rem;
-        margin: 0 2rem;
         border-radius: 0.25rem;
     }
     .value {
@@ -70,8 +70,8 @@
         font-size: 1rem;
         color: white;
     }
-    button:active i {
-        color: var(--active-color-dark);
+    button:active :global(svg > path:last-of-type) {
+        fill: var(--active-color-dark);
     }
     button[disabled] i {
         color: white;
@@ -81,7 +81,10 @@
         font-weight: 600;
         margin: 0.5rem 2rem;
     }
-    i.done {
-        color: var(--active-color-dark);
+    :global(.clipboard svg) {
+        margin: 0;
+    }
+    :global(.clipboard svg > path:last-of-type) {
+        fill: #fff;
     }
 </style>

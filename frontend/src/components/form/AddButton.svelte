@@ -1,64 +1,58 @@
 <script>
+    import { fly, fade } from 'svelte/transition';
+
     export let onClick = () => null;
     export let label = '';
 </script>
 
-<button type="button" on:click|preventDefault="{onClick}">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="-1 -1 25 25">
-        <g
-            stroke="#0067c5"
-            stroke-width="2px"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-miterlimit="10"
-            fill="none"
-        >
-            <circle cx="11.5" cy="11.5" r="11"></circle>
-            <path d="M11.5 5.5v12M17.5 11.5h-12"></path>
-        </g>
+<button
+    class="add-button"
+    type="button"
+    on:click|preventDefault="{onClick}"
+    in:fly="{{ x: -20, duration: 200, delay: 50 }}"
+    out:fly="{{ x: -20, duration: 200 }}"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+        <path d="M0 0h24v24H0V0z" fill="none"></path>
+        <path
+            fill="var(--font-color)"
+            d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
+            10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+        ></path>
     </svg>
-    <span class="label">{label}</span>
+    <span class="label">
+        {label}
+        <slot />
+    </span>
 </button>
 
 <style>
-    .label {
-        color: #0067c5;
-        font-size: 1rem;
-        padding: 0 0.125rem;
-        margin: 0 0 0 0.75rem;
-        box-shadow: inset 0 -1px 0 0 #0067c5;
-    }
-    .content {
-        margin: 1rem 2.325rem;
-    }
     button {
         display: flex;
         align-items: center;
-        background: none;
-        padding: 0;
+        background: var(--background-light);
+        width: max-content;
         border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        outline: none;
         cursor: pointer;
-        margin-bottom: 0.5rem;
-    }
-    button:focus g,
-    button:active g {
-        fill: #254b6d;
-        stroke: #254b6d;
-    }
-    button:focus path,
-    button:active path {
-        stroke: #fff;
-    }
-    button:focus .label,
-    button:active .label {
-        color: #254b6d;
     }
     button:hover,
     button:focus {
-        outline: none;
+        background: var(--background);
     }
-    button:hover .label,
-    button:focus .label {
-        box-shadow: none;
+    button:active {
+        background: var(--background-dark);
+        box-shadow: 0 0 0 3px var(--background-dark);
+    }
+    .label {
+        font-size: 1rem;
+    }
+    :global(.add-button:not(:last-child)) {
+        margin-bottom: 1.5rem;
+    }
+    svg {
+        margin-right: 0.5rem;
     }
 </style>

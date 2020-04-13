@@ -1,13 +1,19 @@
 <script>
-    import Input from './form/Input.svelte';
-    import Form from './form/Form.svelte';
-    import DateInput from './form/DateInput.svelte';
-    import NumberInput from './form/NumberInput.svelte';
     import { deletePerson, getInntekt, postVedtaksperiode } from '../io/http';
-    import Switch from './form/Toggle.svelte';
-    import AddButton from './form/AddButton.svelte';
-    import DateRange from './form/DateRange.svelte';
-    import Mortness from './mortness/Mortness.svelte';
+    import Card from '../components/Card.svelte';
+    import Form from '../components/form/Form.svelte';
+    import Input from '../components/form/Input.svelte';
+    import Toggle from '../components/form/Toggle.svelte';
+    import Mortness from '../components/mortness/Mortness.svelte';
+    import FormGroup from '../components/form/FormGroup.svelte';
+    import DateInput from '../components/form/DateInput.svelte';
+    import AddButton from '../components/form/AddButton.svelte';
+    import DateRange from '../components/form/DateRange.svelte';
+    import NumberInput from '../components/form/NumberInput.svelte';
+    import SubmitButton from '../components/form/SubmitButton.svelte';
+    import ContentColumn from '../components/ContentColumn.svelte';
+
+    let status;
 
     let invalid = false;
     let fnr = '';
@@ -26,9 +32,9 @@
     let faktiskgrad = null;
     let arbeidsgiverperiode = [];
     let ferieInntektsmelding = [];
+    let førstefraværsdag = '2020-01-01';
     let opphørRefusjon = null;
     let endringRefusjon = [];
-    let førstefraværsdag = '2020-01-01';
 
     const onSubmit = async () => {
         const vedtak = {
@@ -60,6 +66,7 @@
         event.preventDefault();
         const respons = await getInntekt({ fnr });
         respons.json().then(data => (inntekt = data.beregnetMånedsinntekt));
+        console.log(respons);
     };
 
     const leggTilPeriode = () => {
@@ -96,40 +103,61 @@
     };
 </script>
 
-<Form {onSubmit} submitText="Opprett vedtaksperiode">
-    <span class="form-group">
-        <Input
-            bind:value="{fnr}"
-            onblur="{hentInntekt}"
-            label="Fødselsnummer"
-            placeholder="Arbeidstakers fødselsnummer"
-            required
-        />
-        <Switch label="Slett og gjenskap data for personen" bind:checked="{gjenopprett}" />
-    </span>
-    <span class="form-group">
-        <Input
-            bind:value="{orgnummer}"
-            label="Organisasjonsnummer"
-            placeholder="Arbeidsgivers organisasjonsnummer"
-            required
-        />
-    </span>
-    <span class="form-group">
-        <Switch label="Send sykmelding" bind:checked="{skalSendeSykmelding}" />
-        <Switch label="Send søknad" bind:checked="{skalSendeSøknad}" />
-        <Switch label="Send inntektsmelding" bind:checked="{skalSendeInntektsmelding}" />
-        <Switch label="Har andre inntektskilder" bind:checked="{harAndreInntektskilder}" />
-    </span>
-    <span class="form-group">
-        <DateInput bind:value="{førstefraværsdag}" label="Første fraværsdag" />
-        <DateInput bind:value="{sykdomFom}" label="Sykdom f.o.m." required />
-        <DateInput bind:value="{sykdomTom}" label="Sykdom t.o.m." required />
-    </span>
+<ContentColumn>
+    <Form {onSubmit} bind:status>
+        <Card title="Person">
+            <FormGroup>
+                <Input
+                    bind:value="{fnr}"
+                    onBlur="{hentInntekt}"
+                    placeholder="Fødselsnummer"
+                    required
+                />
+                <Input
+                    bind:value="{orgnummer}"
+                    placeholder="Organisasjonsnummer"
+                    required
+                />
+                <NumberInput
+                    bind:value="{inntekt}"
+                    placeholder="Inntekt"
+                    required="{skalSendeInntektsmelding}"
+                    disabled="{!skalSendeInntektsmelding}"
+                />
+            </FormGroup>
+            <Toggle label="Slett og gjenskap data for personen" bind:checked="{gjenopprett}" />
+            <Toggle label="Send sykmelding" bind:checked="{skalSendeSykmelding}" />
+            <Toggle label="Send søknad" bind:checked="{skalSendeSøknad}" />
+            <Toggle label="Send inntektsmelding" bind:checked="{skalSendeInntektsmelding}" />
+            <Toggle label="Har andre inntektskilder" bind:checked="{harAndreInntektskilder}" />
+        </Card>
+        <Card title="Sykdom">
+            <DateInput bind:value="{førstefraværsdag}" label="Første fraværsdag" />
+            <DateInput bind:value="{sykdomFom}" label="Sykdom f.o.m." required />
+            <DateInput bind:value="{sykdomTom}" label="Sykdom t.o.m." required />
+        </Card>
 
-    <span class="form-group">
+        <Card title="Søknad">
+            <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" />
+            <DateInput bind:value="{sendtArbeidsgiver}" label="Søknad sendt arbeidsgiver" />
+            <DateInput bind:value="{opphørRefusjon}" label="Opphør refusjon" />
+            <NumberInput
+                bind:value="{sykmeldingsgrad}"
+                placeholder="Sykdomsgrad i sykmeldingen"
+                required
+                min="0"
+                max="100"
+            />
+            <NumberInput
+                bind:value="{faktiskgrad}"
+                placeholder="Faktisk arbeidsgrad i søknad"
+                min
+                max
+            />
+        </Card>
+
         <AddButton label="Legg inn arbeidsgiverperioder" onClick="{leggTilPeriode}" />
-        <span>
+        <span class="perioder">
             {#each arbeidsgiverperiode as periode, i}
                 <DateRange
                     bind:start="{periode.fom}"
@@ -141,7 +169,7 @@
             {/each}
         </span>
         <AddButton label="Legg inn ferie" onClick="{leggTilFerie}" />
-        <span>
+        <span class="perioder">
             {#each ferieInntektsmelding as ferie, i}
                 <DateRange
                     bind:start="{ferie.fom}"
@@ -153,7 +181,7 @@
             {/each}
         </span>
         <AddButton label="Legg inn endring i refusjon" onClick="{leggTilEndringRefusjon}" />
-        <span>
+        <span class="perioder">
             {#each endringRefusjon as endring, i}
                 <DateInput
                     bind:value="{endring}"
@@ -162,45 +190,13 @@
                 />
             {/each}
         </span>
-    </span>
-
-    <span class="form-group">
-        <DateInput bind:value="{opphørRefusjon}" label="Opphør refusjon" />
-        <DateInput bind:value="{sendtNav}" label="Søknad sendt NAV" />
-        <DateInput bind:value="{sendtArbeidsgiver}" label="Søknad sendt arbeidsgiver" />
-        <NumberInput
-            bind:value="{sykmeldingsgrad}"
-            label="Sykmeldingsgrad"
-            placeholder="Sykdomsgrad på sykmeldingen"
-            required
-            min="0"
-            max="100"
-        />
-        <NumberInput
-            bind:value="{faktiskgrad}"
-            label="Faktisk arbeidsgrad i søknad"
-            placeholder="Faktisk arbeidsgrad"
-            min
-            max
-        />
-    </span>
-    <span class="form-group">
-        <Input
-            bind:value="{inntekt}"
-            label="Inntekt"
-            placeholder="0"
-            required="{skalSendeInntektsmelding}"
-            disabled="{!skalSendeInntektsmelding}"
-        />
-    </span>
-    <span class="form-group">
         <Mortness />
-    </span>
-</Form>
+        <SubmitButton className="block-l" value="Opprett vedtaksperiode" {status} />
+    </Form>
+</ContentColumn>
 
 <style>
-    .form-group {
+    :global(.perioder > *:last-child) {
         margin-bottom: 1.5rem;
-        width: max-content;
     }
 </style>

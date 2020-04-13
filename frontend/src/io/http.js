@@ -1,5 +1,11 @@
 const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '';
 
+export const Status = {
+    Suksess: 'suksess',
+    Sender: 'sender',
+    Error: 'error'
+};
+
 export const getInntekt = async ({ fnr }) => {
     return await fetch(`${baseUrl}/person/inntekt`, {
         method: 'get',

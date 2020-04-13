@@ -8,8 +8,17 @@ skal inngå som en del av <style>-taggen til komponentfila.
 *:not(code) {
     color: #3e3832;
     font-family: 'Source Sans Pro', sans-serif;
+    --font-color: #3e3832;
     --active-color: #00b58a;
     --active-color-dark: #006E54;
+    --active-color-blue: #0067c5;
+    --active-color-blue-dark: #254b6d;
+
+    --inactive-color: #c2c2c2;
+    --background-light: #e5dfdc;
+    --background: #d2c5c0;
+    --background-dark: #a38f88;
+    --light-disabled-color: #f3f3f3;
     --disabled-color: #c2c2c2;
 }
 
@@ -27,11 +36,12 @@ label {
 }
 
 input[type="date"], input[type="text"], input[type="number"] {
+    position: relative;
     appearance: none;
-    padding: 0.5rem;
-    background-color: #FFF;
-    border-radius: 4px;
-    border: 1px solid rgb(120, 112, 106);
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 0.5rem 0.5rem 0 0;
+    box-shadow: 0 1px 0 0 var(--inactive-color);
     box-sizing: border-box;
     line-height: 1.375rem;
     min-width: 20rem;
@@ -47,9 +57,12 @@ input:hover { border-color: var(--active-color); }
 
 input:focus {
     outline: 0;
-    box-shadow: 0 0 0 3px var(--active-color-dark);
 }
 
 input:-moz-submit-invalid, input:-moz-ui-invalid {
     box-shadow: none;
+}
+
+.block-l {
+    margin-bottom: 3.5rem;
 }

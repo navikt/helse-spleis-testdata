@@ -10,7 +10,7 @@
     const akseptstring = 'Jeg aksepterer risken';
 </script>
 
-<Modal className="shake" onClose={onClose}>
+<Modal className="shake" {onClose}>
     <div class="modalinnhold">
         <h1>🚨🚨🚨🚨🚨</h1>
         <p>

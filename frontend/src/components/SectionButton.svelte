@@ -1,41 +1,38 @@
 <script>
-    export let label;
     export let onClick;
     export let isActive = false;
 </script>
 
-<button class:active="{isActive}" on:click="{onClick}">{label}</button>
+<button class="section-button" class:active="{isActive}" on:click="{onClick}">
+    <slot />
+</button>
 
 <style>
     button {
-        background: white;
-        color: black;
-        position: relative;
-        border: none;
-        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        color: #3e3832;
+        background: none;
+        padding: 0.75rem 1rem;
+        text-align: left;
         font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.5rem;
+        margin: 0.25rem 0;
         cursor: pointer;
-        margin: 0;
-        transition: all 0.2s;
+        outline: none;
+        transition: background 0.1s ease;
     }
-    button:after {
-        position: absolute;
-        content: '';
-        height: 5px;
-        width: 100%;
-        left: 0;
-        bottom: -5px;
-        transition: all 0.2s;
+    :global(.section-button > *) {
+        margin-right: 0.5rem;
     }
-    button.active:after,
-    button:focus:after,
-    button:hover:after {
-        background: var(--active-color);
-    }
-    button.active,
     button:hover,
     button:focus {
-        outline: none;
-        color: var(--active-color);
+        background: var(--light-background);
+    }
+    button.active,
+    button:active {
+        background: #bce8de;
     }
 </style>

@@ -1,60 +1,52 @@
 <script>
+    import { fly } from 'svelte/transition';
+
     export let onClick = () => null;
     export let label = 'Fjern';
 </script>
 
-<button type="button" on:click|preventDefault="{onClick}">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="-1 -1 25 25">
-        <g
-            stroke="#0067c5"
-            stroke-width="2px"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-miterlimit="10"
-            fill="none"
-        >
-            <path
-                d="M3.516 3.5h16v20h-16zM7.516.5h8v3h-8zM1.016 3.5h22M7.516 7v12M11.516 7v12M15.516
-                7v12"
-            ></path>
-        </g>
+<button
+    type="button"
+    on:click|preventDefault="{onClick}"
+    in:fly="{{ x: 20, duration: 200 }}"
+    out:fly="{{ x: 20, duration: 200 }}"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+        <path d="M0 0h24v24H0V0z" fill="none"></path>
+        <path
+            class="icon"
+            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12
+            1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59
+            14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"
+        ></path>
+        <path d="M0 0h24v24H0z" fill="none"></path>
     </svg>
-    <span class="label">{label}</span>
 </button>
 
 <style>
-    .label {
-        color: #0067c5;
-        font-size: 1rem;
-        padding: 0 0.125rem;
-        margin: 0 0 0 0.75rem;
-        box-shadow: inset 0 -1px 0 0 #0067c5;
-    }
-    .content {
-        margin: 1rem 2.325rem;
-    }
     button {
         display: flex;
         align-items: center;
-        background: none;
+        justify-content: center;
+        background: var(--background);
+        height: 2.5rem;
+        width: 2.5rem;
         padding: 0;
+        border-radius: 50%;
         border: none;
         cursor: pointer;
-    }
-    button:focus path,
-    button:active path {
-        stroke: #254b6d;
-    }
-    button:focus .label,
-    button:active .label {
-        color: #254b6d;
+        outline: none;
     }
     button:hover,
     button:focus {
-        outline: none;
+        background: #c73535;
     }
-    button:hover .label,
-    button:focus .label {
-        box-shadow: none;
+    button:hover .icon,
+    button:focus .icon,
+    button:active .icon {
+        fill: #fff;
+    }
+    button:active {
+        box-shadow: 0 0 0 3px #c73535;
     }
 </style>

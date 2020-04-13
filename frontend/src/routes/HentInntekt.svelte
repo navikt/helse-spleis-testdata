@@ -1,12 +1,17 @@
 <script>
-    import Form from './form/Form.svelte';
-    import Input from './form/Input.svelte';
+    import Form from '../components/form/Form.svelte';
+    import Input from '../components/form/Input.svelte';
     import { getInntekt } from '../io/http';
-    import Clipboard from './clipboard/Clipboard.svelte';
+    import Clipboard from '../components/clipboard/Clipboard.svelte';
+    import Card from '../components/Card.svelte';
+    import ContentColumn from '../components/ContentColumn.svelte';
+    import SubmitButton from '../components/form/SubmitButton.svelte';
 
     let inntektField;
     let fnr = '';
     let inntekt = {};
+
+    let status;
 
     const onSubmit = async () => {
         return getInntekt({ fnr }).then(async res => {
@@ -16,15 +21,22 @@
     };
 </script>
 
-<Form {onSubmit} submitText="Hent inntekt">
-    <Input
-        bind:value="{fnr}"
-        label="Fødselsnummer"
-        placeholder="Arbeidstakers fødselsnummer"
-        required
-    />
-</Form>
-<Clipboard value="{inntekt.beregnetMånedsinntekt}" />
+<ContentColumn>
+    <Card>
+        <Form {onSubmit} bind:status>
+            <Input
+                bind:value="{fnr}"
+                placeholder="Arbeidstakers fødselsnummer"
+                required
+            />
+            <SubmitButton value="Hent inntekt" {status} />
+        </Form>
+    </Card>
+    <Card>
+        <label>Inntekt</label>
+        <Clipboard value="{inntekt.beregnetMånedsinntekt}" />
+    </Card>
+</ContentColumn>
 
 <style>
     button {

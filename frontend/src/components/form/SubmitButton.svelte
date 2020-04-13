@@ -1,14 +1,28 @@
 <script>
     import Spinner from '../Spinner.svelte';
+    import { Status } from '../../io/http';
 
+    export let status;
     export let value = '';
-    export let disabled = false;
+    export let className = '';
+
+    let disabled;
+
+    $: disabled = status === Status.Sender;
 </script>
 
-<div class="wrapper">
-    <input type="submit" {value} {disabled} />
-    {#if disabled}
-        <Spinner />
+<div class="{`flex ${className}`}">
+    <div class="wrapper">
+        <input type="submit" {value} {disabled} />
+        {#if disabled}
+            <Spinner />
+        {/if}
+    </div>
+    {#if status === Status.Error}
+        <p class="status error">Noe gikk galt 💔</p>
+    {/if}
+    {#if status === Status.Suksess}
+        <p class="status suksess">Huge success! 🎉</p>
     {/if}
 </div>
 
@@ -41,5 +55,19 @@
         align-items: center;
         width: max-content;
         height: max-content;
+    }
+    p.status {
+        margin: 0 0 0 1rem;
+    }
+    p.error {
+        color: red;
+    }
+    p.suksess {
+        color: var(--active-color);
+    }
+    .flex {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
     }
 </style>

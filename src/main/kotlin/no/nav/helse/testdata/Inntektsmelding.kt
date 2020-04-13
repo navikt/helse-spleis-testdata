@@ -27,7 +27,7 @@ fun inntektsmelding(
             "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
             "refusjon":{
                 "beloepPrMnd":"${vedtak.inntekt}",
-                "opphoersdato":${vedtak.opphørRefusjon?.let { "\"$it\"" } ?: "null"}
+                "opphoersdato":${vedtak.opphørRefusjon?.let { "{\"endringsdato\": \"$it\" }" } ?: "null"}
             },
             "endringIRefusjoner":[${vedtak.endringRefusjon.joinToString { "\"$it\"" }}],
             "opphoerAvNaturalytelser":[],

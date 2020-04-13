@@ -200,9 +200,8 @@ internal fun Routing.registerVedtaksperiodeApi(
         }
         if (vedtak.skalSendeInntektsmelding) {
             val inntektsmelding = inntektsmelding(vedtak, aktørId)
-            log.info("produserer inntektsmelding på aktør: $aktørId")
+            log.info("produserer inntektsmelding på aktør: $aktørId\n$inntektsmelding")
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
-                .also { log.info("produsert inntektsmelding $inntektsmelding") }
         }
 
         call.respond(HttpStatusCode.OK)

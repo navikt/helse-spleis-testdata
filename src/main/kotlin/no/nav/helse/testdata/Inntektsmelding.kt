@@ -22,7 +22,7 @@ fun inntektsmelding(
             "arbeidsgiverFnr":"Don't care",
             "arbeidsgiverAktorId":"Don't care",
             "arbeidsgivertype":"VIRKSOMHET",
-            "arbeidsforholdId":"42",
+            "arbeidsforholdId": "",
             "beregnetInntekt":"${vedtak.inntekt}",
             "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
             "refusjon":{

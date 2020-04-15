@@ -27,6 +27,7 @@
             isActive = false;
         }}"
         on:focus="{() => (isActive = true)}"
+        autocomplete="on"
     />
     <div class="placeholder" class:isActive class:hasValue="{value}">{placeholder}</div>
 </div>

@@ -1,7 +1,7 @@
 <script>
+    import { deletePerson } from '../io/http';
     import Input from '../components/form/Input.svelte';
     import Form from '../components/form/Form.svelte';
-    import { deletePerson, Status } from '../io/http';
     import Card from '../components/Card.svelte';
     import SubmitButton from '../components/form/SubmitButton.svelte';
     import ContentColumn from '../components/ContentColumn.svelte';

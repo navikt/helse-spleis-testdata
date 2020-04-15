@@ -1,9 +1,16 @@
 <script>
-    export let onClick;
-    export let isActive = false;
+    import { route, setCurrentRoute } from '../store/routing';
+
+    export let section;
+
+    $: currentRoute = $route;
 </script>
 
-<button class="section-button" class:active="{isActive}" on:click="{onClick}">
+<button
+    class="section-button"
+    class:active="{section === currentRoute}"
+    on:click="{() => setCurrentRoute(section)}"
+>
     <slot />
 </button>
 

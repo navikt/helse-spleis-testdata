@@ -35,10 +35,10 @@ export const deletePerson = async ({ fnr }) => {
     });
 };
 
-export const postVedtaksperiode = async ({ vedtak }) => {
+export const postVedtaksperiode = async ({ vedtaksperiode }) => {
     return await fetch(`${baseUrl}/vedtaksperiode/`, {
         method: 'post',
-        body: JSON.stringify(vedtak),
+        body: JSON.stringify(vedtaksperiode),
         headers: { 'Content-Type': 'application/json' }
     });
 };

@@ -24,34 +24,21 @@ const addPeriode = key => vedtaksperiodeStore.update(periode => ({
     [key]: [...periode[key], { id: uuid() }]
 }));
 
+const removePeriode = (key, index) => vedtaksperiodeStore.update(periode => ({
+    ...periode,
+    [key]: [
+        ...periode[key].slice(0, index),
+        ...periode[key].slice(index + 1)
+    ]
+}))
+
 export const updateInntekt = inntekt => vedtaksperiodeStore.update(periode => ({ ...periode, inntekt }));
 
+export const addFerie = () => addPeriode('ferieInntektsmelding');
+export const addRefusjonsendring = () => addPeriode('endringRefusjon');
 export const addArbeidsgiverperiode = () => addPeriode('arbeidsgiverperiode');
 
-export const addFerie = () => addPeriode('ferieInntektsmelding');
+export const removeFerie = i => removePeriode('ferieInntektsmelding', i);
+export const removeRefusjonsendring = i => removePeriode('endringRefusjon', i);
+export const removeArbeidsgiverperiode = i => removePeriode('arbeidsgiverperiode', i);
 
-export const addRefusjonsendring = () => addPeriode('endringRefusjon');
-
-export const removeArbeidsgiverperiode = i => vedtaksperiodeStore.update(periode => ({
-    ...periode,
-    arbeidsgiverperiode: [
-        ...periode.arbeidsgiverperiode.slice(0, i),
-        ...periode.arbeidsgiverperiode.slice(i + 1)
-    ]
-}));
-
-export const removeFerie = i => vedtaksperiodeStore.update(periode => ({
-    ...periode,
-    ferieInntektsmelding: [
-        ...periode.ferieInntektsmelding.slice(0, i),
-        ...periode.ferieInntektsmelding.slice(i + 1)
-    ]
-}));
-
-export const removeRefusjonsendring = i => vedtaksperiodeStore.update(periode => ({
-    ...periode,
-    endringRefusjon: [
-        ...periode.endringRefusjon.slice(0, i),
-        ...periode.endringRefusjon.slice(i + 1)
-    ]
-}));

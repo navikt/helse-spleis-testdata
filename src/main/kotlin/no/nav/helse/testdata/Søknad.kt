@@ -36,7 +36,7 @@ fun søknad(
             "sendtNav":${vedtak.sendtNav?.atStartOfDay()?.let { "\"$it\"" }},
             "sendtArbeidsgiver":${vedtak.sendtArbeidsgiver?.atStartOfDay()?.let { "\"$it\"" }},
             "egenmeldinger":[],
-            "papirsykmeldinger":null,
+            "papirsykmeldinger":[],
             "fravar":[],
             "andreInntektskilder":[${if(vedtak.harAndreInntektskilder) { "{\"type\": \"Arbeid\", \"sykmeldt\": true }"} else {""}}],
             "soknadsperioder":[

@@ -181,13 +181,13 @@ internal fun Routing.registerVedtaksperiodeApi(
         val aktørId = aktørIdResult.unwrap()
 
         if (vedtak.skalSendeSykmelding) {
-            log.info("produserer sykmelding på aktør: $aktørId")
             val sykmelding = sykmelding(vedtak, aktørId)
+            log.info("produserer sykmelding på aktør: $aktørId\n$sykmelding")
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
         }
         if (vedtak.skalSendeSøknad) {
-            log.info("produserer søknad på aktør: $aktørId")
             val søknad = søknad(vedtak, aktørId)
+            log.info("produserer søknad på aktør: $aktørId\n$søknad")
             producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
         }
         if (vedtak.skalSendeInntektsmelding) {

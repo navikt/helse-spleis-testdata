@@ -68,7 +68,7 @@ fun main() = runBlocking {
         }
     }
 
-    val stsRestClient = StsRestClient("http://security-token-service", environment.serviceUser)
+    val stsRestClient = StsRestClient("http://security-token-service.default.svc.nais.local", environment.serviceUser)
     val inntektRestClient = InntektRestClient(environment.inntektRestUrl, httpClient, stsRestClient)
     val aktørRestClient = AktørRestClient(environment.aktørRestUrl, httpClient, stsRestClient)
 

@@ -37,9 +37,9 @@ class PersonService(
             )
 
             vedtakIder?.let { (vedtakId, speilSnapshotRef) ->
-                session.run(queryOf("DELETE FROM oppgave WHERE vedtak_ref = ?", speilSnapshotRef).asExecute)
+                session.run(queryOf("DELETE FROM oppgave WHERE vedtak_ref = ?", vedtakId).asExecute)
                 if (personId != null) session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asExecute)
-                session.run(queryOf("DELETE FROM speil_snapshot WHERE id = ?", vedtakId).asExecute)
+                session.run(queryOf("DELETE FROM speil_snapshot WHERE id = ?", speilSnapshotRef).asExecute)
             }
 
             session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asExecute)

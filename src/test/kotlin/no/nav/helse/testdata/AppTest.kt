@@ -170,8 +170,8 @@ class AppTest {
             val personId = it.run(
                 queryOf(
                     "insert into person (fodselsnummer, aktor_id) values (?, ?)",
-                    Integer.parseInt(fnr),
-                    Integer.parseInt(fnr.reversed())
+                    fnr.toLong(),
+                    fnr.reversed().toLong()
                 ).asUpdateAndReturnGeneratedKey
             )
             val speilSnapshotId = it.run(

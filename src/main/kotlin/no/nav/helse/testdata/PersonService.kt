@@ -27,20 +27,19 @@ class PersonService(
         using(sessionOf(spesialistDataSource)) { session ->
             val personId = session.run(
                 queryOf("SELECT id FROM person WHERE fodselsnummer = ?;", Integer.parseInt(fnr))
-                    .map { it.int(0) }.asSingle
+                    .map { it.int(1) }.asSingle
             )
 
             val vedtakIder = session.run(
                 queryOf("SELECT id, speil_snapshot_ref FROM vedtak WHERE person_ref = ?;", personId)
-                    .map { Pair(it.int(0), it.int(1)) }.asSingle
+                    .map { Pair(it.int(1), it.int(2)) }.asSingle
             )
 
             vedtakIder?.let { (vedtakId, speilSnapshotRef) ->
-                session.run(queryOf("DELETE FROM speil_snapshot WHERE id = ?", vedtakId).asExecute)
                 session.run(queryOf("DELETE FROM oppgave WHERE vedtak_ref = ?", speilSnapshotRef).asExecute)
+                if (personId != null) session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asExecute)
+                session.run(queryOf("DELETE FROM speil_snapshot WHERE id = ?", vedtakId).asExecute)
             }
-
-            if (personId != null) session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asExecute)
 
             session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", Integer.parseInt(fnr)).asExecute)
         }

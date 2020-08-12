@@ -7,7 +7,8 @@ create table person
 
 create table speil_snapshot
 (
-    id serial not null constraint speil_snapshot_pkey primary key
+    id serial not null constraint speil_snapshot_pkey primary key,
+    data VARCHAR(255)
 );
 
 create table vedtak

@@ -1,14 +1,7 @@
 package no.nav.helse.testdata
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
 import io.ktor.http.HttpMethod
-import io.ktor.http.fullPath
-import io.ktor.http.headersOf
 import io.ktor.http.isSuccess
 import io.ktor.routing.routing
 import io.ktor.server.testing.handleRequest
@@ -21,9 +14,12 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.sql.Connection
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -52,7 +48,8 @@ class AppTest {
         runMigration(spleisDB, "spleis")
         runMigration(spesialistDB, "spesialist")
         runMigration(spennDB, "spenn")
-        personService = PersonService(spleisDB.postgresDatabase, spesialistDB.postgresDatabase, spennDB.postgresDatabase)
+        personService =
+            PersonService(spleisDB.postgresDatabase, spesialistDB.postgresDatabase, spennDB.postgresDatabase)
     }
 
     @AfterEach
@@ -152,6 +149,11 @@ class AppTest {
     }
 
     private fun opprettPerson(fnr: String) {
+        opprettSpleisPerson(fnr)
+        opprettSpesialistPerson(fnr)
+    }
+
+    private fun opprettSpleisPerson(fnr: String) {
         using(sessionOf(spleisDB.postgresDatabase), {
             it.run(
                 queryOf(
@@ -161,6 +163,33 @@ class AppTest {
                 ).asUpdate
             )
         })
+    }
+
+    private fun opprettSpesialistPerson(fnr: String) {
+        using(sessionOf(spesialistDB.postgresDatabase, returnGeneratedKey = true)) {
+            val personId = it.run(
+                queryOf(
+                    "insert into person (fodselsnummer, aktor_id) values (?, ?)",
+                    Integer.parseInt(fnr),
+                    Integer.parseInt(fnr.reversed())
+                ).asUpdateAndReturnGeneratedKey
+            )
+            val speilSnapshotId = it.run(
+                queryOf(
+                    "insert into speil_snapshot (data) values ('some data')"
+                ).asUpdateAndReturnGeneratedKey
+            )
+            val vedtakId = it.run(
+                queryOf(
+                    "insert into vedtak (person_ref, speil_snapshot_ref) values (?, ?)", personId, speilSnapshotId
+                ).asUpdateAndReturnGeneratedKey
+            )
+            it.run(
+                queryOf(
+                    "insert into oppgave (vedtak_ref) values(?)", vedtakId
+                ).asUpdate
+            )
+        }
     }
 
     private fun antallRader(fnr: String): Int {

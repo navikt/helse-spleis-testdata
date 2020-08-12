@@ -60,6 +60,7 @@ class AppTest {
     @Test
     fun `slett person`() {
         opprettPerson(fnr1)
+        opprettPerson(fnr1)
         opprettPerson(fnr2)
 
         withTestApplication({
@@ -165,9 +166,16 @@ class AppTest {
         })
     }
 
+    private fun finnPerson(fnr: String) = using(sessionOf(spesialistDB.postgresDatabase)) { session ->
+        session.run(
+            queryOf("select id from person where fodselsnummer = ?", fnr.toLong()).map { it.int(1) }.asSingle
+        )
+    }
+
     private fun opprettSpesialistPerson(fnr: String) {
         using(sessionOf(spesialistDB.postgresDatabase, returnGeneratedKey = true)) {
-            val personId = it.run(
+
+            val personId = finnPerson(fnr) ?: it.run(
                 queryOf(
                     "insert into person (fodselsnummer, aktor_id) values (?, ?)",
                     fnr.toLong(),

@@ -5,8 +5,8 @@ import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
 import javax.sql.DataSource
 
 // Understands how to create a data source from environment variables
-internal class DataSourceBuilder(env: Environment) {
-    private val databaseName = env.databaseName
+internal class DataSourceBuilder(env: Environment, databaseConfig: DatabaseConfig) {
+    private val databaseName = databaseConfig.databaseName
 
     private val vaultMountPath = env.vaultMountPath
 
@@ -15,10 +15,10 @@ internal class DataSourceBuilder(env: Environment) {
     private val hikariConfig = HikariConfig().apply {
         jdbcUrl = String.format(
             "jdbc:postgresql://%s:%s/%s%s",
-            requireNotNull(env.databaseHost) { "database host must be set if jdbc url is not provided" },
-            requireNotNull(env.databasePort) { "database port must be set if jdbc url is not provided" },
-            requireNotNull(env.databaseName) { "database name must be set if jdbc url is not provided" },
-            env.databaseUsername?.let { "?user=$it" } ?: "")
+            requireNotNull(databaseConfig.databaseHost) { "database host must be set if jdbc url is not provided" },
+            requireNotNull(databaseConfig.databasePort) { "database port must be set if jdbc url is not provided" },
+            requireNotNull(databaseConfig.databaseName) { "database name must be set if jdbc url is not provided" },
+            databaseConfig.databaseUsername?.let { "?user=$it" } ?: "")
         username = env.serviceUser.username
         password = env.serviceUser.password
 

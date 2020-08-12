@@ -27,6 +27,7 @@ spec:
     cpuThresholdPercentage: 90
   ingresses:
     - https://spleis-testdata.nais.preprod.local
+    - https://spleis-testdata.dev-fss.nais.io
   prometheus:
     enabled: true
     path: /metrics
@@ -38,11 +39,23 @@ spec:
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS
       value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
-    - name: DATABASE_HOST
+    - name: DATABASE_HOST_SPLEIS
       value: b27dbvl008.preprod.local
-    - name: DATABASE_PORT
+    - name: DATABASE_PORT_SPLEIS
       value: "5432"
-    - name: DATABASE_NAME
+    - name: DATABASE_NAME_SPLEIS
       value: spleis
+    - name: DATABASE_HOST_SPESIALIST
+      value: b27dbvl009.preprod.local
+    - name: DATABASE_PORT_SPESIALIST
+      value: "5432"
+    - name: DATABASE_NAME_SPESIALIST
+      value: spesialist
+    - name: DATABASE_HOST_SPENN
+      value: b27dbvl007.preprod.local
+    - name: DATABASE_PORT_SPENN
+      value: "5432"
+    - name: DATABASE_NAME_SPENN
+      value: helse-spenn-oppdrag
     - name: VAULT_MOUNTPATH
       value: postgresql/preprod-fss/

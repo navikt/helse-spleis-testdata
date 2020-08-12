@@ -55,7 +55,9 @@ const val spleisTopic = "helse-rapid-v1"
 fun main() = runBlocking {
     val environment = setUpEnvironment()
 
-    val dataSourceBuilder = DataSourceBuilder(environment)
+    val spleisDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spleisConfig).getDataSource()
+    val spesialistDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spesialistConfig).getDataSource()
+    val spennDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spennConfig).getDataSource()
     val producer = KafkaProducer<String, String>(loadBaseConfig(environment).toProducerConfig())
 
     val httpClient = HttpClient(CIO) {
@@ -73,15 +75,19 @@ fun main() = runBlocking {
     val aktørRestClient = AktørRestClient(environment.aktørRestUrl, httpClient, stsRestClient)
 
     launchApplication(
-        dataSourceBuilder.getDataSource(),
-        inntektRestClient,
-        aktørRestClient,
-        producer
+        spleisDataSource = spleisDataSource,
+        spesialistDataSource = spesialistDataSource,
+        spennDataSource = spennDataSource,
+        inntektRestClient = inntektRestClient,
+        aktørRestClient = aktørRestClient,
+        producer = producer
     )
 }
 
 internal fun launchApplication(
-    dataSource: DataSource,
+    spleisDataSource: DataSource,
+    spesialistDataSource: DataSource,
+    spennDataSource: DataSource,
     inntektRestClient: InntektRestClient,
     aktørRestClient: AktørRestClient,
     producer: KafkaProducer<String, String>
@@ -91,7 +97,11 @@ internal fun launchApplication(
         log.error("Feil i lytter", e)
         context.cancel(CancellationException("Feil i lytter", e))
     }
-    val personService = PersonService(dataSource)
+    val personService = PersonService(
+        spleisDataSource = spleisDataSource,
+        spesialistDataSource = spesialistDataSource,
+        spennDataSource = spennDataSource
+    )
 
 
     runBlocking(exceptionHandler + applicationContext) {

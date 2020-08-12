@@ -35,23 +35,29 @@ class AppTest {
         private const val fnr2 = "456"
     }
 
-    private lateinit var embeddedPostgres: EmbeddedPostgres
+    private lateinit var spleisDB: EmbeddedPostgres
+    private lateinit var spesialistDB: EmbeddedPostgres
+    private lateinit var spennDB: EmbeddedPostgres
     private lateinit var postgresConnection: Connection
     private var producerMock = mockk<KafkaProducer<String, String>>(relaxed = true)
 
     @BeforeEach
     fun `start postgres`() {
-        embeddedPostgres = EmbeddedPostgres.builder().start()
+        spleisDB = EmbeddedPostgres.builder().start()
+        spesialistDB = EmbeddedPostgres.builder().start()
+        spennDB = EmbeddedPostgres.builder().start()
 
-        postgresConnection = embeddedPostgres.postgresDatabase.connection
+        postgresConnection = spleisDB.postgresDatabase.connection
 
-        runMigration(embeddedPostgres)
-        personService = PersonService(embeddedPostgres.postgresDatabase)
+        runMigration(spleisDB, "spleis")
+        runMigration(spesialistDB, "spesialist")
+        runMigration(spennDB, "spenn")
+        personService = PersonService(spleisDB.postgresDatabase, spesialistDB.postgresDatabase, spennDB.postgresDatabase)
     }
 
     @AfterEach
     fun `stop postgres`() {
-        embeddedPostgres.close()
+        spleisDB.close()
     }
 
     @Test
@@ -146,7 +152,7 @@ class AppTest {
     }
 
     private fun opprettPerson(fnr: String) {
-        using(sessionOf(embeddedPostgres.postgresDatabase), {
+        using(sessionOf(spleisDB.postgresDatabase), {
             it.run(
                 queryOf(
                     "insert into person (aktor_id, fnr, skjema_versjon, data) values ('aktørId', ?, 4, (to_json(?::json)))",
@@ -158,7 +164,7 @@ class AppTest {
     }
 
     private fun antallRader(fnr: String): Int {
-        return using(sessionOf(embeddedPostgres.postgresDatabase), { session ->
+        return using(sessionOf(spleisDB.postgresDatabase), { session ->
             session.run(queryOf("select * from person where fnr = ?", fnr).map {
                 it.string("fnr")
             }.asList).size

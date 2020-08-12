@@ -11,11 +11,15 @@ import org.flywaydb.core.Flyway
 import java.time.YearMonth
 
 fun main() {
-    val embeddedPostgres = EmbeddedPostgres.builder().start()
+    val spleisDB = EmbeddedPostgres.builder().start()
+    val spesialistDB = EmbeddedPostgres.builder().start()
+    val spennDB = EmbeddedPostgres.builder().start()
     val producer: KafkaProducer<String, String> = mockk(relaxed = true)
 
-    runMigration(embeddedPostgres)
-    launchApplication(embeddedPostgres.postgresDatabase, mockk {
+    runMigration(spleisDB, "spleis")
+    runMigration(spesialistDB, "spesialist")
+    runMigration(spennDB, "spenn")
+    launchApplication(spleisDB.postgresDatabase, spesialistDB.postgresDatabase, spennDB.postgresDatabase, mockk {
         every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
             Result.Ok(
                 (1..12).map {
@@ -28,9 +32,10 @@ fun main() {
     }, mockk { every { runBlocking { hentAktørId(any())}} .returns( Result.Ok("aktørId")) }, producer)
 }
 
-fun runMigration(embeddedPostgres: EmbeddedPostgres) =
+fun runMigration(embeddedPostgres: EmbeddedPostgres, directory: String) =
     Flyway.configure()
         .dataSource(HikariDataSource(createHikariConfig(embeddedPostgres.getJdbcUrl("postgres", "postgres"))))
+        .locations("classpath:db/migration/$directory")
         .load()
         .migrate()
 

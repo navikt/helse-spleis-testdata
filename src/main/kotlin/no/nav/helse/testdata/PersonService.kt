@@ -24,9 +24,10 @@ class PersonService(
     }
 
     private fun slettPersonFraSpesialist(fnr: String) {
+        val fødselsnummer = fnr.toLong()
         using(sessionOf(spesialistDataSource)) { session ->
             val personId = session.run(
-                queryOf("SELECT id FROM person WHERE fodselsnummer = ?;", Integer.parseInt(fnr))
+                queryOf("SELECT id FROM person WHERE fodselsnummer = ?;", fødselsnummer)
                     .map { it.int(1) }.asSingle
             )
 
@@ -41,7 +42,7 @@ class PersonService(
                 session.run(queryOf("DELETE FROM speil_snapshot WHERE id = ?", vedtakId).asExecute)
             }
 
-            session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", Integer.parseInt(fnr)).asExecute)
+            session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asExecute)
         }
     }
 

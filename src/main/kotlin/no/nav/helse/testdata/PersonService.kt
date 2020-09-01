@@ -43,7 +43,29 @@ class PersonService(
                 ).asUpdate
             )
 
-            if (personId != null) session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
+            val overstyringer = session.run(
+                queryOf(
+                    "SELECT * FROM overstyring WHERE person_ref = ?;",
+                    personId
+                ).map { it.long("id") }.asList
+            )
+
+            overstyringer.forEach { overstyringId ->
+                session.run(
+                    queryOf(
+                        "DELETE FROM overstyrtdag WHERE overstyring_ref = ?;",
+                        overstyringId
+                    ).asUpdate
+                )
+                session.run(
+                    queryOf(
+                        "DELETE FROM overstyring WHERE id = ?;",
+                        overstyringId
+                    ).asUpdate
+                )
+            }
+
+            session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
 
             session.run(
                 queryOf(

@@ -24,3 +24,14 @@ create table oppgave
     vedtak_ref integer constraint oppgave_vedtak_ref_fkey references vedtak
 );
 
+create table overstyring
+(
+    id serial not null constraint overstyring_pkey primary key,
+    person_ref integer constraint overstyring_person_ref_fkey references person
+);
+
+create table overstyrtdag
+(
+    id serial not null constraint overstyrtdag_pkey primary key,
+    overstyring_ref integer constraint overstyrtdag_overstyring_ref_fkey references overstyring
+);

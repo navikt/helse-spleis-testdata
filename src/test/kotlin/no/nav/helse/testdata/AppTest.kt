@@ -192,6 +192,16 @@ class AppTest {
                     "insert into vedtak (person_ref, speil_snapshot_ref) values (?, ?)", personId, speilSnapshotId
                 ).asUpdateAndReturnGeneratedKey
             )
+            val overstyringId = it.run(
+                queryOf(
+                    "insert into overstyring(person_ref) values (?)", personId
+                ).asUpdateAndReturnGeneratedKey
+            )
+            it.run(
+                queryOf(
+                    "insert into overstyrtdag(overstyring_ref) values (?)", overstyringId
+                ).asUpdate
+            )
             it.run(
                 queryOf(
                     "insert into oppgave (vedtak_ref) values(?)", vedtakId

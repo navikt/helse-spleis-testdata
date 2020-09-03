@@ -259,4 +259,5 @@ data class Vedtak(
     val endringRefusjon: List<LocalDate> = emptyList()
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Periode(val fom: LocalDate, val tom: LocalDate)

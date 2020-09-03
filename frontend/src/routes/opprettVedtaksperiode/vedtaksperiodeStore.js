@@ -13,7 +13,7 @@ export const vedtaksperiodeStore = writable({
     sykmeldingsgrad: 100,
     faktiskgrad: null,
     arbeidsgiverperiode: [],
-    ferieInntektsmelding: [],
+    ferieperioder: [],
     førstefraværsdag: '2020-01-01',
     opphørRefusjon: null,
     endringRefusjon: []
@@ -34,11 +34,11 @@ const removePeriode = (key, index) => vedtaksperiodeStore.update(periode => ({
 
 export const updateInntekt = inntekt => vedtaksperiodeStore.update(periode => ({ ...periode, inntekt }));
 
-export const addFerie = () => addPeriode('ferieInntektsmelding');
+export const addFerie = () => addPeriode('ferieperioder');
 export const addRefusjonsendring = () => addPeriode('endringRefusjon');
 export const addArbeidsgiverperiode = () => addPeriode('arbeidsgiverperiode');
 
-export const removeFerie = i => removePeriode('ferieInntektsmelding', i);
+export const removeFerie = i => removePeriode('ferieperioder', i);
 export const removeRefusjonsendring = i => removePeriode('endringRefusjon', i);
 export const removeArbeidsgiverperiode = i => removePeriode('arbeidsgiverperiode', i);
 

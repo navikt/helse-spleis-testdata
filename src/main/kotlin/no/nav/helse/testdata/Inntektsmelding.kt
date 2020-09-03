@@ -33,7 +33,7 @@ fun inntektsmelding(
             "opphoerAvNaturalytelser":[],
             "gjenopptakelseNaturalytelser":[],
             "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},
-            "ferieperioder": ${vedtak.ferieInntektsmelding.tilJson()},
+            "ferieperioder": ${vedtak.ferieperioder.tilJson()},
             "status":"GYLDIG",
             "arkivreferanse":"ENARKIVREFERANSE",
             "hendelseId":"${UUID.randomUUID()}",

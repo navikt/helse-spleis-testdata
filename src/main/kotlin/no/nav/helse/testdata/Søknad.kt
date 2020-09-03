@@ -37,7 +37,7 @@ fun søknad(
             "sendtArbeidsgiver":${vedtak.sendtArbeidsgiver?.atStartOfDay()?.let { "\"$it\"" }},
             "egenmeldinger":[],
             "papirsykmeldinger":[],
-            "fravar":[],
+            "fravar":${vedtak.ferieperioder.somSøknadsferie()},
             "andreInntektskilder":[${if(vedtak.harAndreInntektskilder) { "{\"type\": \"Arbeid\", \"sykmeldt\": true }"} else {""}}],
             "soknadsperioder":[
             {
@@ -55,4 +55,13 @@ fun søknad(
             }   
     """
 }
+
+private fun List<Periode>.somSøknadsferie() =
+    map { """
+            {
+                "type": "FERIE",
+                "fom": "${it.fom}",
+                "tom": "${it.tom}"
+            }"""
+    }
 

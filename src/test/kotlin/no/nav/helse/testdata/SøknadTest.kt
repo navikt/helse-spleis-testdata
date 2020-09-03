@@ -22,9 +22,12 @@ internal class SøknadTest {
             sendtNav = fredag,
             førstefraværsdag = mandag,
             arbeidsgiverperiode = listOf(Periode(mandag, mandag.plusDays(15))),
-            ferieInntektsmelding = listOf(Periode(mandag.plusDays(1), mandag.plusDays(2)))
+            ferieperioder = listOf(
+                Periode(mandag.plusDays(1), mandag.plusDays(2)),
+                Periode(mandag.plusDays(100), mandag.plusDays(101))
+            )
         )
-        val json = søknad(vedtak,"aktørId")
+        val json = søknad(vedtak, "aktørId")
         assertValidJson(json)
     }
 }

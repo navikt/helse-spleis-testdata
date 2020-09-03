@@ -118,7 +118,7 @@
         </span>
         <AddButton label="Legg inn ferie" onClick="{addFerie}" />
         <span class="perioder">
-            {#each vedtaksperiode.ferieInntektsmelding as ferie, i (ferie.id)}
+            {#each vedtaksperiode.ferieperioder as ferie, i (ferie.id)}
                 <DateRange
                     bind:start="{ferie.fom}"
                     startLabel="Ferie f.o.m."

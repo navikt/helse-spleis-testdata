@@ -21,8 +21,8 @@ internal class SykmeldingTest {
             inntekt = 25000.0,
             sendtNav = fredag,
             førstefraværsdag = mandag,
-            arbeidsgiverperiode = listOf(Periode(mandag, mandag.plusDays(15))),
-            ferieInntektsmelding = listOf(Periode(mandag.plusDays(1), mandag.plusDays(2)))
+            arbeidsgiverperiode = emptyList(),
+            ferieperioder = emptyList()
         )
         val json = sykmelding(vedtak,"aktørId")
         assertValidJson(json)

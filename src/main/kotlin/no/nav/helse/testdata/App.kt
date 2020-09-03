@@ -254,7 +254,7 @@ data class Vedtak(
     val sendtArbeidsgiver: LocalDate? = null,
     val førstefraværsdag: LocalDate?,
     val arbeidsgiverperiode: List<Periode>,
-    val ferieInntektsmelding: List<Periode>,
+    val ferieperioder: List<Periode>,
     val opphørRefusjon: LocalDate? = null,
     val endringRefusjon: List<LocalDate> = emptyList()
 )

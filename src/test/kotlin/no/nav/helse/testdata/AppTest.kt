@@ -103,7 +103,7 @@ class AppTest {
                         "skalSendeInntektsmelding": true,
                         "førstefraværsdag": "2019-12-31",
                         "arbeidsgiverperiode": [{"fom": "2019-12-31", "tom": "2020-01-14"}, {"fom": "2019-12-31", "tom": "2020-01-14"}],
-                        "ferieInntektsmelding": []
+                        "ferieperioder": []
                     }
                     """
                 )

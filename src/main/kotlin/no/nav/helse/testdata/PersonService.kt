@@ -36,12 +36,14 @@ class PersonService(
                     .map { Pair(it.int(1), it.int(2)) }.asList
             )
 
-            session.run(
-                queryOf(
-                    "DELETE FROM oppgave WHERE vedtak_ref in (${vedtakIder.joinToString { "?" }})",
-                    *vedtakIder.map { it.first }.toTypedArray()
-                ).asUpdate
-            )
+            if (vedtakIder.isNotEmpty()) {
+                session.run(
+                    queryOf(
+                        "DELETE FROM oppgave WHERE vedtak_ref in (${vedtakIder.joinToString { "?" }})",
+                        *vedtakIder.map { it.first }.toTypedArray()
+                    ).asUpdate
+                )
+            }
 
             val overstyringer = session.run(
                 queryOf(
@@ -67,13 +69,14 @@ class PersonService(
 
             session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
 
-            session.run(
-                queryOf(
-                    "DELETE FROM speil_snapshot WHERE id in (${vedtakIder.joinToString { "?" }})",
-                    *vedtakIder.map { it.second }.toTypedArray()
-                ).asUpdate
-            )
-
+            if (vedtakIder.isNotEmpty()) {
+                session.run(
+                    queryOf(
+                        "DELETE FROM speil_snapshot WHERE id in (${vedtakIder.joinToString { "?" }})",
+                        *vedtakIder.map { it.second }.toTypedArray()
+                    ).asUpdate
+                )
+            }
             session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
         }
 

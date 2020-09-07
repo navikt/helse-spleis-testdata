@@ -8,7 +8,6 @@
 
     const onClick = event => {
         checked = !checked;
-        console.log(checked);
     };
 </script>
 

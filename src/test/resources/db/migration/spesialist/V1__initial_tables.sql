@@ -40,3 +40,8 @@ create table overstyrtdag
     id serial not null constraint overstyrtdag_pkey primary key,
     overstyring_ref integer constraint overstyrtdag_overstyring_ref_fkey references overstyring
 );
+
+create table reserver_person
+(
+    person_ref bigint constraint reserver_person_person_ref_fkey references person
+);

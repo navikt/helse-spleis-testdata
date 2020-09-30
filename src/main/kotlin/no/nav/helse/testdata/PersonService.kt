@@ -85,6 +85,9 @@ class PersonService(
                     ).asUpdate
                 )
             }
+
+            session.run(queryOf("DELETE FROM reserver_person WHERE person_ref = ?", personId).asUpdate)
+
             session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
         }
 

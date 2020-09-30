@@ -24,6 +24,11 @@ create table oppgave
     vedtak_ref integer constraint oppgave_vedtak_ref_fkey references vedtak
 );
 
+create table tildeling
+(
+    oppgave_id_ref bigint not null references oppgave (id)
+);
+
 create table overstyring
 (
     id serial not null constraint overstyring_pkey primary key,

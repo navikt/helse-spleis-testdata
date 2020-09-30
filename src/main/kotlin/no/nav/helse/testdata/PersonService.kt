@@ -38,6 +38,14 @@ class PersonService(
 
             if (vedtakIder.isNotEmpty()) {
                 session.run(
+                    queryOf("""
+                        DELETE FROM tildeling WHERE oppgave_id_ref IN (
+                            SELECT id FROM oppgave WHERE vedtak_ref IN (${vedtakIder.joinToString { "?" }})
+                        )""",
+                        *vedtakIder.map { it.first }.toTypedArray()
+                    ).asUpdate
+                )
+                session.run(
                     queryOf(
                         "DELETE FROM oppgave WHERE vedtak_ref in (${vedtakIder.joinToString { "?" }})",
                         *vedtakIder.map { it.first }.toTypedArray()

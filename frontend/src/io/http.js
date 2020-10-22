@@ -6,7 +6,7 @@ export const Status = {
     Error: 'error'
 };
 
-export const getInntekt = async ({ fnr }) => {
+export const getInntekt = async ({fnr}) => {
     return await fetch(`${baseUrl}/person/inntekt`, {
         method: 'get',
         headers: {
@@ -17,7 +17,7 @@ export const getInntekt = async ({ fnr }) => {
     });
 };
 
-export const getAktørId = async ({ fnr }) => {
+export const getAktørId = async ({fnr}) => {
     return await fetch(`${baseUrl}/person/aktorid`, {
         method: 'get',
         headers: {
@@ -28,17 +28,17 @@ export const getAktørId = async ({ fnr }) => {
     });
 };
 
-export const deletePerson = async ({ fnr }) => {
+export const deletePerson = async ({fnr}) => {
     return await fetch(`${baseUrl}/person`, {
         method: 'delete',
-        headers: { ident: fnr }
-    });
+        headers: {ident: fnr}
+    }).then(response => response.ok ? Promise.resolve(response) : Promise.reject(response.status));
 };
 
-export const postVedtaksperiode = async ({ vedtaksperiode }) => {
+export const postVedtaksperiode = async ({vedtaksperiode}) => {
     return await fetch(`${baseUrl}/vedtaksperiode/`, {
         method: 'post',
         body: JSON.stringify(vedtaksperiode),
-        headers: { 'Content-Type': 'application/json' }
+        headers: {'Content-Type': 'application/json'}
     });
 };

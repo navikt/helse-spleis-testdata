@@ -19,7 +19,7 @@ fun main() {
     runMigration(spleisDB, "spleis")
     runMigration(spesialistDB, "spesialist")
     runMigration(spennDB, "spenn")
-    launchApplication(spleisDB.postgresDatabase, spesialistDB.postgresDatabase, spennDB.postgresDatabase, mockk {
+    val inntektRestClientMock = mockk<InntektRestClient> {
         every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
             Result.Ok(
                 (1..12).map {
@@ -29,7 +29,19 @@ fun main() {
                 }
             )
         )
-    }, mockk { every { runBlocking { hentAktørId(any())}} .returns( Result.Ok("aktørId")) }, producer)
+    }
+    val aktørRestClientMock =
+        mockk<AktørRestClient> {
+            every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId"))
+        }
+    launchApplication(
+        spleisDataSource = spleisDB.postgresDatabase,
+        spesialistDataSource = spesialistDB.postgresDatabase,
+        spennDataSource = spennDB.postgresDatabase,
+        inntektRestClient = inntektRestClientMock,
+        aktørRestClient = aktørRestClientMock,
+        producer = producer
+    )
 }
 
 fun runMigration(embeddedPostgres: EmbeddedPostgres, directory: String) =

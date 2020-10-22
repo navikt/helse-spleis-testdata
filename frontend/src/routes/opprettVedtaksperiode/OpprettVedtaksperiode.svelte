@@ -1,15 +1,15 @@
 <script>
     import {
-        addFerie,
-        removeFerie,
-        updateInntekt,
-        vedtaksperiodeStore,
-        addRefusjonsendring,
-        removeRefusjonsendring,
         addArbeidsgiverperiode,
-        removeArbeidsgiverperiode
+        addFerie,
+        addRefusjonsendring,
+        removeArbeidsgiverperiode,
+        removeFerie,
+        removeRefusjonsendring,
+        updateInntekt,
+        vedtaksperiodeStore
     } from './vedtaksperiodeStore';
-    import { deletePerson, getInntekt, postVedtaksperiode } from '../../io/http';
+    import {deletePerson, getInntekt, postVedtaksperiode} from '../../io/http';
     import Card from '../../components/Card.svelte';
     import Form from '../../components/form/Form.svelte';
     import Input from '../../components/form/Input.svelte';
@@ -35,9 +35,11 @@
     let skalSendeInntektsmelding = true;
     let harAndreInntektskilder = false;
 
-    const onSubmit = async () => {
-        if (gjenopprett) await deletePerson({ fnr: vedtaksperiode.fnr });
-        return await postVedtaksperiode({
+    const deletePersonOnGjenopprett = async () =>
+        gjenopprett ? deletePerson({fnr: vedtaksperiode.fnr}) : Promise.resolve()
+
+    const onSubmit = () => deletePersonOnGjenopprett()
+        .then(() => postVedtaksperiode({
             vedtaksperiode: {
                 ...vedtaksperiode,
                 skalSendeSøknad,
@@ -45,12 +47,11 @@
                 skalSendeInntektsmelding,
                 harAndreInntektskilder
             }
-        });
-    };
+        }));
 
     const hentInntekt = async event => {
         event.preventDefault();
-        const respons = await getInntekt({ fnr: vedtaksperiode.fnr });
+        const respons = await getInntekt({fnr: vedtaksperiode.fnr});
         respons.json().then(data => updateInntekt(data.beregnetMånedsinntekt));
     };
 </script>
@@ -148,13 +149,16 @@
     :global(.perioder > *:last-child) {
         margin-bottom: 1.5rem;
     }
+
     .refusjonsendring {
         display: flex;
         align-items: center;
     }
+
     .refusjonsendring:not(:last-child) {
         margin-bottom: 1.5rem;
     }
+
     :global(.refusjonsendring > .card) {
         margin-bottom: 0;
         margin-right: 1rem;

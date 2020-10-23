@@ -45,3 +45,8 @@ create table reserver_person
 (
     person_ref bigint constraint reserver_person_person_ref_fkey references person
 );
+
+create table automatisering
+(
+    vedtaksperiode_ref bigint references vedtak(id) primary key
+)

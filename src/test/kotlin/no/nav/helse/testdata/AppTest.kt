@@ -71,7 +71,6 @@ class AppTest {
             with(handleRequest(HttpMethod.Delete, "/person") {
                 addHeader("ident", fnr1)
             }) {
-
                 assertTrue(response.status()!!.isSuccess())
                 assertEquals(0, antallRader(fnr1))
                 assertEquals(1, antallRader(fnr2))
@@ -205,6 +204,11 @@ class AppTest {
             it.run(
                 queryOf(
                     "insert into oppgave (vedtak_ref) values(?)", vedtakId
+                ).asUpdate
+            )
+            it.run(
+                queryOf(
+                    "INSERT INTO automatisering (vedtaksperiode_ref) VALUES (?)", vedtakId
                 ).asUpdate
             )
         }

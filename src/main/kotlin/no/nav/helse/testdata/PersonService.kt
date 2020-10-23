@@ -3,6 +3,7 @@ package no.nav.helse.testdata
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import org.intellij.lang.annotations.Language
 import javax.sql.DataSource
 
 class PersonService(
@@ -58,6 +59,12 @@ class PersonService(
                         *vedtakIder.map { it.first }.toTypedArray()
                     ).asUpdate
                 )
+                @Language("PostgreSQL")
+                val automatiseringProblemQuery =
+                    """DELETE FROM automatisering_problem WHERE vedtaksperiode_ref in (${vedtakIder.joinToString { "?" }})"""
+                session.run(
+                    queryOf(automatiseringProblemQuery, *vedtakIder.map { it.first }.toTypedArray()).asUpdate
+                )
             }
 
             val overstyringer = session.run(
@@ -83,6 +90,8 @@ class PersonService(
             }
 
             session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
+
+            session.run(queryOf("DELETE FROM hendelse WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
 
             if (vedtakIder.isNotEmpty()) {
                 session.run(

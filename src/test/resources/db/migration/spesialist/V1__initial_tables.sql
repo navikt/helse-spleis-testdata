@@ -1,52 +1,65 @@
 create table person
 (
-    id serial not null constraint person_pkey primary key,
+    id            serial primary key,
     fodselsnummer bigint not null,
-    aktor_id bigint not null
+    aktor_id      bigint not null
 );
 
 create table speil_snapshot
 (
-    id serial not null constraint speil_snapshot_pkey primary key,
+    id   serial primary key,
     data VARCHAR(255)
 );
 
 create table vedtak
 (
-    id serial not null constraint vedtak_pkey primary key,
-    person_ref integer not null constraint vedtak_person_ref_fkey references person,
-    speil_snapshot_ref integer not null constraint vedtak_speil_snapshot_ref_fkey references speil_snapshot
+    id                 serial primary key,
+    person_ref         bigint references person (id)         not null,
+    speil_snapshot_ref bigint references speil_snapshot (id) not null
 );
 
 create table oppgave
 (
-    id serial not null constraint oppgave_pkey primary key,
-    vedtak_ref integer constraint oppgave_vedtak_ref_fkey references vedtak
+    id         serial primary key,
+    vedtak_ref bigint references vedtak (id) not null
 );
 
 create table tildeling
 (
-    oppgave_id_ref bigint not null references oppgave (id)
+    oppgave_id_ref bigint references oppgave (id) not null
 );
 
 create table overstyring
 (
-    id serial not null constraint overstyring_pkey primary key,
-    person_ref integer constraint overstyring_person_ref_fkey references person
+    id         serial primary key,
+    person_ref bigint references person (id) not null
 );
 
 create table overstyrtdag
 (
-    id serial not null constraint overstyrtdag_pkey primary key,
-    overstyring_ref integer constraint overstyrtdag_overstyring_ref_fkey references overstyring
+    id              serial primary key,
+    overstyring_ref bigint references overstyring (id) not null
 );
 
 create table reserver_person
 (
-    person_ref bigint constraint reserver_person_person_ref_fkey references person
+    person_ref bigint references person (id) not null
 );
 
 create table automatisering
 (
-    vedtaksperiode_ref bigint references vedtak(id) primary key
-)
+    vedtaksperiode_ref bigint references vedtak (id) primary key
+);
+
+create table hendelse
+(
+    id            serial primary key,
+    fodselsnummer bigint not null
+);
+
+create table automatisering_problem
+(
+    id                 serial primary key,
+    vedtaksperiode_ref bigint references vedtak (id),
+    hendelse_ref       bigint references hendelse (id)
+);

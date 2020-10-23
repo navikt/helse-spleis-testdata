@@ -2,7 +2,7 @@ package no.nav.helse.testdata
 
 import java.lang.Exception
 
-abstract sealed class Result<T, E: Exception> {
+sealed class Result<T, E: Exception> {
     abstract fun unwrap():T
     data class Ok<T, E: Exception>(val value: T) : Result<T, E>() {
         override fun unwrap() = value

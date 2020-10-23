@@ -14,6 +14,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import org.apache.kafka.clients.producer.KafkaProducer
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -209,6 +210,22 @@ class AppTest {
             it.run(
                 queryOf(
                     "INSERT INTO automatisering (vedtaksperiode_ref) VALUES (?)", vedtakId
+                ).asUpdate
+            )
+
+            @Language("PostgreSQL")
+            val hendelseQuery = """INSERT INTO hendelse(fodselsnummer) VALUES (?)"""
+            val hendelseId = it.run(
+                queryOf(hendelseQuery, fnr.toLong()).asUpdateAndReturnGeneratedKey
+            )
+
+            @Language("PostgreSQL")
+            val automatiseringProblemQuery =
+                """INSERT INTO automatisering_problem(vedtaksperiode_ref, hendelse_ref) VALUES (:vedtaksperiode_ref, :hendelse_ref)"""
+            it.run(
+                queryOf(
+                    automatiseringProblemQuery,
+                    mapOf("vedtaksperiode_ref" to vedtakId, "hendelse_ref" to hendelseId)
                 ).asUpdate
             )
         }

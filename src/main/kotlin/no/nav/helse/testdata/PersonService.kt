@@ -19,14 +19,15 @@ class PersonService(
     }
 
     private fun slettPersonFraSpleis(fnr: String) {
-        using(sessionOf(spleisDataSource), {
+        val slettedeRader = using(sessionOf(spleisDataSource), {
             it.run(queryOf("delete from person where fnr = ?", fnr).asUpdate)
         })
+        log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spleis")
     }
 
     private fun slettPersonFraSpesialist(fnr: String) {
         val fødselsnummer = fnr.toLong()
-        using(sessionOf(spesialistDataSource)) { session ->
+        val slettedeRader = using(sessionOf(spesialistDataSource)) { session ->
             val personId = session.run(
                 queryOf("SELECT id FROM person WHERE fodselsnummer = ?;", fødselsnummer)
                     .map { it.int(1) }.asSingle
@@ -113,7 +114,7 @@ class PersonService(
 
             session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
         }
-
+        log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spesialist")
     }
 
     private fun slettPersonFraSpenn(fnr: String) {

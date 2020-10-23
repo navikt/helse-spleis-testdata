@@ -63,3 +63,18 @@ create table automatisering_problem
     vedtaksperiode_ref bigint references vedtak (id),
     hendelse_ref       bigint references hendelse (id)
 );
+
+create table digital_kontaktinformasjon
+(
+    person_ref bigint references person (id) not null
+);
+
+create table gosysoppgaver
+(
+    person_ref bigint references person (id) not null
+);
+
+create table egen_ansatt
+(
+    person_ref bigint references person (id) not null
+);

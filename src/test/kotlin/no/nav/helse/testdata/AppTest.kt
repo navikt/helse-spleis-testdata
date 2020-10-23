@@ -197,6 +197,24 @@ class AppTest {
                     "insert into overstyring(person_ref) values (?)", personId
                 ).asUpdateAndReturnGeneratedKey
             )
+            @Language("PostgreSQL")
+            val digitalKontaktinformasjonQuery = """INSERT INTO digital_kontaktinformasjon(person_ref) VALUES (?)"""
+            it.run(
+                queryOf(digitalKontaktinformasjonQuery, personId).asUpdate
+            )
+
+            @Language("PostgreSQL")
+            val gosysoppgaverQuery = """INSERT INTO gosysoppgaver(person_ref) VALUES (?)"""
+            it.run(
+                queryOf(gosysoppgaverQuery, personId).asUpdate
+            )
+
+            @Language("PostgreSQL")
+            val egenAnsattQuery = """INSERT INTO egen_ansatt(person_ref) VALUES (?)"""
+            it.run(
+                queryOf(egenAnsattQuery, personId).asUpdate
+            )
+
             it.run(
                 queryOf(
                     "insert into overstyrtdag(overstyring_ref) values (?)", overstyringId

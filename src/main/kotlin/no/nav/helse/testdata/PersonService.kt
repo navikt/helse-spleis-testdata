@@ -1,5 +1,6 @@
 package no.nav.helse.testdata
 
+import kotliquery.Session
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -114,9 +115,45 @@ class PersonService(
             """
             session.run(queryOf(deletePersonConstraints, mapOf("personId" to personId)).asUpdate)
 
+            slettFraUtbetalingstabeller(session, personId)
+
             session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
         }
         log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spesialist")
+    }
+
+    private fun slettFraUtbetalingstabeller(session: Session, personId: Int?) {
+        @Language("PostgreSQL")
+        val deleteUtbetalingslinje = """
+            DELETE FROM utbetalingslinje where oppdrag_id in (SELECT person_fagsystem_id_ref FROM utbetaling_id WHERE person_ref=:personId);
+            DELETE FROM utbetalingslinje where oppdrag_id in (SELECT arbeidsgiver_fagsystem_id_ref FROM utbetaling_id WHERE person_ref=:personId);
+        """
+        session.run(queryOf(deleteUtbetalingslinje, mapOf("personId" to personId)).asUpdate)
+
+        @Language("PostgreSQL")
+        val finnOppdragId = """
+            SELECT unnest FROM utbetaling_id, unnest(array[person_fagsystem_id_ref, arbeidsgiver_fagsystem_id_ref]) WHERE person_ref=:personId
+        """
+        val oppdragIds = session.run(queryOf(finnOppdragId, mapOf("personId" to personId)).map { it.int(1) }.asList)
+
+        @Language("PostgreSQL")
+        val deleteUtbetaling = """
+            DELETE FROM utbetaling WHERE utbetaling_id_ref in (SELECT id FROM utbetaling_id WHERE person_ref=:personId);
+            DELETE FROM utbetaling_id WHERE person_ref=:personId;
+        """
+        session.run(queryOf(deleteUtbetaling, mapOf("personId" to personId)).asUpdate)
+
+        @Language("PostgreSQL")
+        val deleteOppdrag = """
+            DELETE FROM oppdrag where id in (:oppdragIds);            
+        """
+        if (oppdragIds.isNotEmpty())
+            session.run(
+                queryOf(
+                    deleteOppdrag,
+                    mapOf("oppdragIds" to oppdragIds)
+                ).asUpdate
+            )
     }
 
     private fun slettPersonFraSpenn(fnr: String) {

@@ -78,3 +78,28 @@ create table egen_ansatt
 (
     person_ref bigint references person (id) not null
 );
+
+create table oppdrag
+(
+    id serial not null constraint oppdrag_pkey primary key
+);
+
+create table utbetalingslinje
+(
+    oppdrag_id bigint not null constraint utbetalingslinje_oppdrag_id_fkey references oppdrag
+);
+
+create table utbetaling_id
+(
+    id                            serial          not null constraint utbetaling_id_pkey primary key,
+    utbetaling_id                 uuid            not null constraint utbetaling_id_utbetaling_id_key unique,
+    person_ref                    integer         not null constraint utbetaling_id_person_ref_fkey references person,
+    arbeidsgiver_fagsystem_id_ref bigint          not null constraint utbetaling_id_arbeidsgiver_fagsystem_id_ref_fkey references oppdrag,
+    person_fagsystem_id_ref       bigint          not null constraint utbetaling_id_person_fagsystem_id_ref_fkey references oppdrag
+);
+
+create table utbetaling
+(
+    id                serial            not null constraint utbetaling_pkey primary key,
+    utbetaling_id_ref bigint            not null constraint utbetaling_utbetaling_id_ref_fkey references utbetaling_id
+);

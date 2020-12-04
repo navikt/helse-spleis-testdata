@@ -141,17 +141,13 @@ class PersonService(
         """
         session.run(queryOf(deleteUtbetaling, mapOf("personId" to personId)).asUpdate)
 
-        @Language("PostgreSQL")
-        val deleteOppdrag = """
-            DELETE FROM oppdrag where id in (:oppdragIds);            
-        """
-        if (oppdragIds.isNotEmpty())
-            session.run(
-                queryOf(
-                    deleteOppdrag,
-                    mapOf("oppdragIds" to oppdragIds)
-                ).asUpdate
-            )
+        if (oppdragIds.isNotEmpty()) {
+            @Language("PostgreSQL")
+            val deleteOppdrag = """
+                DELETE FROM oppdrag where id in (${oppdragIds.joinToString { "?" }});
+            """
+            session.run(queryOf(deleteOppdrag, *oppdragIds.toTypedArray()).asUpdate)
+        }
     }
 
     private fun slettPersonFraSpenn(fnr: String) {

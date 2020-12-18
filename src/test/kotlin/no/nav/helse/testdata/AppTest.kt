@@ -197,6 +197,7 @@ class AppTest {
                     "insert into overstyring(person_ref) values (?)", personId
                 ).asUpdateAndReturnGeneratedKey
             )
+
             @Language("PostgreSQL")
             val digitalKontaktinformasjonQuery = """INSERT INTO digital_kontaktinformasjon(person_ref) VALUES (?)"""
             it.run(
@@ -244,6 +245,16 @@ class AppTest {
                 queryOf(
                     automatiseringProblemQuery,
                     mapOf("vedtaksperiode_ref" to vedtakId, "hendelse_ref" to hendelseId)
+                ).asUpdate
+            )
+
+            @Language("PostgreSQL")
+            val arbeidsforholdquery =
+                """INSERT INTO arbeidsforhold(person_ref) VALUES (:person_ref)"""
+            it.run(
+                queryOf(
+                    arbeidsforholdquery,
+                    mapOf("person_ref" to personId)
                 ).asUpdate
             )
         }

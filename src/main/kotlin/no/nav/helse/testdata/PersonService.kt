@@ -110,6 +110,7 @@ class PersonService(
                 DELETE FROM digital_kontaktinformasjon WHERE person_ref=:personId;
                 DELETE FROM gosysoppgaver WHERE person_ref=:personId;
                 DELETE FROM egen_ansatt WHERE person_ref=:personId;
+                DELETE FROM arbeidsforhold WHERE person_ref=:personId;
             """
             session.run(queryOf(deletePersonConstraints, mapOf("personId" to personId)).asUpdate)
 

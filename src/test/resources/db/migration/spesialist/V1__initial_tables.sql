@@ -103,3 +103,9 @@ create table utbetaling
     id                serial            not null constraint utbetaling_pkey primary key,
     utbetaling_id_ref bigint            not null constraint utbetaling_utbetaling_id_ref_fkey references utbetaling_id
 );
+
+CREATE TABLE arbeidsforhold
+(
+    id         SERIAL PRIMARY KEY,
+    person_ref BIGINT NOT NULL REFERENCES person (id)
+)

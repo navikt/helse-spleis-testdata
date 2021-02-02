@@ -111,6 +111,9 @@ class PersonService(
                 DELETE FROM gosysoppgaver WHERE person_ref=:personId;
                 DELETE FROM egen_ansatt WHERE person_ref=:personId;
                 DELETE FROM arbeidsforhold WHERE person_ref=:personId;
+                DELETE FROM saksbehandler WHERE person_id=:personId;
+                DELETE FROM abonnement_for_opptegnelse WHERE person_id=:personId;
+                DELETE FROM opptegnelse WHERE person_id=:personId;
             """
             session.run(queryOf(deletePersonConstraints, mapOf("personId" to personId)).asUpdate)
 

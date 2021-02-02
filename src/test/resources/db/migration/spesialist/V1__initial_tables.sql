@@ -108,4 +108,23 @@ CREATE TABLE arbeidsforhold
 (
     id         SERIAL PRIMARY KEY,
     person_ref BIGINT NOT NULL REFERENCES person (id)
-)
+);
+
+CREATE TABLE saksbehandler(oid UUID NOT NULL PRIMARY KEY, navn VARCHAR(64), epost VARCHAR(128));
+
+CREATE TABLE abonnement_for_opptegnelse
+(
+    saksbehandler_id         UUID NOT NULL REFERENCES saksbehandler(oid),
+    person_id                bigint NOT NULL REFERENCES person(id),
+    siste_sekvensnummer      integer,
+    primary key(saksbehandler_id, person_id)
+);
+
+CREATE TABLE opptegnelse
+(
+    person_id                bigint NOT NULL REFERENCES person(id),
+    sekvensnummer            SERIAL,
+    payload                  JSON NOT NULL,
+    type                     varchar(64),
+    primary key(person_id, sekvensnummer)
+);

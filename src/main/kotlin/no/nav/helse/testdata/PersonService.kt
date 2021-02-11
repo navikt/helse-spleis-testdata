@@ -20,8 +20,9 @@ class PersonService(
     }
 
     private fun slettPersonFraSpleis(fnr: String) {
+        val fødselsnummer = fnr.toLong()
         val slettedeRader = using(sessionOf(spleisDataSource), {
-            it.run(queryOf("delete from person where fnr = ?", fnr).asUpdate)
+            it.run(queryOf("delete from person where fnr = ?", fødselsnummer).asUpdate)
         })
         log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spleis")
     }
@@ -111,7 +112,6 @@ class PersonService(
                 DELETE FROM gosysoppgaver WHERE person_ref=:personId;
                 DELETE FROM egen_ansatt WHERE person_ref=:personId;
                 DELETE FROM arbeidsforhold WHERE person_ref=:personId;
-                DELETE FROM saksbehandler WHERE person_id=:personId;
                 DELETE FROM abonnement_for_opptegnelse WHERE person_id=:personId;
                 DELETE FROM opptegnelse WHERE person_id=:personId;
             """

@@ -2,7 +2,7 @@ CREATE TABLE person
 (
     id             BIGSERIAL,
     skjema_versjon INT                      NOT NULL,
-    fnr            VARCHAR(32)              NOT NULL,
+    fnr            BIGINT                   NOT NULL,
     aktor_id       VARCHAR(32)              NOT NULL,
     data           JSON                     NOT NULL,
     opprettet      TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'utc'),
@@ -23,7 +23,7 @@ CREATE TABLE utbetalingsreferanse
 CREATE TABLE melding
 (
     id           BIGSERIAL,
-    fnr          VARCHAR(32)              NOT NULL,
+    fnr          BIGINT                   NOT NULL,
     melding_id   VARCHAR(40)              NOT NULL,
     melding_type VARCHAR(40)              NOT NULL,
     data         JSON                     NOT NULL,

@@ -159,7 +159,7 @@ class AppTest {
             it.run(
                 queryOf(
                     "insert into person (aktor_id, fnr, skjema_versjon, data) values ('aktørId', ?, 4, (to_json(?::json)))",
-                    fnr,
+                    fnr.toLong(),
                     "{}"
                 ).asUpdate
             )
@@ -262,8 +262,8 @@ class AppTest {
 
     private fun antallRader(fnr: String): Int {
         return using(sessionOf(spleisDB.postgresDatabase), { session ->
-            session.run(queryOf("select * from person where fnr = ?", fnr).map {
-                it.string("fnr")
+            session.run(queryOf("select * from person where fnr = ?", fnr.toLong()).map {
+                it.long("fnr")
             }.asList).size
         })
     }

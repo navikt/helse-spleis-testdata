@@ -1,12 +1,9 @@
 package no.nav.helse.testdata
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import io.ktor.http.HttpMethod
-import io.ktor.http.isSuccess
-import io.ktor.routing.routing
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.http.*
+import io.ktor.routing.*
+import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -22,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.sql.Connection
+import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppTest {
@@ -161,6 +159,13 @@ class AppTest {
                     "insert into person (aktor_id, fnr, skjema_versjon, data) values ('aktørId', ?, 4, (to_json(?::json)))",
                     fnr.toLong(),
                     "{}"
+                ).asUpdate
+            )
+            it.run(
+                queryOf("""
+                        insert into melding (fnr, melding_id, melding_type, data, lest_dato)
+                        values (?, '${UUID.randomUUID()}', 'melding_type', '{}', now())""",
+                    fnr.toLong()
                 ).asUpdate
             )
         })

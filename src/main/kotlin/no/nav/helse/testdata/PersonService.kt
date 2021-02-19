@@ -25,6 +25,11 @@ class PersonService(
             it.run(queryOf("delete from person where fnr = ?", fødselsnummer).asUpdate)
         })
         log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spleis")
+        val slettedeMeldinger = using(sessionOf(spleisDataSource), {
+            it.run(queryOf("delete from melding where fnr = ?", fødselsnummer).asUpdate)
+        })
+        log.info("Slettet $slettedeMeldinger meldinger for fnr=$fnr fra Spleis")
+
     }
 
     private fun slettPersonFraSpesialist(fnr: String) {

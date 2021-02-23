@@ -58,32 +58,37 @@ dependencies {
     testImplementation("io.mockk:mockk:1.10.6")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "14"
-}
+tasks {
+    compileKotlin {
+        kotlinOptions.jvmTarget = "15"
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "15"
+    }
 
-tasks.named<Jar>("jar") {
-    archiveBaseName.set("app")
+    named<Jar>("jar") {
+        archiveBaseName.set("app")
 
-    manifest {
-        attributes["Main-Class"] = "no.nav.helse.testdata.AppKt"
-        attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-            it.name
+        manifest {
+            attributes["Main-Class"] = "no.nav.helse.testdata.AppKt"
+            attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
+                it.name
+            }
+        }
+
+        doLast {
+            configurations.runtimeClasspath.get().forEach {
+                val file = File("$buildDir/libs/${it.name}")
+                if (!file.exists())
+                    it.copyTo(file)
+            }
         }
     }
 
-    doLast {
-        configurations.runtimeClasspath.get().forEach {
-            val file = File("$buildDir/libs/${it.name}")
-            if (!file.exists())
-                it.copyTo(file)
+    withType<Test> {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
         }
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
     }
 }

@@ -1,4 +1,4 @@
-FROM navikt/java:12
+FROM navikt/java:15
 
 COPY build/libs/*.jar ./
 COPY public ./public/

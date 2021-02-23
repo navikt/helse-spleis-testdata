@@ -1,7 +1,9 @@
 package no.nav.helse.testdata
 
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
+import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.security.auth.SecurityProtocol
 import org.apache.kafka.common.serialization.StringSerializer
 import java.nio.file.Files
 import java.nio.file.Path
@@ -26,8 +28,9 @@ private fun getDatabaseEnv(postfix: String) = DatabaseConfig(
 
 internal fun setUpEnvironment() =
     Environment(
-        kafkaBootstrapServers = System.getenv("KAFKA_BOOTSTRAP_SERVERS")
-            ?: error("Mangler env var KAFKA_BOOTSTRAP_SERVERS"),
+        kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: error("Mangler env var KAFKA_BROKERS"),
+        kafkaCredstorePassword = System.getenv("KAFKA_CREDSTORE_PASSWORD"),
+        kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH"),
         databaseConfigs = DatabaseConfigs(
             spleisConfig = getDatabaseEnv("SPLEIS"),
             spesialistConfig = getDatabaseEnv("SPESIALIST"),
@@ -53,12 +56,14 @@ data class DatabaseConfigs(
 )
 
 data class Environment(
-    val kafkaBootstrapServers: String,
+    val kafkaBrokers: String,
     val databaseConfigs: DatabaseConfigs,
     val vaultMountPath: String,
     val inntektRestUrl: String,
     val aktørRestUrl: String,
-    val serviceUser: ServiceUser
+    val serviceUser: ServiceUser,
+    val kafkaCredstorePassword: String,
+    val kafkaKeystorePath: String
 )
 
 data class ServiceUser(
@@ -68,16 +73,23 @@ data class ServiceUser(
     val basicAuth = "Basic ${Base64.getEncoder().encodeToString("$username:$password".toByteArray())}"
 }
 
-fun loadBaseConfig(env: Environment): Properties = Properties().also {
-    it.load(Environment::class.java.getResourceAsStream("/kafka_base.properties"))
-    it["sasl.jaas.config"] = "org.apache.kafka.common.security.plain.PlainLoginModule required " +
-            "username=\"${env.serviceUser.username}\" password=\"${env.serviceUser.password}\";"
-    it["bootstrap.servers"] = env.kafkaBootstrapServers
+fun loadBaseConfig(env: Environment): Properties = Properties().apply {
+    put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, env.kafkaBrokers)
+    put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
+    put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
+    put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "jks")
+    put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12")
+    put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, env.kafkaKeystorePath)
+    put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, env.kafkaCredstorePassword)
+    put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, env.kafkaKeystorePath)
+    put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, env.kafkaCredstorePassword)
 }
 
-fun Properties.toProducerConfig(): Properties = Properties().also {
-    it.putAll(this)
-    it[ConsumerConfig.GROUP_ID_CONFIG] = "spleis-testdata-v1"
-    it[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
-    it[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
+fun Properties.toProducerConfig(): Properties = Properties().apply {
+    putAll(this)
+    this[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
+    this[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
+    put(ProducerConfig.ACKS_CONFIG, "1")
+    put(ProducerConfig.LINGER_MS_CONFIG, "0")
+    put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "1")
 }

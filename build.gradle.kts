@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.5.2"
-val ktorVersion = "1.2.5"
+val ktorVersion = "1.5.0"
 val hikariVersion = "3.3.1"
 val flywayVersion = "6.1.3"
 val vaultJdbcVersion = "1.3.1"
 val kotliqueryVersion = "1.3.0"
 
 plugins {
-    kotlin("jvm") version "1.3.60"
+    kotlin("jvm") version "1.4.30"
 }
 
 group = "no.nav.helse"
@@ -20,18 +20,17 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.1.6")
 
-    implementation("org.apache.kafka:kafka-clients:2.3.0")
+    implementation("org.apache.kafka:kafka-clients:2.4.0")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.10")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.10")
@@ -56,16 +55,11 @@ dependencies {
     testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion") {
         exclude("junit")
     }
-    testImplementation("io.mockk:mockk:1.9.3")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_12
-    targetCompatibility = JavaVersion.VERSION_12
+    testImplementation("io.mockk:mockk:1.10.6")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "14"
 }
 
 tasks.named<Jar>("jar") {

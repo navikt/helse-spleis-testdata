@@ -2,6 +2,7 @@ package no.nav.helse.testdata
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
@@ -36,7 +37,7 @@ internal class AktørRestClientTest {
         assertEquals(Result.Ok<String, Exception>("aktørId"), aktørKlient.hentAktørId("fnr"))
     }
 
-    fun aktørKlient(config: suspend HttpRequestData.()->HttpResponseData) = AktørRestClient("unused", HttpClient(MockEngine) {
+    fun aktørKlient(config: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData) = AktørRestClient("unused", HttpClient(MockEngine) {
         install(JsonFeature) {
             serializer = JacksonSerializer()
         }

@@ -6,12 +6,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.response.HttpResponse
-import io.ktor.client.response.readText
+import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import java.time.YearMonth
 
 internal class InntektRestClient(
@@ -26,7 +24,7 @@ internal class InntektRestClient(
         filter: String,
         callId: String
     ): Result<List<Måned>, ResponseFailure> =
-        httpClient.request<HttpResponse>("$baseUrl/api/v1/hentinntektliste") {
+        httpClient.request<HttpStatement>("$baseUrl/api/v1/hentinntektliste") {
             method = HttpMethod.Post
             header("Authorization", "Bearer ${stsRestClient.token()}")
             header("Nav-Consumer-Id", "srvspleistestdata")
@@ -44,12 +42,8 @@ internal class InntektRestClient(
                 "maanedFom" to fom,
                 "maanedTom" to tom
             )
-        }
-            .let {
-                when {
-                    it.status.isSuccess() -> Result.Ok(toMånedListe(objectMapper.readValue(it.readText())))
-                    else -> Result.Error(ResponseFailure(it.status, it.readText()))
-                }
+        }.let {
+            Result.Ok(toMånedListe(objectMapper.readValue(it.receive<String>())))
             }
 }
 

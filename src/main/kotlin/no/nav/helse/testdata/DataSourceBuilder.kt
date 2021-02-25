@@ -19,8 +19,6 @@ internal class DataSourceBuilder(env: Environment, databaseConfig: DatabaseConfi
             requireNotNull(databaseConfig.databasePort) { "database port must be set if jdbc url is not provided" },
             requireNotNull(databaseConfig.databaseName) { "database name must be set if jdbc url is not provided" },
             databaseConfig.databaseUsername?.let { "?user=$it" } ?: "")
-        username = env.serviceUser.username
-        password = env.serviceUser.password
 
         maximumPoolSize = 3
         minimumIdle = 1

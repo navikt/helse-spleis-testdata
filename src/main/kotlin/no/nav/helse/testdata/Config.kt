@@ -11,7 +11,7 @@ import java.nio.file.Paths
 import java.util.Base64
 import java.util.Properties
 
-const val vaultBase = "/var/run/secrets/nais.io/vault"
+const val vaultBase = "/var/run/secrets/nais.io/service_user"
 val vaultBasePath: Path = Paths.get(vaultBase)
 
 private fun readServiceUserCredentials() = ServiceUser(
@@ -86,7 +86,7 @@ fun loadBaseConfig(env: Environment): Properties = Properties().apply {
 }
 
 fun Properties.toProducerConfig(): Properties = Properties().apply {
-    putAll(this)
+    putAll(this@toProducerConfig)
     this[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
     this[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
     put(ProducerConfig.ACKS_CONFIG, "1")

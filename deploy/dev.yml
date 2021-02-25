@@ -31,6 +31,8 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
+  kafka:
+    pool: nav-dev
   vault:
     enabled: true
 

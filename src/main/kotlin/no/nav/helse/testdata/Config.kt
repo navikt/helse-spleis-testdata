@@ -30,6 +30,7 @@ internal fun setUpEnvironment() =
     Environment(
         kafkaBrokers = System.getenv("KAFKA_BROKERS") ?: error("Mangler env var KAFKA_BROKERS"),
         kafkaCredstorePassword = System.getenv("KAFKA_CREDSTORE_PASSWORD"),
+        kafkaTruststorePath = System.getenv("KAFKA_TRUSTSTORE_PATH"),
         kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH"),
         databaseConfigs = DatabaseConfigs(
             spleisConfig = getDatabaseEnv("SPLEIS"),
@@ -63,6 +64,7 @@ data class Environment(
     val aktørRestUrl: String,
     val serviceUser: ServiceUser,
     val kafkaCredstorePassword: String,
+    val kafkaTruststorePath: String,
     val kafkaKeystorePath: String
 )
 
@@ -79,7 +81,7 @@ fun loadBaseConfig(env: Environment): Properties = Properties().apply {
     put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
     put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "jks")
     put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12")
-    put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, env.kafkaKeystorePath)
+    put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, env.kafkaTruststorePath)
     put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, env.kafkaCredstorePassword)
     put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, env.kafkaKeystorePath)
     put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, env.kafkaCredstorePassword)

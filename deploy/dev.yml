@@ -35,6 +35,9 @@ spec:
     pool: nav-dev
   vault:
     enabled: true
+    paths:
+      - mountPath: /var/run/secrets/nais.io/vault
+        kvPath: /serviceuser/data/dev/srvspleistestdata
 
   env:
     - name: DATABASE_HOST_SPLEIS

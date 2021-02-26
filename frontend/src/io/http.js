@@ -36,7 +36,7 @@ export const deletePerson = async ({fnr}) => {
 };
 
 export const postVedtaksperiode = async ({vedtaksperiode}) => {
-    return await fetch(`${baseUrl}/vedtaksperiode/`, {
+    return await fetch(`${baseUrl}/vedtaksperiode`, {
         method: 'post',
         body: JSON.stringify(vedtaksperiode),
         headers: {'Content-Type': 'application/json'}

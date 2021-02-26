@@ -49,7 +49,7 @@ val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
-const val spleisTopic = "helse-rapid-v1"
+const val spleisTopic = "tbd.rapid.v1"
 
 
 @KtorExperimentalAPI

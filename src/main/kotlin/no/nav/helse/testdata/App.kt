@@ -43,6 +43,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
+import kotlin.math.round
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
@@ -166,7 +167,7 @@ internal fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) =
     when (inntekterResult) {
         is Result.Ok -> {
             val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumByDouble { it.beløp }
-            val beregnetMånedsinntekt = beregnetÅrsinntekt / 12
+            val beregnetMånedsinntekt = round(beregnetÅrsinntekt / 12)
             call.respond(
                 mapOf(
                     "beregnetMånedsinntekt" to beregnetMånedsinntekt

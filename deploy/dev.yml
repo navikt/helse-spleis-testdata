@@ -28,6 +28,7 @@ spec:
   ingresses:
     - https://spleis-testdata.nais.preprod.local
     - https://spleis-testdata.dev-fss.nais.io
+    - https://spleis-testdata.dev.intern.nav.no
   prometheus:
     enabled: true
     path: /metrics

@@ -35,6 +35,7 @@ class AppTest {
     private lateinit var spennDB: EmbeddedPostgres
     private lateinit var postgresConnection: Connection
     private var producerMock = mockk<KafkaProducer<String, String>>(relaxed = true)
+    private var rapidProducer = RapidProducer { producerMock }
 
     @BeforeEach
     fun `start postgres`() {
@@ -83,7 +84,7 @@ class AppTest {
             installJacksonFeature()
             routing {
                 registerVedtaksperiodeApi(
-                    producer = producerMock,
+                    producer = rapidProducer,
                     aktørRestClient = mockk { every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId")) })
             }
         }) {

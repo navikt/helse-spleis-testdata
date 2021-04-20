@@ -6,34 +6,27 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.features.ContentNegotiation
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.default
-import io.ktor.http.content.files
-import io.ktor.http.content.static
-import io.ktor.http.content.staticRootFolder
-import io.ktor.jackson.jackson
-import io.ktor.metrics.micrometer.MicrometerMetrics
-import io.ktor.request.header
-import io.ktor.request.receive
-import io.ktor.response.respond
+import io.ktor.application.*
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.http.content.*
+import io.ktor.jackson.*
+import io.ktor.metrics.micrometer.*
+import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
-import io.ktor.server.netty.Netty
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.util.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.errors.AuthorizationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -60,7 +53,7 @@ fun main() = runBlocking {
     val spleisDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spleisConfig).getDataSource()
     val spesialistDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spesialistConfig).getDataSource()
     val spennDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spennConfig).getDataSource()
-    val producer = KafkaProducer<String, String>(loadBaseConfig(environment).toProducerConfig())
+    val rapidProducer = RapidProducer { KafkaProducer<String, String>(loadBaseConfig(environment).toProducerConfig()) }
 
     val httpClient = HttpClient(CIO) {
         expectSuccess = false
@@ -82,8 +75,25 @@ fun main() = runBlocking {
         spennDataSource = spennDataSource,
         inntektRestClient = inntektRestClient,
         aktørRestClient = aktørRestClient,
-        producer = producer
+        rapidProducer = rapidProducer
     )
+}
+
+internal class RapidProducer(private val producerFactory: () -> KafkaProducer<String, String>) {
+
+    private var producer: KafkaProducer<String, String>? = null
+
+    private fun producer(): KafkaProducer<String, String> {
+        return (producer ?: producerFactory()).also {
+            producer = it
+        }
+    }
+
+    internal fun send(fnr: String, melding: String) {
+        producer().send(ProducerRecord(spleisTopic, fnr, melding)) { _, err ->
+            if (err != null && err is AuthorizationException) producer = null // nuller ut producer slik at den instansieres på nytt neste kall, med oppdatert autentisering
+        }.get()
+    }
 }
 
 internal fun launchApplication(
@@ -92,7 +102,7 @@ internal fun launchApplication(
     spennDataSource: DataSource,
     inntektRestClient: InntektRestClient,
     aktørRestClient: AktørRestClient,
-    producer: KafkaProducer<String, String>
+    rapidProducer: RapidProducer
 ) {
     val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
     val exceptionHandler = CoroutineExceptionHandler { context, e ->
@@ -105,7 +115,6 @@ internal fun launchApplication(
         spennDataSource = spennDataSource
     )
 
-
     runBlocking(exceptionHandler + applicationContext) {
         val server = embeddedServer(Netty, 8080) {
             install(MicrometerMetrics) {
@@ -116,9 +125,9 @@ internal fun launchApplication(
             routing {
                 registerHealthApi({ true }, { true }, meterRegistry)
                 registerPersonApi(personService, aktørRestClient)
-                registerVedtaksperiodeApi(producer, aktørRestClient)
+                registerVedtaksperiodeApi(rapidProducer, aktørRestClient)
                 registerInntektsApi(inntektRestClient)
-                registerBehovApi(producer)
+                registerBehovApi(rapidProducer)
 
                 static("/") {
                     staticRootFolder = File("public")
@@ -179,7 +188,7 @@ internal fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) =
 }
 
 internal fun Routing.registerVedtaksperiodeApi(
-    producer: KafkaProducer<String, String>,
+    producer: RapidProducer,
     aktørRestClient: AktørRestClient
 ) {
     post("/vedtaksperiode") {
@@ -195,17 +204,17 @@ internal fun Routing.registerVedtaksperiodeApi(
         if (vedtak.skalSendeSykmelding) {
             val sykmelding = sykmelding(vedtak, aktørId)
             log.info("produserer sykmelding på aktør: $aktørId\n$sykmelding")
-            producer.send(ProducerRecord(spleisTopic, vedtak.fnr, sykmelding)).get()
+            producer.send(vedtak.fnr, sykmelding)
         }
         if (vedtak.skalSendeSøknad) {
             val søknad = søknad(vedtak, aktørId)
             log.info("produserer søknad på aktør: $aktørId\n$søknad")
-            producer.send(ProducerRecord(spleisTopic, vedtak.fnr, søknad)).get()
+            producer.send(vedtak.fnr, søknad)
         }
         if (vedtak.skalSendeInntektsmelding) {
             val inntektsmelding = inntektsmelding(vedtak, aktørId)
             log.info("produserer inntektsmelding på aktør: $aktørId\n$inntektsmelding")
-            producer.send(ProducerRecord(spleisTopic, vedtak.fnr, inntektsmelding)).get()
+            producer.send(vedtak.fnr, inntektsmelding)
         }
 
         call.respond(HttpStatusCode.OK)
@@ -214,7 +223,7 @@ internal fun Routing.registerVedtaksperiodeApi(
 }
 
 internal fun Routing.registerBehovApi(
-    producer: KafkaProducer<String, String>
+    producer: RapidProducer
 ) {
     post("/behov") {
         val behov = call.receive<ObjectNode>()
@@ -223,7 +232,7 @@ internal fun Routing.registerBehovApi(
         if (!behov.path("fødselsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("organisasjonsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("vedtaksperiodeId").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
-        producer.send(ProducerRecord(spleisTopic, behov.toString())).get()
+        producer.send(behov.path("fødselsnummer").asText(), behov.toString())
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for behov: $behov") }
     }

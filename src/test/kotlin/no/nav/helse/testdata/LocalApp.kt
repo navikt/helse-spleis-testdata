@@ -15,6 +15,7 @@ fun main() {
     val spesialistDB = EmbeddedPostgres.builder().start()
     val spennDB = EmbeddedPostgres.builder().start()
     val producer: KafkaProducer<String, String> = mockk(relaxed = true)
+    val rapidProducer = RapidProducer { producer }
 
     runMigration(spleisDB, "spleis")
     runMigration(spesialistDB, "spesialist")
@@ -40,7 +41,7 @@ fun main() {
         spennDataSource = spennDB.postgresDatabase,
         inntektRestClient = inntektRestClientMock,
         aktørRestClient = aktørRestClientMock,
-        producer = producer
+        rapidProducer = rapidProducer
     )
 }
 

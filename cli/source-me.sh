@@ -69,16 +69,16 @@ function opprett_inntekter {
 
     local -r months=(januar februar mars april mai juni juli august september oktober november desember)
 
-    for m in {2..0}; do
-        _opprett_inntekt ${fnr} ${mndlnn} ${months[$m]} 2020 ${orgnr}
+    for m in {11..0}; do
+        _opprett_inntekt ${fnr} ${mndlnn} ${months[$m]} 2022 ${orgnr}
     done
 
     for m in {11..0}; do
-        _opprett_inntekt ${fnr} ${mndlnn} ${months[$m]} 2019 ${orgnr}
+        _opprett_inntekt ${fnr} ${mndlnn} ${months[$m]} 2021 ${orgnr}
     done
 
-    for m in {11..8}; do
-        _opprett_inntekt ${fnr} ${mndlnn} ${months[$m]} 2018 ${orgnr}
+    for m in {11..0}; do
+        _opprett_inntekt ${fnr} ${mndlnn} ${months[$m]} 2020 ${orgnr}
     done
 }
 

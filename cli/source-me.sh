@@ -3,8 +3,8 @@ set -o pipefail
 tmp_dir=/tmp/istub-cli
 authdataFile=$tmp_dir/authdata
 tokens=$tmp_dir/tokens
-STUB_BASE_URL=https://app-q1.adeo.no
-STUB_API=${STUB_BASE_URL}/inntektstub/api/v1
+STUB_BASE_URL=https://inntektstub.nais.preprod.local
+STUB_API=${STUB_BASE_URL}/api/v1
 
 function checkConnectivity {
     if ! curl -Is ${STUB_BASE_URL} > /dev/null; then

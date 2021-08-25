@@ -21,17 +21,17 @@ export const CopyField: Component<CopyFieldProps> = (props) => {
   const [copied, setCopied] = createSignal(false);
 
   const copyValueToClipboard = () => {
-    console.log(navigator.clipboard);
-    navigator.clipboard
-      .writeText(props.value)
-      .then(() => {
-        setError(false);
-        setCopied(true);
-      })
-      .catch(() => {
-        setCopied(false);
-        setError(true);
-      });
+    try {
+      navigator.clipboard
+        .writeText(props.value)
+        .then(() => {
+          setError(false);
+          setCopied(true);
+        });
+    } catch {
+      setCopied(false);
+      setError(true);
+    }
   };
 
   createEffect(() => {

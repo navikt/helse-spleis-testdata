@@ -1,5 +1,6 @@
-package no.nav.helse.testdata
+package no.nav.helse.testdata.dokumenter
 
+import no.nav.helse.testdata.assertValidJson
 import org.junit.jupiter.api.Test
 
 import java.time.LocalDate
@@ -7,8 +8,8 @@ import java.time.LocalDate
 internal class SykmeldingTest {
 
     companion object {
-        val mandag = LocalDate.of(2020, 3, 23)
-        val fredag = LocalDate.of(2020, 3, 27)
+        val mandag: LocalDate = LocalDate.of(2020, 3, 23)
+        val fredag: LocalDate = LocalDate.of(2020, 3, 27)
     }
 
     @Test
@@ -18,11 +19,9 @@ internal class SykmeldingTest {
             orgnummer = "orgnummer",
             sykdomFom = mandag,
             sykdomTom = fredag,
-            inntekt = 25000.0,
-            sendtNav = fredag,
-            førstefraværsdag = mandag,
-            arbeidsgiverperiode = emptyList(),
-            ferieperioder = emptyList()
+            sykmelding = Sykmelding(
+                sykmeldingsgrad = 100
+            )
         )
         val json = sykmelding(vedtak,"aktørId")
         assertValidJson(json)

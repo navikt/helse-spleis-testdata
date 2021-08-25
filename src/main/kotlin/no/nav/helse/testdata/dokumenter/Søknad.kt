@@ -1,7 +1,19 @@
-package no.nav.helse.testdata
+package no.nav.helse.testdata.dokumenter
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Søknad(
+    val sykmeldingsgrad: Int,
+    val harAndreInntektskilder: Boolean,
+    val ferieperioder: List<Periode> = emptyList(),
+    val faktiskgrad: Int? = null,
+    val sendtNav: LocalDate? = null,
+    val sendtArbeidsgiver: LocalDate? = null,
+)
 
 fun søknad(
     vedtak: Vedtak,

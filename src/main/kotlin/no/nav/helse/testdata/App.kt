@@ -1,6 +1,5 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -24,13 +23,16 @@ import io.ktor.util.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import kotlinx.coroutines.*
+import no.nav.helse.testdata.dokumenter.Vedtak
+import no.nav.helse.testdata.dokumenter.inntektsmelding
+import no.nav.helse.testdata.dokumenter.sykmelding
+import no.nav.helse.testdata.dokumenter.søknad
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.errors.AuthorizationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 import java.util.concurrent.Executors
@@ -246,42 +248,3 @@ internal fun Application.installJacksonFeature() {
         }
     }
 }
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Vedtak(
-    val fnr: String,
-    val orgnummer: String,
-    val sykdomFom: LocalDate,
-    val sykdomTom: LocalDate,
-    val sykmelding: Sykmelding? = null,
-    val søknad: Søknad? = null,
-    val inntektsmelding: Inntektsmelding? = null
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Sykmelding(
-    val sykmeldingsgrad: Int,
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Søknad(
-    val sykmeldingsgrad: Int,
-    val harAndreInntektskilder: Boolean,
-    val ferieperioder: List<Periode> = emptyList(),
-    val faktiskgrad: Int? = null,
-    val sendtNav: LocalDate? = null,
-    val sendtArbeidsgiver: LocalDate? = null,
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Inntektsmelding(
-    val inntekt: Double,
-    val ferieperioder: List<Periode>,
-    val arbeidsgiverperiode: List<Periode> = emptyList(),
-    val endringRefusjon: List<LocalDate> = emptyList(),
-    val opphørRefusjon: LocalDate? = null,
-    val førsteFraværsdag: LocalDate? = null,
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Periode(val fom: LocalDate, val tom: LocalDate)

@@ -1,7 +1,20 @@
-package no.nav.helse.testdata
+package no.nav.helse.testdata.dokumenter
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.helse.testdata.objectMapper
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Inntektsmelding(
+    val inntekt: Double,
+    val ferieperioder: List<Periode>,
+    val arbeidsgiverperiode: List<Periode> = emptyList(),
+    val endringRefusjon: List<LocalDate> = emptyList(),
+    val opphørRefusjon: LocalDate? = null,
+    val førsteFraværsdag: LocalDate? = null,
+)
 
 fun inntektsmelding(
     vedtak: Vedtak,

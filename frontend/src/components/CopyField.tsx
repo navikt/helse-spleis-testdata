@@ -21,6 +21,7 @@ export const CopyField: Component<CopyFieldProps> = (props) => {
   const [copied, setCopied] = createSignal(false);
 
   const copyValueToClipboard = () => {
+    console.log(navigator.clipboard);
     navigator.clipboard
       .writeText(props.value)
       .then(() => {

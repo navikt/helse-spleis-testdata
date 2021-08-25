@@ -1,0 +1,23 @@
+body {
+  --body-background-color: white;
+  margin: 0;
+  font-family: "Open Sans", sans-serif;
+  background-color: var(--body-background-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --block-extra-small: 0.25rem;
+  --block-small: 1rem;
+  --block-medium: 2rem;
+  --block-large: 4rem;
+
+  --border-radius: 0.25rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+}

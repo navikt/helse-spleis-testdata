@@ -1,0 +1,41 @@
+.App {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: var(--background-color-primary);
+  color: var(--text-color-primary);
+  transition: background-color 0.2s ease;
+
+  --focus-shadow: 0 0 0 3px var(--active-color-primary);
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+}
+
+.light {
+  --background-color-primary: #efefef;
+  --background-color-secondary: #ffffff;
+  --text-color-primary: #222222;
+  --text-color-secondary: #8d8d8d;
+  --text-color-inverse: #eeeeee;
+  --text-color-error: #ae1111;
+  --active-color-primary: #00a6ff;
+  --active-color-secondary: #bdf2ff;
+  --invert: 0%;
+  --color-success: #128f59;
+  --color-disabled: #a5a5a5;
+}
+
+.dark {
+  --background-color-primary: #000000;
+  --background-color-secondary: #181818;
+  --text-color-primary: #eeeeee;
+  --text-color-secondary: #8d8d8d;
+  --text-color-inverse: #161616;
+  --text-color-error: #ae1111;
+  --active-color-primary: #0081ba;
+  --active-color-secondary: #004772;
+  --invert: 100%;
+  --color-success: #208358;
+  --color-disabled: #676767;
+}

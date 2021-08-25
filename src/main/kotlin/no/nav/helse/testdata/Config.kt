@@ -1,15 +1,9 @@
 package no.nav.helse.testdata
 
-import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.config.SslConfigs
-import org.apache.kafka.common.security.auth.SecurityProtocol
-import org.apache.kafka.common.serialization.StringSerializer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.Base64
-import java.util.Properties
+import java.util.*
 
 const val vaultBase = "/var/run/secrets/nais.io/service_user"
 val vaultBasePath: Path = Paths.get(vaultBase)
@@ -73,25 +67,4 @@ data class ServiceUser(
     val password: String
 ) {
     val basicAuth = "Basic ${Base64.getEncoder().encodeToString("$username:$password".toByteArray())}"
-}
-
-fun loadBaseConfig(env: Environment): Properties = Properties().apply {
-    put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, env.kafkaBrokers)
-    put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
-    put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
-    put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "jks")
-    put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12")
-    put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, env.kafkaTruststorePath)
-    put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, env.kafkaCredstorePassword)
-    put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, env.kafkaKeystorePath)
-    put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, env.kafkaCredstorePassword)
-}
-
-fun Properties.toProducerConfig(): Properties = Properties().apply {
-    putAll(this@toProducerConfig)
-    this[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
-    this[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
-    put(ProducerConfig.ACKS_CONFIG, "1")
-    put(ProducerConfig.LINGER_MS_CONFIG, "0")
-    put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "1")
 }

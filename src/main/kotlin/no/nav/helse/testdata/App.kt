@@ -17,27 +17,20 @@ import io.ktor.metrics.micrometer.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.util.*
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.coroutines.*
+import no.nav.helse.rapids_rivers.RapidApplication
+import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.testdata.dokumenter.Vedtak
 import no.nav.helse.testdata.dokumenter.inntektsmelding
 import no.nav.helse.testdata.dokumenter.sykmelding
 import no.nav.helse.testdata.dokumenter.søknad
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.errors.AuthorizationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.YearMonth
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import javax.sql.DataSource
 import kotlin.math.round
 
 val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
@@ -45,17 +38,14 @@ val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
-const val spleisTopic = "tbd.rapid.v1"
-
 
 @KtorExperimentalAPI
-fun main() = runBlocking {
-    val environment = setUpEnvironment()
+fun main() {
+    val env = setUpEnvironment()
 
-    val spleisDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spleisConfig).getDataSource()
-    val spesialistDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spesialistConfig).getDataSource()
-    val spennDataSource = DataSourceBuilder(environment, environment.databaseConfigs.spennConfig).getDataSource()
-    val rapidProducer = RapidProducer { KafkaProducer<String, String>(loadBaseConfig(environment).toProducerConfig()) }
+    val spleisDataSource = DataSourceBuilder(env, env.databaseConfigs.spleisConfig).getDataSource()
+    val spesialistDataSource = DataSourceBuilder(env, env.databaseConfigs.spesialistConfig).getDataSource()
+    val spennDataSource = DataSourceBuilder(env, env.databaseConfigs.spennConfig).getDataSource()
 
     val httpClient = HttpClient(CIO) {
         expectSuccess = false
@@ -67,82 +57,70 @@ fun main() = runBlocking {
         }
     }
 
-    val stsRestClient = StsRestClient("http://security-token-service.default.svc.nais.local", environment.serviceUser)
-    val inntektRestClient = InntektRestClient(environment.inntektRestUrl, httpClient, stsRestClient)
-    val aktørRestClient = AktørRestClient(environment.aktørRestUrl, httpClient, stsRestClient)
+    val stsRestClient = StsRestClient("http://security-token-service.default.svc.nais.local", env.serviceUser)
+    val inntektRestClient = InntektRestClient(env.inntektRestUrl, httpClient, stsRestClient)
+    val aktørRestClient = AktørRestClient(env.aktørRestUrl, httpClient, stsRestClient)
 
-    launchApplication(
-        spleisDataSource = spleisDataSource,
-        spesialistDataSource = spesialistDataSource,
-        spennDataSource = spennDataSource,
-        inntektRestClient = inntektRestClient,
-        aktørRestClient = aktørRestClient,
-        rapidProducer = rapidProducer
-    )
-}
-
-internal class RapidProducer(private val producerFactory: () -> KafkaProducer<String, String>) {
-
-    private var producer: KafkaProducer<String, String>? = null
-
-    private fun producer(): KafkaProducer<String, String> {
-        return (producer ?: producerFactory()).also {
-            producer = it
-        }
-    }
-
-    internal fun send(fnr: String, melding: String) {
-        producer().send(ProducerRecord(spleisTopic, fnr, melding)) { _, err ->
-            if (err != null && err is AuthorizationException) producer = null // nuller ut producer slik at den instansieres på nytt neste kall, med oppdatert autentisering
-        }.get()
-    }
-}
-
-internal fun launchApplication(
-    spleisDataSource: DataSource,
-    spesialistDataSource: DataSource,
-    spennDataSource: DataSource,
-    inntektRestClient: InntektRestClient,
-    aktørRestClient: AktørRestClient,
-    rapidProducer: RapidProducer
-) {
-    val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
-    val exceptionHandler = CoroutineExceptionHandler { context, e ->
-        log.error("Feil i lytter", e)
-        context.cancel(CancellationException("Feil i lytter", e))
-    }
     val personService = PersonService(
         spleisDataSource = spleisDataSource,
         spesialistDataSource = spesialistDataSource,
         spennDataSource = spennDataSource
     )
 
-    runBlocking(exceptionHandler + applicationContext) {
-        val server = embeddedServer(Netty, 8080) {
-            install(MicrometerMetrics) {
-                registry = meterRegistry
-            }
-            installJacksonFeature()
+    ApplicationBuilder(
+        rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
+        personService = personService,
+        aktørRestClient = aktørRestClient,
+        inntektRestClient = inntektRestClient
+    ).start()
+}
 
-            routing {
-                registerHealthApi({ true }, { true }, meterRegistry)
-                registerPersonApi(personService, aktørRestClient)
-                registerVedtaksperiodeApi(rapidProducer, aktørRestClient)
-                registerInntektsApi(inntektRestClient)
-                registerBehovApi(rapidProducer)
+internal data class RapidsMediator(internal val connection: RapidsConnection)
 
-                static("/") {
-                    staticRootFolder = File("public")
-                    files("")
-                    default("index.html")
-                }
-            }
-        }.start(wait = false)
+internal class ApplicationBuilder(
+    rapidsConfig: RapidApplication.RapidApplicationConfig,
+    private val personService: PersonService,
+    private val aktørRestClient: AktørRestClient,
+    private val inntektRestClient: InntektRestClient,
+) : RapidsConnection.StatusListener {
+    private lateinit var rapidsMediator: RapidsMediator
 
-        Runtime.getRuntime().addShutdownHook(Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
-            applicationContext.close()
-        })
+    private val rapidsConnection =
+        RapidApplication.Builder(rapidsConfig)
+            .withKtorModule { installKtorModule(personService, aktørRestClient, inntektRestClient, rapidsMediator) }
+            .build()
+
+    init {
+        rapidsMediator = RapidsMediator(rapidsConnection)
+        rapidsConnection.register(this)
+    }
+
+    fun start() = rapidsConnection.start()
+}
+
+internal fun Application.installKtorModule(
+    personService: PersonService,
+    aktørRestClient: AktørRestClient,
+    inntektRestClient: InntektRestClient,
+    rapidsMediator: RapidsMediator,
+) {
+    install(MicrometerMetrics) {
+        registry = meterRegistry
+    }
+    installJacksonFeature()
+
+    routing {
+        registerHealthApi({ true }, { true }, meterRegistry)
+        registerPersonApi(personService, aktørRestClient)
+        registerVedtaksperiodeApi(rapidsMediator, aktørRestClient)
+        registerInntektsApi(inntektRestClient)
+        registerBehovApi(rapidsMediator)
+
+        static("/") {
+            staticRootFolder = File("public")
+            files("")
+            default("index.html")
+        }
     }
 }
 
@@ -164,7 +142,6 @@ internal fun Routing.registerPersonApi(personService: PersonService, aktørRestC
 }
 
 internal fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) = get("/person/inntekt") {
-
     val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
     val end = YearMonth.now().minusMonths(1)
     val start = end.minusMonths(11)
@@ -189,10 +166,7 @@ internal fun Routing.registerInntektsApi(inntektRestClient: InntektRestClient) =
     }
 }
 
-internal fun Routing.registerVedtaksperiodeApi(
-    producer: RapidProducer,
-    aktørRestClient: AktørRestClient
-) {
+internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator, aktørRestClient: AktørRestClient) {
     post("/vedtaksperiode") {
         val vedtak = call.receive<Vedtak>()
         val aktørIdResult = aktørRestClient.hentAktørId(vedtak.fnr)
@@ -205,17 +179,17 @@ internal fun Routing.registerVedtaksperiodeApi(
 
         sykmelding(vedtak, aktørId)?.also {
             log.info("produserer sykmelding på aktør: $aktørId\n$it")
-            producer.send(vedtak.fnr, it)
+            mediator.connection.publish(vedtak.fnr, it)
         }
 
         søknad(vedtak, aktørId)?.also {
             log.info("produserer søknad på aktør: $aktørId\n$it")
-            producer.send(vedtak.fnr, it)
+            mediator.connection.publish(vedtak.fnr, it)
         }
 
         inntektsmelding(vedtak, aktørId)?.also {
             log.info("produserer inntektsmelding på aktør: $aktørId\n$it")
-            producer.send(vedtak.fnr, it)
+            mediator.connection.publish(vedtak.fnr, it)
         }
 
         call.respond(HttpStatusCode.OK)
@@ -223,9 +197,7 @@ internal fun Routing.registerVedtaksperiodeApi(
     }
 }
 
-internal fun Routing.registerBehovApi(
-    producer: RapidProducer
-) {
+internal fun Routing.registerBehovApi(mediator: RapidsMediator) {
     post("/behov") {
         val behov = call.receive<ObjectNode>()
         behov.put("@event_name", "behov")
@@ -233,7 +205,7 @@ internal fun Routing.registerBehovApi(
         if (!behov.path("fødselsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("organisasjonsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("vedtaksperiodeId").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
-        producer.send(behov.path("fødselsnummer").asText(), behov.toString())
+        mediator.connection.publish(behov.path("fødselsnummer").asText(), behov.toString())
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for behov: $behov") }
     }

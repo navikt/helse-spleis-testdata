@@ -1,5 +1,6 @@
 package no.nav.helse.testdata
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -52,7 +53,9 @@ class InntektRestClientTest {
     private val inntektRestClient = InntektRestClient(
         "http://localhost.no", HttpClient(MockEngine) {
             install(JsonFeature) {
-                this.serializer = JacksonSerializer()
+                this.serializer = JacksonSerializer() {
+                    registerModule(JavaTimeModule())
+                }
             }
             engine {
                 addHandler { request ->

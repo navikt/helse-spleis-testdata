@@ -3,23 +3,33 @@ package no.nav.helse.testdata
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
-import org.apache.kafka.clients.producer.KafkaProducer
+import kotlinx.coroutines.*
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.flywaydb.core.Flyway
 import java.time.YearMonth
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 fun main() {
     val spleisDB = EmbeddedPostgres.builder().start()
     val spesialistDB = EmbeddedPostgres.builder().start()
     val spennDB = EmbeddedPostgres.builder().start()
-    val producer: KafkaProducer<String, String> = mockk(relaxed = true)
-    val rapidProducer = RapidProducer { producer }
 
     runMigration(spleisDB, "spleis")
     runMigration(spesialistDB, "spesialist")
     runMigration(spennDB, "spenn")
+
+    val aktørRestClientMock =
+        mockk<AktørRestClient> {
+            every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId"))
+        }
+
     val inntektRestClientMock = mockk<InntektRestClient> {
         every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
             Result.Ok(
@@ -31,18 +41,55 @@ fun main() {
             )
         )
     }
-    val aktørRestClientMock =
-        mockk<AktørRestClient> {
-            every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId"))
-        }
-    launchApplication(
+
+    val personService = PersonService(
         spleisDataSource = spleisDB.postgresDatabase,
         spesialistDataSource = spesialistDB.postgresDatabase,
-        spennDataSource = spennDB.postgresDatabase,
-        inntektRestClient = inntektRestClientMock,
-        aktørRestClient = aktørRestClientMock,
-        rapidProducer = rapidProducer
+        spennDataSource = spennDB.postgresDatabase
     )
+
+    LocalApplicationBuilder(
+        personService = personService,
+        aktørRestClient = aktørRestClientMock,
+        inntektRestClient = inntektRestClientMock
+    ).start()
+}
+
+internal class LocalApplicationBuilder(
+    private val personService: PersonService,
+    private val aktørRestClient: AktørRestClient,
+    private val inntektRestClient: InntektRestClient,
+) : RapidsConnection.StatusListener {
+    private val rapidsConnection = TestRapid()
+    private val rapidsMediator = RapidsMediator(rapidsConnection)
+
+    fun start() = runLocalServer {
+        installKtorModule(
+            personService = personService,
+            aktørRestClient = aktørRestClient,
+            inntektRestClient = inntektRestClient,
+            rapidsMediator = rapidsMediator,
+        )
+    }
+}
+
+internal fun runLocalServer(applicationBlock: Application.() -> Unit) {
+    val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
+    val exceptionHandler = CoroutineExceptionHandler { context, e ->
+        log.error("Feil i lytter", e)
+        context.cancel(CancellationException("Feil i lytter", e))
+    }
+
+    runBlocking(exceptionHandler + applicationContext) {
+        val server = embeddedServer(Netty, 8080) {
+            applicationBlock()
+        }.start(wait = false)
+
+        Runtime.getRuntime().addShutdownHook(Thread {
+            server.stop(10, 10, TimeUnit.SECONDS)
+            applicationContext.close()
+        })
+    }
 }
 
 fun runMigration(embeddedPostgres: EmbeddedPostgres, directory: String) =

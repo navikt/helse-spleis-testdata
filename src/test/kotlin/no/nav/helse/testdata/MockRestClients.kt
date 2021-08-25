@@ -1,5 +1,7 @@
 package no.nav.helse.testdata
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -14,7 +16,10 @@ import kotlinx.coroutines.runBlocking
 internal val inntektRestClient = InntektRestClient(
     "http://localhost.no", HttpClient(MockEngine) {
         install(JsonFeature) {
-            this.serializer = JacksonSerializer()
+            serializer = JacksonSerializer {
+                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                registerModule(JavaTimeModule())
+            }
         }
         engine {
             addHandler { request ->

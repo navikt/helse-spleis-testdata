@@ -10,7 +10,8 @@ import kotlinx.coroutines.runBlocking
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import org.apache.kafka.clients.producer.KafkaProducer
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -34,8 +35,7 @@ class AppTest {
     private lateinit var spesialistDB: EmbeddedPostgres
     private lateinit var spennDB: EmbeddedPostgres
     private lateinit var postgresConnection: Connection
-    private var producerMock = mockk<KafkaProducer<String, String>>(relaxed = true)
-    private var rapidProducer = RapidProducer { producerMock }
+    private lateinit var rapidsConnection: RapidsConnection
 
     @BeforeEach
     fun `start postgres`() {
@@ -44,6 +44,7 @@ class AppTest {
         spennDB = EmbeddedPostgres.builder().start()
 
         postgresConnection = spleisDB.postgresDatabase.connection
+        rapidsConnection = TestRapid()
 
         runMigration(spleisDB, "spleis")
         runMigration(spesialistDB, "spesialist")
@@ -84,7 +85,7 @@ class AppTest {
             installJacksonFeature()
             routing {
                 registerVedtaksperiodeApi(
-                    producer = rapidProducer,
+                    mediator = RapidsMediator(rapidsConnection),
                     aktørRestClient = mockk { every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId")) })
             }
         }) {
@@ -154,7 +155,7 @@ class AppTest {
     }
 
     private fun opprettSpleisPerson(fnr: String) {
-        using(sessionOf(spleisDB.postgresDatabase), {
+        using(sessionOf(spleisDB.postgresDatabase)) {
             it.run(
                 queryOf(
                     "insert into person (aktor_id, fnr, skjema_versjon, data) values ('aktørId', ?, 4, (to_json(?::json)))",
@@ -163,13 +164,14 @@ class AppTest {
                 ).asUpdate
             )
             it.run(
-                queryOf("""
+                queryOf(
+                    """
                         insert into melding (fnr, melding_id, melding_type, data, lest_dato)
                         values (?, '${UUID.randomUUID()}', 'melding_type', '{}', now())""",
                     fnr.toLong()
                 ).asUpdate
             )
-        })
+        }
     }
 
     private fun finnPerson(fnr: String) = using(sessionOf(spesialistDB.postgresDatabase)) { session ->
@@ -267,11 +269,11 @@ class AppTest {
     }
 
     private fun antallRader(fnr: String): Int {
-        return using(sessionOf(spleisDB.postgresDatabase), { session ->
+        return using(sessionOf(spleisDB.postgresDatabase)) { session ->
             session.run(queryOf("select * from person where fnr = ?", fnr.toLong()).map {
                 it.long("fnr")
             }.asList).size
-        })
+        }
     }
 
 }

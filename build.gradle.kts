@@ -1,7 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val junitJupiterVersion = "5.5.2"
-val ktorVersion = "1.5.0"
+val ktorVersion = "1.5.1"
 val hikariVersion = "3.3.1"
 val flywayVersion = "6.1.3"
 val vaultJdbcVersion = "1.3.1"
@@ -17,9 +15,11 @@ repositories {
     mavenCentral()
     maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/kotlinx")
+    maven("https://jitpack.io")
 }
 
 dependencies {
+    implementation("com.github.navikt:rapids-and-rivers:20210617121814-3e67e4d")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")

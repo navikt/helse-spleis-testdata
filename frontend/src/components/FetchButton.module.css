@@ -1,0 +1,16 @@
+.FetchButton.isFetching > *:last-child {
+  margin-left: 0.5rem;
+}
+
+.Icon {
+  filter: invert(100%);
+  margin-left: 0.5rem;
+}
+
+.FetchButton.error {
+  background: var(--text-color-error);
+}
+
+.FetchButton.success {
+  background: var(--color-success);
+}

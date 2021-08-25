@@ -1,0 +1,7 @@
+.Card {
+  padding: 1.5rem;
+  background-color: var(--background-color-secondary);
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+  width: max-content;
+}

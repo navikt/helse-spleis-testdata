@@ -201,20 +201,19 @@ internal fun Routing.registerVedtaksperiodeApi(
         }
         val aktørId = aktørIdResult.unwrap()
 
-        if (vedtak.skalSendeSykmelding) {
-            val sykmelding = sykmelding(vedtak, aktørId)
-            log.info("produserer sykmelding på aktør: $aktørId\n$sykmelding")
-            producer.send(vedtak.fnr, sykmelding)
+        sykmelding(vedtak, aktørId)?.also {
+            log.info("produserer sykmelding på aktør: $aktørId\n$it")
+            producer.send(vedtak.fnr, it)
         }
-        if (vedtak.skalSendeSøknad) {
-            val søknad = søknad(vedtak, aktørId)
-            log.info("produserer søknad på aktør: $aktørId\n$søknad")
-            producer.send(vedtak.fnr, søknad)
+
+        søknad(vedtak, aktørId)?.also {
+            log.info("produserer søknad på aktør: $aktørId\n$it")
+            producer.send(vedtak.fnr, it)
         }
-        if (vedtak.skalSendeInntektsmelding) {
-            val inntektsmelding = inntektsmelding(vedtak, aktørId)
-            log.info("produserer inntektsmelding på aktør: $aktørId\n$inntektsmelding")
-            producer.send(vedtak.fnr, inntektsmelding)
+
+        inntektsmelding(vedtak, aktørId)?.also {
+            log.info("produserer inntektsmelding på aktør: $aktørId\n$it")
+            producer.send(vedtak.fnr, it)
         }
 
         call.respond(HttpStatusCode.OK)
@@ -254,20 +253,34 @@ data class Vedtak(
     val orgnummer: String,
     val sykdomFom: LocalDate,
     val sykdomTom: LocalDate,
-    val inntekt: Double,
-    val harAndreInntektskilder: Boolean = false,
-    val skalSendeInntektsmelding: Boolean = true,
-    val skalSendeSykmelding: Boolean = true,
-    val skalSendeSøknad: Boolean = true,
-    val sykmeldingsgrad: Int = 100,
+    val sykmelding: Sykmelding? = null,
+    val søknad: Søknad? = null,
+    val inntektsmelding: Inntektsmelding? = null
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Sykmelding(
+    val sykmeldingsgrad: Int,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Søknad(
+    val sykmeldingsgrad: Int,
+    val harAndreInntektskilder: Boolean,
+    val ferieperioder: List<Periode> = emptyList(),
     val faktiskgrad: Int? = null,
     val sendtNav: LocalDate? = null,
     val sendtArbeidsgiver: LocalDate? = null,
-    val førstefraværsdag: LocalDate?,
-    val arbeidsgiverperiode: List<Periode>,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Inntektsmelding(
+    val inntekt: Double,
     val ferieperioder: List<Periode>,
+    val arbeidsgiverperiode: List<Periode> = emptyList(),
+    val endringRefusjon: List<LocalDate> = emptyList(),
     val opphørRefusjon: LocalDate? = null,
-    val endringRefusjon: List<LocalDate> = emptyList()
+    val førsteFraværsdag: LocalDate? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

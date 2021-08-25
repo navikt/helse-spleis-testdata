@@ -1,0 +1,26 @@
+.Input {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 2px 0 -1px var(--text-color-primary);
+  color: var(--text-color-primary);
+  font-size: 1rem;
+  line-height: 1.25rem;
+  padding: 0.25rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.Input:focus,
+.Input:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.Input:global(.error) {
+  box-shadow: 0 1px 0 0 var(--text-color-error);
+}
+
+::-webkit-calendar-picker-indicator {
+  transition: filter 0.2s ease;
+  filter: invert(var(--invert));
+}

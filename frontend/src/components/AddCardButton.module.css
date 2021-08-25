@@ -1,0 +1,25 @@
+.AddButton {
+  display: flex;
+  align-items: center;
+  outline: none;
+  border: none;
+  background: none;
+  color: var(--text-color-primary);
+  font-size: 1rem;
+  width: max-content;
+  transition: color 0.2s ease;
+}
+
+.AddButton:focus-visible {
+  color: var(--active-color-primary);
+}
+
+.AddButton:active {
+  filter: brightness(50%);
+}
+
+.Icon {
+  margin-right: 0.5rem;
+  filter: invert(var(--invert));
+  transition: filter 0.2s ease;
+}

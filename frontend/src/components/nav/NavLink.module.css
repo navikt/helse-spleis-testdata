@@ -1,0 +1,64 @@
+.Link > a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  margin: 0 0 var(--block-extra-small);
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  text-decoration: none;
+  overflow: hidden;
+  color: var(--text-color-primary);
+  padding: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.Link > a:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.Link > a > img:first-child {
+  margin-right: 0.5rem;
+}
+
+.Link > a > img {
+  transition: filter 0.2s ease;
+  filter: invert(var(--invert));
+}
+
+.Link > a:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -0.5rem;
+  width: 0.5rem;
+  height: 100%;
+  transition: left 0.2s ease;
+}
+
+.Link > a:hover,
+.Link > :global(a.active) {
+  background: var(--active-color-secondary);
+}
+
+.isExpanded > :global(a.active) {
+  padding-left: 1.5rem;
+}
+
+.isExpanded > :global(a.active) {
+  padding-left: 1.5rem;
+}
+
+.Link > :global(a.active:before) {
+  background: var(--active-color-primary);
+  left: 0;
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+
+.isExpanded > a {
+}
+
+.isMinified > a {
+  padding: 1rem 0.5rem;
+}

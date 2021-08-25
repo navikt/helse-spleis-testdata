@@ -1,0 +1,4 @@
+.ErrorMessage {
+  color: var(--text-color-error);
+  margin: var(--block-extra-small) 0 0;
+}

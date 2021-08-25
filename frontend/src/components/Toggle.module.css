@@ -1,0 +1,41 @@
+.Toggle {
+  --toggle-height: 1.5rem;
+  --toggle-width: 2.5rem;
+  position: relative;
+  height: var(--toggle-height);
+  width: var(--toggle-width);
+  border-radius: 0.75rem;
+  border: none;
+  background: var(--color-disabled);
+  padding: 0;
+  margin: 0;
+  outline: none;
+  transition: all 0.1s ease;
+}
+
+.Toggle:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.Toggle:before {
+  --toggle-pin-size: calc(var(--toggle-height) - 4px);
+  content: "";
+  position: absolute;
+  width: var(--toggle-pin-size);
+  height: var(--toggle-pin-size);
+  background: var(--color-white);
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  transition: all 0.1s ease;
+}
+
+.Toggle.toggled {
+  background: var(--color-success);
+}
+
+.Toggle.toggled:before {
+  transform: translateY(-50%)
+    translateX(calc(var(--toggle-width) - var(--toggle-height)));
+}

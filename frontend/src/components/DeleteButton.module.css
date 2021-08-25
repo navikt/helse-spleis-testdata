@@ -1,0 +1,23 @@
+.DeleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  background-color: var(--text-color-error);
+  outline: none;
+}
+
+.DeleteButton > img {
+  filter: invert(1);
+}
+
+.DeleteButton:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.DeleteButton:active {
+  filter: brightness(50%);
+}

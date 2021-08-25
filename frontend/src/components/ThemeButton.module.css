@@ -1,0 +1,47 @@
+.ThemeButton {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--background-color-secondary);
+  overflow: hidden;
+  box-shadow: 0 3px 5px -3px black;
+  outline: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.ThemeButton:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.ThemeButton:before {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  top: 5%;
+  left: 5%;
+}
+
+.ThemeButton.light:before {
+  background: #ff9900;
+  mix-blend-mode: lighten;
+}
+
+.ThemeButton.dark {
+  transform: rotate(45deg);
+  background: var(--background-color-secondary);
+}
+
+.ThemeButton.dark > img {
+  filter: invert(100%);
+}
+
+.ThemeButton.dark:before {
+  background: #ffffff;
+  mix-blend-mode: darken;
+}

@@ -1,0 +1,25 @@
+.SlettPerson {
+  display: flex;
+  flex-direction: column;
+  margin: 2rem;
+}
+
+.SlettPerson > *:not(:last-child) {
+  margin-bottom: var(--block-medium);
+}
+
+.Title {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: var(--block-medium);
+}
+
+.CardContainer {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.CardContainer > *:not(:last-child) {
+  margin-bottom: var(--block-small);
+}

@@ -1,0 +1,47 @@
+.Navigation {
+  --padding-expanded: 2rem 2rem 0.5rem;
+  --padding-minified: 2rem 0.5rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--background-color-secondary);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.Navigation > * {
+  margin: 0;
+}
+
+.Title {
+  margin: 0 0 2rem;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--text-color-primary);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.Title > span:not(:last-child) {
+  margin-right: 1rem;
+}
+
+.Links {
+  list-style: none;
+  padding: 0;
+}
+
+.isExpanded {
+  width: 350px;
+  padding: var(--padding-expanded);
+}
+
+.isMinified {
+  width: 55px;
+  padding: var(--padding-minified);
+}
+
+.isMinified .Title {
+  margin-left: 0.5rem;
+}

@@ -1,0 +1,46 @@
+.Period {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  height: 40px;
+  border-radius: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--period-width);
+  left: var(--period-left);
+  padding: 0 0.5rem;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.Period > p {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.Period > *:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+.Period > img {
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: invert(var(--invert));
+  transition: filter 0.2s ease;
+}
+
+.Period.sykmelding {
+  background-color: var(--sykmelding-background-color);
+  box-shadow: 0 0 0 2px var(--sykmelding-border-color);
+}
+
+.Period.søknad {
+  background-color: var(--søknad-background-color);
+  box-shadow: 0 0 0 2px var(--søknad-border-color);
+}
+
+.Period.inntektsmelding {
+  background-color: var(--inntektsmelding-background-color);
+  box-shadow: 0 0 0 2px var(--inntektsmelding-border-color);
+}

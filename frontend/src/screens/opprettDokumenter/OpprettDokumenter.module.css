@@ -1,0 +1,60 @@
+.OpprettDokumenter {
+  display: flex;
+  flex-direction: column;
+  margin: 2rem;
+}
+
+.OpprettDokumenter > *:not(:last-child) {
+  margin-bottom: var(--block-medium);
+}
+
+.Title {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: var(--block-medium);
+}
+
+.CardContainer {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--block-small);
+}
+
+.CardContainer > *:not(:last-child) {
+  margin-bottom: var(--block-small);
+}
+
+.PeriodContainer {
+  display: flex;
+  position: relative;
+}
+
+.PeriodContainer > *:not(:last-child) {
+  margin-right: 1rem;
+}
+
+.PeriodContainer > button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(2.5rem, -50%);
+}
+
+.Flex {
+  display: flex;
+  align-items: center;
+}
+
+.Flex > *:not(:last-child) {
+  margin-right: 1rem;
+}
+
+.DocumentContainer {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.DocumentError {
+  font-size: 12px;
+}

@@ -1,0 +1,47 @@
+.ExpandButton {
+  --size: 1.5rem;
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: black;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50%;
+  height: var(--size);
+  width: var(--size);
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  transition: all 0.1s ease;
+}
+
+.ExpandButton:hover,
+.ExpandButton:active {
+  background: var(--active-color-primary);
+}
+
+.ExpandButton:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.ExpandButton:before,
+.ExpandButton:after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.ExpandButton > img {
+  filter: invert(100%);
+}
+
+.minified:after {
+  transform: rotate(90deg);
+}

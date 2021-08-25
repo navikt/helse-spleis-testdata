@@ -1,0 +1,22 @@
+.Button {
+  background: var(--color-black);
+  color: var(--color-white);
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  width: max-content;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 0 1px var(--color-white);
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+}
+
+.Button:active {
+  filter: brightness(50%);
+}
+
+.Button:focus-visible {
+  box-shadow: var(--focus-shadow);
+}

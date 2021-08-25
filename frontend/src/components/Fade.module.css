@@ -1,0 +1,16 @@
+.Fade:global(.fade-exit-to) {
+  opacity: 0;
+}
+
+.Fade:global(.fade-enter) {
+  opacity: 0;
+  transform: translateX(-2%);
+}
+
+.Fade:global(.fade-enter-active) {
+  transition: all 0.2s ease;
+}
+
+.Fade:global(.fade-exit-active) {
+  transition: all 0.2s ease;
+}

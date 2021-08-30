@@ -48,15 +48,19 @@ fun main() {
         spennDataSource = spennDB.postgresDatabase
     )
 
+    val subscriptionService = LocalSubscriptionService()
+
     LocalApplicationBuilder(
         personService = personService,
+        subscriptionService = subscriptionService,
         aktørRestClient = aktørRestClientMock,
-        inntektRestClient = inntektRestClientMock
+        inntektRestClient = inntektRestClientMock,
     ).start()
 }
 
 internal class LocalApplicationBuilder(
     private val personService: PersonService,
+    private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
 ) : RapidsConnection.StatusListener {
@@ -66,6 +70,7 @@ internal class LocalApplicationBuilder(
     fun start() = runLocalServer {
         installKtorModule(
             personService = personService,
+            subscriptionService = subscriptionService,
             aktørRestClient = aktørRestClient,
             inntektRestClient = inntektRestClient,
             rapidsMediator = rapidsMediator,

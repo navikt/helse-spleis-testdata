@@ -1,7 +1,7 @@
 import styles from "./ThemeButton.module.css";
 import type { Component } from "solid-js";
 import { Match, Switch, useContext } from "solid-js";
-import { ThemeContext } from "../state/ThemeProvider";
+import { ThemeContext } from "../state/ThemeContext";
 
 import lightIcon from "material-design-icons/image/svg/production/ic_wb_sunny_24px.svg";
 import darkIcon from "material-design-icons/image/svg/production/ic_brightness_2_24px.svg";

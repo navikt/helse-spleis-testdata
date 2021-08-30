@@ -6,6 +6,7 @@
     "start": "vite",
     "dev": "vite --host",
     "build": "vite build",
+    "watch": "vite build --watch",
     "serve": "vite preview",
     "prettier": "prettier ./src --write"
   },

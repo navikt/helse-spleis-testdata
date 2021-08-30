@@ -12,6 +12,9 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.helse.testdata.api.registerInntektApi
+import no.nav.helse.testdata.api.registerPersonApi
+import no.nav.helse.testdata.api.registerVedtaksperiodeApi
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -118,7 +121,7 @@ class AppTest {
         withTestApplication({
             installJacksonFeature()
             routing {
-                registerInntektsApi(inntektRestClient)
+                registerInntektApi(inntektRestClient)
             }
         }) {
             with(handleRequest(HttpMethod.Get, "/person/inntekt") {

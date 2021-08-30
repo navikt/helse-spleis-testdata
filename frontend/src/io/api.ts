@@ -1,6 +1,6 @@
 type Headers = { [key: string]: string };
 
-const baseUrl =
+const baseUrl: string =
   import.meta.env.MODE === "development" ? "http://0.0.0.0:8080" : "";
 
 export const post = (

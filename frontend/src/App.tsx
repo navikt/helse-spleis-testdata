@@ -4,7 +4,7 @@ import { Route, Routes } from "solid-app-router";
 
 import styles from "./App.module.css";
 import { Nav } from "./components/nav/Nav";
-import { ThemeContext } from "./state/ThemeProvider";
+import { ThemeContext } from "./state/ThemeContext";
 import classNames from "classnames";
 import { ThemeButton } from "./components/ThemeButton";
 import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";

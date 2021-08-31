@@ -1,11 +1,11 @@
 import { defineConfig } from "vite";
-import solidPlugin from "vite-plugin-solid";
+import reactRefresh from "@vitejs/plugin-react-refresh";
 
 export default defineConfig({
-  plugins: [solidPlugin()],
+  plugins: [reactRefresh()],
   build: {
     target: "esnext",
     polyfillDynamicImport: false,
-    outDir: "../public"
+    outDir: "../public",
   },
 });

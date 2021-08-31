@@ -1,5 +1,4 @@
 import styles from "./OpprettDokumenter.module.css";
-import { Fade } from "../../components/Fade";
 import { del, post } from "../../io/api";
 import { PersonCard } from "./PersonCard";
 import { SøknadCard } from "./SøknadCard";
@@ -10,12 +9,10 @@ import { SykmeldingCard } from "./SykmeldingCard";
 import { EndringRefusjon } from "./EndringRefusjon";
 import { InntektsmeldingCard } from "./InntektsmeldingCard";
 import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
-import { useFormContext, withFormProvider } from "../../state/useFormContext";
-import { createSignal, Match, Show, Switch } from "solid-js";
-import { subscribe } from "../../io/websockets";
+import { useSubscribe } from "../../io/websockets";
 import { Spinner } from "../../components/Spinner";
+import React, { useState } from "react";
 
-import type { FormValues } from "../../state/useForm";
 import type {
   FellesDTO,
   InntektsmeldingDTO,
@@ -23,6 +20,8 @@ import type {
   SykmeldingDTO,
   SøknadDTO,
 } from "../../io/api.d";
+
+import { FormProvider, useForm } from "react-hook-form";
 
 type Period = {
   fom: string;
@@ -37,7 +36,9 @@ type OpprettVedtaksperiodePayload = PersonDTO &
     inntektsmelding?: InntektsmeldingDTO;
   };
 
-const createPayload = (values: FormValues): OpprettVedtaksperiodePayload => {
+const createPayload = (
+  values: Record<string, any>
+): OpprettVedtaksperiodePayload => {
   const valuesWithName = (values, name) =>
     Object.entries(values)
       .filter(([key]) => key.includes(name))
@@ -54,7 +55,7 @@ const createPayload = (values: FormValues): OpprettVedtaksperiodePayload => {
   });
 
   const søknad = (): SøknadDTO => ({
-    sykmeldingsgrad: values.sykmeldingsgrad,
+    sykmeldingsgrad: values.sykmeldingsgrad ?? values.sykmeldingsgradSøknad,
     harAndreInntektskilder: values.harAndreInntektskilder ?? false,
     ferieperioder: mapPeriodArray(values, "ferieFom", "ferieTom"),
     faktiskgrad: values.faktiskgrad || undefined,
@@ -84,90 +85,93 @@ const createPayload = (values: FormValues): OpprettVedtaksperiodePayload => {
   };
 };
 
-export const OpprettDokumenter = withFormProvider(() => {
-  const { register, deregister, errors, values } = useFormContext();
+export const OpprettDokumenter = React.memo(() => {
+  const form = useForm({
+    defaultValues: {
+      slettPerson: false,
+      skalSendeSykmelding: true,
+      skalSendeSøknad: true,
+      skalSendeInntektsmelding: true,
+    },
+  });
 
-  const [status, setStatus] = createSignal<number>();
-  const [isFetching, setIsFetching] = createSignal<boolean>(false);
-  const [tilstand, setTilstand] = createSignal<string>();
+  const skalSlettePerson = form.watch("slettPerson");
+  const skalSendeSykmelding = form.watch("skalSendeSykmelding");
+  const skalSendeSøknad = form.watch("skalSendeSøknad");
+  const skalSendeInntektsmelding = form.watch("skalSendeInntektsmelding");
 
-  const onSubmit = async (event: Event) => {
-    event.preventDefault();
+  const [status, setStatus] = useState<number>();
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
-    if (values().slettPerson) {
-      setIsFetching(true);
-      const { status } = await del("/person", { ident: values().fnr }).finally(
-        () => setIsFetching(false)
-      );
-      if (status >= 400) {
-        setStatus(status);
-        return;
-      }
-    }
+  const [subscribe, tilstand] = useSubscribe();
 
+  const deletePerson = async (fødselsnummer: string): Promise<Response> => {
     setIsFetching(true);
-
-    const { status } = await post("/vedtaksperiode", createPayload(values()))
-      .then((response) => {
-        subscribe(values().fnr);
-        return response;
+    return del("/person", { ident: fødselsnummer })
+      .catch((error) => {
+        setStatus(error.status);
+        return error;
       })
       .finally(() => setIsFetching(false));
+  };
+
+  const postPayload = async (data: Record<string, any>): Promise<Response> => {
+    setIsFetching(true);
+    return post("/vedtaksperiode", createPayload(data)).finally(() =>
+      setIsFetching(false)
+    );
+  };
+
+  const onSubmit = async (data: Record<string, any>) => {
+    if (skalSlettePerson) {
+      const { status } = await deletePerson(data.fnr);
+      if (status >= 400) return;
+    }
+
+    const { status } = await postPayload(data);
     setStatus(status);
+
+    if (status < 400) {
+      subscribe(data.fnr);
+    }
   };
 
   return (
-    <Fade>
-      <form onSubmit={onSubmit}>
-        <div class={styles.OpprettDokumenter}>
-          <div class={styles.DocumentContainer}>
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className={styles.OpprettDokumenter}>
+          <div className={styles.DocumentContainer}>
             <PersonCard />
-            <Show when={values().skalSendeSykmelding}>
-              <SykmeldingCard />
-            </Show>
-            <Show when={values().skalSendeSøknad}>
-              <SøknadCard />
-            </Show>
-            <Show when={values().skalSendeInntektsmelding}>
-              <InntektsmeldingCard />
-            </Show>
+            {skalSendeSykmelding && <SykmeldingCard />}
+            {skalSendeSøknad && <SøknadCard />}
+            {skalSendeInntektsmelding && <InntektsmeldingCard />}
           </div>
-          <Show when={values().skalSendeInntektsmelding}>
-            <Arbeidsgiverperioder />
-            <EndringRefusjon />
-          </Show>
-          <Show
-            when={values().skalSendeInntektsmelding || values().skalSendeSøknad}
-          >
-            <Ferieperioder />
-          </Show>
-          <div class={styles.Flex}>
-            <FetchButton
-              status={status()}
-              isFetching={isFetching()}
-              type="submit"
-            >
+          {skalSendeInntektsmelding && (
+            <>
+              <Arbeidsgiverperioder />
+              <EndringRefusjon />
+            </>
+          )}
+          {(skalSendeInntektsmelding || skalSendeSøknad) && <Ferieperioder />}
+          <div className={styles.Flex}>
+            <FetchButton status={status} isFetching={isFetching} type="submit">
               Opprett dokumenter
             </FetchButton>
-            <Switch>
-              <Match when={status() >= 400}>
-                <ErrorMessage>
-                  Noe gikk galt! Mottok respons med statuskode {status()}
-                </ErrorMessage>
-              </Match>
-              <Match when={status() < 400}>
-                <p>Dokumentene er sendt!</p>
-              </Match>
-            </Switch>
-            <div class={styles.Flex}>
-              <Show when={tilstand() === "IKKE_OPPRETTET"}>
-                <Spinner />
-              </Show>
-              <p>Opprettet vedtaksperiode har tilstand: {tilstand()}</p>
-            </div>
+            {status >= 400 && (
+              <ErrorMessage>
+                Noe gikk galt! Mottok respons med statuskode {status}
+              </ErrorMessage>
+            )}
+            {status < 400 && <p>Dokumentene er sendt!</p>}
+            {tilstand && (
+              <div className={styles.Flex}>
+                {tilstand === "IKKE_OPPRETTET" && <Spinner />}
+                <p>Opprettet vedtaksperiode har tilstand: {tilstand}</p>
+              </div>
+            )}
           </div>
         </div>
       </form>
-    </Fade>
+    </FormProvider>
   );
 });

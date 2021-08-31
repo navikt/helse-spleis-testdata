@@ -1,20 +1,15 @@
-import { render } from "solid-js/web";
-import { Router } from "solid-app-router";
-
 import "./index.css";
 import { App } from "./App";
-import { ThemeProvider } from "./state/ThemeContext";
-import { SystemMessageProvider } from "./state/SystemMessageContext";
+import { render } from "react-dom";
+import { BrowserRouter } from "react-router-dom";
+import { RecoilRoot } from "recoil";
+import React from "react";
 
 render(
-  () => (
-    <Router>
-      <SystemMessageProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </SystemMessageProvider>
-    </Router>
-  ),
+  <BrowserRouter>
+    <RecoilRoot>
+      <App />
+    </RecoilRoot>
+  </BrowserRouter>,
   document.getElementById("root")
 );

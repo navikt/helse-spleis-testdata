@@ -1,40 +1,35 @@
-import type { Component, JSX } from "solid-js";
-import type {
-  FormErrors,
-  RegisterFunction,
-  ValidationFunction,
-} from "../state/useForm";
-import { Accessor } from "solid-js";
+import React from "react";
 import { InputLabel } from "./InputLabel";
 import { Input } from "./Input";
 import { ErrorMessage } from "./ErrorMessage";
+import type { FieldErrors } from "react-hook-form";
+import classNames from "classnames";
+import { nanoid } from "nanoid";
 
-interface FormInputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
-  register: RegisterFunction;
-  errors: Accessor<FormErrors>;
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  name: string;
-  id: string;
-  defaultValue?: any;
-  validation?: ValidationFunction;
+  errors: FieldErrors;
 }
 
-export const FormInput: Component<FormInputProps> = (props) => {
-  return (
-    <InputLabel>
-      {props.label}
-      <Input
-        id={props.id}
-        name={props.name}
-        type={props.type ?? "text"}
-        required={props.required}
-        ref={props.register(props.validation, props.defaultValue)}
-      />
-      {props.errors()[props.name] && (
-        <ErrorMessage label-for={props.id}>
-          {props.errors()[props.name]}
-        </ErrorMessage>
-      )}
-    </InputLabel>
-  );
-};
+export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
+  ({ name, label, type, errors, ...rest }, ref) => {
+    const id = nanoid();
+    return (
+      <InputLabel>
+        {label}
+        <Input
+          id={id}
+          name={name}
+          type={type ?? "text"}
+          className={classNames(errors[name] && "error")}
+          aria-invalid={errors[name] ? "true" : "false"}
+          {...rest}
+          ref={ref}
+        />
+        {errors[name] && (
+          <ErrorMessage label-for={id}>{errors[name].message}</ErrorMessage>
+        )}
+      </InputLabel>
+    );
+  }
+);

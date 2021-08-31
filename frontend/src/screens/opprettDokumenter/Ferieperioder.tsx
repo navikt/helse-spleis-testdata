@@ -4,67 +4,58 @@ import { Card } from "../../components/Card";
 import { FormInput } from "../../components/FormInput";
 import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
-import type { Component } from "solid-js";
-import { createSignal, For } from "solid-js";
-import { useFormContext } from "../../state/useFormContext";
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 
-export const Ferieperioder: Component = () => {
-  const { register, deregister, errors } = useFormContext();
-  const [feriePeriods, setFeriePeriods] = createSignal<string[]>([]);
+type PeriodeId = string;
+
+const formattedDateString = (date: Date): string =>
+  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
+
+export const Ferieperioder = React.memo(() => {
+  const { register, unregister, formState } = useFormContext();
+
+  const [perioder, setPerioder] = useState<PeriodeId[]>([]);
 
   const addFerieperiode = () => {
-    setFeriePeriods((old) => [...old, nanoid()]);
+    setPerioder((old) => [...old, nanoid()]);
   };
 
-  const removeFerieperiode = (id: string) => {
-    const index = feriePeriods().findIndex((it) => it === id);
-    deregister(`ferieFom-${id}`);
-    deregister(`ferieTom-${id}`);
-    setFeriePeriods((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
+  const removeFerieperiode = (id: PeriodeId) => {
+    const index = perioder.findIndex((it) => it === id);
+    unregister(`ferieFom-${id}`);
+    unregister(`ferieTom-${id}`);
+    setPerioder((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
   return (
     <>
       <AddButton onClick={addFerieperiode}>Legg inn ferieperioder</AddButton>
-      <For each={feriePeriods()}>
-        {(id: string, i) => (
-          <Card>
-            <div class={styles.PeriodContainer}>
-              <FormInput
-                register={register}
-                errors={errors}
-                label="Ferieperiode f.o.m."
-                name={`ferieFom-${id}`}
-                id={`ferieFom-${id}`}
-                type="date"
-                required
-                defaultValue={new Date("2020-01-01").toLocaleDateString(
-                  "nb-NO",
-                  {
-                    dateStyle: "short",
-                  }
-                )}
-              />
-              <FormInput
-                register={register}
-                errors={errors}
-                label="Ferieperiode t.o.m."
-                name={`ferieTom-${id}`}
-                id={`ferieTom-${id}`}
-                type="date"
-                required
-                defaultValue={new Date("2020-01-10").toLocaleDateString(
-                  "nb-NO",
-                  {
-                    dateStyle: "short",
-                  }
-                )}
-              />
-              <DeleteButton onClick={() => removeFerieperiode(id)} />
-            </div>
-          </Card>
-        )}
-      </For>
+      {perioder.map((id, i) => (
+        <Card>
+          <div className={styles.PeriodContainer}>
+            <FormInput
+              type="date"
+              label="Ferieperiode f.o.m."
+              errors={formState.errors}
+              defaultValue={formattedDateString(new Date("2020-01-01"))}
+              {...register(`ferieFom-${id}`, {
+                required: "Start av ferieperioden må angis",
+              })}
+            />
+            <FormInput
+              type="date"
+              label="Ferieperiode t.o.m."
+              errors={formState.errors}
+              defaultValue={formattedDateString(new Date("2020-01-10"))}
+              {...register(`ferieTom-${id}`, {
+                required: "Slutt av ferieperioden må angis",
+              })}
+            />
+            <DeleteButton onClick={() => removeFerieperiode(id)} />
+          </div>
+        </Card>
+      ))}
     </>
   );
-};
+});

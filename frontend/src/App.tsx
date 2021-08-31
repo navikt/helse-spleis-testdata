@@ -1,40 +1,46 @@
-import type { Component } from "solid-js";
-import { createEffect, useContext } from "solid-js";
-import { Route, Routes } from "solid-app-router";
-
-import styles from "./App.module.css";
-import { Nav } from "./components/nav/Nav";
-import { ThemeContext } from "./state/ThemeContext";
+import React, { useEffect } from "react";
+import { Route, Switch } from "react-router-dom";
 import classNames from "classnames";
+import { useTheme } from "./state/useTheme";
+import { Nav } from "./components/nav/Nav";
 import { ThemeButton } from "./components/ThemeButton";
-import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
 import { HentInntekt } from "./screens/HentInntekt";
 import { HentAktørId } from "./screens/HentAktørId";
 import { SlettPerson } from "./screens/SlettPerson";
+import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
+import styles from "./App.module.css";
 
-const useUpdateBodyBackgroundColor = (state) => {
-  createEffect(() => {
+const useUpdateBodyBackgroundColor = (theme) => {
+  useEffect(() => {
     document.body.style.setProperty(
       "--body-background-color",
-      state.theme === "light" ? "white" : "black"
+      theme === "light" ? "white" : "black"
     );
-  });
+  }, [theme]);
 };
 
-export const App: Component = () => {
-  const [state] = useContext(ThemeContext);
+export const App = () => {
+  const theme = useTheme();
 
-  useUpdateBodyBackgroundColor(state);
+  useUpdateBodyBackgroundColor(theme);
 
   return (
-    <div class={classNames(styles.App, styles[state.theme])}>
+    <div className={classNames(styles.App, styles[theme])}>
       <Nav />
-      <Routes>
-        <Route path="/" element={<OpprettDokumenter />} />
-        <Route path="/inntekt/hent" element={<HentInntekt />} />
-        <Route path="/aktorid/hent" element={<HentAktørId />} />
-        <Route path="/person/slett" element={<SlettPerson />} />
-      </Routes>
+      <Switch>
+        <Route path="/" exact>
+          <OpprettDokumenter />
+        </Route>
+        <Route path="/inntekt/hent">
+          <HentInntekt />
+        </Route>
+        <Route path="/aktorid/hent">
+          <HentAktørId />
+        </Route>
+        <Route path="/person/slett">
+          <SlettPerson />
+        </Route>
+      </Switch>
       <ThemeButton />
     </div>
   );

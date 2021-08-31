@@ -1,10 +1,14 @@
 import styles from "./InputLabel.module.css";
-import type { Component } from "solid-js";
-import { JSX } from "solid-js";
 import classNames from "classnames";
+import React from "react";
 
-interface InputLabelProps extends JSX.HTMLAttributes<HTMLLabelElement> {}
+interface InputLabelProps extends React.HTMLAttributes<HTMLLabelElement> {
+  className?: string;
+}
 
-export const InputLabel: Component<InputLabelProps> = (props) => {
-  return <label class={classNames(props.class ?? styles.InputLabel)} {...props}>{props.children}</label>;
-};
+export const InputLabel: React.FC<InputLabelProps> = ({
+  className,
+  ...rest
+}) => (
+  <label className={classNames(className ?? styles.InputLabel)} {...rest} />
+);

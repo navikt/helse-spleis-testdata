@@ -1,61 +1,56 @@
 import styles from "./SlettPerson.module.css";
-import type { Component } from "solid-js";
-import { createSignal, Show } from "solid-js";
-import { Fade } from "../components/Fade";
 import { Card } from "../components/Card";
 import { FormInput } from "../components/FormInput";
-import { useForm } from "../state/useForm";
 import { FetchButton } from "../components/FetchButton";
-import { del, get } from "../io/api";
+import { del } from "../io/api";
 import { ErrorMessage } from "../components/ErrorMessage";
+import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { validateFødselsnummer } from "./formValidation";
 
-const numerical = (value: string, message: string): false | string =>
-  isNaN(Number.parseInt(value)) && message;
+export const SlettPerson = React.memo(() => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-const validFnr = (value: string): false | string =>
-  numerical(value, "Fødselsnummeret må være numerisk") ||
-  (value.length !== 11 && "Fødselsnummeret må bestå av 11 siffere");
+  const [status, setStatus] = useState<number>();
+  const [isFetching, setIsFetching] = useState(false);
 
-export const SlettPerson: Component = () => {
-  const { register, errors, values } = useForm();
-  const [status, setStatus] = createSignal<number>();
-  const [isFetching, setIsFetching] = createSignal(false);
-
-  const onSubmit = async (event: Event) => {
-    event.preventDefault();
+  const onSubmit = (data: Record<string, any>) => {
     setIsFetching(true);
-    del("/person", { ident: values().fnr })
+    del("/person", { ident: data.fnr })
       .then((response) => setStatus(response.status))
       .catch((error) => setStatus(404))
       .finally(() => setIsFetching(false));
   };
 
   return (
-    <Fade>
-      <form onSubmit={onSubmit}>
-        <div class={styles.SlettPerson}>
-          <Card>
-            <h2 class={styles.Title}>Slett person</h2>
-            <div class={styles.CardContainer}>
-              <FormInput
-                register={register}
-                validation={validFnr}
-                errors={errors}
-                label="Fødselsnummer"
-                name="fnr"
-                id="fnr"
-                required
-              />
-              <FetchButton status={status()} isFetching={isFetching()}>
-                Slett person
-              </FetchButton>
-              <Show when={status() >= 400}>
-                <ErrorMessage>Kunne ikke slette person</ErrorMessage>
-              </Show>
-            </div>
-          </Card>
-        </div>
-      </form>
-    </Fade>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className={styles.SlettPerson}>
+        <Card>
+          <h2 className={styles.Title}>Slett person</h2>
+          <div className={styles.CardContainer}>
+            <FormInput
+              id="fnr"
+              name="fnr"
+              label="Fødselsnummer"
+              errors={errors}
+              {...register("fnr", {
+                required: "Fødselsnummer må fylles ut",
+                validate: validateFødselsnummer,
+              })}
+            />
+            <FetchButton status={status} isFetching={isFetching}>
+              Slett person
+            </FetchButton>
+            {status >= 400 && (
+              <ErrorMessage>Kunne ikke slette person</ErrorMessage>
+            )}
+          </div>
+        </Card>
+      </div>
+    </form>
   );
-};
+});

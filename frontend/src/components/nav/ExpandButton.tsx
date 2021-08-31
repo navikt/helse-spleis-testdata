@@ -1,23 +1,25 @@
 import styles from "./ExpandButton.module.css";
-import type { Component, JSX } from "solid-js";
-
 import classNames from "classnames";
+import React from "react";
 
-interface ExpandButtonProps
-  extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ExpandButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   expanded: boolean;
   onExpand: () => void;
 }
 
-export const ExpandButton: Component<ExpandButtonProps> = (props) => {
+export const ExpandButton: React.FC<ExpandButtonProps> = ({
+  expanded,
+  onExpand,
+  ...buttonProps
+}) => {
   return (
     <button
-      class={classNames(
+      className={classNames(
         styles.ExpandButton,
-        props.expanded ? styles.expanded : styles.minified
+        expanded ? styles.expanded : styles.minified
       )}
-      {...props}
-      onClick={props.onExpand}
+      onClick={onExpand}
+      {...buttonProps}
     />
   );
 };

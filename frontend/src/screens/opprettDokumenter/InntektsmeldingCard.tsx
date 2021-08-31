@@ -1,62 +1,68 @@
 import styles from "./OpprettDokumenter.module.css";
-import type { Component } from "solid-js";
-import { createEffect, createSignal, onCleanup } from "solid-js";
-import { useFormContext } from "../../state/useFormContext";
 import { Card } from "../../components/Card";
 import { FormInput } from "../../components/FormInput";
-import { invalidFnr, nonNumerical } from "./validators";
 import { get } from "../../io/api";
+import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { validateFødselsnummer, validateInntekt } from "../formValidation";
 
-const validInntekt = (value: string): false | string =>
-  nonNumerical(value, "Inntekten må være numerisk");
+const useUnregisterInntektsmeldingCard = () => {
+  const { unregister } = useFormContext();
+  useEffect(() => {
+    return () => {
+      unregister("førsteFraværsdag");
+      unregister("inntekt");
+    };
+  }, []);
+};
 
-export const InntektsmeldingCard: Component = (props) => {
-  const { register, deregister, errors, values, setValue } = useFormContext();
-  const [fetchedInntekt, setFetchedInntekt] = createSignal(false);
+const useFetchInntekt = () => {
+  const { watch, setValue, clearErrors } = useFormContext();
+  const fødselsnummer = watch("fnr");
+  const [fetchedInntekt, setFetchedInntekt] = useState(false);
 
-  onCleanup(() => {
-    deregister("førstefraværsdag");
-    deregister("inntekt");
-  });
-
-  createEffect(() => {
-    const fødselsnummer = values().fnr;
-    if (!invalidFnr(fødselsnummer) && !fetchedInntekt()) {
+  useEffect(() => {
+    if (!fetchedInntekt && validateFødselsnummer(fødselsnummer) === true) {
       setFetchedInntekt(true);
       get("/person/inntekt", { ident: fødselsnummer })
         .then(async (result) => {
           const response = await result.json();
-          console.log(response);
-          setValue("inntekt", response.beregnetMånedsinntekt);
+          clearErrors("inntekt");
+          setValue("inntekt", String(response.beregnetMånedsinntekt));
         })
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     }
-  });
+  }, [fetchedInntekt, fødselsnummer]);
+};
+
+export const InntektsmeldingCard = React.memo(() => {
+  const { register, formState } = useFormContext();
+
+  useUnregisterInntektsmeldingCard();
+  useFetchInntekt();
 
   return (
     <Card>
-      <h2 class={styles.Title}>Inntektsmelding</h2>
-      <div class={styles.CardContainer}>
+      <h2 className={styles.Title}>Inntektsmelding</h2>
+      <div className={styles.CardContainer}>
         <FormInput
-          register={register}
-          errors={errors}
-          label="Første fraværsdag"
-          name="førstefraværsdag"
-          id="førstefraværsdag"
           type="date"
-          required
+          label="Første fraværsdag"
+          errors={formState.errors}
           defaultValue="2020-01-01"
+          {...register("førsteFraværsdag", {
+            required: "Første fraværsdag må angis",
+          })}
         />
         <FormInput
-          register={register}
-          errors={errors}
           label="Inntekt"
-          name="inntekt"
-          id="inntekt"
-          validation={validInntekt}
-          required
+          errors={formState.errors}
+          {...register("inntekt", {
+            required: "Inntekt må angis",
+            validate: validateInntekt,
+          })}
         />
       </div>
     </Card>
   );
-};
+});

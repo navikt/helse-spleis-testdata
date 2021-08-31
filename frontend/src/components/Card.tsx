@@ -1,12 +1,14 @@
+import React from "react";
 import styles from "./Card.module.css";
-import type { Component, JSX } from "solid-js";
 import classNames from "classnames";
 
-interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {}
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
 
-export const Card: Component<CardProps> = (props) => {
+export const Card: React.FC<CardProps> = (props) => {
   return (
-    <div {...props} class={classNames(styles.Card, props.class)}>
+    <div {...props} className={classNames(styles.Card, props.className)}>
       {props.children}
     </div>
   );

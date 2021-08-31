@@ -1,13 +1,12 @@
 import styles from "./ErrorMessage.module.css";
-import type { Component, JSX } from "solid-js";
+import React from "react";
 import classNames from "classnames";
 
-interface ErrorMessageProps extends JSX.HTMLAttributes<HTMLParagraphElement> {}
+interface ErrorMessageProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  className?: string;
+}
 
-export const ErrorMessage: Component<ErrorMessageProps> = (props) => {
-  return (
-    <p class={classNames(styles.ErrorMessage, props.class)} {...props}>
-      {props.children}
-    </p>
-  );
-};
+export const ErrorMessage: React.FC<ErrorMessageProps> = ({
+  className,
+  ...rest
+}) => <p className={classNames(styles.ErrorMessage, className)} {...rest} />;

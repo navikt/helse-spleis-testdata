@@ -1,13 +1,14 @@
 import styles from "./Button.module.css";
-import type { Component, JSX } from "solid-js";
 import classNames from "classnames";
+import React from "react";
 
-interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+}
 
-export const Button: Component<ButtonProps> = (props) => {
-  return (
-    <button {...props} class={classNames(styles.Button, props.class)}>
-      {props.children}
-    </button>
-  );
-};
+export const Button: React.FC<ButtonProps> = ({
+  className,
+  ...buttonProps
+}) => (
+  <button className={classNames(styles.Button, className)} {...buttonProps} />
+);

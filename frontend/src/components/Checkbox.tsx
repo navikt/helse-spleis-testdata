@@ -1,43 +1,34 @@
-import type { Accessor, Component, JSX } from "solid-js";
-import { Show, splitProps } from "solid-js";
-import type { FormErrors, RegisterFunction, ValidationFunction } from "../state/useForm";
 import styles from "./Checkbox.module.css";
 import { InputLabel } from "./InputLabel";
-import { Input } from "./Input";
 import { ErrorMessage } from "./ErrorMessage";
 import classNames from "classnames";
+import React from "react";
+import type { FieldErrors } from "react-hook-form";
 
-interface CheckboxProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
+interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  name: string;
-  id: string;
-  register: RegisterFunction;
-  errors?: Accessor<FormErrors>;
-  validation?: ValidationFunction;
-  defaultValue?: any;
+  errors?: FieldErrors;
 }
 
-export const Checkbox: Component<CheckboxProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "register"]);
-  return (
-    <InputLabel class={classNames(styles.Label, others.class)}>
-      <Input
-        type="checkbox"
-        id={others.id}
-        name={others.name}
-        required={others.required}
-        ref={local.register(others.validation, others.defaultValue)}
-        class={styles.Checkbox}
-        {...others}
-      />
-      <div>
-        {local.label}
-        <Show when={others.errors?.()[others.name]}>
-          <ErrorMessage label-for={others.id}>
-            {others.errors()[others.name]}
-          </ErrorMessage>
-        </Show>
-      </div>
-    </InputLabel>
-  );
-};
+export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+  ({ id, name, label, errors, className, ...rest }, ref) => {
+    return (
+      <InputLabel className={classNames(styles.Label, className)}>
+        <input
+          type="checkbox"
+          id={id}
+          name={name}
+          className={styles.Checkbox}
+          ref={ref}
+          {...rest}
+        />
+        <div>
+          {label}
+          {errors?.[name] && (
+            <ErrorMessage label-for={id}>{errors[name].message}</ErrorMessage>
+          )}
+        </div>
+      </InputLabel>
+    );
+  }
+);

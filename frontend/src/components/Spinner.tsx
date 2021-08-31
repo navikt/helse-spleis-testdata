@@ -1,6 +1,4 @@
 import styles from "./Spinner.module.css";
-import type { Component } from "solid-js";
+import React from "react";
 
-export const Spinner: Component = () => {
-  return <div class={styles.Spinner} />;
-};
+export const Spinner = () => <div className={styles.Spinner} />;

@@ -1,5 +1,4 @@
-import { useContext } from "solid-js";
-import { SystemMessageContext } from "../state/SystemMessageContext";
+import { useEffect, useState } from "react";
 
 const baseUrl: string =
   import.meta.env.MODE === "dev"
@@ -24,43 +23,55 @@ type EndringFrame = {
   tilstand: string;
 };
 
-export const subscribe = (fødselsnummer: string) => {
-  const socket = new WebSocket(`${baseUrl}/ws/vedtaksperiode`);
-  const [messagesContext, { add, remove }] = useContext(SystemMessageContext);
+type UseSubscribeResult = [
+  subscribeFunction: (fødselsnummer: string) => void,
+  tilstand: string
+];
 
-  let currentTilstand = "IKKE_OPPRETTET";
-  add({ id: currentTilstand, text: currentTilstand });
+export const useSubscribe = (): UseSubscribeResult => {
+  const [fødselsnummer, setFødselsnummer] = useState<string>();
+  const [tilstand, setTilstand] = useState<string>();
 
-  socket.onopen = () => {
-    socket.send(
-      JSON.stringify({
-        type: SubscriptionType.Vedtaksperiode,
-        fødselsnummer: fødselsnummer,
-      })
-    );
-  };
+  useEffect(() => {
+    if (fødselsnummer) {
+      const socket = new WebSocket(`${baseUrl}/ws/vedtaksperiode`);
 
-  console.log(add, messagesContext.messages);
+      setTilstand("IKKE_OPPRETTET");
 
-  socket.onmessage = async (event: MessageEvent) => {
-    const message = await JSON.parse(event.data);
+      socket.onopen = () => {
+        socket.send(
+          JSON.stringify({
+            type: SubscriptionType.Vedtaksperiode,
+            fødselsnummer: fødselsnummer,
+          })
+        );
+      };
 
-    console.log("received message", message);
+      socket.onmessage = async (event: MessageEvent) => {
+        const message = await JSON.parse(event.data);
 
-    switch (message.type) {
-      case MessageType.Endring: {
-        remove(currentTilstand);
-        currentTilstand = message.tilstand;
-        add({ id: currentTilstand, text: currentTilstand });
-        break;
-      }
-      default: {
-        console.error("Received unknown message:", message);
-      }
+        console.log("received message", message);
+
+        switch (message.type) {
+          case MessageType.Endring: {
+            setTilstand(message.tilstand);
+            break;
+          }
+          default: {
+            console.error("Received unknown message:", message);
+          }
+        }
+      };
+
+      socket.onclose = (event: CloseEvent) => {
+        console.log("Closed socket", event.reason);
+      };
+
+      return () => {
+        socket.close();
+      };
     }
-  };
+  }, [fødselsnummer]);
 
-  socket.onclose = (event: CloseEvent) => {
-    console.log("Closed socket", event.reason);
-  };
+  return [(fødselsnummer: string) => setFødselsnummer(fødselsnummer), tilstand];
 };

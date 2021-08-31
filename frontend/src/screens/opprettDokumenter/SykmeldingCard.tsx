@@ -1,33 +1,39 @@
-import type { Component } from "solid-js";
-import { onCleanup } from "solid-js";
 import { Card } from "../../components/Card";
 import styles from "./OpprettDokumenter.module.css";
 import { FormInput } from "../../components/FormInput";
-import { useFormContext } from "../../state/useFormContext";
-import { invalidSykdomsgrad } from "./validators";
+import { useFormContext } from "react-hook-form";
+import React, { useEffect } from "react";
+import { validateSykdomsgrad } from "../formValidation";
 
-export const SykmeldingCard: Component = () => {
-  const { register, deregister, errors, values } = useFormContext();
+const useUnregisterSykmeldingCard = () => {
+  const { unregister } = useFormContext();
 
-  onCleanup(() => {
-    deregister("sykmeldingsgrad");
-  });
+  useEffect(() => {
+    return () => {
+      unregister("sykmeldingsgrad");
+    };
+  }, []);
+};
+
+export const SykmeldingCard = React.memo(() => {
+  const { register, formState } = useFormContext();
+
+  useUnregisterSykmeldingCard();
 
   return (
     <Card>
-      <h2 class={styles.Title}>Sykmelding</h2>
-      <div class={styles.CardContainer}>
+      <h2 className={styles.Title}>Sykmelding</h2>
+      <div className={styles.CardContainer}>
         <FormInput
-          register={register}
-          errors={errors}
           label="Sykdomsgrad"
-          name="sykmeldingsgrad"
-          id="sykmeldingsgrad"
-          required
-          validation={invalidSykdomsgrad}
+          errors={formState.errors}
           defaultValue={100}
+          {...register("sykmeldingsgrad", {
+            required: "Sykmeldingsgrad må angis",
+            validate: validateSykdomsgrad,
+          })}
         />
       </div>
     </Card>
   );
-};
+});

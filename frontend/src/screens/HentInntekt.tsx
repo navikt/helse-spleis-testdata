@@ -1,37 +1,32 @@
 import styles from "./HentInntekt.module.css";
-import type { Component } from "solid-js";
-import { createSignal, Show } from "solid-js";
-import { Fade } from "../components/Fade";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { get } from "../io/api";
 import { Card } from "../components/Card";
 import { FormInput } from "../components/FormInput";
-import { useForm } from "../state/useForm";
-import { FetchButton } from "../components/FetchButton";
 import { CopyField } from "../components/CopyField";
-import { get } from "../io/api";
+import { FetchButton } from "../components/FetchButton";
 import { ErrorMessage } from "../components/ErrorMessage";
+import { validateFødselsnummer } from "./formValidation";
 
 type HentInntektResponse = {
   beregnetMånedsinntekt: number;
 };
 
-const numerical = (value: string, message: string): false | string =>
-  isNaN(Number.parseInt(value)) && message;
+export const HentInntekt = React.memo(() => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-const validFnr = (value: string): false | string =>
-  numerical(value, "Fødselsnummeret må være numerisk") ||
-  (value.length !== 11 && "Fødselsnummeret må bestå av 11 siffere");
+  const [status, setStatus] = useState<number>();
+  const [inntekt, setInntekt] = useState<number>();
+  const [isFetching, setIsFetching] = useState(false);
 
-export const HentInntekt: Component = () => {
-  const { register, errors, values } = useForm();
-  const [status, setStatus] = createSignal<number>();
-  const [isFetching, setIsFetching] = createSignal(false);
-  const [inntekt, setInntekt] = createSignal<number>();
-
-  const onSubmit = async (event: Event) => {
-    event.preventDefault();
+  const onSubmit = (data: Record<string, any>) => {
     setIsFetching(true);
-
-    const response = await get("/person/inntekt", { ident: values().fnr })
+    get("/person/inntekt", { ident: data.fnr })
       .then(async (response) => {
         const { beregnetMånedsinntekt } = await response.json();
         setInntekt(beregnetMånedsinntekt);
@@ -42,34 +37,33 @@ export const HentInntekt: Component = () => {
   };
 
   return (
-    <Fade>
-      <form onSubmit={onSubmit}>
-        <div class={styles.HentInntekt}>
-          <Card>
-            <h2 class={styles.Title}>Hent inntekt</h2>
-            <div class={styles.CardContainer}>
-              <FormInput
-                register={register}
-                validation={validFnr}
-                errors={errors}
-                label="Fødselsnummer"
-                name="fnr"
-                id="fnr"
-                required
-              />
-              <FetchButton status={status()} isFetching={isFetching()}>
-                Hent inntekt
-              </FetchButton>
-              <Show when={status() >= 400}>
-                <ErrorMessage>Kunne ikke hente inntekt</ErrorMessage>
-              </Show>
-            </div>
-          </Card>
-          <Card>
-            <CopyField value={String(inntekt() ?? "")} label="Inntekt" />
-          </Card>
-        </div>
-      </form>
-    </Fade>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className={styles.HentInntekt}>
+        <Card>
+          <h2 className={styles.Title}>Hent inntekt</h2>
+          <div className={styles.CardContainer}>
+            <FormInput
+              id="fnr"
+              name="fnr"
+              label="Fødselsnummer"
+              errors={errors}
+              {...register("fnr", {
+                required: "Fødselsnummer må fylles ut",
+                validate: validateFødselsnummer,
+              })}
+            />
+            <FetchButton status={status} isFetching={isFetching}>
+              Hent inntekt
+            </FetchButton>
+            {status >= 400 && (
+              <ErrorMessage>Kunne ikke hente inntekt</ErrorMessage>
+            )}
+          </div>
+        </Card>
+        <Card>
+          <CopyField value={String(inntekt ?? "")} label="Inntekt" />
+        </Card>
+      </div>
+    </form>
   );
-};
+});

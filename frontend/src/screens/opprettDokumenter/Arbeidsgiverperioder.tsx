@@ -4,23 +4,27 @@ import { Card } from "../../components/Card";
 import { FormInput } from "../../components/FormInput";
 import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
-import type { Component } from "solid-js";
-import { createSignal, For } from "solid-js";
-import { useFormContext } from "../../state/useFormContext";
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 
-export const Arbeidsgiverperioder: Component = () => {
-  const { register, deregister, errors } = useFormContext();
-  const [arbPeriods, setArbPeriods] = createSignal<string[]>([]);
+type PeriodeId = string;
+
+const formattedDateString = (date: Date): string =>
+  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
+
+export const Arbeidsgiverperioder = React.memo(() => {
+  const { register, unregister, formState } = useFormContext();
+  const [perioder, setPerioder] = useState<PeriodeId[]>([]);
 
   const addArbeidsgiverperiode = () => {
-    setArbPeriods((old) => [...old, nanoid()]);
+    setPerioder((old) => [...old, nanoid()]);
   };
 
-  const removeArbeidsgiverperiode = (id: string) => {
-    const index = arbPeriods().findIndex((it) => it === id);
-    deregister(`arbFom-${id}`);
-    deregister(`arbTom-${id}`);
-    setArbPeriods((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
+  const removeArbeidsgiverperiode = (id: PeriodeId) => {
+    const index = perioder.findIndex((it) => it === id);
+    unregister(`arbFom-${id}`);
+    unregister(`arbTom-${id}`);
+    setPerioder((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
   return (
@@ -28,45 +32,31 @@ export const Arbeidsgiverperioder: Component = () => {
       <AddButton onClick={addArbeidsgiverperiode}>
         Legg inn arbeidsgiverperioder
       </AddButton>
-      <For each={arbPeriods()}>
-        {(id: string) => (
-          <Card>
-            <div class={styles.PeriodContainer}>
-              <FormInput
-                register={register}
-                errors={errors}
-                label="Arbeidsgiverperiode f.o.m."
-                name={`arbFom-${id}`}
-                id={`arbFom-${id}`}
-                type="date"
-                required
-                defaultValue={new Date("2020-01-01").toLocaleDateString(
-                  "nb-NO",
-                  {
-                    dateStyle: "short",
-                  }
-                )}
-              />
-              <FormInput
-                register={register}
-                errors={errors}
-                label="Arbeidsgiverperiode t.o.m."
-                name={`arbTom-${id}`}
-                id={`arbTom-${id}`}
-                type="date"
-                required
-                defaultValue={new Date("2020-01-16").toLocaleDateString(
-                  "no-NB",
-                  {
-                    dateStyle: "short",
-                  }
-                )}
-              />
-              <DeleteButton onClick={() => removeArbeidsgiverperiode(id)} />
-            </div>
-          </Card>
-        )}
-      </For>
+      {perioder.map((id) => (
+        <Card key={id}>
+          <div className={styles.PeriodContainer}>
+            <FormInput
+              type="date"
+              label="Arbeidsgiverperiode f.o.m."
+              errors={formState.errors}
+              defaultValue={formattedDateString(new Date("2020-01-01"))}
+              {...register(`arbFom-${id}`, {
+                required: "Start av arbeidsgiverperioden må angis",
+              })}
+            />
+            <FormInput
+              type="date"
+              label="Arbeidsgiverperiode t.o.m."
+              errors={formState.errors}
+              defaultValue={formattedDateString(new Date("2020-01-16"))}
+              {...register(`arbTom-${id}`, {
+                required: "Slutt av arbeidsgiverperioden må angis",
+              })}
+            />
+            <DeleteButton onClick={() => removeArbeidsgiverperiode(id)} />
+          </div>
+        </Card>
+      ))}
     </>
   );
-};
+});

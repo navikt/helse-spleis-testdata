@@ -4,51 +4,52 @@ import { Card } from "../../components/Card";
 import { FormInput } from "../../components/FormInput";
 import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
-import type { Component } from "solid-js";
-import { createSignal, For } from "solid-js";
-import { useFormContext } from "../../state/useFormContext";
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 
-export const EndringRefusjon: Component = () => {
-  const { register, deregister, errors } = useFormContext();
-  const [opphør, setOpphør] = createSignal<string[]>([]);
+type OpphørId = string;
+
+const formattedDateString = (date: Date): string =>
+  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
+
+export const EndringRefusjon = React.memo(() => {
+  const {
+    register,
+    unregister,
+    formState: { errors },
+  } = useFormContext();
+
+  const [opphør, setOpphør] = useState<OpphørId[]>([]);
 
   const addEndring = () => {
     setOpphør((old) => [...old, nanoid()]);
   };
 
-  const removeEndring = (id: string) => {
-    const index = opphør().findIndex((it) => it === id);
-    deregister(`endring${id}`);
+  const removeEndring = (id: OpphørId) => {
+    const index = opphør.findIndex((it) => it === id);
+    unregister(`endring${id}`);
     setOpphør((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
   return (
     <>
       <AddButton onClick={addEndring}>Legg inn endring i refusjon</AddButton>
-      <For each={opphør()}>
-        {(id: string) => (
-          <Card>
-            <div class={styles.PeriodContainer}>
-              <FormInput
-                register={register}
-                errors={errors}
-                label="Dato for endring"
-                name={`endring${id}`}
-                id={`endring${id}`}
-                type="date"
-                required
-                defaultValue={new Date("2020-01-01").toLocaleDateString(
-                  "nb-NO",
-                  {
-                    dateStyle: "short",
-                  }
-                )}
-              />
-              <DeleteButton onClick={() => removeEndring(id)} />
-            </div>
-          </Card>
-        )}
-      </For>
+      {opphør.map((id) => (
+        <Card key={id}>
+          <div className={styles.PeriodContainer}>
+            <FormInput
+              type="date"
+              label="Dato for endring"
+              errors={errors}
+              defaultValue={formattedDateString(new Date("2020-01-01"))}
+              {...register(`endring${id}`, {
+                required: "Dato for endring må angis",
+              })}
+            />
+            <DeleteButton onClick={() => removeEndring(id)} />
+          </div>
+        </Card>
+      ))}
     </>
   );
-};
+});

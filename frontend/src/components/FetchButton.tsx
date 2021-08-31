@@ -1,8 +1,7 @@
+import React from "react";
 import styles from "./FetchButton.module.css";
-import type { Component, JSX } from "solid-js";
-import { Switch, Match } from "solid-js";
-import { Button } from "./Button";
 import classNames from "classnames";
+import { Button } from "./Button";
 import { Spinner } from "./Spinner";
 
 import errorIcon from "material-design-icons/alert/svg/production/ic_error_18px.svg";
@@ -11,35 +10,34 @@ import successIcon from "material-design-icons/action/svg/production/ic_check_ci
 const error = (status: number): boolean => status >= 400;
 const success = (status: number): boolean => status < 400;
 
-interface FetchButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
+interface FetchButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isFetching: boolean;
   status?: number;
+  className?: string;
 }
 
-export const FetchButton: Component<FetchButtonProps> = (props) => {
-  return (
-    <Button
-      {...props}
-      class={classNames(
-        styles.FetchButton,
-        props.isFetching && styles.isFetching,
-        success(props.status) && styles.success,
-        error(props.status) && styles.error,
-        props.class
-      )}
-    >
-      {props.children}
-      <Switch>
-        <Match when={success(props.status)}>
-          <img class={styles.Icon} src={successIcon} alt="" />
-        </Match>
-        <Match when={error(props.status)}>
-          <img class={styles.Icon} src={errorIcon} alt="" />
-        </Match>
-        <Match when={props.isFetching}>
-          <Spinner />
-        </Match>
-      </Switch>
-    </Button>
-  );
-};
+export const FetchButton: React.FC<FetchButtonProps> = ({
+  isFetching,
+  status,
+  className,
+  ...rest
+}) => (
+  <Button
+    className={classNames(
+      styles.FetchButton,
+      isFetching && styles.isFetching,
+      success(status) && styles.success,
+      error(status) && styles.error,
+      className
+    )}
+    {...rest}
+  >
+    {rest.children}
+    {success(status) && (
+      <img className={styles.Icon} src={successIcon} alt="" />
+    )}
+    {error(status) && <img className={styles.Icon} src={errorIcon} alt="" />}
+    {isFetching && <Spinner />}
+  </Button>
+);

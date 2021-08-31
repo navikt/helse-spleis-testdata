@@ -1,7 +1,21 @@
-import { useContext } from "solid-js";
-import { ThemeContext } from "./ThemeContext";
+import { atom, selector, useRecoilState, useRecoilValue } from "recoil";
 
-export const useTheme = () => {
-  const [state] = useContext(ThemeContext);
-  return state;
-};
+type Theme = "light" | "dark";
+
+const themeState = atom<Theme>({
+  key: "themeState",
+  default: (localStorage.getItem("theme") as Theme) ?? "light",
+});
+
+const derivedTheme = selector<Theme>({
+  key: "derivedTheme",
+  get: ({ get }) => get(themeState),
+  set: ({ set }, newValue) => {
+    localStorage.setItem("theme", newValue as string);
+    set(themeState, newValue);
+  },
+});
+
+export const useTheme = () => useRecoilValue(derivedTheme);
+
+export const useThemeState = () => useRecoilState(derivedTheme);

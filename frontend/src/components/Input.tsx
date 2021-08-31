@@ -1,9 +1,17 @@
+import React from "react";
 import styles from "./Input.module.css";
-import type { Component, JSX } from "solid-js";
 import classNames from "classnames";
 
-interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {}
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  className?: string;
+}
 
-export const Input: Component<InputProps> = (props) => {
-  return <input class={classNames(props.class ?? styles.Input)} {...props} />;
-};
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, ...rest }, ref) => (
+    <input
+      className={classNames(styles.Input, className)}
+      {...rest}
+      ref={ref}
+    />
+  )
+);

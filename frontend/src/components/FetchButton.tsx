@@ -7,8 +7,11 @@ import { Spinner } from "./Spinner";
 import errorIcon from "material-design-icons/alert/svg/production/ic_error_18px.svg";
 import successIcon from "material-design-icons/action/svg/production/ic_check_circle_24px.svg";
 
-const error = (status: number): boolean => status >= 400;
-const success = (status: number): boolean => status < 400;
+const error = (status?: number): boolean =>
+  !isNaN(Number.parseInt(String(status))) && status >= 400;
+
+const success = (status?: number): boolean =>
+  !isNaN(Number.parseInt(String(status))) && status < 400;
 
 interface FetchButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

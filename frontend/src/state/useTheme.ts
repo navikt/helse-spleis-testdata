@@ -1,21 +1,34 @@
 import { atom, selector, useRecoilState, useRecoilValue } from "recoil";
+import { useEffect } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
+
+const storage: Storage = global.localStorage;
 
 const themeState = atom<Theme>({
   key: "themeState",
-  default: (localStorage.getItem("theme") as Theme) ?? "light",
+  default: (storage.getItem("theme") as Theme) ?? "light",
 });
 
 const derivedTheme = selector<Theme>({
   key: "derivedTheme",
   get: ({ get }) => get(themeState),
   set: ({ set }, newValue) => {
-    localStorage.setItem("theme", newValue as string);
+    storage.setItem("theme", newValue as string);
     set(themeState, newValue);
   },
 });
 
-export const useTheme = () => useRecoilValue(derivedTheme);
+export const useTheme = (): Theme => useRecoilValue(derivedTheme);
 
-export const useThemeState = () => useRecoilState(derivedTheme);
+export const useThemeState = (): ReturnType<typeof useRecoilState> =>
+  useRecoilState<Theme>(derivedTheme);
+
+export const useUpdateBodyBackgroundColor = (theme) => {
+  useEffect(() => {
+    document.body.style.setProperty(
+      "--body-background-color",
+      theme === "light" ? "white" : "black"
+    );
+  }, [theme]);
+};

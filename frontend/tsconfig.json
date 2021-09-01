@@ -5,8 +5,8 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "jsxImportSource": "react",
-    "types": ["vite/client"],
+    "types": ["vite/client", "jest"],
   },
 }

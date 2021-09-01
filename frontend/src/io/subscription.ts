@@ -31,12 +31,12 @@ type UseSubscribeResult = [
 ];
 
 export const useSubscribe = (): UseSubscribeResult => {
-  const [fødselsnummer, setFødselsnummer] = useState<string>();
+  const [data, setData] = useState<{ fødselsnummer: string; key: string }>();
   const [tilstand, setTilstand] = useState<string>();
   const addMessage = useAddSystemMessage();
 
   useEffect(() => {
-    if (fødselsnummer) {
+    if (data?.fødselsnummer) {
       const socket = new WebSocket(`${baseUrl}/ws/vedtaksperiode`);
 
       addMessage({
@@ -49,7 +49,7 @@ export const useSubscribe = (): UseSubscribeResult => {
         socket.send(
           JSON.stringify({
             type: SubscriptionType.Vedtaksperiode,
-            fødselsnummer: fødselsnummer,
+            fødselsnummer: data.fødselsnummer,
           })
         );
       };
@@ -82,7 +82,12 @@ export const useSubscribe = (): UseSubscribeResult => {
         socket.close();
       };
     }
-  }, [fødselsnummer]);
+  }, [data]);
 
-  return [(fødselsnummer: string) => setFødselsnummer(fødselsnummer), tilstand];
+  return [
+    (fødselsnummer: string) => {
+      setData({ fødselsnummer, key: nanoid() });
+    },
+    tilstand,
+  ];
 };

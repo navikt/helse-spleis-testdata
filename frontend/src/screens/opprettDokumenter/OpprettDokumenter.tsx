@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { del, post } from "../../io/api";
-import { useSubscribe } from "../../io/websockets";
+import { useSubscribe } from "../../io/subscription";
 
 import { PersonCard } from "./PersonCard";
 import { SøknadCard } from "./SøknadCard";

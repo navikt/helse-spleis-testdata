@@ -22,14 +22,11 @@ dependencies {
     implementation("com.github.navikt:rapids-and-rivers:20210617121814-3e67e4d")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
     implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-websockets:$ktorVersion")
-
-    implementation("io.micrometer:micrometer-registry-prometheus:1.1.6")
 
     implementation("org.apache.kafka:kafka-clients:2.4.0")
 

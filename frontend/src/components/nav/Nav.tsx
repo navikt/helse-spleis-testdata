@@ -9,6 +9,8 @@ import { ExpandButton } from "./ExpandButton";
 import { useLocalStorageState } from "../../state/persistance";
 import React from "react";
 
+import logo from "../../assets/logo.png";
+
 export const Nav = React.memo(() => {
   const [expanded, setExpanded] = useLocalStorageState<boolean>("expanded");
 
@@ -22,7 +24,7 @@ export const Nav = React.memo(() => {
     >
       <ul className={styles.Links}>
         <h1 className={styles.Title}>
-          <span>🧬</span>
+          <img className={styles.Logo} src={logo} alt="" />
           <span>Spleis testdata</span>
         </h1>
         <NavLink to="/" isExpanded={expanded}>

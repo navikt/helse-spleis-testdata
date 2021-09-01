@@ -21,9 +21,17 @@
   color: var(--text-color-primary);
   white-space: nowrap;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
 .Title > span:not(:last-child) {
+  margin-right: 1rem;
+}
+
+.Logo {
+  width: 1.75rem;
+  height: 1.75rem;
   margin-right: 1rem;
 }
 

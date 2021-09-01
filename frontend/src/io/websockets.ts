@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useAddSystemMessage } from "../state/useSystemMessages";
+import { nanoid } from "nanoid";
 
 const baseUrl: string =
   import.meta.env.MODE === "dev"
@@ -31,12 +33,17 @@ type UseSubscribeResult = [
 export const useSubscribe = (): UseSubscribeResult => {
   const [fødselsnummer, setFødselsnummer] = useState<string>();
   const [tilstand, setTilstand] = useState<string>();
+  const addMessage = useAddSystemMessage();
 
   useEffect(() => {
     if (fødselsnummer) {
       const socket = new WebSocket(`${baseUrl}/ws/vedtaksperiode`);
 
-      setTilstand("IKKE_OPPRETTET");
+      addMessage({
+        id: nanoid(),
+        text: "Dokumenter er sendt. Venter på tilstandsendringer i spleis.",
+        timeToLiveMs: 5000,
+      });
 
       socket.onopen = () => {
         socket.send(
@@ -50,7 +57,11 @@ export const useSubscribe = (): UseSubscribeResult => {
       socket.onmessage = async (event: MessageEvent) => {
         const message = await JSON.parse(event.data);
 
-        console.log("received message", message);
+        addMessage({
+          id: nanoid(),
+          text: `Vedtaksperioden har tilstand: ${message.tilstand}`,
+          timeToLiveMs: 5000,
+        });
 
         switch (message.type) {
           case MessageType.Endring: {

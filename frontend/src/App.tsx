@@ -9,6 +9,7 @@ import { HentAktørId } from "./screens/HentAktørId";
 import { SlettPerson } from "./screens/SlettPerson";
 import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
 import styles from "./App.module.css";
+import { SystemMessages } from "./components/SystemMessages";
 
 const useUpdateBodyBackgroundColor = (theme) => {
   useEffect(() => {
@@ -42,6 +43,7 @@ export const App = () => {
         </Route>
       </Switch>
       <ThemeButton />
+      <SystemMessages />
     </div>
   );
 };

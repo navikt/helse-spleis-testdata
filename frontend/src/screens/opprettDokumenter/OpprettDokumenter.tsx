@@ -1,17 +1,20 @@
 import styles from "./OpprettDokumenter.module.css";
+import React, { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+
 import { del, post } from "../../io/api";
+import { useSubscribe } from "../../io/websockets";
+
 import { PersonCard } from "./PersonCard";
 import { SøknadCard } from "./SøknadCard";
-import { FetchButton } from "../../components/FetchButton";
-import { ErrorMessage } from "../../components/ErrorMessage";
 import { Ferieperioder } from "./Ferieperioder";
 import { SykmeldingCard } from "./SykmeldingCard";
 import { EndringRefusjon } from "./EndringRefusjon";
 import { InntektsmeldingCard } from "./InntektsmeldingCard";
 import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
-import { useSubscribe } from "../../io/websockets";
-import { Spinner } from "../../components/Spinner";
-import React, { useState } from "react";
+
+import { FetchButton } from "../../components/FetchButton";
+import { ErrorMessage } from "../../components/ErrorMessage";
 
 import type {
   FellesDTO,
@@ -20,8 +23,6 @@ import type {
   SykmeldingDTO,
   SøknadDTO,
 } from "../../io/api.d";
-
-import { FormProvider, useForm } from "react-hook-form";
 
 type Period = {
   fom: string;
@@ -103,7 +104,7 @@ export const OpprettDokumenter = React.memo(() => {
   const [status, setStatus] = useState<number>();
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const [subscribe, tilstand] = useSubscribe();
+  const [subscribe] = useSubscribe();
 
   const deletePerson = async (fødselsnummer: string): Promise<Response> => {
     setIsFetching(true);
@@ -161,13 +162,6 @@ export const OpprettDokumenter = React.memo(() => {
               <ErrorMessage>
                 Noe gikk galt! Mottok respons med statuskode {status}
               </ErrorMessage>
-            )}
-            {status < 400 && <p>Dokumentene er sendt!</p>}
-            {tilstand && (
-              <div className={styles.Flex}>
-                {tilstand === "IKKE_OPPRETTET" && <Spinner />}
-                <p>Opprettet vedtaksperiode har tilstand: {tilstand}</p>
-              </div>
             )}
           </div>
         </div>

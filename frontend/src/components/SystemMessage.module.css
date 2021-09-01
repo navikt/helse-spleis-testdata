@@ -1,0 +1,39 @@
+.SystemMessage {
+    position: relative;
+    display: flex;
+    padding: var(--block-small) calc(var(--block-small) + var(--block-extra-small));
+    background-color: var(--background-color-secondary);
+    border-radius: var(--border-radius);
+    width: max-content;
+}
+
+.MessageText {
+    padding: 0;
+    margin: 0;
+}
+
+.DismissButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    outline: none;
+    border: none;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0 0 0 var(--block-small);
+    padding: 0;
+}
+
+.DismissButton:hover {
+    background-color: var(--background-color-primary);
+}
+
+.DismissButton:active {
+    filter: brightness(50%);
+}
+
+.DismissButton > img {
+    filter: invert(var(--invert));
+}

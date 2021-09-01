@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 export type Theme = "light" | "dark";
 
-const storage: Storage = global.localStorage;
+const storage: Storage = localStorage;
 
 const themeState = atom<Theme>({
   key: "themeState",

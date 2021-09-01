@@ -11,12 +11,9 @@ import io.ktor.client.features.json.*
 import io.ktor.features.*
 import io.ktor.http.content.*
 import io.ktor.jackson.*
-import io.ktor.metrics.micrometer.*
 import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.websocket.*
-import io.micrometer.prometheus.PrometheusConfig
-import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.testdata.api.*
@@ -25,7 +22,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 
-val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -83,7 +79,13 @@ internal class ApplicationBuilder(
 
     private val rapidsConnection =
         RapidApplication.Builder(rapidsConfig)
-            .withKtorModule { installKtorModule(personService, subscriptionService, aktørRestClient, inntektRestClient, rapidsMediator) }
+            .withKtorModule {
+                installKtorModule(personService,
+                    subscriptionService,
+                    aktørRestClient,
+                    inntektRestClient,
+                    rapidsMediator)
+            }
             .build()
 
     init {
@@ -102,12 +104,10 @@ internal fun Application.installKtorModule(
     inntektRestClient: InntektRestClient,
     rapidsMediator: RapidsMediator,
 ) {
-    install(MicrometerMetrics) { registry = meterRegistry }
     installJacksonFeature()
     install(WebSockets)
 
     routing {
-        registerHealthApi({ true }, { true }, meterRegistry)
         registerPersonApi(personService, aktørRestClient)
         registerVedtaksperiodeApi(rapidsMediator, aktørRestClient)
         registerInntektApi(inntektRestClient)

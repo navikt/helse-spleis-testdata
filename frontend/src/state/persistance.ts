@@ -1,18 +1,29 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
+type UsePersistedStateResult<T> = [
+  value: T,
+  set: Dispatch<SetStateAction<T>>,
+  clear: () => void
+];
+
 const usePersistedState = <T extends unknown>(
   storage: Storage,
   key: string
-): [T, Dispatch<SetStateAction<T>>] => {
+): UsePersistedStateResult<T> => {
   const [value, setValue] = useState<T>(JSON.parse(storage.getItem(key)));
+
+  const clearValue = () => {
+    storage.removeItem(key);
+    setValue(null);
+  };
 
   useEffect(() => {
     storage.setItem(key, JSON.stringify(value));
   }, [value]);
 
-  return [value, setValue];
+  return [value, setValue, clearValue];
 };
 
 export const useLocalStorageState = <T extends unknown>(
   key: string
-): [T, Dispatch<SetStateAction<T>>] => usePersistedState(localStorage, key);
+): UsePersistedStateResult<T> => usePersistedState(localStorage, key);

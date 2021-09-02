@@ -22,7 +22,7 @@ internal class ConcreteSubscriptionService : SubscriptionService {
     override fun update(fødselsnummer: String, nyTilstand: String) {
         val frame = EndringFrame("endring", nyTilstand)
         val payload = Frame.Text(objectMapper.writeValueAsString(frame))
-        subscriptions.first { it.fødselsnummer == fødselsnummer }.let {
+        subscriptions.firstOrNull { it.fødselsnummer == fødselsnummer }?.let {
             runBlocking {
                 launch {
                     it.session.outgoing.send(payload)
@@ -32,7 +32,7 @@ internal class ConcreteSubscriptionService : SubscriptionService {
     }
 
     override fun close(fødselsnummer: String) {
-        subscriptions.first { it.fødselsnummer == fødselsnummer }.let {
+        subscriptions.firstOrNull { it.fødselsnummer == fødselsnummer }?.let {
             subscriptions.remove(it)
             runBlocking {
                 launch {

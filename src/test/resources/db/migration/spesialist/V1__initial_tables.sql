@@ -7,8 +7,9 @@ create table person
 
 create table speil_snapshot
 (
-    id   serial primary key,
-    data VARCHAR(255)
+    id         serial primary key,
+    data       VARCHAR(255),
+    person_ref INT UNIQUE REFERENCES person (id)
 );
 
 create table vedtak
@@ -81,27 +82,36 @@ create table egen_ansatt
 
 create table oppdrag
 (
-    id serial not null constraint oppdrag_pkey primary key
+    id serial not null
+        constraint oppdrag_pkey primary key
 );
 
 create table utbetalingslinje
 (
-    oppdrag_id bigint not null constraint utbetalingslinje_oppdrag_id_fkey references oppdrag
+    oppdrag_id bigint not null
+        constraint utbetalingslinje_oppdrag_id_fkey references oppdrag
 );
 
 create table utbetaling_id
 (
-    id                            serial          not null constraint utbetaling_id_pkey primary key,
-    utbetaling_id                 uuid            not null constraint utbetaling_id_utbetaling_id_key unique,
-    person_ref                    integer         not null constraint utbetaling_id_person_ref_fkey references person,
-    arbeidsgiver_fagsystem_id_ref bigint          not null constraint utbetaling_id_arbeidsgiver_fagsystem_id_ref_fkey references oppdrag,
-    person_fagsystem_id_ref       bigint          not null constraint utbetaling_id_person_fagsystem_id_ref_fkey references oppdrag
+    id                            serial  not null
+        constraint utbetaling_id_pkey primary key,
+    utbetaling_id                 uuid    not null
+        constraint utbetaling_id_utbetaling_id_key unique,
+    person_ref                    integer not null
+        constraint utbetaling_id_person_ref_fkey references person,
+    arbeidsgiver_fagsystem_id_ref bigint  not null
+        constraint utbetaling_id_arbeidsgiver_fagsystem_id_ref_fkey references oppdrag,
+    person_fagsystem_id_ref       bigint  not null
+        constraint utbetaling_id_person_fagsystem_id_ref_fkey references oppdrag
 );
 
 create table utbetaling
 (
-    id                serial            not null constraint utbetaling_pkey primary key,
-    utbetaling_id_ref bigint            not null constraint utbetaling_utbetaling_id_ref_fkey references utbetaling_id
+    id                serial not null
+        constraint utbetaling_pkey primary key,
+    utbetaling_id_ref bigint not null
+        constraint utbetaling_utbetaling_id_ref_fkey references utbetaling_id
 );
 
 CREATE TABLE arbeidsforhold
@@ -110,21 +120,26 @@ CREATE TABLE arbeidsforhold
     person_ref BIGINT NOT NULL REFERENCES person (id)
 );
 
-CREATE TABLE saksbehandler(oid UUID NOT NULL PRIMARY KEY, navn VARCHAR(64), epost VARCHAR(128));
+CREATE TABLE saksbehandler
+(
+    oid   UUID NOT NULL PRIMARY KEY,
+    navn  VARCHAR(64),
+    epost VARCHAR(128)
+);
 
 CREATE TABLE abonnement_for_opptegnelse
 (
-    saksbehandler_id         UUID NOT NULL REFERENCES saksbehandler(oid),
-    person_id                bigint NOT NULL REFERENCES person(id),
-    siste_sekvensnummer      integer,
-    primary key(saksbehandler_id, person_id)
+    saksbehandler_id    UUID   NOT NULL REFERENCES saksbehandler (oid),
+    person_id           bigint NOT NULL REFERENCES person (id),
+    siste_sekvensnummer integer,
+    primary key (saksbehandler_id, person_id)
 );
 
 CREATE TABLE opptegnelse
 (
-    person_id                bigint NOT NULL REFERENCES person(id),
-    sekvensnummer            SERIAL,
-    payload                  JSON NOT NULL,
-    type                     varchar(64),
-    primary key(person_id, sekvensnummer)
+    person_id     bigint NOT NULL REFERENCES person (id),
+    sekvensnummer SERIAL,
+    payload       JSON   NOT NULL,
+    type          varchar(64),
+    primary key (person_id, sekvensnummer)
 );

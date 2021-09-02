@@ -2,10 +2,17 @@ import { useEffect, useState } from "react";
 import { useAddSystemMessage } from "../state/useSystemMessages";
 import { nanoid } from "nanoid";
 
+type WebsocketProtocol = "ws" | "wss";
+
+const protocol: WebsocketProtocol =
+  import.meta.env.MODE === "dev" || window.location.host.includes("0.0.0.0")
+    ? "ws"
+    : "wss";
+
+console.log(protocol);
+
 const baseUrl: string =
-  import.meta.env.MODE === "dev"
-    ? "ws://0.0.0.0:8080"
-    : `ws://${window.location.host}`;
+  import.meta.env.MODE === "dev" ? "0.0.0.0:8080" : window.location.host;
 
 enum SubscriptionType {
   Vedtaksperiode = "vedtaksperiode",
@@ -37,7 +44,9 @@ export const useSubscribe = (): UseSubscribeResult => {
 
   useEffect(() => {
     if (data?.fødselsnummer) {
-      const socket = new WebSocket(`${baseUrl}/ws/vedtaksperiode`);
+      const socket = new WebSocket(
+        `${protocol}://${`${baseUrl}/ws/vedtaksperiode`}`
+      );
 
       addMessage({
         id: nanoid(),

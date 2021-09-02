@@ -51,7 +51,7 @@ export const SøknadCard = React.memo(() => {
           defaultValue={
             sykdomTom
               ? formatDateString(nextDay(new Date(sykdomTom)))
-              : "2020-02-01"
+              : "2021-08-01"
           }
           {...register("sendtNav")}
         />

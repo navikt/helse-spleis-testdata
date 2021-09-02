@@ -49,7 +49,7 @@ export const InntektsmeldingCard = React.memo(() => {
           type="date"
           label="Første fraværsdag"
           errors={formState.errors}
-          defaultValue="2020-01-01"
+          defaultValue="2021-07-01"
           {...register("førsteFraværsdag", {
             required: "Første fraværsdag må angis",
           })}

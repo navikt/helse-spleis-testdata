@@ -59,7 +59,7 @@ export const PersonCard = React.memo(() => {
           label="Sykdom f.o.m."
           errors={formState.errors}
           type="date"
-          defaultValue="2020-01-01"
+          defaultValue="2021-07-01"
           {...register("sykdomFom", {
             required: "Start av sykdomsforløp må angis",
           })}
@@ -70,7 +70,7 @@ export const PersonCard = React.memo(() => {
           label="Sykdom t.o.m."
           errors={formState.errors}
           type="date"
-          defaultValue="2020-01-31"
+          defaultValue="2021-07-31"
           {...register("sykdomTom", {
             required: "Slutt av sykdomsforløp må angis",
           })}

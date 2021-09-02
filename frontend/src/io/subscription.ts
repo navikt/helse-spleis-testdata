@@ -9,8 +9,6 @@ const protocol: WebsocketProtocol =
     ? "ws"
     : "wss";
 
-console.log(protocol);
-
 const baseUrl: string =
   import.meta.env.MODE === "dev" ? "0.0.0.0:8080" : window.location.host;
 
@@ -69,7 +67,7 @@ export const useSubscribe = (): UseSubscribeResult => {
         addMessage({
           id: nanoid(),
           text: `Vedtaksperioden har tilstand: ${message.tilstand}`,
-          timeToLiveMs: 5000,
+          dismissable: true,
         });
 
         switch (message.type) {

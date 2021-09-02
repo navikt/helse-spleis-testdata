@@ -3,10 +3,9 @@ import styles from "./SystemMessage.module.css";
 import classNames from "classnames";
 import { useRemoveSystemMessage } from "../state/useSystemMessages";
 import { Text } from "./Text";
+import closeIcon from "material-design-icons/navigation/svg/production/ic_close_18px.svg";
 
 interface SystemMessageProps extends SystemMessageObject {}
-
-import closeIcon from "material-design-icons/navigation/svg/production/ic_close_18px.svg";
 
 export const SystemMessage = React.forwardRef<
   HTMLDivElement,
@@ -29,7 +28,7 @@ export const SystemMessage = React.forwardRef<
   return (
     <div className={classNames(styles.SystemMessage)} ref={ref}>
       <Text className={styles.MessageText}>{text}</Text>
-      {dismissable || (
+      {dismissable && (
         <button
           className={styles.DismissButton}
           onClick={() => removeMessage(id)}

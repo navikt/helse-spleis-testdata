@@ -60,6 +60,8 @@ class AppTest {
     @AfterEach
     fun `stop postgres`() {
         spleisDB.close()
+        spesialistDB.close()
+        spennDB.close()
     }
 
     @Test
@@ -202,7 +204,7 @@ class AppTest {
             )
             val vedtakId = it.run(
                 queryOf(
-                    "insert into vedtak (person_ref, speil_snapshot_ref) values (?, ?)", personId, speilSnapshotId
+                    "insert into vedtak (person_ref, speil_snapshot_ref, vedtaksperiode_id) values (?, ?, ?)", personId, speilSnapshotId, UUID.randomUUID()
                 ).asUpdateAndReturnGeneratedKey
             )
             val overstyringId = it.run(

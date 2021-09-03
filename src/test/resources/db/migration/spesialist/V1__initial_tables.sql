@@ -14,9 +14,11 @@ create table speil_snapshot
 
 create table vedtak
 (
-    id                 serial primary key,
-    person_ref         bigint references person (id)         not null,
-    speil_snapshot_ref bigint references speil_snapshot (id) not null
+    id                 SERIAL PRIMARY KEY,
+    person_ref         BIGINT REFERENCES person (id)         NOT NULL,
+    speil_snapshot_ref BIGINT REFERENCES speil_snapshot (id) NOT NULL,
+    vedtaksperiode_id  uuid                                  NOT NULL
+        CONSTRAINT vedtak_vedtaksperiode_id_key UNIQUE
 );
 
 create table oppgave
@@ -143,3 +145,14 @@ CREATE TABLE opptegnelse
     type          varchar(64),
     primary key (person_id, sekvensnummer)
 );
+
+CREATE TABLE notat
+(
+    id                SERIAL PRIMARY KEY,
+    tekst             VARCHAR(200),
+    opprettet         TIMESTAMP DEFAULT now(),
+    saksbehandler_oid UUID,
+    vedtaksperiode_id UUID NOT NULL
+        CONSTRAINT notat_vedtak_ref_fkey REFERENCES vedtak (vedtaksperiode_id),
+    CONSTRAINT notat_saksbehandler_ref_fkey FOREIGN KEY (saksbehandler_oid) REFERENCES saksbehandler (oid)
+)

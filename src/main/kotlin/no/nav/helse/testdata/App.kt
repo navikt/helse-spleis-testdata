@@ -27,7 +27,6 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
 
-@KtorExperimentalAPI
 fun main() {
     val env = setUpEnvironment()
 

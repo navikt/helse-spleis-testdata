@@ -4,6 +4,7 @@ import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import io.ktor.http.*
 import io.ktor.routing.*
 import io.ktor.server.testing.*
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -84,12 +85,13 @@ class AppTest {
 
     @Test
     fun `opprett vedtak`() {
+
         withTestApplication({
             installJacksonFeature()
             routing {
                 registerVedtaksperiodeApi(
                     mediator = RapidsMediator(rapidsConnection),
-                    aktørRestClient = mockk { every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId")) })
+                    aktørRestClient = mockk { coEvery { hentAktørId(any()) }.returns(Result.Ok("aktørId")) })
             }
         }) {
             with(handleRequest(HttpMethod.Post, "/vedtaksperiode") {

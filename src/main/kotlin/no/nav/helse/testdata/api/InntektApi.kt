@@ -24,7 +24,7 @@ internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) = 
     )
     when (inntekterResult) {
         is Result.Ok -> {
-            val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumByDouble { it.beløp }
+            val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumOf { it.beløp }
             val beregnetMånedsinntekt = round(beregnetÅrsinntekt / 12)
             call.respond(
                 mapOf(

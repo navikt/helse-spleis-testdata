@@ -1,19 +1,18 @@
-val junitJupiterVersion = "5.5.2"
-val ktorVersion = "1.5.1"
+val junitJupiterVersion = "5.7.2"
+val ktorVersion = "1.6.2"
 val hikariVersion = "3.3.1"
 val flywayVersion = "6.1.3"
 val vaultJdbcVersion = "1.3.1"
 val kotliqueryVersion = "1.3.0"
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.5.30"
 }
 
 group = "no.nav.helse"
 
 repositories {
     mavenCentral()
-    maven("http://packages.confluent.io/maven/")
     maven("https://dl.bintray.com/kotlin/kotlinx")
     maven("https://jitpack.io")
 }
@@ -53,15 +52,15 @@ dependencies {
     testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion") {
         exclude("junit")
     }
-    testImplementation("io.mockk:mockk:1.10.6")
+    testImplementation("io.mockk:mockk:1.12.0")
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "15"
+        kotlinOptions.jvmTarget = "16"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "15"
+        kotlinOptions.jvmTarget = "16"
     }
 
     named<Jar>("jar") {

@@ -1,8 +1,8 @@
 package no.nav.helse.testdata
 
+import org.junit.jupiter.api.Assertions.assertNotNull
 import java.io.IOException
 import java.lang.RuntimeException
-import kotlin.test.assertNotNull
 
 fun assertValidJson(json: String?) {
     try {

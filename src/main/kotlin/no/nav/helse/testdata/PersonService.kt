@@ -1,10 +1,8 @@
 package no.nav.helse.testdata
 
-import kotliquery.Session
-import kotliquery.queryOf
-import kotliquery.sessionOf
-import kotliquery.using
+import kotliquery.*
 import org.intellij.lang.annotations.Language
+import java.util.*
 import javax.sql.DataSource
 
 class PersonService(
@@ -21,61 +19,81 @@ class PersonService(
 
     private fun slettPersonFraSpleis(fnr: String) {
         val fødselsnummer = fnr.toLong()
-        val slettedeRader = sessionOf(spleisDataSource).use {
-            it.run(queryOf("delete from person where fnr = ?", fødselsnummer).asUpdate)
+        sessionOf(spleisDataSource).use {
+            it.transaction { transactionalSession ->
+                val slettedeRader =
+                    transactionalSession.run(queryOf("delete from person where fnr = ?", fødselsnummer).asUpdate)
+                log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spleis")
+                val slettedeMeldinger =
+                    transactionalSession.run(queryOf("delete from melding where fnr = ?", fødselsnummer).asUpdate)
+                log.info("Slettet $slettedeMeldinger meldinger for fnr=$fnr fra Spleis")
+            }
         }
-        log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spleis")
-        val slettedeMeldinger = sessionOf(spleisDataSource).use {
-            it.run(queryOf("delete from melding where fnr = ?", fødselsnummer).asUpdate)
-        }
-        log.info("Slettet $slettedeMeldinger meldinger for fnr=$fnr fra Spleis")
-
     }
+
+    private data class Vedtak(
+        val id: Int,
+        val speilSnapshotRef: Int,
+        val vedtaksperiodeId: UUID,
+    )
 
     private fun slettPersonFraSpesialist(fnr: String) {
         val fødselsnummer = fnr.toLong()
-        val slettedeRader = sessionOf(spesialistDataSource).use { session ->
-            val personId = session.run(
+        val slettedeRader = sessionOf(spesialistDataSource).transaction { transactionalSession ->
+            val personId = transactionalSession.run(
                 queryOf("SELECT id FROM person WHERE fodselsnummer = ?;", fødselsnummer)
                     .map { it.int(1) }.asSingle
             )
 
-            val vedtakIder = session.run(
-                queryOf("SELECT id, speil_snapshot_ref FROM vedtak WHERE person_ref = ?;", personId)
-                    .map { Pair(it.int(1), it.int(2)) }.asList
+            val vedtak = transactionalSession.run(
+                queryOf("SELECT id, speil_snapshot_ref, vedtaksperiode_id FROM vedtak WHERE person_ref = ?;", personId)
+                    .map {
+                        Vedtak(
+                            it.int("id"),
+                            it.int("speil_snapshot_ref"),
+                            UUID.fromString(it.string("vedtaksperiode_id"))
+                        )
+                    }.asList
             )
 
-            if (vedtakIder.isNotEmpty()) {
-                session.run(
+            if (vedtak.isNotEmpty()) {
+                transactionalSession.run(
                     queryOf(
                         """
                         DELETE FROM tildeling WHERE oppgave_id_ref IN (
-                            SELECT id FROM oppgave WHERE vedtak_ref IN (${vedtakIder.joinToString { "?" }})
+                            SELECT id FROM oppgave WHERE vedtak_ref IN (${vedtak.joinToString { "?" }})
                         )""",
-                        *vedtakIder.map { it.first }.toTypedArray()
+                        *vedtak.map { it.id }.toTypedArray()
                     ).asUpdate
                 )
-                session.run(
+                transactionalSession.run(
                     queryOf(
-                        "DELETE FROM oppgave WHERE vedtak_ref in (${vedtakIder.joinToString { "?" }})",
-                        *vedtakIder.map { it.first }.toTypedArray()
+                        "DELETE FROM oppgave WHERE vedtak_ref in (${vedtak.joinToString { "?" }})",
+                        *vedtak.map { it.id }.toTypedArray()
                     ).asUpdate
                 )
-                session.run(
+                transactionalSession.run(
                     queryOf(
-                        "DELETE FROM automatisering WHERE vedtaksperiode_ref in (${vedtakIder.joinToString { "?" }})",
-                        *vedtakIder.map { it.first }.toTypedArray()
+                        "DELETE FROM automatisering WHERE vedtaksperiode_ref in (${vedtak.joinToString { "?" }})",
+                        *vedtak.map { it.id }.toTypedArray()
                     ).asUpdate
                 )
                 @Language("PostgreSQL")
                 val automatiseringProblemQuery =
-                    """DELETE FROM automatisering_problem WHERE vedtaksperiode_ref in (${vedtakIder.joinToString { "?" }})"""
-                session.run(
-                    queryOf(automatiseringProblemQuery, *vedtakIder.map { it.first }.toTypedArray()).asUpdate
+                    """DELETE FROM automatisering_problem WHERE vedtaksperiode_ref in (${vedtak.joinToString { "?" }})"""
+                transactionalSession.run(
+                    queryOf(automatiseringProblemQuery, *vedtak.map { it.id }.toTypedArray()).asUpdate
+                )
+
+                transactionalSession.run(
+                    queryOf(
+                        "DELETE FROM notat WHERE vedtaksperiode_id in (${vedtak.joinToString { "?" }})",
+                        *vedtak.map { it.vedtaksperiodeId }.toTypedArray()
+                    ).asUpdate
                 )
             }
 
-            val overstyringer = session.run(
+            val overstyringer = transactionalSession.run(
                 queryOf(
                     "SELECT * FROM overstyring WHERE person_ref = ?;",
                     personId
@@ -83,13 +101,13 @@ class PersonService(
             )
 
             overstyringer.forEach { overstyringId ->
-                session.run(
+                transactionalSession.run(
                     queryOf(
                         "DELETE FROM overstyrtdag WHERE overstyring_ref = ?;",
                         overstyringId
                     ).asUpdate
                 )
-                session.run(
+                transactionalSession.run(
                     queryOf(
                         "DELETE FROM overstyring WHERE id = ?;",
                         overstyringId
@@ -97,15 +115,15 @@ class PersonService(
                 )
             }
 
-            session.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
+            transactionalSession.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
 
-            session.run(queryOf("DELETE FROM hendelse WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
+            transactionalSession.run(queryOf("DELETE FROM hendelse WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
 
-            if (vedtakIder.isNotEmpty()) {
-                session.run(
+            if (vedtak.isNotEmpty()) {
+                transactionalSession.run(
                     queryOf(
-                        "DELETE FROM speil_snapshot WHERE id in (${vedtakIder.joinToString { "?" }})",
-                        *vedtakIder.map { it.second }.toTypedArray()
+                        "DELETE FROM speil_snapshot WHERE id in (${vedtak.joinToString { "?" }})",
+                        *vedtak.map { it.speilSnapshotRef }.toTypedArray()
                     ).asUpdate
                 )
             }
@@ -120,16 +138,16 @@ class PersonService(
                 DELETE FROM abonnement_for_opptegnelse WHERE person_id=:personId;
                 DELETE FROM opptegnelse WHERE person_id=:personId;
             """
-            session.run(queryOf(deletePersonConstraints, mapOf("personId" to personId)).asUpdate)
+            transactionalSession.run(queryOf(deletePersonConstraints, mapOf("personId" to personId)).asUpdate)
 
-            slettFraUtbetalingstabeller(session, personId)
+            slettFraUtbetalingstabeller(transactionalSession, personId)
 
-            session.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
+            transactionalSession.run(queryOf("DELETE FROM person WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
         }
         log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spesialist")
     }
 
-    private fun slettFraUtbetalingstabeller(session: Session, personId: Int?) {
+    private fun slettFraUtbetalingstabeller(session: TransactionalSession, personId: Int?) {
         @Language("PostgreSQL")
         val deleteUtbetalingslinje = """
             DELETE FROM utbetalingslinje where oppdrag_id in (SELECT person_fagsystem_id_ref FROM utbetaling_id WHERE person_ref=:personId);

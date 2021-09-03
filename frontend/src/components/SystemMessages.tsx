@@ -30,7 +30,7 @@ const useSystemMessageTransitions = (
   return [transitions, refs];
 };
 
-export const SystemMessages: React.FC = () => {
+export const SystemMessages: React.FC = React.memo(() => {
   const [messages] = useSystemMessages();
   const [transitions, refs] = useSystemMessageTransitions(messages);
 
@@ -45,4 +45,4 @@ export const SystemMessages: React.FC = () => {
       ))}
     </div>
   );
-};
+});

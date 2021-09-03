@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAddSystemMessage } from "../state/useSystemMessages";
 import { nanoid } from "nanoid";
+import { Environment } from "./environment";
 
 type WebsocketProtocol = "ws" | "wss";
-
-const protocol: WebsocketProtocol =
-  import.meta.env.MODE === "dev" || window.location.host.includes("0.0.0.0")
-    ? "ws"
-    : "wss";
-
-const baseUrl: string =
-  import.meta.env.MODE === "dev" ? "0.0.0.0:8080" : window.location.host;
 
 enum SubscriptionType {
   Vedtaksperiode = "vedtaksperiode",
@@ -30,6 +23,14 @@ type EndringFrame = {
   tilstand: string;
 };
 
+const protocol: WebsocketProtocol =
+  Environment.Mode === "development" || window.location.host.includes("0.0.0.0")
+    ? "ws"
+    : "wss";
+
+const baseUrl: string =
+  Environment.Mode === "development" ? "0.0.0.0:8080" : window.location.host;
+
 type UseSubscribeResult = [
   subscribeFunction: (fødselsnummer: string) => void,
   tilstand: string
@@ -46,13 +47,13 @@ export const useSubscribe = (): UseSubscribeResult => {
         `${protocol}://${`${baseUrl}/ws/vedtaksperiode`}`
       );
 
-      addMessage({
-        id: nanoid(),
-        text: "Dokumenter er sendt. Venter på tilstandsendringer i spleis.",
-        timeToLiveMs: 5000,
-      });
-
       socket.onopen = () => {
+        addMessage({
+          id: nanoid(),
+          text: "Dokumenter er sendt. Venter på tilstandsendringer i spleis.",
+          timeToLiveMs: 5000,
+        });
+
         socket.send(
           JSON.stringify({
             type: SubscriptionType.Vedtaksperiode,

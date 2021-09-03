@@ -1,8 +1,15 @@
-const isNumerical = (value?: string): boolean => value?.match(/^\d+$/) !== null;
+const isNumerical = (value?: string): boolean =>
+  value !== undefined && !isNaN(Number(value));
+
+const isInteger = (value?: string): boolean =>
+  isNumerical(value) && Number(value) === Number.parseInt(value);
+
+export const isNaturalNumber = (value?: string): boolean =>
+  value !== undefined && value.match(/^\d+$/) !== null;
 
 export const validateFødselsnummer = (value?: string): boolean | string =>
-  !isNumerical(value)
-    ? "Fødselsnummeret må være numerisk"
+  !isNaturalNumber(value)
+    ? "Fødselsnummeret må være et positivt heltall"
     : value?.length !== 11
     ? "Fødselsnummeret må bestå av 11 siffere"
     : true;
@@ -11,11 +18,11 @@ export const validateInntekt = (value: string): boolean | string =>
   isNumerical(value) || "Inntekten må være numerisk";
 
 export const validateOrganisasjonsnummer = (value: string): boolean | string =>
-  isNumerical(value) || "Organisasjonsnummeret må være numerisk";
+  isNaturalNumber(value) || "Organisasjonsnummeret må være numerisk";
 
 export const validateSykdomsgrad = (value?: string): boolean | string =>
-  !isNumerical(value)
-    ? "Sykdomsgraden må være numerisk"
+  !isInteger(value)
+    ? "Sykdomsgraden må være et heltall"
     : Number.parseInt(value) > 100
     ? "Sykdomsgrad må være 100 eller lavere"
     : Number.parseInt(value) < 0
@@ -24,8 +31,8 @@ export const validateSykdomsgrad = (value?: string): boolean | string =>
 
 export const validateArbeidsgrad = (value?: string): boolean | string =>
   value.length === 0 ||
-  (!isNumerical(value)
-    ? "Arbeidsgraden må være numerisk"
+  (!isInteger(value)
+    ? "Arbeidsgraden må være et heltall"
     : Number.parseInt(value) > 100
     ? "Arbeidsgrad må være 100 eller lavere"
     : Number.parseInt(value) < 0

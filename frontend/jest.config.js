@@ -1,4 +1,5 @@
 module.exports = {
+  preset: "ts-jest",
   testEnvironment: "jsdom",
   moduleFileExtensions: ["js", "jsx", "json", "tsx", "ts"],
   transform: {
@@ -14,4 +15,8 @@ module.exports = {
   },
   transformIgnorePatterns: ["<rootDir>/node_modules"],
   watchPathIgnorePatterns: ["<rootDir>/dist", "<rootDir>/node_modules"],
+  setupFilesAfterEnv: [
+    "<rootDir>/__mocks__/consoleMock.js",
+    "<rootDir>/__mocks__/setup.js",
+  ],
 };

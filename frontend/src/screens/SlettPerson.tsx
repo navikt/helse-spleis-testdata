@@ -22,7 +22,7 @@ export const SlettPerson = React.memo(() => {
     setIsFetching(true);
     del("/person", { ident: data.fnr })
       .then((response) => setStatus(response.status))
-      .catch((error) => setStatus(404))
+      .catch((error) => setStatus(error.status ?? 404))
       .finally(() => setIsFetching(false));
   };
 

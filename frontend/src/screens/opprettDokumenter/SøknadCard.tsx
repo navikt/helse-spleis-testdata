@@ -62,6 +62,7 @@ export const SøknadCard = React.memo(() => {
           {...register("sendtArbeidsgiver")}
         />
         <FormInput
+          data-testid="faktiskgrad"
           label="Faktisk arbeidsgrad"
           errors={formState.errors}
           {...register("faktiskgrad", {
@@ -70,6 +71,7 @@ export const SøknadCard = React.memo(() => {
           })}
         />
         <Checkbox
+          data-testid="harAndreInntektskilder"
           label="Har andre inntektskilder"
           errors={formState.errors}
           {...register("harAndreInntektskilder")}

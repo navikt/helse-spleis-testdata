@@ -5,17 +5,23 @@ import { useRemoveSystemMessage } from "../state/useSystemMessages";
 import { Text } from "./Text";
 import closeIcon from "material-design-icons/navigation/svg/production/ic_close_18px.svg";
 
-interface SystemMessageProps extends SystemMessageObject {}
+export const SystemMessageInitializationError = () =>
+  Error(
+    "Kan ikke opprette systemmelding som hverken lukkes automatisk eller kan lukkes av bruker"
+  );
+
+interface SystemMessageProps
+  extends SystemMessageObject,
+    Omit<React.HTMLAttributes<HTMLDivElement>, "id"> {}
 
 export const SystemMessage = React.forwardRef<
   HTMLDivElement,
   SystemMessageProps
->(({ id, text, dismissable, timeToLiveMs }, ref) => {
+>(({ id, text, dismissable, timeToLiveMs, ...rest }, ref) => {
   if (!dismissable && timeToLiveMs === undefined) {
-    throw Error(
-      "Kan ikke opprette systemmelding som hverken lukkes automatisk eller kan lukkes av bruker"
-    );
+    throw SystemMessageInitializationError();
   }
+
   const removeMessage = useRemoveSystemMessage();
 
   useEffect(() => {
@@ -26,7 +32,7 @@ export const SystemMessage = React.forwardRef<
   }, [id, timeToLiveMs]);
 
   return (
-    <div className={classNames(styles.SystemMessage)} ref={ref}>
+    <div className={classNames(styles.SystemMessage)} ref={ref} {...rest}>
       <Text className={styles.MessageText}>{text}</Text>
       {dismissable && (
         <button

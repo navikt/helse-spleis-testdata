@@ -1,6 +1,6 @@
 import { atom, useRecoilState, useSetRecoilState } from "recoil";
 
-const systemMessagesState = atom<SystemMessageObject[]>({
+export const systemMessagesState = atom<SystemMessageObject[]>({
   key: "systemMessagesState",
   default: [],
 });

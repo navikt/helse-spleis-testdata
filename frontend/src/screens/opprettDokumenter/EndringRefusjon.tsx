@@ -33,15 +33,18 @@ export const EndringRefusjon = React.memo(() => {
 
   return (
     <>
-      <AddButton onClick={addEndring}>Legg inn endring i refusjon</AddButton>
-      {opphør.map((id) => (
+      <AddButton onClick={addEndring} data-testid="endringButton">
+        Legg inn endring i refusjon
+      </AddButton>
+      {opphør.map((id, i) => (
         <Card key={id}>
           <div className={styles.PeriodContainer}>
             <FormInput
+              data-testid={`endring${i}`}
               type="date"
               label="Dato for endring"
               errors={errors}
-              defaultValue={formattedDateString(new Date("2020-01-01"))}
+              defaultValue={formattedDateString(new Date("2021-07-01"))}
               {...register(`endring${id}`, {
                 required: "Dato for endring må angis",
               })}

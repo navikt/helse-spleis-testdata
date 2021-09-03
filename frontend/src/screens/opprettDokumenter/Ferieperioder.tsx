@@ -30,24 +30,28 @@ export const Ferieperioder = React.memo(() => {
 
   return (
     <>
-      <AddButton onClick={addFerieperiode}>Legg inn ferieperioder</AddButton>
+      <AddButton onClick={addFerieperiode} data-testid="ferieButton">
+        Legg inn ferieperioder
+      </AddButton>
       {perioder.map((id, i) => (
         <Card>
           <div className={styles.PeriodContainer}>
             <FormInput
+              data-testid={`ferieFom${i}`}
               type="date"
               label="Ferieperiode f.o.m."
               errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2020-01-01"))}
+              defaultValue={formattedDateString(new Date("2021-07-01"))}
               {...register(`ferieFom-${id}`, {
                 required: "Start av ferieperioden må angis",
               })}
             />
             <FormInput
+              data-testid={`ferieTom${i}`}
               type="date"
               label="Ferieperiode t.o.m."
               errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2020-01-10"))}
+              defaultValue={formattedDateString(new Date("2021-07-10"))}
               {...register(`ferieTom-${id}`, {
                 required: "Slutt av ferieperioden må angis",
               })}

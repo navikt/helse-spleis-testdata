@@ -29,26 +29,31 @@ export const Arbeidsgiverperioder = React.memo(() => {
 
   return (
     <>
-      <AddButton onClick={addArbeidsgiverperiode}>
+      <AddButton
+        onClick={addArbeidsgiverperiode}
+        data-testid="arbeidsgiverperioderButton"
+      >
         Legg inn arbeidsgiverperioder
       </AddButton>
-      {perioder.map((id) => (
+      {perioder.map((id, i) => (
         <Card key={id}>
           <div className={styles.PeriodContainer}>
             <FormInput
+              data-testid={`arbeidsgiverFom${i}`}
               type="date"
               label="Arbeidsgiverperiode f.o.m."
               errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2020-01-01"))}
+              defaultValue={formattedDateString(new Date("2021-07-01"))}
               {...register(`arbFom-${id}`, {
                 required: "Start av arbeidsgiverperioden må angis",
               })}
             />
             <FormInput
+              data-testid={`arbeidsgiverTom${i}`}
               type="date"
               label="Arbeidsgiverperiode t.o.m."
               errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2020-01-16"))}
+              defaultValue={formattedDateString(new Date("2021-07-16"))}
               {...register(`arbTom-${id}`, {
                 required: "Slutt av arbeidsgiverperioden må angis",
               })}

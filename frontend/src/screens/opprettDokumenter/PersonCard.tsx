@@ -34,8 +34,7 @@ export const PersonCard = React.memo(() => {
       <h2 className={styles.Title}>Person</h2>
       <div className={styles.CardContainer}>
         <FormInput
-          id="fnr"
-          name="fnr"
+          data-testid="fnr"
           label="Fødselsnummer"
           errors={formState.errors}
           {...register("fnr", {
@@ -44,8 +43,7 @@ export const PersonCard = React.memo(() => {
           })}
         />
         <FormInput
-          id="orgnummer"
-          name="orgnummer"
+          data-testid="orgnummer"
           label="Organisasjonsnummer"
           errors={formState.errors}
           {...register("orgnummer", {
@@ -54,8 +52,6 @@ export const PersonCard = React.memo(() => {
           })}
         />
         <FormInput
-          id="sykdomFom"
-          name="sykdomFom"
           label="Sykdom f.o.m."
           errors={formState.errors}
           type="date"
@@ -65,8 +61,6 @@ export const PersonCard = React.memo(() => {
           })}
         />
         <FormInput
-          id="sykdomTom"
-          name="sykdomTom"
           label="Sykdom t.o.m."
           errors={formState.errors}
           type="date"
@@ -76,14 +70,11 @@ export const PersonCard = React.memo(() => {
           })}
         />
         <Checkbox
-          id="slettPerson"
-          name="slettPerson"
+          data-testid="slettPerson"
           label="Slett og gjenskap data for personen"
           {...register("slettPerson")}
         />
         <Checkbox
-          id="skalSendeSykmelding"
-          name="skalSendeSykmelding"
           label="Send sykmelding"
           {...register("skalSendeSykmelding", {
             validate: validateSendsDocuments,
@@ -91,8 +82,6 @@ export const PersonCard = React.memo(() => {
           aria-invalid={!!validateSendsDocuments()}
         />
         <Checkbox
-          id="skalSendeSøknad"
-          name="skalSendeSøknad"
           label="Send søknad"
           {...register("skalSendeSøknad", {
             validate: validateSendsDocuments,
@@ -100,8 +89,6 @@ export const PersonCard = React.memo(() => {
           aria-invalid={!!validateSendsDocuments()}
         />
         <Checkbox
-          id="skalSendeInntektsmelding"
-          name="skalSendeInntektsmelding"
           label="Send inntektsmelding"
           {...register("skalSendeInntektsmelding", {
             validate: validateSendsDocuments,

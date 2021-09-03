@@ -1,8 +1,0 @@
-.Timeline {
-  position: relative;
-  width: 100%;
-  height: 60px;
-  background-color: var(--background-color-secondary);
-  padding: 1rem var(--line-dot-size);
-  transition: background-color 0.2s ease;
-}

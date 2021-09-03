@@ -8,7 +8,7 @@ import { nanoid } from "nanoid";
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  errors: FieldErrors;
+  errors?: FieldErrors;
 }
 
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
@@ -21,12 +21,12 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           id={id}
           name={name}
           type={type ?? "text"}
-          className={classNames(errors[name] && "error")}
-          aria-invalid={errors[name] ? "true" : "false"}
+          className={classNames(errors?.[name] && "error")}
+          aria-invalid={errors?.[name] ? "true" : "false"}
           {...rest}
           ref={ref}
         />
-        {errors[name] && (
+        {errors?.[name] && (
           <ErrorMessage label-for={id}>{errors[name].message}</ErrorMessage>
         )}
       </InputLabel>

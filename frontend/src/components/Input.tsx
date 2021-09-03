@@ -2,9 +2,7 @@ import React from "react";
 import styles from "./Input.module.css";
 import classNames from "classnames";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  className?: string;
-}
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...rest }, ref) => (

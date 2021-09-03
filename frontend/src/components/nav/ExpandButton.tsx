@@ -10,16 +10,18 @@ interface ExpandButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 export const ExpandButton: React.FC<ExpandButtonProps> = ({
   expanded,
   onExpand,
-  ...buttonProps
+  className,
+  ...rest
 }) => {
   return (
     <button
       className={classNames(
         styles.ExpandButton,
-        expanded ? styles.expanded : styles.minified
+        expanded ? styles.expanded : styles.minified,
+        className
       )}
       onClick={onExpand}
-      {...buttonProps}
+      {...rest}
     />
   );
 };

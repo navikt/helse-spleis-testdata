@@ -55,6 +55,7 @@ export const InntektsmeldingCard = React.memo(() => {
           })}
         />
         <FormInput
+          data-testid="inntekt"
           label="Inntekt"
           errors={formState.errors}
           {...register("inntekt", {

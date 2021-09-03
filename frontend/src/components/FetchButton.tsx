@@ -8,22 +8,22 @@ import errorIcon from "material-design-icons/alert/svg/production/ic_error_18px.
 import successIcon from "material-design-icons/action/svg/production/ic_check_circle_24px.svg";
 
 const error = (status?: number): boolean =>
-  !isNaN(Number.parseInt(String(status))) && status >= 400;
+  status !== undefined && status !== null && status >= 400;
 
 const success = (status?: number): boolean =>
-  !isNaN(Number.parseInt(String(status))) && status < 400;
+  status !== undefined && status !== null && status < 400;
 
 interface FetchButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isFetching: boolean;
   status?: number;
-  className?: string;
 }
 
 export const FetchButton: React.FC<FetchButtonProps> = ({
   isFetching,
   status,
   className,
+  children,
   ...rest
 }) => (
   <Button
@@ -36,11 +36,18 @@ export const FetchButton: React.FC<FetchButtonProps> = ({
     )}
     {...rest}
   >
-    {rest.children}
+    {children}
     {success(status) && (
-      <img className={styles.Icon} src={successIcon} alt="" />
+      <img
+        className={styles.Icon}
+        src={successIcon}
+        alt=""
+        data-testid="success"
+      />
     )}
-    {error(status) && <img className={styles.Icon} src={errorIcon} alt="" />}
+    {error(status) && (
+      <img className={styles.Icon} src={errorIcon} alt="" data-testid="error" />
+    )}
     {isFetching && <Spinner />}
   </Button>
 );

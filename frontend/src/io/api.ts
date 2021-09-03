@@ -1,7 +1,9 @@
+import { Environment } from "./environment";
+
 type Headers = { [key: string]: string };
 
 const baseUrl: string =
-  import.meta.env.MODE === "development" ? "http://0.0.0.0:8080" : "";
+  Environment.Mode === "development" ? "http://0.0.0.0:8080" : "";
 
 export const post = (
   path: string,

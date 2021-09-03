@@ -8,16 +8,20 @@ interface NavLinkProps {
   isExpanded: boolean;
 }
 
-export const NavLink: React.FC<NavLinkProps> = (props) => {
+export const NavLink: React.FC<NavLinkProps> = ({
+  to,
+  isExpanded,
+  children,
+}) => {
   return (
     <li
       className={classNames(
         styles.Link,
-        props.isExpanded ? styles.isExpanded : styles.isMinified
+        isExpanded ? styles.isExpanded : styles.isMinified
       )}
     >
-      <Link to={props.to} exact={true}>
-        {props.children}
+      <Link to={to} exact={true}>
+        {children}
       </Link>
     </li>
   );

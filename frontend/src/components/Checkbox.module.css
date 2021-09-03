@@ -1,31 +1,33 @@
 .Label {
   --checkbox-width: 1rem;
-  font-size: 12px;
-  display: flex;
+  flex-direction: row;
   align-items: center;
+}
+
+.Label > input {
+  margin-top: 0;
 }
 
 .Checkbox {
   position: relative;
   appearance: none;
   width: var(--checkbox-width);
+  height: var(--checkbox-width);
   margin: 0 0.5rem 0 0;
 }
 
 .Checkbox:before {
   content: "";
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   background-color: var(--background-color-secondary);
   background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMyAxMCI+PGc+PHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTQsMTBjLTAuNCwwLTAuOC0wLjEtMS4xLTAuNEwwLjQsNy4xQzAuMSw2LjgsMCw2LjQsMCw2czAuMi0wLjgsMC41LTEuMUMxLDQuNCwyLDQuNCwyLjUsNC45TDQsNi40bDYuNC02ICAgIEMxMC44LDAuMSwxMS4xLDAsMTEuNSwwYzAuNCwwLDAuOCwwLjIsMSwwLjVjMC42LDAuNiwwLjUsMS42LTAuMSwyLjF2MEw1LDkuNkM0LjcsOS45LDQuNCwxMCw0LDEweiBNMTEuOCwxLjlMMTEuOCwxLjkgICAgQzExLjgsMS45LDExLjgsMS45LDExLjgsMS45eiBNMTEuMiwxLjFDMTEuMiwxLjEsMTEuMiwxLjEsMTEuMiwxLjFMMTEuMiwxLjF6Ii8+PC9nPjwvc3ZnPg==);
   background-repeat: no-repeat;
   background-size: 0;
   background-position: 50%;
-  border-radius: var(--border-radius);
-  box-shadow: inset 0 0 0 1px var(--text-color-primary);
   width: var(--checkbox-width);
   height: var(--checkbox-width);
+  border-radius: var(--border-radius);
+  box-shadow: inset 0 0 0 1px var(--text-color-primary);
   transition: all 0.1s ease, background-color 0.2s ease;
 }
 

@@ -21,8 +21,7 @@ const derivedTheme = selector<Theme>({
 
 export const useTheme = (): Theme => useRecoilValue(derivedTheme);
 
-export const useThemeState = (): ReturnType<typeof useRecoilState> =>
-  useRecoilState<Theme>(derivedTheme);
+export const useThemeState = () => useRecoilState<Theme>(derivedTheme);
 
 export const useUpdateBodyBackgroundColor = (theme) => {
   useEffect(() => {

@@ -119,11 +119,9 @@ class PersonService(
 
             transactionalSession.run(queryOf("DELETE FROM hendelse WHERE fodselsnummer = ?", fødselsnummer).asUpdate)
 
-            if (vedtak.isNotEmpty()) {
-                transactionalSession.run(
-                    queryOf("DELETE FROM speil_snapshot WHERE person_ref = ?", personId).asUpdate
-                )
-            }
+            transactionalSession.run(
+                queryOf("DELETE FROM speil_snapshot WHERE person_ref = ?", personId).asUpdate
+            )
 
             @Language("PostgreSQL")
             val deletePersonConstraints = """

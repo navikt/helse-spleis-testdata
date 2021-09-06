@@ -45,6 +45,7 @@ export const SøknadCard = React.memo(() => {
       <h2 className={styles.Title}>Søknad</h2>
       <div className={styles.CardContainer}>
         <FormInput
+          data-testid="sendtNav"
           label="Søknad sendt Nav"
           type="date"
           errors={formState.errors}

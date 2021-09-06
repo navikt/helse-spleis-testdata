@@ -118,7 +118,7 @@ describe("OpprettDokumenter", () => {
   });
 
   it("sletter person", async () => {
-    render(<OpprettDokumenter />);
+    render(<OpprettDokumenter />, { wrapper });
 
     mockFetchResponse({ json: () => ({ beregnetMånedsinntekt: 54321 }) });
     userEvent.type(screen.getByTestId("fnr"), "01234567890");
@@ -135,6 +135,16 @@ describe("OpprettDokumenter", () => {
         "http://0.0.0.0:8080/person",
         { headers: { ident: "01234567890" }, method: "delete" }
       );
+    });
+  });
+
+  it("endring av sykdomTom endrer automatisk søknadSendt til sykdomTom + 1", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    userEvent.type(screen.getByTestId("sykdomTom"), "2021-08-31");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sendtNav")).toHaveValue("2021-09-01");
     });
   });
 });

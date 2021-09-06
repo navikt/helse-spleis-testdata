@@ -18,7 +18,11 @@ export const validateInntekt = (value: string): boolean | string =>
   isNumerical(value) || "Inntekten må være numerisk";
 
 export const validateOrganisasjonsnummer = (value: string): boolean | string =>
-  isNaturalNumber(value) || "Organisasjonsnummeret må være numerisk";
+  !isNaturalNumber(value)
+    ? "Organisasjonsnummeret må være numerisk"
+    : value?.length !== 9
+    ? "Organisasjonsnummeret må bestå av 9 siffere"
+    : true;
 
 export const validateSykdomsgrad = (value?: string): boolean | string =>
   !isInteger(value)

@@ -10,6 +10,7 @@ import {
   validateOrganisasjonsnummer,
 } from "../formValidation";
 import { SykdomTom } from "./SykdomTom";
+import { SykdomFom } from "./SykdomFom";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -52,15 +53,7 @@ export const PersonCard = React.memo(() => {
             validate: validateOrganisasjonsnummer,
           })}
         />
-        <FormInput
-          label="Sykdom f.o.m."
-          errors={formState.errors}
-          type="date"
-          defaultValue="2021-07-01"
-          {...register("sykdomFom", {
-            required: "Start av sykdomsforløp må angis",
-          })}
-        />
+        <SykdomFom />
         <SykdomTom />
         <Checkbox
           data-testid="slettPerson"

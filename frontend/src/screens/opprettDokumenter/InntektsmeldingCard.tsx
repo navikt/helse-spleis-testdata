@@ -46,6 +46,7 @@ export const InntektsmeldingCard = React.memo(() => {
       <h2 className={styles.Title}>Inntektsmelding</h2>
       <div className={styles.CardContainer}>
         <FormInput
+          data-testid="førsteFraværsdag"
           type="date"
           label="Første fraværsdag"
           errors={formState.errors}

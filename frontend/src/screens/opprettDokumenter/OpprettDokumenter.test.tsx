@@ -147,4 +147,14 @@ describe("OpprettDokumenter", () => {
       expect(screen.getByTestId("sendtNav")).toHaveValue("2021-09-01");
     });
   });
+
+  it("endring av sykdomFom endrer automatisk førsteFraværsdag til sykdomFom", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    userEvent.type(screen.getByTestId("sykdomFom"), "2021-07-31");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("førsteFraværsdag")).toHaveValue("2021-07-31");
+    });
+  });
 });

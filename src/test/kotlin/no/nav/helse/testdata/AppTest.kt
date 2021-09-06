@@ -199,12 +199,13 @@ class AppTest {
             )
             val speilSnapshotId = it.run(
                 queryOf(
-                    "insert into speil_snapshot (data) values ('some data')"
+                    "insert into speil_snapshot (data, person_ref) values ('some data', ?) ON CONFLICT (person_ref) DO UPDATE SET data = 'some new data'", personId
                 ).asUpdateAndReturnGeneratedKey
             )
+            val vedtaksperiodeId = UUID.randomUUID()
             val vedtakId = it.run(
                 queryOf(
-                    "insert into vedtak (person_ref, speil_snapshot_ref, vedtaksperiode_id) values (?, ?, ?)", personId, speilSnapshotId, UUID.randomUUID()
+                    "insert into vedtak (person_ref, speil_snapshot_ref, vedtaksperiode_id) values (?, ?, ?)", personId, speilSnapshotId, vedtaksperiodeId
                 ).asUpdateAndReturnGeneratedKey
             )
             val overstyringId = it.run(
@@ -244,6 +245,24 @@ class AppTest {
             it.run(
                 queryOf(
                     "INSERT INTO automatisering (vedtaksperiode_ref) VALUES (?)", vedtakId
+                ).asUpdate
+            )
+
+            val saksbehandleroid = UUID.randomUUID()
+            it.run(
+                queryOf(
+                    "INSERT INTO saksbehandler (oid, navn, epost) VALUES (?, ?, ?)",
+                    saksbehandleroid,
+                    "En Saksbehandler",
+                    "saksbehandler@nav.no"
+                ).asUpdate
+            )
+
+            it.run(
+                queryOf(
+                    "INSERT INTO notat (tekst, saksbehandler_oid, vedtaksperiode_id) VALUES('some text', ?, ?)",
+                    saksbehandleroid,
+                    vedtaksperiodeId
                 ).asUpdate
             )
 

@@ -121,10 +121,7 @@ class PersonService(
 
             if (vedtak.isNotEmpty()) {
                 transactionalSession.run(
-                    queryOf(
-                        "DELETE FROM speil_snapshot WHERE id in (${vedtak.joinToString { "?" }})",
-                        *vedtak.map { it.speilSnapshotRef }.toTypedArray()
-                    ).asUpdate
+                    queryOf("DELETE FROM speil_snapshot WHERE person_ref = ?", personId).asUpdate
                 )
             }
 

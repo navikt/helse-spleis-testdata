@@ -26,10 +26,18 @@ jobs:
       env:
         ORG_GRADLE_PROJECT_githubUser: x-access-token
         ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Cache node deps
+      id: cache-node
+      uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node-
     - name: build frontend
       run: |
         cd frontend
-        npm install
+        npm ci
         npm run build
     - name: build docker imagex
       run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}

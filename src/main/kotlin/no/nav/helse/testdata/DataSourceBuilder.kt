@@ -23,7 +23,7 @@ internal class DataSourceBuilder(env: Environment, databaseConfig: DatabaseConfi
         maximumPoolSize = 3
         minimumIdle = 1
         idleTimeout = 10001
-        connectionTimeout = 1000
+        connectionTimeout = 10000
         maxLifetime = 30001
     }
 

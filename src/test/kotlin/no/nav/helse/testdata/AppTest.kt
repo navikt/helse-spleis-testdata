@@ -215,6 +215,12 @@ class AppTest {
             )
 
             @Language("PostgreSQL")
+            val overstyringInntektQuery = """INSERT INTO overstyring_inntekt(person_ref) VALUES (?)"""
+            it.run(
+                queryOf(overstyringInntektQuery, personId).asUpdate
+            )
+
+            @Language("PostgreSQL")
             val digitalKontaktinformasjonQuery = """INSERT INTO digital_kontaktinformasjon(person_ref) VALUES (?)"""
             it.run(
                 queryOf(digitalKontaktinformasjonQuery, personId).asUpdate

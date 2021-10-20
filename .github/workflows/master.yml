@@ -39,7 +39,7 @@ jobs:
     - name: build frontend
       run: |
         cd frontend
-        npm ci --ignore-scripts
+        npm ci
         npm run build
     - name: build docker image
       run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}

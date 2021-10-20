@@ -14,9 +14,14 @@ data class Inntektsmelding(
     val ferieperioder: List<Periode>,
     val arbeidsgiverperiode: List<Periode> = emptyList(),
     val endringRefusjon: List<EndringIRefusjon> = emptyList(),
-    val opphørRefusjon: LocalDate? = null,
-    val refusjonsbeløp: Double = inntekt,
+    val refusjon: Refusjon,
     val førsteFraværsdag: LocalDate? = null,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Refusjon(
+    val refusjonsbeløp: Double? = null,
+    val opphørRefusjon: LocalDate? = null,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,8 +65,8 @@ fun inntektsmelding(
                 "beregnetInntekt":"${inntektsmelding.inntekt}",
                 "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                 "refusjon":{
-                    "beloepPrMnd":"${inntektsmelding.refusjonsbeløp}",
-                    "opphoersdato": ${inntektsmelding.opphørRefusjon?.let { "\"$it\"" }}
+                    "beloepPrMnd":"${inntektsmelding.refusjon.refusjonsbeløp}",
+                    "opphoersdato": ${inntektsmelding.refusjon.opphørRefusjon?.let { "\"$it\"" }}
                 },
                 "endringIRefusjoner": ${inntektsmelding.endringRefusjon.tilJson()},
                 "opphoerAvNaturalytelser":[],

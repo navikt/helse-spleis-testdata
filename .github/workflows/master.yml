@@ -18,7 +18,7 @@ jobs:
         java-version: '16.x'
     - uses: actions/setup-node@v1
       with:
-        node-version: "12.x"
+        node-version: "14"
     - name: create docker tag
       run: echo "TAG=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
     - name: test and build
@@ -29,17 +29,19 @@ jobs:
 
     - name: Cache node deps
       id: cache-node
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: ${{ runner.os }}-node-
+    - name: set timezone
+      run: export TZ=utc
     - name: build frontend
       run: |
         cd frontend
-        npm install
+        npm ci --ignore-scripts
         npm run build
-    - name: build docker imagex
+    - name: build docker image
       run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
     - name: push docker image
       run: |

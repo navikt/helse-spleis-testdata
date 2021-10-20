@@ -33,6 +33,11 @@ npm run build
 npm run watch
 ```
 
+```shell script
+# Kjøre tester
+npx jest
+```
+
 ### Backend
 
 Lokal app med mocket rapids-and-rivers og embedded postgres-db kan kjøres ved å starte main-funksjonen i `LocalApp.kt`. Serveren svarer på `0.0.0.0:8080` og server filer fra `public`-mappen hvis du har bygd frontend-appen på forhånd.

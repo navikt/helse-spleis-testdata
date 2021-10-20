@@ -29,7 +29,18 @@ export interface InntektsmeldingDTO {
   inntekt: number;
   ferieperioder: PeriodeDTO[];
   arbeidsgiverperiode: PeriodeDTO[];
-  endringRefusjon: string[];
+  endringRefusjon: EndringIRefusjonDto[];
   opphørRefusjon?: string;
   førsteFraværsdag?: string;
+  refusjon: RefusjonDto;
+}
+
+export interface RefusjonDto {
+  opphørRefusjon?: string;
+  refusjonsbeløp?: number;
+}
+
+export interface EndringIRefusjonDto {
+  beløp: number;
+  endringsdato: string;
 }

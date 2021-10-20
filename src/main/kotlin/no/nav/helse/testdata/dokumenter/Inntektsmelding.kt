@@ -1,7 +1,9 @@
 package no.nav.helse.testdata.dokumenter
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.helse.testdata.dokumenter.EndringIRefusjon.Companion.tilJson
 import no.nav.helse.testdata.objectMapper
+import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -11,10 +13,23 @@ data class Inntektsmelding(
     val inntekt: Double,
     val ferieperioder: List<Periode>,
     val arbeidsgiverperiode: List<Periode> = emptyList(),
-    val endringRefusjon: List<LocalDate> = emptyList(),
+    val endringRefusjon: List<EndringIRefusjon> = emptyList(),
     val opphørRefusjon: LocalDate? = null,
+    val refusjonsbeløp: Double = inntekt,
     val førsteFraværsdag: LocalDate? = null,
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class EndringIRefusjon(
+    val endringsdato: LocalDate,
+    val beløp: Double
+) {
+    @Language("JSON")
+    internal fun tilJson() = """{"endringsdato":"$endringsdato", "beloep": "$beløp"}"""
+    internal companion object {
+        internal fun List<EndringIRefusjon>.tilJson() = joinToString(",", prefix = "[", postfix = "]", transform = EndringIRefusjon::tilJson)
+    }
+}
 
 fun inntektsmelding(
     vedtak: Vedtak,
@@ -45,10 +60,10 @@ fun inntektsmelding(
                 "beregnetInntekt":"${inntektsmelding.inntekt}",
                 "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                 "refusjon":{
-                    "beloepPrMnd":"${inntektsmelding.inntekt}",
-                    "opphoersdato":${inntektsmelding.opphørRefusjon?.let { "{\"endringsdato\": \"$it\" }" } ?: "null"}
+                    "beloepPrMnd":"${inntektsmelding.refusjonsbeløp}",
+                    "opphoersdato": ${inntektsmelding.opphørRefusjon?.let { "\"$it\"" }}
                 },
-                "endringIRefusjoner":[${inntektsmelding.endringRefusjon.joinToString { "\"$it\"" }}],
+                "endringIRefusjoner": ${inntektsmelding.endringRefusjon.tilJson()},
                 "opphoerAvNaturalytelser":[],
                 "gjenopptakelseNaturalytelser":[],
                 "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},

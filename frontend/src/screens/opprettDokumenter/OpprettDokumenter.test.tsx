@@ -72,6 +72,10 @@ describe("OpprettDokumenter", () => {
     userEvent.type(screen.getByTestId("orgnummer"), "987654321");
     userEvent.type(screen.getByTestId("faktiskgrad"), "80");
 
+    userEvent.clear(screen.getByTestId("refusjonsbeløp"))
+    userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000")
+    userEvent.type(screen.getByTestId("opphørRefusjon"), "2021-08-01")
+
     userEvent.click(screen.getByTestId("arbeidsgiverperioderButton"));
     userEvent.type(screen.getByTestId("arbeidsgiverFom0"), "2021-07-01");
     userEvent.type(screen.getByTestId("arbeidsgiverTom0"), "2021-07-16");
@@ -81,7 +85,8 @@ describe("OpprettDokumenter", () => {
     userEvent.type(screen.getByTestId("ferieTom0"), "2021-07-04");
 
     userEvent.click(screen.getByTestId("endringButton"));
-    userEvent.type(screen.getByTestId("endring0"), "2021-07-17");
+    userEvent.type(screen.getByTestId("endringsdato0"), "2021-07-17");
+    userEvent.type(screen.getByTestId("endringsbeløp0"), "19000");
 
     mockFetchResponse({ status: 204 });
     userEvent.click(screen.getByText("Opprett dokumenter"));
@@ -105,9 +110,14 @@ describe("OpprettDokumenter", () => {
             },
             inntektsmelding: {
               inntekt: "54321",
+              refusjon: {
+                opphørRefusjon: "2021-08-01",
+                refusjonsbeløp: "20000"
+              },
               ferieperioder: [{ fom: "2021-07-02", tom: "2021-07-04" }],
               arbeidsgiverperiode: [{ fom: "2021-07-01", tom: "2021-07-16" }],
-              førsteFraværsdag: "2021-07-01",
+              endringRefusjon: [{ endringsdato: "2021-07-17", beløp: "19000"}],
+              førsteFraværsdag: "2021-07-01"
             },
           })}`,
           headers: { "Content-Type": "application/json" },

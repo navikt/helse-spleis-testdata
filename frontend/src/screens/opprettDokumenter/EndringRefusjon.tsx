@@ -6,6 +6,7 @@ import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { validateInntekt } from "../formValidation";
 
 type OpphørId = string;
 
@@ -16,7 +17,7 @@ export const EndringRefusjon = React.memo(() => {
   const {
     register,
     unregister,
-    formState: { errors },
+    formState,
   } = useFormContext();
 
   const [opphør, setOpphør] = useState<OpphørId[]>([]);
@@ -27,7 +28,8 @@ export const EndringRefusjon = React.memo(() => {
 
   const removeEndring = (id: OpphørId) => {
     const index = opphør.findIndex((it) => it === id);
-    unregister(`endring${id}`);
+    unregister(`endringsdato-${id}`);
+    unregister(`endringsbeløp-${id}`);
     setOpphør((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
@@ -38,18 +40,29 @@ export const EndringRefusjon = React.memo(() => {
       </AddButton>
       {opphør.map((id, i) => (
         <Card key={id}>
-          <div className={styles.PeriodContainer}>
+          <div className={styles.CardContainer}>
+            <div className={styles.PeriodContainer}>
+              <FormInput
+                data-testid={`endringsdato${i}`}
+                type="date"
+                label="Dato for endring"
+                errors={formState.errors}
+                defaultValue={formattedDateString(new Date("2021-07-01"))}
+                {...register(`endringsdato-${id}`, {
+                  required: "Dato for endring må angis",
+                })}
+              />
+              <DeleteButton onClick={() => removeEndring(id)} />
+            </div>
             <FormInput
-              data-testid={`endring${i}`}
-              type="date"
-              label="Dato for endring"
-              errors={errors}
-              defaultValue={formattedDateString(new Date("2021-07-01"))}
-              {...register(`endring${id}`, {
-                required: "Dato for endring må angis",
-              })}
+                data-testid={`endringsbeløp${i}`}
+                label="Beløp for endring"
+                errors={formState.errors}
+                {...register(`endringsbeløp-${id}`, {
+                  required: "Beløp for endring må angis",
+                  validate: validateInntekt,
+                })}
             />
-            <DeleteButton onClick={() => removeEndring(id)} />
           </div>
         </Card>
       ))}

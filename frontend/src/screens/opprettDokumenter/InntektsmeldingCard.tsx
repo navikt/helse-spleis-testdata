@@ -4,7 +4,7 @@ import { FormInput } from "../../components/FormInput";
 import { get } from "../../io/api";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { validateFødselsnummer, validateInntekt } from "../formValidation";
+import {validateFødselsnummer, validateInntekt, validateRefusjonsbeløp} from "../formValidation";
 
 const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
@@ -28,7 +28,9 @@ const useFetchInntekt = () => {
         .then(async (result) => {
           const response = await result.json();
           clearErrors("inntekt");
+          clearErrors("refusjonsbeløp");
           setValue("inntekt", String(response.beregnetMånedsinntekt));
+          setValue("refusjonsbeløp", String(response.beregnetMånedsinntekt));
         })
         .catch((error) => console.log(error));
     }
@@ -56,12 +58,27 @@ export const InntektsmeldingCard = React.memo(() => {
           })}
         />
         <FormInput
+          data-testid="opphørRefusjon"
+          type="date"
+          label="Opphør av refusjon"
+          errors={formState.errors}
+          {...register("opphørRefusjon")}
+        />
+        <FormInput
           data-testid="inntekt"
           label="Inntekt"
           errors={formState.errors}
           {...register("inntekt", {
             required: "Inntekt må angis",
             validate: validateInntekt,
+          })}
+        />
+        <FormInput
+          data-testid="refusjonsbeløp"
+          label="Refusjonsbeløp"
+          errors={formState.errors}
+          {...register("refusjonsbeløp", {
+            validate: validateRefusjonsbeløp,
           })}
         />
       </div>

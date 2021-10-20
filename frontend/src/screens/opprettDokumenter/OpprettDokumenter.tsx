@@ -22,6 +22,7 @@ import type {
   PersonDTO,
   SykmeldingDTO,
   SøknadDTO,
+  EndringIRefusjonDto,
 } from "../../io/api.d";
 
 type Period = {
@@ -51,6 +52,12 @@ const createPayload = (
     return first.map((it, i) => ({ fom: it, tom: second[i] })) ?? [];
   };
 
+  const mapEndringIRefusjon = (values): EndringIRefusjonDto[] => {
+    const endringsdato = valuesWithName(values, "endringsdato");
+    const beløp = valuesWithName(values, "endringsbeløp");
+    return endringsdato.map((it, i) => ({ endringsdato: it as string, beløp: beløp[i] as number })) ?? [];
+  }
+
   const sykmelding = (): SykmeldingDTO => ({
     sykmeldingsgrad: values.sykmeldingsgrad,
   });
@@ -66,10 +73,13 @@ const createPayload = (
 
   const inntektsmelding = (): InntektsmeldingDTO => ({
     inntekt: values.inntekt,
+    refusjon: {
+      opphørRefusjon: values.opphørRefusjon || null,
+      refusjonsbeløp: values.refusjonsbeløp || null
+    },
     ferieperioder: mapPeriodArray(values, "ferieFom", "ferieTom"),
     arbeidsgiverperiode: mapPeriodArray(values, "arbFom", "arbTom"),
-    endringRefusjon: values.endringRefusjon,
-    opphørRefusjon: values.opphørRefusjon,
+    endringRefusjon: mapEndringIRefusjon(values),
     førsteFraværsdag: values.førsteFraværsdag,
   });
 

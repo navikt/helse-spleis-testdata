@@ -37,7 +37,7 @@ jobs:
     - name: build frontend
       run: |
         cd frontend
-        npm ci
+        npm install
         npm run build
     - name: build docker imagex
       run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}

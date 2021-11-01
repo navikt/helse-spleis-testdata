@@ -21,8 +21,7 @@ internal object ConcreteSubscriptionService : SubscriptionService {
     }
 
     override fun update(fødselsnummer: String, nyTilstand: String) {
-        val frame = EndringFrame("endring", nyTilstand)
-        val payload = Frame.Text(objectMapper.writeValueAsString(frame))
+        val frameText = objectMapper.writeValueAsString(EndringFrame("endring", nyTilstand))
         var antallAbonnementerPåFnr: Int
         subscriptions.filter { it.fødselsnummer == fødselsnummer }
             .also { antallAbonnementerPåFnr = it.size }
@@ -32,7 +31,7 @@ internal object ConcreteSubscriptionService : SubscriptionService {
             .forEach { session ->
                 runBlocking {
                     launch {
-                        session.outgoing.send(payload)
+                        session.outgoing.send(Frame.Text(frameText))
                     }
                 }
             }

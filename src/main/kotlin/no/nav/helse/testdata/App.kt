@@ -12,7 +12,6 @@ import io.ktor.features.*
 import io.ktor.http.content.*
 import io.ktor.jackson.*
 import io.ktor.routing.*
-import io.ktor.util.*
 import io.ktor.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -54,12 +53,10 @@ fun main() {
         spennDataSource = spennDataSource
     )
 
-    val subscriptionService = ConcreteSubscriptionService()
-
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         personService = personService,
-        subscriptionService = subscriptionService,
+        subscriptionService = ConcreteSubscriptionService,
         aktørRestClient = aktørRestClient,
         inntektRestClient = inntektRestClient
     ).start()

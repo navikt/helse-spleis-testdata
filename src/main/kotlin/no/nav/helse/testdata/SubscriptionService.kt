@@ -12,7 +12,7 @@ internal interface SubscriptionService {
     fun close(fødselsnummer: String)
 }
 
-internal class ConcreteSubscriptionService : SubscriptionService {
+internal object ConcreteSubscriptionService : SubscriptionService {
     private val subscriptions = mutableListOf<Subscription>()
 
     override fun addSubscription(subscription: Subscription) {

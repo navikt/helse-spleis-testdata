@@ -24,7 +24,7 @@ type EndringFrame = {
 };
 
 const protocol: WebsocketProtocol =
-  Environment.Mode === "development" || window.location.host.includes("0.0.0.0")
+  Environment.Mode === "development" || window.location.host.includes("0.0.0.0") || window.location.host.includes("localhost")
     ? "ws"
     : "wss";
 

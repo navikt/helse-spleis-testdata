@@ -1,36 +1,26 @@
 package no.nav.helse.testdata
 
-import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import no.nav.helse.testdata.api.EndringFrame
 import no.nav.helse.testdata.api.Subscription
 
-class LocalSubscriptionService() : SubscriptionService {
+object LocalSubscriptionService : SubscriptionService {
+
+    private val concreteSubscriptionService = ConcreteSubscriptionService
+
     override fun addSubscription(subscription: Subscription) {
-        subscription.session.let { session ->
-            runBlocking {
-                launch {
-                    session.sendPayload("AVVENTER_VILKÅRSPRØVING".toEndringPayload())
-                    session.sendPayload("AVVENTER_SIMULERING".toEndringPayload())
-                    session.sendPayload("AVVENTER_GODKJENNING".toEndringPayload())
-                    session.close()
-                }
-            }
+        concreteSubscriptionService.addSubscription(subscription)
+
+        runBlocking {
+            delay(1500L)
+            concreteSubscriptionService.update(subscription.fødselsnummer, "AVVENTER_VILKÅRSPRØVING")
+            delay(350L)
+            concreteSubscriptionService.update(subscription.fødselsnummer, "AVVENTER_SIMULERING")
+            delay(650L)
+            concreteSubscriptionService.update(subscription.fødselsnummer, "AVVENTER_GODKJENNING")
         }
     }
 
     override fun update(fødselsnummer: String, nyTilstand: String) {}
-
     override fun close(fødselsnummer: String) {}
-
-    private suspend fun WebSocketSession.sendPayload(payload: Frame) {
-        delay(2000L)
-        this.outgoing.send(payload)
-    }
-
-    private fun String.toEndringPayload() =
-        Frame.Text(objectMapper.writeValueAsString(EndringFrame("endring", this)))
-
 }

@@ -48,11 +48,9 @@ fun main() {
         spennDataSource = spennDB.postgresDatabase
     )
 
-    val subscriptionService = LocalSubscriptionService()
-
     LocalApplicationBuilder(
         personService = personService,
-        subscriptionService = subscriptionService,
+        subscriptionService = LocalSubscriptionService,
         aktørRestClient = aktørRestClientMock,
         inntektRestClient = inntektRestClientMock,
     ).start()

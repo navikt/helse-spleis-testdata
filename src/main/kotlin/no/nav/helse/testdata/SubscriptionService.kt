@@ -1,6 +1,7 @@
 package no.nav.helse.testdata
 
 import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.testdata.api.EndringFrame
@@ -22,17 +23,23 @@ internal object ConcreteSubscriptionService : SubscriptionService {
     override fun update(fødselsnummer: String, nyTilstand: String) {
         val frame = EndringFrame("endring", nyTilstand)
         val payload = Frame.Text(objectMapper.writeValueAsString(frame))
-        subscriptions.firstOrNull { it.fødselsnummer == fødselsnummer }?.let {
-            runBlocking {
-                launch {
-                    it.session.outgoing.send(payload)
+        var antallAbonnementerPåFnr: Int
+        subscriptions.filter { it.fødselsnummer == fødselsnummer }
+            .also { antallAbonnementerPåFnr = it.size }
+            .map { it.session }
+            .filter { it.isActive }
+            .also { log.info("Sender oppdatering til ${it.size} aktive sesjoner, av totalt $antallAbonnementerPåFnr sesjoner for fnr.") }
+            .forEach { session ->
+                runBlocking {
+                    launch {
+                        session.outgoing.send(payload)
+                    }
                 }
             }
-        }
     }
 
     override fun close(fødselsnummer: String) {
-        subscriptions.firstOrNull { it.fødselsnummer == fødselsnummer }?.let {
+        subscriptions.filter { it.fødselsnummer == fødselsnummer }.forEach {
             subscriptions.remove(it)
             runBlocking {
                 launch {

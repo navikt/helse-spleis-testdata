@@ -32,6 +32,7 @@ npm run build
 # Evt watch mode dersom du ønsker å bygge mens du skriver kode:
 npm run watch
 ```
+Deretter starte backend (se nedenfor) og navigere til `localhost:8080`
 
 ```shell script
 # Kjøre tester

@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.util.pipeline.*
 import no.nav.helse.testdata.AktørRestClient
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.Result
@@ -17,9 +18,11 @@ import no.nav.helse.testdata.log
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator, aktørRestClient: AktørRestClient) {
     post("/vedtaksperiode") {
-        val vedtak = call.receive<Vedtak>()
-        val aktørIdResult = aktørRestClient.hentAktørId(vedtak.fnr)
+        val vedtak = call.receive<Vedtak>().also {
+            validate(it)
+        }
 
+        val aktørIdResult = aktørRestClient.hentAktørId(vedtak.fnr)
         if (aktørIdResult is Result.Error) {
             call.respond(HttpStatusCode.InternalServerError, aktørIdResult.error.message!!)
             return@post
@@ -43,5 +46,13 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator, aktørR
 
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for vedtak på aktør: $aktørId") }
+    }
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.validate(
+    vedtak: Vedtak,
+) {
+    if (vedtak.sykdomFom > vedtak.sykdomTom) {
+        call.respond(HttpStatusCode.BadRequest, "FOM må være før TOM")
     }
 }

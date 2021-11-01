@@ -112,6 +112,7 @@ export const OpprettDokumenter = React.memo(() => {
   const skalSendeInntektsmelding = form.watch("skalSendeInntektsmelding");
 
   const [status, setStatus] = useState<number>();
+  const [errorBody, setErrorBody] = useState<string>();
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const [subscribe] = useSubscribe();
@@ -139,8 +140,11 @@ export const OpprettDokumenter = React.memo(() => {
       if (status >= 400) return;
     }
 
-    const { status } = await postPayload(data);
+    const response = await postPayload(data);
+    const { status } = response
     setStatus(status);
+    const errorBody = await response.text()
+    setErrorBody(errorBody);
 
     if (status < 400) {
       subscribe(data.fnr);
@@ -170,7 +174,7 @@ export const OpprettDokumenter = React.memo(() => {
             </FetchButton>
             {status >= 400 && (
               <ErrorMessage>
-                Noe gikk galt! Mottok respons med statuskode {status}
+                Noe gikk galt! Melding fra server: {errorBody}, statuskode {status}
               </ErrorMessage>
             )}
           </div>

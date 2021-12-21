@@ -1,0 +1,15 @@
+.ClearMessagesButton {
+  position: fixed;
+  bottom: 1rem;
+  right: 2rem;
+  padding: 1rem;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: var(--background-color-secondary);
+}
+
+.ClearMessagesButton:hover {
+  box-shadow: 2px 1px 8px -3px black;
+}

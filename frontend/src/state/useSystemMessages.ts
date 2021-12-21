@@ -1,4 +1,4 @@
-import { atom, useRecoilState, useSetRecoilState } from "recoil";
+import {atom, useRecoilValue, useResetRecoilState, useSetRecoilState} from "recoil";
 
 export const systemMessagesState = atom<SystemMessageObject[]>({
   key: "systemMessagesState",
@@ -25,17 +25,26 @@ export const useRemoveSystemMessage = (): UseRemoveSystemMessageResult => {
   };
 };
 
+type UseClearSystemMessagesResult = () => void;
+
+export const useClearSystemMessages = (): UseClearSystemMessagesResult => {
+  const resetSystemMessages = useResetRecoilState(systemMessagesState);
+  return () => resetSystemMessages();
+};
+
 type UseSystemMessagesResult = [
   messages: SystemMessageObject[],
   methods: {
     addMessage: (message: SystemMessageObject) => void;
     removeMessage: (id: string) => void;
+    clearMessages: UseClearSystemMessagesResult;
   }
 ];
 
 export const useSystemMessages = (): UseSystemMessagesResult => {
-  const [messages, setMessages] = useRecoilState(systemMessagesState);
+  const messages = useRecoilValue(systemMessagesState);
   const addMessage = useAddSystemMessage();
   const removeMessage = useRemoveSystemMessage();
-  return [messages, { addMessage, removeMessage }];
+  const clearMessages = useClearSystemMessages();
+  return [messages, { addMessage, removeMessage, clearMessages }];
 };

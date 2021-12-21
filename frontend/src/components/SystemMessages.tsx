@@ -4,6 +4,7 @@ import { useSystemMessages } from "../state/useSystemMessages";
 import { SystemMessage } from "./SystemMessage";
 import type { TransitionFn } from "react-spring";
 import { animated, useTransition } from "react-spring";
+import { ClearMessagesButton } from "./ClearMessagesButton";
 
 type UseSystemMessageTransitionsResult = [
   TransitionFn<SystemMessageObject, { opacity: number; height: number }>,
@@ -35,14 +36,17 @@ export const SystemMessages: React.FC = React.memo(() => {
   const [transitions, refs] = useSystemMessageTransitions(messages);
 
   return (
-    <div className={styles.SystemMessages}>
-      {transitions((style, it) => (
-        <animated.div
-          style={{ ...style, marginBottom: "var(--block-extra-small)" }}
-        >
-          <SystemMessage ref={(ref) => ref && refs.set(it, ref)} {...it} />
-        </animated.div>
-      ))}
-    </div>
+    <>
+      {messages.length > 0 && <ClearMessagesButton />}
+      <div className={styles.SystemMessages}>
+        {transitions((style, it) => (
+          <animated.div
+            style={{ ...style, marginBottom: "var(--block-extra-small)" }}
+          >
+            <SystemMessage ref={(ref) => ref && refs.set(it, ref)} {...it} />
+          </animated.div>
+        ))}
+      </div>
+    </>
   );
 });

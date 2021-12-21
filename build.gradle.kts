@@ -13,7 +13,6 @@ group = "no.nav.helse"
 
 repositories {
     mavenCentral()
-    maven("https://dl.bintray.com/kotlin/kotlinx")
     maven("https://jitpack.io")
 }
 

@@ -12,13 +12,22 @@ create table speil_snapshot
     person_ref INT UNIQUE REFERENCES person (id)
 );
 
+CREATE TABLE snapshot
+(
+    id         SERIAL PRIMARY KEY,
+    data       JSON NOT NULL,
+    versjon    INT  NOT NULL,
+    person_ref INT UNIQUE REFERENCES person (id)
+);
+
 create table vedtak
 (
     id                 SERIAL PRIMARY KEY,
     person_ref         BIGINT REFERENCES person (id)         NOT NULL,
     speil_snapshot_ref BIGINT REFERENCES speil_snapshot (id) NOT NULL,
     vedtaksperiode_id  uuid                                  NOT NULL
-        CONSTRAINT vedtak_vedtaksperiode_id_key UNIQUE
+        CONSTRAINT vedtak_vedtaksperiode_id_key UNIQUE,
+    snapshot_ref       INT REFERENCES snapshot (id)
 );
 
 create table oppgave
@@ -161,4 +170,4 @@ CREATE TABLE notat
     vedtaksperiode_id UUID NOT NULL
         CONSTRAINT notat_vedtak_ref_fkey REFERENCES vedtak (vedtaksperiode_id),
     CONSTRAINT notat_saksbehandler_ref_fkey FOREIGN KEY (saksbehandler_oid) REFERENCES saksbehandler (oid)
-)
+);

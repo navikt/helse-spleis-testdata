@@ -5,9 +5,7 @@ import io.ktor.http.*
 import io.ktor.routing.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -199,13 +197,17 @@ class AppTest {
             )
             val speilSnapshotId = it.run(
                 queryOf(
-                    "insert into speil_snapshot (data, person_ref) values ('some data', ?) ON CONFLICT (person_ref) DO UPDATE SET data = 'some new data'", personId
+                    "insert into speil_snapshot (data, person_ref) values ('some data', ?) ON CONFLICT (person_ref) DO UPDATE SET data = 'some new data'",
+                    personId
                 ).asUpdateAndReturnGeneratedKey
             )
             val vedtaksperiodeId = UUID.randomUUID()
             val vedtakId = it.run(
                 queryOf(
-                    "insert into vedtak (person_ref, speil_snapshot_ref, vedtaksperiode_id) values (?, ?, ?)", personId, speilSnapshotId, vedtaksperiodeId
+                    "insert into vedtak (person_ref, speil_snapshot_ref, vedtaksperiode_id) values (?, ?, ?)",
+                    personId,
+                    speilSnapshotId,
+                    vedtaksperiodeId
                 ).asUpdateAndReturnGeneratedKey
             )
             val overstyringId = it.run(

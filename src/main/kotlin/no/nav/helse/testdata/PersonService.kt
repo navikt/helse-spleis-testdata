@@ -134,6 +134,10 @@ class PersonService(
                     queryOf("DELETE FROM speil_snapshot WHERE person_ref = ?", personId).asUpdate
                 )
 
+                transactionalSession.run(
+                    queryOf("DELETE FROM snapshot WHERE person_ref = ?", personId).asUpdate
+                )
+
                 @Language("PostgreSQL")
                 val deletePersonConstraints = """
                 DELETE FROM reserver_person WHERE person_ref=:personId;

@@ -171,3 +171,12 @@ CREATE TABLE notat
         CONSTRAINT notat_vedtak_ref_fkey REFERENCES vedtak (vedtaksperiode_id),
     CONSTRAINT notat_saksbehandler_ref_fkey FOREIGN KEY (saksbehandler_oid) REFERENCES saksbehandler (oid)
 );
+
+CREATE TABLE vergemal
+(
+    person_ref             BIGINT PRIMARY KEY REFERENCES person (id),
+    har_vergemal           BOOLEAN   NOT NULL,
+    har_fremtidsfullmakter BOOLEAN   NOT NULL,
+    har_fullmakter         BOOLEAN   NOT NULL,
+    opprettet              TIMESTAMP NOT NULL
+)

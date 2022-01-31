@@ -121,6 +121,8 @@ class PersonService(
 
                 transactionalSession.run(queryOf("DELETE FROM overstyring_inntekt WHERE person_ref = ?", personId).asUpdate)
 
+                transactionalSession.run(queryOf("DELETE FROM overstyring_arbeidsforhold WHERE person_ref = ?", personId).asUpdate)
+
                 transactionalSession.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
 
                 transactionalSession.run(

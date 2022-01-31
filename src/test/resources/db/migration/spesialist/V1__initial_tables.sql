@@ -59,6 +59,12 @@ create table overstyring_inntekt
     person_ref int references person (id) not null
 );
 
+create table overstyring_arbeidsforhold
+(
+    id         serial primary key,
+    person_ref int references person (id) not null
+);
+
 create table reserver_person
 (
     person_ref bigint references person (id) not null

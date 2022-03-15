@@ -1,14 +1,17 @@
 package no.nav.helse.testdata
 
-import kotliquery.*
+import kotliquery.TransactionalSession
+import kotliquery.queryOf
+import kotliquery.sessionOf
 import org.intellij.lang.annotations.Language
 import java.util.*
 import javax.sql.DataSource
 
-class PersonService(
+internal class PersonService(
     val spleisDataSource: DataSource,
     val spesialistDataSource: DataSource,
-    val spennDataSource: DataSource
+    val spennDataSource: DataSource,
+    private val rapidsMediator: RapidsMediator
 ) {
 
     fun slett(fnr: String) {

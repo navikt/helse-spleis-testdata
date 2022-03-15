@@ -18,7 +18,7 @@ internal fun Routing.registerBehovApi(mediator: RapidsMediator) {
         if (!behov.path("fødselsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("organisasjonsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("vedtaksperiodeId").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
-        mediator.connection.publish(behov.path("fødselsnummer").asText(), behov.toString())
+        mediator.publiser(behov.path("fødselsnummer").asText(), behov.toString())
         call.respond(HttpStatusCode.OK)
             .also { log.info("produsert data for behov: $behov") }
     }

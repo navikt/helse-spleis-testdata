@@ -31,17 +31,17 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator, aktørR
 
         sykmelding(vedtak, aktørId)?.also {
             log.info("produserer sykmelding på aktør: $aktørId\n$it")
-            mediator.connection.publish(vedtak.fnr, it)
+            mediator.publiser(vedtak.fnr, it)
         }
 
         søknad(vedtak, aktørId)?.also {
             log.info("produserer søknad på aktør: $aktørId\n$it")
-            mediator.connection.publish(vedtak.fnr, it)
+            mediator.publiser(vedtak.fnr, it)
         }
 
         inntektsmelding(vedtak, aktørId)?.also {
             log.info("produserer inntektsmelding på aktør: $aktørId\n$it")
-            mediator.connection.publish(vedtak.fnr, it)
+            mediator.publiser(vedtak.fnr, it)
         }
 
         call.respond(HttpStatusCode.OK)

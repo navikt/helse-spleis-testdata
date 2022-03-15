@@ -20,6 +20,7 @@ import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import javax.sql.DataSource
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -47,26 +48,22 @@ fun main() {
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, httpClient, stsRestClient)
     val aktørRestClient = AktørRestClient(env.aktørRestUrl, httpClient, stsRestClient)
 
-    val personService = PersonService(
-        spleisDataSource = spleisDataSource,
-        spesialistDataSource = spesialistDataSource,
-        spennDataSource = spennDataSource
-    )
-
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
-        personService = personService,
+        spleisDataSource = spleisDataSource,
+        spesialistDataSource = spesialistDataSource,
+        spennDataSource = spennDataSource,
         subscriptionService = ConcreteSubscriptionService,
         aktørRestClient = aktørRestClient,
         inntektRestClient = inntektRestClient
     ).start()
 }
 
-internal data class RapidsMediator(internal val connection: RapidsConnection)
-
 internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
-    private val personService: PersonService,
+    spleisDataSource: DataSource,
+    spesialistDataSource: DataSource,
+    spennDataSource: DataSource,
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
@@ -83,6 +80,13 @@ internal class ApplicationBuilder(
                     rapidsMediator)
             }
             .build()
+
+    private val personService: PersonService = PersonService(
+        spleisDataSource,
+        spesialistDataSource,
+        spennDataSource,
+        rapidsMediator
+    )
 
     init {
         rapidsMediator = RapidsMediator(rapidsConnection)

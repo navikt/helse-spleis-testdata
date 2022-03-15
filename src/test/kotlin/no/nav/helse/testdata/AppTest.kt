@@ -54,11 +54,12 @@ class AppTest {
 
         rapidsConnection = TestRapid()
 
-        runMigration(psqlContainer, "spleis")
-        runMigration(psqlContainer, "spesialist")
-        runMigration(psqlContainer, "spenn")
-        personService =
-            PersonService(spleisDataSource, spesialistDataSource, spennDataSource)
+        personService = PersonService(
+            spleisDataSource = spleisDataSource,
+            spesialistDataSource = spesialistDataSource,
+            spennDataSource = spennDataSource,
+            rapidsMediator = RapidsMediator(rapidsConnection)
+        )
     }
 
     @AfterAll

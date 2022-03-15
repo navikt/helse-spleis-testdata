@@ -47,10 +47,12 @@ fun main() {
         )
     }
 
+    val rapidsMediator = RapidsMediator(rapidsConnection)
     val personService = PersonService(
         spleisDataSource = spleisDataSource,
         spesialistDataSource = spesialistDataSource,
-        spennDataSource = spennDataSource
+        spennDataSource = spennDataSource,
+        rapidsMediator = rapidsMediator
     )
 
     LocalApplicationBuilder(
@@ -58,6 +60,7 @@ fun main() {
         subscriptionService = LocalSubscriptionService,
         aktørRestClient = aktørRestClientMock,
         inntektRestClient = inntektRestClientMock,
+        rapidsMediator = rapidsMediator
     ).start()
 }
 
@@ -66,9 +69,8 @@ internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
+    private val rapidsMediator: RapidsMediator
 ) : RapidsConnection.StatusListener {
-    private val rapidsConnection = TestRapid()
-    private val rapidsMediator = RapidsMediator(rapidsConnection)
 
     fun start() = runLocalServer {
         installKtorModule(

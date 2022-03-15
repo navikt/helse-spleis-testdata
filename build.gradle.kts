@@ -4,6 +4,7 @@ val hikariVersion = "3.3.1"
 val flywayVersion = "6.1.3"
 val vaultJdbcVersion = "1.3.1"
 val kotliqueryVersion = "1.3.0"
+val testContainersVersion = "1.16.3"
 
 plugins {
     kotlin("jvm") version "1.5.30"
@@ -40,7 +41,8 @@ dependencies {
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
 
     testImplementation("org.flywaydb:flyway-core:$flywayVersion")
-    testImplementation("com.opentable.components:otj-pg-embedded:0.13.1")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")

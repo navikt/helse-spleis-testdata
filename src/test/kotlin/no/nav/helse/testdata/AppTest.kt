@@ -1,9 +1,11 @@
 package no.nav.helse.testdata
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
-import io.ktor.http.*
-import io.ktor.routing.*
-import io.ktor.server.testing.*
+import io.ktor.http.HttpMethod
+import io.ktor.http.isSuccess
+import io.ktor.routing.routing
+import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
+import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotliquery.queryOf
@@ -15,14 +17,12 @@ import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
 import no.nav.helse.testdata.api.registerVedtaksperiodeApi
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import java.sql.Connection
+import org.testcontainers.containers.PostgreSQLContainer
 import java.util.*
+import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppTest {
@@ -33,33 +33,37 @@ class AppTest {
         private const val fnr2 = "456"
     }
 
-    private lateinit var spleisDB: EmbeddedPostgres
-    private lateinit var spesialistDB: EmbeddedPostgres
-    private lateinit var spennDB: EmbeddedPostgres
-    private lateinit var postgresConnection: Connection
+    private lateinit var psqlContainer: PostgreSQLContainer<Nothing>
+    private lateinit var spleisDataSource: DataSource
+    private lateinit var spesialistDataSource: DataSource
+    private lateinit var spennDataSource: DataSource
     private lateinit var rapidsConnection: RapidsConnection
+
+    @BeforeAll
+    fun beforeAll() {
+        psqlContainer = PostgreSQLContainer<Nothing>("postgres:12").withInitScript("create_databases.sql")
+        psqlContainer.start()
+    }
 
     @BeforeEach
     fun `start postgres`() {
-        spleisDB = EmbeddedPostgres.builder().start()
-        spesialistDB = EmbeddedPostgres.builder().start()
-        spennDB = EmbeddedPostgres.builder().start()
 
-        postgresConnection = spleisDB.postgresDatabase.connection
+        spleisDataSource = runMigration(psqlContainer, "spleis")
+        spesialistDataSource = runMigration(psqlContainer, "spesialist")
+        spennDataSource = runMigration(psqlContainer, "spenn")
+
         rapidsConnection = TestRapid()
 
-        runMigration(spleisDB, "spleis")
-        runMigration(spesialistDB, "spesialist")
-        runMigration(spennDB, "spenn")
+        runMigration(psqlContainer, "spleis")
+        runMigration(psqlContainer, "spesialist")
+        runMigration(psqlContainer, "spenn")
         personService =
-            PersonService(spleisDB.postgresDatabase, spesialistDB.postgresDatabase, spennDB.postgresDatabase)
+            PersonService(spleisDataSource, spesialistDataSource, spennDataSource)
     }
 
-    @AfterEach
-    fun `stop postgres`() {
-        spleisDB.close()
-        spesialistDB.close()
-        spennDB.close()
+    @AfterAll
+    fun afterAll() {
+        psqlContainer.close()
     }
 
     @Test
@@ -160,7 +164,7 @@ class AppTest {
     }
 
     private fun opprettSpleisPerson(fnr: String) {
-        using(sessionOf(spleisDB.postgresDatabase)) {
+        using(sessionOf(spleisDataSource)) {
             it.run(
                 queryOf(
                     "insert into person (aktor_id, fnr, skjema_versjon, data) values ('aktørId', ?, 4, (to_json(?::json)))",
@@ -179,14 +183,14 @@ class AppTest {
         }
     }
 
-    private fun finnPerson(fnr: String) = using(sessionOf(spesialistDB.postgresDatabase)) { session ->
+    private fun finnPerson(fnr: String) = using(sessionOf(spesialistDataSource)) { session ->
         session.run(
             queryOf("select id from person where fodselsnummer = ?", fnr.toLong()).map { it.int(1) }.asSingle
         )
     }
 
     private fun opprettSpesialistPerson(fnr: String) {
-        using(sessionOf(spesialistDB.postgresDatabase, returnGeneratedKey = true)) {
+        using(sessionOf(spesialistDataSource, returnGeneratedKey = true)) {
 
             val personId = finnPerson(fnr) ?: it.run(
                 queryOf(
@@ -309,7 +313,7 @@ class AppTest {
     }
 
     private fun antallRader(fnr: String): Int {
-        return using(sessionOf(spleisDB.postgresDatabase)) { session ->
+        return using(sessionOf(spleisDataSource)) { session ->
             session.run(queryOf("select * from person where fnr = ?", fnr.toLong()).map {
                 it.long("fnr")
             }.asList).size

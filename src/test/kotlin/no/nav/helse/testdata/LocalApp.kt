@@ -1,29 +1,34 @@
 package no.nav.helse.testdata
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.application.Application
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.stop
+import io.ktor.server.netty.Netty
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.*
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.flywaydb.core.Flyway
+import org.intellij.lang.annotations.Language
+import org.testcontainers.containers.PostgreSQLContainer
 import java.time.YearMonth
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import javax.sql.DataSource
 
 fun main() {
-    val spleisDB = EmbeddedPostgres.builder().start()
-    val spesialistDB = EmbeddedPostgres.builder().start()
-    val spennDB = EmbeddedPostgres.builder().start()
+    val rapidsConnection = TestRapid()
+    val psqlContainer = PostgreSQLContainer<Nothing>("postgres:12").apply {
+        withInitScript("create_databases.sql")
+        start()
+    }
 
-    runMigration(spleisDB, "spleis")
-    runMigration(spesialistDB, "spesialist")
-    runMigration(spennDB, "spenn")
+    val spleisDataSource = runMigration(psqlContainer, "spleis")
+    val spesialistDataSource = runMigration(psqlContainer, "spesialist")
+    val spennDataSource = runMigration(psqlContainer, "spenn")
 
     val aktørRestClientMock =
         mockk<AktørRestClient> {
@@ -43,9 +48,9 @@ fun main() {
     }
 
     val personService = PersonService(
-        spleisDataSource = spleisDB.postgresDatabase,
-        spesialistDataSource = spesialistDB.postgresDatabase,
-        spennDataSource = spennDB.postgresDatabase
+        spleisDataSource = spleisDataSource,
+        spesialistDataSource = spesialistDataSource,
+        spennDataSource = spennDataSource
     )
 
     LocalApplicationBuilder(
@@ -95,16 +100,28 @@ internal fun runLocalServer(applicationBlock: Application.() -> Unit) {
     }
 }
 
-fun runMigration(embeddedPostgres: EmbeddedPostgres, directory: String) =
+@Language("SQL")
+private val dropTables = """
+    DROP SCHEMA public CASCADE;
+    CREATE SCHEMA public;
+""".trimIndent()
+
+fun runMigration(psql: PostgreSQLContainer<Nothing>, directory: String): DataSource {
+    val dataSource = HikariDataSource(createHikariConfig(psql.withDatabaseName(directory)))
     Flyway.configure()
-        .dataSource(HikariDataSource(createHikariConfig(embeddedPostgres.getJdbcUrl("postgres", "postgres"))))
+        .initSql(dropTables)
+        .dataSource(dataSource)
         .locations("classpath:db/migration/$directory")
         .load()
         .migrate()
+    return dataSource
+}
 
-fun createHikariConfig(jdbcUrl: String) =
+fun createHikariConfig(psql: PostgreSQLContainer<Nothing>) =
     HikariConfig().apply {
-        this.jdbcUrl = jdbcUrl
+        this.jdbcUrl = psql.jdbcUrl
+        this.username = psql.username
+        this.password = psql.password
         maximumPoolSize = 3
         minimumIdle = 1
         idleTimeout = 10001

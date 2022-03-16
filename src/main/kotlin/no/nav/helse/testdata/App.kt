@@ -66,22 +66,23 @@ internal class ApplicationBuilder(
     private val inntektRestClient: InntektRestClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
+    private lateinit var personService: PersonService
 
     private val rapidsConnection =
         RapidApplication.Builder(rapidsConfig)
             .withKtorModule {
-                installKtorModule(personService,
+                installKtorModule(
+                    personService,
                     subscriptionService,
                     aktørRestClient,
                     inntektRestClient,
-                    rapidsMediator)
-            }
-            .build()
-
-    private val personService: PersonService = PersonService(spesialistDataSource, spennDataSource, rapidsMediator)
+                    rapidsMediator
+                )
+            }.build()
 
     init {
         rapidsMediator = RapidsMediator(rapidsConnection)
+        personService = PersonService(spesialistDataSource, spennDataSource, rapidsMediator)
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
     }

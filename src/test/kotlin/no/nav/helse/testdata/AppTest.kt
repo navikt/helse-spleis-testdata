@@ -11,7 +11,6 @@ import io.mockk.mockk
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
@@ -37,7 +36,7 @@ class AppTest {
     private lateinit var spleisDataSource: DataSource
     private lateinit var spesialistDataSource: DataSource
     private lateinit var spennDataSource: DataSource
-    private lateinit var rapidsConnection: RapidsConnection
+    private lateinit var testRapid: TestRapid
 
     @BeforeAll
     fun beforeAll() {
@@ -52,13 +51,12 @@ class AppTest {
         spesialistDataSource = runMigration(psqlContainer, "spesialist")
         spennDataSource = runMigration(psqlContainer, "spenn")
 
-        rapidsConnection = TestRapid()
+        testRapid = TestRapid()
 
         personService = PersonService(
-            spleisDataSource = spleisDataSource,
             spesialistDataSource = spesialistDataSource,
             spennDataSource = spennDataSource,
-            rapidsMediator = RapidsMediator(rapidsConnection)
+            rapidsMediator = RapidsMediator(testRapid)
         )
     }
 
@@ -82,8 +80,9 @@ class AppTest {
                 addHeader("ident", fnr1)
             }) {
                 assertTrue(response.status()!!.isSuccess())
-                assertEquals(0, antallRader(fnr1))
                 assertEquals(1, antallRader(fnr2))
+                assertEquals(1, testRapid.inspektør.size)
+                assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asText())
             }
         }
     }
@@ -95,7 +94,7 @@ class AppTest {
             installJacksonFeature()
             routing {
                 registerVedtaksperiodeApi(
-                    mediator = RapidsMediator(rapidsConnection),
+                    mediator = RapidsMediator(testRapid),
                     aktørRestClient = mockk { coEvery { hentAktørId(any()) }.returns(Result.Ok("aktørId")) })
             }
         }) {

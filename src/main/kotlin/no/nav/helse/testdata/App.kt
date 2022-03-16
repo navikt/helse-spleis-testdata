@@ -30,7 +30,6 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
 fun main() {
     val env = setUpEnvironment()
 
-    val spleisDataSource = DataSourceBuilder(env, env.databaseConfigs.spleisConfig).getDataSource()
     val spesialistDataSource = DataSourceBuilder(env, env.databaseConfigs.spesialistConfig).getDataSource()
     val spennDataSource = DataSourceBuilder(env, env.databaseConfigs.spennConfig).getDataSource()
 
@@ -50,7 +49,6 @@ fun main() {
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
-        spleisDataSource = spleisDataSource,
         spesialistDataSource = spesialistDataSource,
         spennDataSource = spennDataSource,
         subscriptionService = ConcreteSubscriptionService,
@@ -61,7 +59,6 @@ fun main() {
 
 internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
-    spleisDataSource: DataSource,
     spesialistDataSource: DataSource,
     spennDataSource: DataSource,
     private val subscriptionService: SubscriptionService,
@@ -81,12 +78,7 @@ internal class ApplicationBuilder(
             }
             .build()
 
-    private val personService: PersonService = PersonService(
-        spleisDataSource,
-        spesialistDataSource,
-        spennDataSource,
-        rapidsMediator
-    )
+    private val personService: PersonService = PersonService(spesialistDataSource, spennDataSource, rapidsMediator)
 
     init {
         rapidsMediator = RapidsMediator(rapidsConnection)

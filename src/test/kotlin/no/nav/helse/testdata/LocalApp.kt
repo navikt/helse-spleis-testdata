@@ -49,7 +49,6 @@ fun main() {
 
     val rapidsMediator = RapidsMediator(rapidsConnection)
     val personService = PersonService(
-        spleisDataSource = spleisDataSource,
         spesialistDataSource = spesialistDataSource,
         spennDataSource = spennDataSource,
         rapidsMediator = rapidsMediator

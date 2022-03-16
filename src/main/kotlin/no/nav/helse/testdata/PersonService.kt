@@ -8,30 +8,15 @@ import java.util.*
 import javax.sql.DataSource
 
 internal class PersonService(
-    val spleisDataSource: DataSource,
     val spesialistDataSource: DataSource,
     val spennDataSource: DataSource,
     private val rapidsMediator: RapidsMediator
 ) {
 
     fun slett(fnr: String) {
-        slettPersonFraSpleis(fnr)
+        rapidsMediator.slett(fnr)
         slettPersonFraSpesialist(fnr)
         slettPersonFraSpenn(fnr)
-    }
-
-    private fun slettPersonFraSpleis(fnr: String) {
-        val fødselsnummer = fnr.toLong()
-        sessionOf(spleisDataSource).use {
-            it.transaction { transactionalSession ->
-                val slettedeRader =
-                    transactionalSession.run(queryOf("delete from person where fnr = ?", fødselsnummer).asUpdate)
-                log.info("Slettet $slettedeRader testpersoner med fnr=$fnr fra Spleis")
-                val slettedeMeldinger =
-                    transactionalSession.run(queryOf("delete from melding where fnr = ?", fødselsnummer).asUpdate)
-                log.info("Slettet $slettedeMeldinger meldinger for fnr=$fnr fra Spleis")
-            }
-        }
     }
 
     private data class Vedtak(
@@ -122,9 +107,19 @@ internal class PersonService(
                     )
                 }
 
-                transactionalSession.run(queryOf("DELETE FROM overstyring_inntekt WHERE person_ref = ?", personId).asUpdate)
+                transactionalSession.run(
+                    queryOf(
+                        "DELETE FROM overstyring_inntekt WHERE person_ref = ?",
+                        personId
+                    ).asUpdate
+                )
 
-                transactionalSession.run(queryOf("DELETE FROM overstyring_arbeidsforhold WHERE person_ref = ?", personId).asUpdate)
+                transactionalSession.run(
+                    queryOf(
+                        "DELETE FROM overstyring_arbeidsforhold WHERE person_ref = ?",
+                        personId
+                    ).asUpdate
+                )
 
                 transactionalSession.run(queryOf("DELETE FROM vedtak WHERE person_ref = ?", personId).asUpdate)
 

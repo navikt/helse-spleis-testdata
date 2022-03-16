@@ -27,7 +27,6 @@ internal fun setUpEnvironment() =
         kafkaTruststorePath = System.getenv("KAFKA_TRUSTSTORE_PATH"),
         kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH"),
         databaseConfigs = DatabaseConfigs(
-            spleisConfig = getDatabaseEnv("SPLEIS"),
             spesialistConfig = getDatabaseEnv("SPESIALIST"),
             spennConfig = getDatabaseEnv("SPENN")
         ),
@@ -45,7 +44,6 @@ data class DatabaseConfig(
 )
 
 data class DatabaseConfigs(
-    val spleisConfig: DatabaseConfig,
     val spesialistConfig: DatabaseConfig,
     val spennConfig: DatabaseConfig
 )

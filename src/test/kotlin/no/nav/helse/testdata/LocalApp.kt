@@ -26,7 +26,6 @@ fun main() {
         start()
     }
 
-    val spleisDataSource = runMigration(psqlContainer, "spleis")
     val spesialistDataSource = runMigration(psqlContainer, "spesialist")
     val spennDataSource = runMigration(psqlContainer, "spenn")
 

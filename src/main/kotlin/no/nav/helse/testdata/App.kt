@@ -30,7 +30,6 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
 fun main() {
     val env = setUpEnvironment()
 
-    val spesialistDataSource = DataSourceBuilder(env, env.databaseConfigs.spesialistConfig).getDataSource()
     val spennDataSource = DataSourceBuilder(env, env.databaseConfigs.spennConfig).getDataSource()
 
     val httpClient = HttpClient(CIO) {
@@ -49,7 +48,6 @@ fun main() {
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
-        spesialistDataSource = spesialistDataSource,
         spennDataSource = spennDataSource,
         subscriptionService = ConcreteSubscriptionService,
         aktørRestClient = aktørRestClient,
@@ -59,7 +57,6 @@ fun main() {
 
 internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
-    spesialistDataSource: DataSource,
     spennDataSource: DataSource,
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
@@ -82,7 +79,7 @@ internal class ApplicationBuilder(
 
     init {
         rapidsMediator = RapidsMediator(rapidsConnection)
-        personService = PersonService(spesialistDataSource, spennDataSource, rapidsMediator)
+        personService = PersonService(spennDataSource, rapidsMediator)
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
     }

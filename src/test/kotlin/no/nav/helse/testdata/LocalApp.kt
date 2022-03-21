@@ -26,7 +26,6 @@ fun main() {
         start()
     }
 
-    val spesialistDataSource = runMigration(psqlContainer, "spesialist")
     val spennDataSource = runMigration(psqlContainer, "spenn")
 
     val aktørRestClientMock =
@@ -48,7 +47,6 @@ fun main() {
 
     val rapidsMediator = RapidsMediator(rapidsConnection)
     val personService = PersonService(
-        spesialistDataSource = spesialistDataSource,
         spennDataSource = spennDataSource,
         rapidsMediator = rapidsMediator
     )

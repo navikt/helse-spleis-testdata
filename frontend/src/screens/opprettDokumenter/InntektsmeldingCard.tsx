@@ -60,7 +60,7 @@ export const InntektsmeldingCard = React.memo(() => {
         <FormInput
           data-testid="opphørRefusjon"
           type="date"
-          label="Opphør av refusjon"
+          label="Siste dag med refusjon"
           errors={formState.errors}
           {...register("opphørRefusjon")}
         />

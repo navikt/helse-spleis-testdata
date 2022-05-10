@@ -26,8 +26,6 @@ spec:
     max: 1
     cpuThresholdPercentage: 90
   ingresses:
-    - https://spleis-testdata.nais.preprod.local
-    - https://spleis-testdata.dev-fss.nais.io
     - https://spleis-testdata.dev.intern.nav.no
   prometheus:
     enabled: true
@@ -40,12 +38,6 @@ spec:
       - mountPath: /var/run/secrets/nais.io/service_user
         kvPath: /serviceuser/data/dev/srvspleistestdata
   env:
-    - name: DATABASE_HOST_SPESIALIST
-      value: b27dbvl009.preprod.local
-    - name: DATABASE_PORT_SPESIALIST
-      value: "5432"
-    - name: DATABASE_NAME_SPESIALIST
-      value: spesialist
     - name: DATABASE_HOST_SPENN
       value: b27dbvl007.preprod.local
     - name: DATABASE_PORT_SPENN

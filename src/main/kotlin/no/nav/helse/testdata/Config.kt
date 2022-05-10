@@ -27,7 +27,6 @@ internal fun setUpEnvironment() =
         kafkaTruststorePath = System.getenv("KAFKA_TRUSTSTORE_PATH"),
         kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH"),
         databaseConfigs = DatabaseConfigs(
-            spesialistConfig = getDatabaseEnv("SPESIALIST"),
             spennConfig = getDatabaseEnv("SPENN")
         ),
         vaultMountPath = System.getenv("VAULT_MOUNTPATH") ?: error("Mangler env var VAULT_MOUNTPATH"),
@@ -40,12 +39,11 @@ data class DatabaseConfig(
     val databaseName: String,
     val databaseHost: String,
     val databasePort: String,
-    val databaseUsername: String?
+    val databaseUsername: String?,
 )
 
 data class DatabaseConfigs(
-    val spesialistConfig: DatabaseConfig,
-    val spennConfig: DatabaseConfig
+    val spennConfig: DatabaseConfig,
 )
 
 data class Environment(
@@ -57,12 +55,12 @@ data class Environment(
     val serviceUser: ServiceUser,
     val kafkaCredstorePassword: String,
     val kafkaTruststorePath: String,
-    val kafkaKeystorePath: String
+    val kafkaKeystorePath: String,
 )
 
 data class ServiceUser(
     val username: String,
-    val password: String
+    val password: String,
 ) {
     val basicAuth = "Basic ${Base64.getEncoder().encodeToString("$username:$password".toByteArray())}"
 }

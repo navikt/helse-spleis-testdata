@@ -38,14 +38,6 @@ spec:
       - mountPath: /var/run/secrets/nais.io/service_user
         kvPath: /serviceuser/data/dev/srvspleistestdata
   env:
-    - name: DATABASE_HOST_SPENN
-      value: b27dbvl007.preprod.local
-    - name: DATABASE_PORT_SPENN
-      value: "5432"
-    - name: DATABASE_NAME_SPENN
-      value: helse-spenn-oppdrag
-    - name: VAULT_MOUNTPATH
-      value: postgresql/preprod-fss/
     - name: KAFKA_RAPID_TOPIC
       value: tbd.rapid.v1
     - name: KAFKA_CONSUMER_GROUP_ID

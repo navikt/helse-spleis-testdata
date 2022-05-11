@@ -7,7 +7,7 @@ val kotliqueryVersion = "1.3.0"
 val testContainersVersion = "1.16.3"
 
 plugins {
-    kotlin("jvm") version "1.5.30"
+    kotlin("jvm") version "1.6.21"
 }
 
 group = "no.nav.helse"
@@ -54,10 +54,10 @@ dependencies {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "17"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "17"
     }
 
     named<Jar>("jar") {

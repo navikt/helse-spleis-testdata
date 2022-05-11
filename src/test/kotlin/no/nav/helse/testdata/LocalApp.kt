@@ -1,6 +1,6 @@
 package no.nav.helse.testdata
 
-import io.ktor.application.Application
+import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
 import io.ktor.server.netty.Netty

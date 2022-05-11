@@ -1,9 +1,10 @@
 package no.nav.helse.testdata.api
 
-import io.ktor.application.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.call
+import io.ktor.server.request.header
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.get
 import no.nav.helse.testdata.InntektRestClient
 import no.nav.helse.testdata.Result
 import java.time.YearMonth

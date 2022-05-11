@@ -1,6 +1,7 @@
 package no.nav.helse.testdata
 
-import io.ktor.http.cio.websocket.*
+import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

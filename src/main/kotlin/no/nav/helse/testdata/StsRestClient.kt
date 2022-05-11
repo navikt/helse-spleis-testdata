@@ -2,10 +2,10 @@ package no.nav.helse.testdata
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
 import java.time.LocalDateTime
 
@@ -25,13 +25,13 @@ class StsRestClient(
         ?.takeUnless { it.expired }
         ?: fetchToken().also { cachedOidcToken = it }
 
-    private suspend fun fetchToken(): Token = httpClient.get<HttpStatement>(
+    private suspend fun fetchToken(): Token = httpClient.get(
         "$baseUrl/rest/v1/sts/token?grant_type=client_credentials&scope=openid"
     ) {
         header("Authorization", serviceUser.basicAuth)
         accept(ContentType.Application.Json)
     }.let { response ->
-        objectMapper.readValue(response.receive<String>())
+        objectMapper.readValue(response.body<String>())
     }
 
     internal data class Token(

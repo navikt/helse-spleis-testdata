@@ -5,18 +5,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.fullPath
 import io.ktor.http.headersOf
+import io.ktor.serialization.jackson.jackson
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 
 internal val inntektRestClient = InntektRestClient(
     "http://localhost.no", HttpClient(MockEngine) {
-        install(JsonFeature) {
-            serializer = JacksonSerializer {
+        install(ContentNegotiation) {
+            jackson {
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 registerModule(JavaTimeModule())
             }
@@ -41,9 +41,7 @@ internal val inntektRestClient = InntektRestClient(
 
 internal val aktørRestClient = AktørRestClient(
     "http://localhost.no", HttpClient(MockEngine) {
-        install(JsonFeature) {
-            this.serializer = JacksonSerializer()
-        }
+        install(ContentNegotiation) { jackson() }
         engine {
             addHandler { request ->
                 if (request.url.fullPath.startsWith("/identer")) {

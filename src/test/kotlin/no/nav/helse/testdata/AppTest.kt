@@ -2,7 +2,7 @@ package no.nav.helse.testdata
 
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
-import io.ktor.routing.routing
+import io.ktor.server.routing.routing
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication

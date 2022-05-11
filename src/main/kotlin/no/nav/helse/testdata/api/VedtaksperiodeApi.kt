@@ -1,11 +1,13 @@
 package no.nav.helse.testdata.api
 
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.util.pipeline.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.post
+import io.ktor.util.pipeline.PipelineContext
 import no.nav.helse.testdata.AktørRestClient
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.Result

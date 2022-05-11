@@ -1,9 +1,11 @@
 package no.nav.helse.testdata.api
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.ktor.http.cio.websocket.*
-import io.ktor.routing.*
-import io.ktor.websocket.*
+import io.ktor.server.routing.Routing
+import io.ktor.server.websocket.WebSocketServerSession
+import io.ktor.server.websocket.webSocket
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
 import no.nav.helse.testdata.SubscriptionService
 import no.nav.helse.testdata.objectMapper
 

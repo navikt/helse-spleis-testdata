@@ -1,5 +1,5 @@
 val junitJupiterVersion = "5.7.2"
-val ktorVersion = "1.6.2"
+val ktorVersion = "2.0.1"
 val hikariVersion = "3.3.1"
 val flywayVersion = "6.1.3"
 val vaultJdbcVersion = "1.3.1"
@@ -18,9 +18,13 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:20210617121814-3e67e4d")
+    implementation("com.github.navikt:rapids-and-rivers:2022.05.09-12.50.569dc0a4e492")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-server-websockets:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-json-jvm:$ktorVersion")

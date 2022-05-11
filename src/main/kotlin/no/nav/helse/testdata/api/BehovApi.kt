@@ -1,11 +1,12 @@
 package no.nav.helse.testdata.api
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.post
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.log
 

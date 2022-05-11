@@ -3,12 +3,12 @@ package no.nav.helse.testdata
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
-import io.ktor.client.request.request
-import io.ktor.client.statement.HttpStatement
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import java.time.YearMonth
 
@@ -24,26 +24,27 @@ internal class InntektRestClient(
         filter: String,
         callId: String
     ): Result<List<Måned>, ResponseFailure> =
-        httpClient.request<HttpStatement>("$baseUrl/api/v1/hentinntektliste") {
-            method = HttpMethod.Post
+        httpClient.post("$baseUrl/api/v1/hentinntektliste") {
             header("Authorization", "Bearer ${stsRestClient.token()}")
             header("Nav-Consumer-Id", "srvspleistestdata")
             header("Nav-Call-Id", callId)
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
-            body = mapOf(
-                "ident" to mapOf(
-                    "identifikator" to fnr,
-                    "aktoerType" to "NATURLIG_IDENT"
-                ),
-                "ainntektsfilter" to filter,
-                // TODO: Bruker Foreldrepenger midlertidig på grunn av mangel på tilgang til 8-28 og 8-30 som Sykepenger
-                "formaal" to "Foreldrepenger",
-                "maanedFom" to fom,
-                "maanedTom" to tom
+            setBody(
+                mapOf(
+                    "ident" to mapOf(
+                        "identifikator" to fnr,
+                        "aktoerType" to "NATURLIG_IDENT"
+                    ),
+                    "ainntektsfilter" to filter,
+                    // TODO: Bruker Foreldrepenger midlertidig på grunn av mangel på tilgang til 8-28 og 8-30 som Sykepenger
+                    "formaal" to "Foreldrepenger",
+                    "maanedFom" to fom,
+                    "maanedTom" to tom
+                )
             )
         }.let {
-            Result.Ok(toMånedListe(objectMapper.readValue(it.receive<String>())))
+            Result.Ok(toMånedListe(objectMapper.readValue(it.body<String>())))
             }
 }
 

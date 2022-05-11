@@ -1,11 +1,11 @@
 package no.nav.helse.testdata
 
-import io.ktor.http.HttpMethod
+import io.ktor.client.request.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.isSuccess
 import io.ktor.server.routing.routing
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -34,34 +34,35 @@ class AppTest {
 
     @Test
     fun `slett person`() {
-        withTestApplication({
-            routing {
-                registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
+        testApplication {
+            application {
+                routing {
+                    registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
+                }
             }
-        }) {
-            with(handleRequest(HttpMethod.Delete, "/person") {
-                addHeader("ident", fnr1)
-            }) {
-                assertTrue(response.status()!!.isSuccess())
-                assertEquals(1, testRapid.inspektør.size)
-                assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asText())
+            val response = client.delete("/person") {
+                header("ident", fnr1)
             }
+
+            assertTrue(response.status.isSuccess())
+            assertEquals(1, testRapid.inspektør.size)
+            assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asText())
         }
     }
 
     @Test
     fun `opprett vedtak`() {
-
-        withTestApplication({
-            installJacksonFeature()
-            routing {
-                registerVedtaksperiodeApi(
-                    mediator = RapidsMediator(testRapid),
-                    aktørRestClient = mockk { coEvery { hentAktørId(any()) }.returns(Result.Ok("aktørId")) })
+        testApplication {
+            application {
+                routing {
+                    registerVedtaksperiodeApi(
+                        mediator = RapidsMediator(testRapid),
+                        aktørRestClient = mockk { coEvery { hentAktørId(any()) }.returns(Result.Ok("aktørId")) })
+                }
+                installJacksonFeature()
             }
-        }) {
-            with(handleRequest(HttpMethod.Post, "/vedtaksperiode") {
-                addHeader("Content-Type", "application/json")
+            val response = client.post("/vedtaksperiode") {
+                header("Content-Type", "application/json")
                 setBody(
                     """
                     {
@@ -78,45 +79,43 @@ class AppTest {
                     }
                     """
                 )
-            }) {
-                assertTrue(response.status()!!.isSuccess())
             }
+            assertTrue(response.status.isSuccess())
         }
     }
 
     @Test
     fun `slå opp inntekt`() {
-        withTestApplication({
-            installJacksonFeature()
-            routing {
-                registerInntektApi(inntektRestClient)
+        testApplication {
+            application {
+                installJacksonFeature()
+                routing {
+                    registerInntektApi(inntektRestClient)
+                }
             }
-        }) {
-            with(handleRequest(HttpMethod.Get, "/person/inntekt") {
-                addHeader("Content-Type", "application/json")
-                addHeader("Accept", "application/json")
-                addHeader("ident", "fnr")
-            }) {
-                assertTrue(response.status()!!.isSuccess())
+            val response = client.get("/person/inntekt") {
+                header(Accept, ContentType.Application.Json)
+                header("ident", "fnr")
             }
+            assertTrue(response.status.isSuccess())
         }
     }
 
     @Test
     fun `slå opp aktørId`() {
-        withTestApplication({
-            installJacksonFeature()
-            routing {
-                registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
+        testApplication {
+            application {
+                installJacksonFeature()
+                routing {
+                    registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
+                }
             }
-        }) {
-            with(handleRequest(HttpMethod.Get, "/person/aktorid") {
-                addHeader("Content-Type", "application/json")
-                addHeader("Accept", "application/json")
-                addHeader("ident", "fnr")
-            }) {
-                assertTrue(response.status()!!.isSuccess())
+            val response = client.get("/person/aktorid") {
+                header(Accept, ContentType.Application.Json)
+                header("ident", "fnr")
             }
+
+            assertTrue(response.status.isSuccess())
         }
     }
 }

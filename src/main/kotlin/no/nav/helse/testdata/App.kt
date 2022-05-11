@@ -20,7 +20,6 @@ import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import javax.sql.DataSource
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -29,8 +28,6 @@ val objectMapper: ObjectMapper = jacksonObjectMapper()
 
 fun main() {
     val env = setUpEnvironment()
-
-    val spennDataSource = DataSourceBuilder(env, env.databaseConfigs.spennConfig).getDataSource()
 
     val httpClient = HttpClient(CIO) {
         expectSuccess = false
@@ -48,7 +45,6 @@ fun main() {
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
-        spennDataSource = spennDataSource,
         subscriptionService = ConcreteSubscriptionService,
         aktørRestClient = aktørRestClient,
         inntektRestClient = inntektRestClient
@@ -57,19 +53,16 @@ fun main() {
 
 internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
-    spennDataSource: DataSource,
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
-    private lateinit var personService: PersonService
 
     private val rapidsConnection =
         RapidApplication.Builder(rapidsConfig)
             .withKtorModule {
                 installKtorModule(
-                    personService,
                     subscriptionService,
                     aktørRestClient,
                     inntektRestClient,
@@ -79,7 +72,6 @@ internal class ApplicationBuilder(
 
     init {
         rapidsMediator = RapidsMediator(rapidsConnection)
-        personService = PersonService(spennDataSource, rapidsMediator)
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
     }
@@ -88,7 +80,6 @@ internal class ApplicationBuilder(
 }
 
 internal fun Application.installKtorModule(
-    personService: PersonService,
     subscriptionService: SubscriptionService,
     aktørRestClient: AktørRestClient,
     inntektRestClient: InntektRestClient,
@@ -98,7 +89,7 @@ internal fun Application.installKtorModule(
     install(WebSockets)
 
     routing {
-        registerPersonApi(personService, aktørRestClient)
+        registerPersonApi(rapidsMediator, aktørRestClient)
         registerVedtaksperiodeApi(rapidsMediator, aktørRestClient)
         registerInntektApi(inntektRestClient)
         registerBehovApi(rapidsMediator)

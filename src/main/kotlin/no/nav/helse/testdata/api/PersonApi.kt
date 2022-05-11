@@ -6,13 +6,13 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.helse.testdata.AktørRestClient
-import no.nav.helse.testdata.PersonService
+import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.Result
 
-internal fun Routing.registerPersonApi(personService: PersonService, aktørRestClient: AktørRestClient) {
+internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, aktørRestClient: AktørRestClient) {
     delete("/person") {
         val fnr = call.request.header("ident")
-        personService.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
+        rapidsMediator.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
         call.respond(HttpStatusCode.OK)
     }
     get("/person/aktorid") {

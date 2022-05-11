@@ -36,14 +36,6 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("net.logstash.logback:logstash-logback-encoder:6.2")
 
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("no.nav:vault-jdbc:$vaultJdbcVersion")
-    implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
-
-    testImplementation("org.flywaydb:flyway-core:$flywayVersion")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")

@@ -12,53 +12,31 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
 import no.nav.helse.testdata.api.registerVedtaksperiodeApi
-import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.testcontainers.containers.PostgreSQLContainer
-import javax.sql.DataSource
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppTest {
 
     companion object {
-        private lateinit var personService: PersonService
         private const val fnr1 = "123"
     }
 
-    private lateinit var psqlContainer: PostgreSQLContainer<Nothing>
-    private lateinit var spennDataSource: DataSource
     private lateinit var testRapid: TestRapid
 
-    @BeforeAll
-    fun beforeAll() {
-        psqlContainer = PostgreSQLContainer<Nothing>("postgres:12").withInitScript("create_databases.sql")
-        psqlContainer.start()
-    }
-
     @BeforeEach
-    fun `start postgres`() {
-
-        spennDataSource = runMigration(psqlContainer, "spenn")
-
+    fun beforeEach() {
         testRapid = TestRapid()
-
-        personService = PersonService(
-            spennDataSource = spennDataSource,
-            rapidsMediator = RapidsMediator(testRapid)
-        )
-    }
-
-    @AfterAll
-    fun afterAll() {
-        psqlContainer.close()
     }
 
     @Test
     fun `slett person`() {
         withTestApplication({
             routing {
-                registerPersonApi(personService, aktørRestClient)
+                registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
             }
         }) {
             with(handleRequest(HttpMethod.Delete, "/person") {
@@ -129,7 +107,7 @@ class AppTest {
         withTestApplication({
             installJacksonFeature()
             routing {
-                registerPersonApi(personService, aktørRestClient)
+                registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
             }
         }) {
             with(handleRequest(HttpMethod.Get, "/person/aktorid") {

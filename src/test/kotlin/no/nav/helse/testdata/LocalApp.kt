@@ -1,7 +1,5 @@
 package no.nav.helse.testdata
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
@@ -11,22 +9,12 @@ import io.mockk.mockk
 import kotlinx.coroutines.*
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import org.flywaydb.core.Flyway
-import org.intellij.lang.annotations.Language
-import org.testcontainers.containers.PostgreSQLContainer
 import java.time.YearMonth
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import javax.sql.DataSource
 
 fun main() {
     val rapidsConnection = TestRapid()
-    val psqlContainer = PostgreSQLContainer<Nothing>("postgres:12").apply {
-        withInitScript("create_databases.sql")
-        start()
-    }
-
-    val spennDataSource = runMigration(psqlContainer, "spenn")
 
     val aktørRestClientMock =
         mockk<AktørRestClient> {
@@ -46,13 +34,8 @@ fun main() {
     }
 
     val rapidsMediator = RapidsMediator(rapidsConnection)
-    val personService = PersonService(
-        spennDataSource = spennDataSource,
-        rapidsMediator = rapidsMediator
-    )
 
     LocalApplicationBuilder(
-        personService = personService,
         subscriptionService = LocalSubscriptionService,
         aktørRestClient = aktørRestClientMock,
         inntektRestClient = inntektRestClientMock,
@@ -61,7 +44,6 @@ fun main() {
 }
 
 internal class LocalApplicationBuilder(
-    private val personService: PersonService,
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
@@ -70,7 +52,6 @@ internal class LocalApplicationBuilder(
 
     fun start() = runLocalServer {
         installKtorModule(
-            personService = personService,
             subscriptionService = subscriptionService,
             aktørRestClient = aktørRestClient,
             inntektRestClient = inntektRestClient,
@@ -97,32 +78,3 @@ internal fun runLocalServer(applicationBlock: Application.() -> Unit) {
         })
     }
 }
-
-@Language("SQL")
-private val dropTables = """
-    DROP SCHEMA public CASCADE;
-    CREATE SCHEMA public;
-""".trimIndent()
-
-fun runMigration(psql: PostgreSQLContainer<Nothing>, directory: String): DataSource {
-    val dataSource = HikariDataSource(createHikariConfig(psql.withDatabaseName(directory)))
-    Flyway.configure()
-        .initSql(dropTables)
-        .dataSource(dataSource)
-        .locations("classpath:db/migration/$directory")
-        .load()
-        .migrate()
-    return dataSource
-}
-
-fun createHikariConfig(psql: PostgreSQLContainer<Nothing>) =
-    HikariConfig().apply {
-        this.jdbcUrl = psql.jdbcUrl
-        this.username = psql.username
-        this.password = psql.password
-        maximumPoolSize = 3
-        minimumIdle = 1
-        idleTimeout = 10001
-        connectionTimeout = 1000
-        maxLifetime = 30001
-    }

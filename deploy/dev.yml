@@ -27,17 +27,22 @@ spec:
     cpuThresholdPercentage: 90
   ingresses:
     - https://spleis-testdata.dev.intern.nav.no
-  azure:
-    sidecar:
-      enabled: true
-    application:
-      enabled: true
-      tenant: nav.no
+#  azure:
+#    sidecar:
+#      enabled: true
+#    application:
+#      enabled: true
+#      tenant: nav.no
   prometheus:
     enabled: true
     path: /metrics
   kafka:
     pool: nav-dev
+  vault:
+    enabled: true
+    paths:
+      - mountPath: /var/run/secrets/nais.io/service_user
+        kvPath: /serviceuser/data/dev/srvspleistestdata
   env:
     - name: KAFKA_RAPID_TOPIC
       value: tbd.rapid.v1

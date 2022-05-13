@@ -8,7 +8,7 @@ on:
         required: true
 
 env:
-  APP: speil
+  APP: spleis-testdata
   TEAM: tbd
   IMAGE: docker.pkg.github.com/${{ github.repository }}/spleis-testdata
 

@@ -21,12 +21,11 @@ jobs:
           node-version: "14"
       - name: create docker tag
         run: echo "TAG=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
-      - name: test and build
+      - name: Build backend
         run: ./gradlew test build
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Cache node deps
         id: cache-node
         uses: actions/cache@v2
@@ -34,22 +33,25 @@ jobs:
           path: "**/node_modules"
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - name: set timezone
+      - name: Set timezone
         run: export TZ=utc
-      - name: build frontend
+      - name: Install dependencies
         run: |
           cd frontend
           npm ci
+      - name: Build frontend
+        run: |
+          cd frontend
           npm run build
-      - name: build docker image
+      - name: Build docker image
         run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
-      - name: push docker image
+      - name: Push docker image
         run: |
           echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin https://docker.pkg.github.com
           docker push ${{ env.IMAGE }}:${{ env.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: deploy to dev
+      - name: Deploy to dev
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}

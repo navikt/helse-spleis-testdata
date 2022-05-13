@@ -33,13 +33,16 @@ fun main() {
         )
     }
 
+    val dollyRestClient = mockk<DollyRestClient>(relaxed = true)
+
     val rapidsMediator = RapidsMediator(rapidsConnection)
 
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
         aktørRestClient = aktørRestClientMock,
         inntektRestClient = inntektRestClientMock,
-        rapidsMediator = rapidsMediator
+        dollyRestClient = dollyRestClient,
+        rapidsMediator = rapidsMediator,
     ).start()
 }
 
@@ -47,7 +50,8 @@ internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
-    private val rapidsMediator: RapidsMediator
+    private val dollyRestClient: DollyRestClient,
+    private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
 
     fun start() = runLocalServer {
@@ -55,6 +59,7 @@ internal class LocalApplicationBuilder(
             subscriptionService = subscriptionService,
             aktørRestClient = aktørRestClient,
             inntektRestClient = inntektRestClient,
+            dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
         )
     }

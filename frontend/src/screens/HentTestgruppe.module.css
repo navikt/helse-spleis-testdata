@@ -1,0 +1,18 @@
+.HentTestgruppe {
+    display: flex;
+    flex-direction: column;
+    margin: 2rem;
+}
+
+.Title {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: var(--block-medium);
+}
+
+.CardContainer {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    gap: var(--block-small);
+}

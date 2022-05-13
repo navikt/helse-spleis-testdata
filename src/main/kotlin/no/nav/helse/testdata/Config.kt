@@ -22,7 +22,8 @@ internal fun setUpEnvironment() =
         vaultMountPath = System.getenv("VAULT_MOUNTPATH") ?: error("Mangler env var VAULT_MOUNTPATH"),
         inntektRestUrl = "https://app-q1.adeo.no/inntektskomponenten-ws/rs",
         serviceUser = readServiceUserCredentials(),
-        aktørRestUrl = "https://app-q1.adeo.no/aktoerregister/api/v1"
+        aktørRestUrl = "https://app-q1.adeo.no/aktoerregister/api/v1",
+        dollyRestUrl = "https://dolly-backend.dev.intern.nav.no/api/v1"
     )
 
 data class Environment(
@@ -34,6 +35,7 @@ data class Environment(
     val kafkaCredstorePassword: String,
     val kafkaTruststorePath: String,
     val kafkaKeystorePath: String,
+    val dollyRestUrl: String,
 )
 
 data class ServiceUser(

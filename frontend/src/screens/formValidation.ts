@@ -45,3 +45,6 @@ export const validateArbeidsgrad = (value?: string): boolean | string =>
     : Number.parseInt(value) < 0
     ? "Arbeidsgrad må være 0 eller høyere"
     : true);
+
+export const validateGruppeId = (value?: string): boolean | string =>
+  isInteger(value) || "Gruppe-ID må være et heltall"

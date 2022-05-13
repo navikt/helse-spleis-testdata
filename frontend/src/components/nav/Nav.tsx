@@ -4,6 +4,7 @@ import opprettDokumenter from "material-design-icons/action/svg/production/ic_de
 import hentInntektIcon from "material-design-icons/editor/svg/production/ic_attach_money_24px.svg";
 import hentAktørIdIcon from "material-design-icons/action/svg/production/ic_fingerprint_24px.svg";
 import slettPersonIcon from "material-design-icons/action/svg/production/ic_delete_forever_24px.svg";
+import dollyIcon from "material-design-icons/action/svg/production/ic_accessibility_24px.svg";
 import classNames from "classnames";
 import { ExpandButton } from "./ExpandButton";
 import { useLocalStorageState } from "../../state/persistance";
@@ -33,15 +34,19 @@ export const Nav = React.memo(() => {
         </NavLink>
         <NavLink to="/inntekt/hent" isExpanded={expanded}>
           <img src={hentInntektIcon} alt="" />
-          "Hent inntekt
+          Hent inntekt
         </NavLink>
         <NavLink to="/aktorid/hent" isExpanded={expanded}>
           <img src={hentAktørIdIcon} alt="" />
-          "Hent aktør-ID
+          Hent aktør-ID
         </NavLink>
         <NavLink to="/person/slett" isExpanded={expanded}>
           <img src={slettPersonIcon} alt="" />
-          "Slett person
+          Slett person
+        </NavLink>
+        <NavLink to="/testgruppe" isExpanded={expanded}>
+          <img src={dollyIcon} alt="" />
+          Hent testgruppe
         </NavLink>
       </ul>
       <ExpandButton

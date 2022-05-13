@@ -46,12 +46,14 @@ fun main() {
     val stsRestClient = StsRestClient("http://security-token-service.default.svc.nais.local", env.serviceUser)
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, httpClient, stsRestClient)
     val aktørRestClient = AktørRestClient(env.aktørRestUrl, httpClient, stsRestClient)
+    val dollyRestClient = DollyRestClient(env.dollyRestUrl, httpClient, stsRestClient)
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         aktørRestClient = aktørRestClient,
-        inntektRestClient = inntektRestClient
+        inntektRestClient = inntektRestClient,
+        dollyRestClient = dollyRestClient,
     ).start()
 }
 
@@ -60,6 +62,7 @@ internal class ApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
+    private val dollyRestClient: DollyRestClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -70,6 +73,7 @@ internal class ApplicationBuilder(
                     subscriptionService,
                     aktørRestClient,
                     inntektRestClient,
+                    dollyRestClient,
                     rapidsMediator
                 )
             }.build()
@@ -87,6 +91,7 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     aktørRestClient: AktørRestClient,
     inntektRestClient: InntektRestClient,
+    dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
 ) {
     installJacksonFeature()
@@ -96,6 +101,7 @@ internal fun Application.installKtorModule(
         registerPersonApi(rapidsMediator, aktørRestClient)
         registerVedtaksperiodeApi(rapidsMediator, aktørRestClient)
         registerInntektApi(inntektRestClient)
+        registerDollyApi(dollyRestClient)
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)
 

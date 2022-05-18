@@ -41,8 +41,8 @@ jobs:
           path: "**/node_modules"
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - name: Set timezone
 
+      - name: Set timezone
         run: export TZ=utc
 
       - name: Install dependencies
@@ -55,33 +55,21 @@ jobs:
           cd frontend
           npm run build
 
-      - name: build docker image
+      - name: Build docker image
+        run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
+
+      - name: Push docker image
         run: |
-          npm prune --production
-          docker build . --pull -t ${{ env.IMAGE }}:${{ needs.set_version.outputs.tag }}
+          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin https://docker.pkg.github.com
+          docker push ${{ env.IMAGE }}:${{ env.TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to GitHub Pkg Registry
-        uses: docker/login-action@v1
-        with:
-          registry: docker.pkg.github.com
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: push docker image
-        run: |
-          docker push ${{ env.IMAGE }}:${{ needs.set_version.outputs.tag }}
-
-  deployDev:
-    name: Deploy to dev
-    needs: [set_version, build]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-        with:
-          ref: ${{ needs.set_version.outputs.tag }}
-      - uses: nais/deploy/actions/deploy@v1
+      - name: Deploy to dev
+        uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: deploy/dev.yml
-          VAR: "image=${{env.IMAGE}}:${{ needs.set_version.outputs.tag }},team=${{env.TEAM}},app=${{env.APP}}"
+          WAIT: false
+          VAR: "image=${{env.IMAGE}},tag=${{env.TAG}},team=${{env.TEAM}},app=${{env.APP}}"

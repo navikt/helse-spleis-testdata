@@ -27,6 +27,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v1
+        with:
+          ref: ${{ needs.set_version.outputs.tag }}
       - uses: actions/setup-java@v1
         with:
           java-version: '17.x'
@@ -62,12 +64,12 @@ jobs:
           npm run build
 
       - name: Build docker image
-        run: docker build . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
+        run: docker build . --pull -t ${{ env.IMAGE }}:${{ needs.set_version.outputs.tag }}
 
       - name: Push docker image
         run: |
           echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin https://docker.pkg.github.com
-          docker push ${{ env.IMAGE }}:${{ env.TAG }}
+          docker push ${{ env.IMAGE }}:${{ needs.set_version.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,4 +80,4 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: deploy/dev.yml
           WAIT: false
-          VAR: "image=${{env.IMAGE}},tag=${{env.TAG}},team=${{env.TEAM}},app=${{env.APP}}"
+          VAR: "image=${{env.IMAGE}}:${{ needs.set_version.outputs.tag }},team=${{env.TEAM}},app=${{env.APP}}"

@@ -34,6 +34,12 @@ jobs:
         with:
           node-version: "14"
 
+      - name: Build backend
+        run: ./gradlew test build
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Cache node deps
         id: cache-node
         uses: actions/cache@v2

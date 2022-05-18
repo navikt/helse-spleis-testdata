@@ -1,37 +1,17 @@
 package no.nav.helse.testdata
 
-import io.ktor.server.application.Application
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
-import io.ktor.server.netty.Netty
-import io.mockk.every
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import io.mockk.mockk
 import kotlinx.coroutines.*
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import java.time.YearMonth
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 fun main() {
     val rapidsConnection = TestRapid()
-
-    val aktørRestClientMock =
-        mockk<AktørRestClient> {
-            every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId"))
-        }
-
-    val inntektRestClientMock = mockk<InntektRestClient> {
-        every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
-            Result.Ok(
-                (1..12).map {
-                    Måned(
-                        YearMonth.of(2019, it), listOf(Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "orgnummer"))
-                    )
-                }
-            )
-        )
-    }
 
     val dollyRestClient = mockk<DollyRestClient>(relaxed = true)
 
@@ -39,8 +19,6 @@ fun main() {
 
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
-        aktørRestClient = aktørRestClientMock,
-        inntektRestClient = inntektRestClientMock,
         dollyRestClient = dollyRestClient,
         rapidsMediator = rapidsMediator,
     ).start()
@@ -48,8 +26,6 @@ fun main() {
 
 internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
-    private val aktørRestClient: AktørRestClient,
-    private val inntektRestClient: InntektRestClient,
     private val dollyRestClient: DollyRestClient,
     private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
@@ -57,8 +33,6 @@ internal class LocalApplicationBuilder(
     fun start() = runLocalServer {
         installKtorModule(
             subscriptionService = subscriptionService,
-            aktørRestClient = aktørRestClient,
-            inntektRestClient = inntektRestClient,
             dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
         )

@@ -1,7 +1,7 @@
 package no.nav.helse.testdata.api
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.ktor.server.routing.Routing
+import io.ktor.server.routing.*
 import io.ktor.server.websocket.WebSocketServerSession
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
@@ -26,7 +26,7 @@ data class Subscription(
     val fødselsnummer: String,
 )
 
-internal fun Routing.registerSubscriptionApi(subscriptionService: SubscriptionService) {
+internal fun Route.registerSubscriptionApi(subscriptionService: SubscriptionService) {
     webSocket("/ws/vedtaksperiode") {
         for (frame in incoming) {
             frame.getSubscriptionFrame()?.also {

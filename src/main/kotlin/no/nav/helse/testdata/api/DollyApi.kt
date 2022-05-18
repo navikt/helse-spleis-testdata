@@ -7,7 +7,7 @@ import io.ktor.server.routing.*
 import no.nav.helse.testdata.DollyRestClient
 import no.nav.helse.testdata.Result
 
-internal fun Routing.registerDollyApi(dollyRestClient: DollyRestClient) {
+internal fun Route.registerDollyApi(dollyRestClient: DollyRestClient) {
     get("/gruppe/{id}") {
         val id = call.parameters["id"]
 

@@ -30,6 +30,8 @@ dependencies {
     implementation("io.ktor:ktor-client-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-websockets:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
 
     implementation("org.apache.kafka:kafka-clients:2.6.3")
 

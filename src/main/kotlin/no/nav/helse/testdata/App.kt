@@ -4,18 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.serialization.jackson.jackson
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.http.content.default
-import io.ktor.server.http.content.files
-import io.ktor.server.http.content.static
-import io.ktor.server.http.content.staticRootFolder
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.routing.routing
-import io.ktor.server.websocket.WebSockets
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
+import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.testdata.api.*
@@ -84,19 +82,28 @@ internal fun Application.installKtorModule(
     rapidsMediator: RapidsMediator,
 ) {
     installJacksonFeature()
+    install(Authentication) {
+        oauth("oauth") {}
+    }
     install(WebSockets)
+    install(Sessions) {
+        cookie<UserSession>(name = "user_session", storage = SessionStorageMemory())
+    }
 
     routing {
-        registerPersonApi(rapidsMediator)
-        registerVedtaksperiodeApi(rapidsMediator)
-        registerDollyApi(dollyRestClient)
-        registerBehovApi(rapidsMediator)
-        registerSubscriptionApi(subscriptionService)
+        authenticate("oauth") {
+            registerAuthApi()
+            registerPersonApi(rapidsMediator)
+            registerVedtaksperiodeApi(rapidsMediator)
+            registerDollyApi(dollyRestClient)
+            registerBehovApi(rapidsMediator)
+            registerSubscriptionApi(subscriptionService)
 
-        static("/") {
-            staticRootFolder = File("public")
-            files("")
-            default("index.html")
+            static("/") {
+                staticRootFolder = File("public")
+                files("")
+                default("index.html")
+            }
         }
     }
 }

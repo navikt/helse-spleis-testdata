@@ -5,13 +5,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.Routing
-import io.ktor.server.routing.post
+import io.ktor.server.routing.*
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.log
 
 
-internal fun Routing.registerBehovApi(mediator: RapidsMediator) {
+internal fun Route.registerBehovApi(mediator: RapidsMediator) {
     post("/behov") {
         val behov = call.receive<ObjectNode>()
         behov.put("@event_name", "behov")

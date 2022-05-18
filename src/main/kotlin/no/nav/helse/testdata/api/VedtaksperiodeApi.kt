@@ -5,13 +5,12 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.Routing
-import io.ktor.server.routing.post
+import io.ktor.server.routing.*
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.dokumenter.Vedtak
 
-internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
+internal fun Route.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
         val vedtak = call.receive<Vedtak>().also {
             validate(it)

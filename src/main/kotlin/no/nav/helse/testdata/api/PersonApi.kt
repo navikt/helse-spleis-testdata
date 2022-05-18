@@ -7,7 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.helse.testdata.RapidsMediator
 
-internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator) {
+internal fun Route.registerPersonApi(rapidsMediator: RapidsMediator) {
     delete("/person") {
         val fnr = call.request.header("ident")
         rapidsMediator.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))

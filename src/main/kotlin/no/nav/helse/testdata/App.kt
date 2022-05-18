@@ -43,16 +43,11 @@ fun main() {
         }
     }
 
-    val stsRestClient = StsRestClient("http://security-token-service.default.svc.nais.local", env.serviceUser)
-    val inntektRestClient = InntektRestClient(env.inntektRestUrl, httpClient, stsRestClient)
-    val aktørRestClient = AktørRestClient(env.aktørRestUrl, httpClient, stsRestClient)
-    val dollyRestClient = DollyRestClient(env.dollyRestUrl, httpClient, stsRestClient)
+    val dollyRestClient = DollyRestClient(env.dollyRestUrl, httpClient)
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
-        aktørRestClient = aktørRestClient,
-        inntektRestClient = inntektRestClient,
         dollyRestClient = dollyRestClient,
     ).start()
 }
@@ -60,8 +55,6 @@ fun main() {
 internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
-    private val aktørRestClient: AktørRestClient,
-    private val inntektRestClient: InntektRestClient,
     private val dollyRestClient: DollyRestClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
@@ -70,11 +63,9 @@ internal class ApplicationBuilder(
         RapidApplication.Builder(rapidsConfig)
             .withKtorModule {
                 installKtorModule(
-                    subscriptionService,
-                    aktørRestClient,
-                    inntektRestClient,
-                    dollyRestClient,
-                    rapidsMediator
+                    subscriptionService = subscriptionService,
+                    dollyRestClient = dollyRestClient,
+                    rapidsMediator = rapidsMediator
                 )
             }.build()
 
@@ -89,8 +80,6 @@ internal class ApplicationBuilder(
 
 internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
-    aktørRestClient: AktørRestClient,
-    inntektRestClient: InntektRestClient,
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
 ) {
@@ -98,9 +87,8 @@ internal fun Application.installKtorModule(
     install(WebSockets)
 
     routing {
-        registerPersonApi(rapidsMediator, aktørRestClient)
-        registerVedtaksperiodeApi(rapidsMediator, aktørRestClient)
-        registerInntektApi(inntektRestClient)
+        registerPersonApi(rapidsMediator)
+        registerVedtaksperiodeApi(rapidsMediator)
         registerDollyApi(dollyRestClient)
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)

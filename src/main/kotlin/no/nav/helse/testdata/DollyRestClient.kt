@@ -15,14 +15,11 @@ import java.util.*
 internal class DollyRestClient(
     private val baseUrl: String,
     private val httpClient: HttpClient,
-    private val stsRestClient: StsRestClient
 ) {
     suspend fun hentTestgruppe(id: String): Result<DollyTestgruppe, ResponseFailure> {
         return httpClient.get("$baseUrl/gruppe/$id") {
-            val token = stsRestClient.token()
-            log.info(token)
             accept(ContentType.Application.Json)
-            header("Authorization", "Bearer ${token}")
+//            header("Authorization", "Bearer ${token}")
             header("Nav-Consumer-Id", "spleis-testdata")
             header("Nav-Call-Id", UUID.randomUUID().toString())
         }.let {

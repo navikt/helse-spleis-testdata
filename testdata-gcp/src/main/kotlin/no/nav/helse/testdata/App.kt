@@ -14,7 +14,9 @@ import io.ktor.server.http.content.default
 import io.ktor.server.http.content.files
 import io.ktor.server.http.content.static
 import io.ktor.server.http.content.staticRootFolder
+import io.ktor.server.plugins.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.*
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -50,6 +52,7 @@ fun main() {
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
+        httpClient = httpClient,
     ).start()
 }
 
@@ -57,6 +60,7 @@ internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
+    private val httpClient: HttpClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -66,7 +70,8 @@ internal class ApplicationBuilder(
                 installKtorModule(
                     subscriptionService,
                     dollyRestClient,
-                    rapidsMediator
+                    rapidsMediator,
+                    httpClient,
                 )
             }.build()
 
@@ -83,11 +88,15 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
+    httpClient: HttpClient,
 ) {
     installJacksonFeature()
     install(WebSockets)
     install(Authentication) {
-        oauth("oauth") {}
+        oauth("oauth") {
+            urlProvider = { "${request.origin.scheme}://${request.host()}/oauth2/callback" }
+            client = httpClient
+        }
     }
 
     routing {

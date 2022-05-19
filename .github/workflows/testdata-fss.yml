@@ -7,7 +7,7 @@ on:
 env:
   APP: spleis-testdata
   TEAM: tbd
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/spleis-testdata
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/spleis-testdata-fss
 
 jobs:
   build:

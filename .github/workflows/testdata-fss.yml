@@ -1,0 +1,67 @@
+name: Bygg og deploy (FFS)
+
+on:
+  push:
+    branches:
+      - master
+env:
+  APP: spleis-testdata
+  TEAM: tbd
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/spleis-testdata
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '17.x'
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+
+      - name: create docker tag
+        run: echo "TAG=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: Build backend
+        run: ./gradlew :testdata-fss:test :testdata-fss:build
+        env:
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache node deps
+        id: cache-node
+        uses: actions/cache@v2
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Set timezone
+        run: export TZ=utc
+
+      - name: Install dependencies
+        run: npm --prefix frontend ci
+
+      - name: Build frontend
+        run: npm --prefix frontend run build
+
+      - name: Build docker image
+        run: docker build -f Dockerfile-fss . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
+
+      - name: Push docker image
+        run: |
+          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin https://docker.pkg.github.com
+          docker push ${{ env.IMAGE }}:${{ env.TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy to dev
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-fss
+          RESOURCE: deploy/dev-fss.yml
+          WAIT: false
+          VAR: "image=${{env.IMAGE}},tag=${{env.TAG}},team=${{env.TEAM}},app=${{env.APP}}"

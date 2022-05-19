@@ -4,25 +4,22 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import io.ktor.http.*
-import io.ktor.serialization.jackson.jackson
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.http.content.default
-import io.ktor.server.http.content.files
-import io.ktor.server.http.content.static
-import io.ktor.server.http.content.staticRootFolder
-import io.ktor.server.plugins.*
+import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.request.*
-import io.ktor.server.routing.routing
-import io.ktor.server.websocket.WebSockets
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.testdata.api.*
+import no.nav.helse.testdata.api.registerAuthApi
+import no.nav.helse.testdata.api.registerBehovApi
+import no.nav.helse.testdata.api.registerDollyApi
+import no.nav.helse.testdata.api.registerSubscriptionApi
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -99,7 +96,7 @@ internal fun Application.installKtorModule(
     install(WebSockets)
     install(Authentication) {
         oauth("oauth") {
-            urlProvider = { "${request.origin.scheme}://${request.host()}/oauth2/callback" }
+            urlProvider = { "https://spleis-testdata-gcp.dev.intern.nav.no/oauth2/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "AAD",

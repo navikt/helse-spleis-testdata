@@ -54,14 +54,10 @@ jobs:
         run: export TZ=utc
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci
+        run: npm --prefix frontend ci
 
       - name: Build frontend
-        run: |
-          cd frontend
-          npm run build
+        run: npm --prefix frontend run build
 
       - name: Build docker image
         run: docker build . --pull -t ${{ env.IMAGE }}:${{ needs.set_version.outputs.tag }}

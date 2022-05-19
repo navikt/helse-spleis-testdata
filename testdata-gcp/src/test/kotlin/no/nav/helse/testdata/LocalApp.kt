@@ -35,7 +35,8 @@ internal class LocalApplicationBuilder(
             subscriptionService = subscriptionService,
             dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
-            httpClient = mockk(relaxed = true)
+            httpClient = mockk(relaxed = true),
+            config = mockk(relaxed = true),
         )
     }
 }

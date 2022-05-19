@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.http.*
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -53,6 +54,7 @@ fun main() {
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
         httpClient = httpClient,
+        config = env,
     ).start()
 }
 
@@ -61,6 +63,7 @@ internal class ApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
     private val httpClient: HttpClient,
+    private val config: Environment,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -72,6 +75,7 @@ internal class ApplicationBuilder(
                     dollyRestClient,
                     rapidsMediator,
                     httpClient,
+                    config,
                 )
             }.build()
 
@@ -89,12 +93,24 @@ internal fun Application.installKtorModule(
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
     httpClient: HttpClient,
+    config: Environment,
 ) {
     installJacksonFeature()
     install(WebSockets)
     install(Authentication) {
         oauth("oauth") {
             urlProvider = { "${request.origin.scheme}://${request.host()}/oauth2/callback" }
+            providerLookup = {
+                OAuthServerSettings.OAuth2ServerSettings(
+                    name = "AAD",
+                    authorizeUrl = config.azureADConfig.authorizationUrl,
+                    accessTokenUrl = config.azureADConfig.tokenEndpoint,
+                    requestMethod = HttpMethod.Post,
+                    clientId = config.azureADConfig.clientId,
+                    clientSecret = config.azureADConfig.clientSecret,
+                    defaultScopes = listOf("openid", "${config.azureADConfig.clientId}/.default")
+                )
+            }
             client = httpClient
         }
     }

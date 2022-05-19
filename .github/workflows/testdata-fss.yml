@@ -42,7 +42,7 @@ jobs:
         run: export TZ=utc
 
       - name: Install dependencies
-        run: npm --prefix frontend ci
+        run: npm --prefix frontend i
 
       - name: Build frontend
         run: npm --prefix frontend run build

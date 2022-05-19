@@ -9,6 +9,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.*
 import io.ktor.server.http.content.default
 import io.ktor.server.http.content.files
 import io.ktor.server.http.content.static
@@ -85,16 +86,22 @@ internal fun Application.installKtorModule(
 ) {
     installJacksonFeature()
     install(WebSockets)
+    install(Authentication) {
+        oauth("oauth") {}
+    }
 
     routing {
-        registerDollyApi(dollyRestClient)
-        registerBehovApi(rapidsMediator)
-        registerSubscriptionApi(subscriptionService)
+        authenticate("oauth") {
+            registerAuthApi()
+            registerDollyApi(dollyRestClient)
+            registerBehovApi(rapidsMediator)
+            registerSubscriptionApi(subscriptionService)
 
-        static("/") {
-            staticRootFolder = File("public")
-            files("")
-            default("index.html")
+            static("/") {
+                staticRootFolder = File("public")
+                files("")
+                default("index.html")
+            }
         }
     }
 }

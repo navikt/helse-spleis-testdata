@@ -30,9 +30,11 @@ spec:
   azure:
     sidecar:
       enabled: true
+      autoLogin: true
     application:
       enabled: true
       tenant: nav.no
+      allowAllUsers: true
   prometheus:
     enabled: true
     path: /metrics

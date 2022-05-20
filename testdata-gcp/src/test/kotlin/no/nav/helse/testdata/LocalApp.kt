@@ -21,6 +21,7 @@ fun main() {
         subscriptionService = LocalSubscriptionService,
         dollyRestClient = dollyRestClient,
         rapidsMediator = rapidsMediator,
+        mockk(relaxed = true),
     ).start()
 }
 
@@ -28,6 +29,7 @@ internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
     private val rapidsMediator: RapidsMediator,
+    private val azureAdAppConfig: AzureAdAppConfig,
 ) : RapidsConnection.StatusListener {
 
     fun start() = runLocalServer {
@@ -35,6 +37,7 @@ internal class LocalApplicationBuilder(
             subscriptionService = subscriptionService,
             dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
+            azureAdAppConfig = azureAdAppConfig,
         )
     }
 }

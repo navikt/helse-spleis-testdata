@@ -8,6 +8,8 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.*
@@ -48,6 +50,7 @@ fun main() {
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
+        azureAdAppConfig = env.azureAdAppConfig,
     ).start()
 }
 
@@ -55,6 +58,7 @@ internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
+    private val azureAdAppConfig: AzureAdAppConfig,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -62,9 +66,10 @@ internal class ApplicationBuilder(
         RapidApplication.Builder(rapidsConfig)
             .withKtorModule {
                 installKtorModule(
-                    subscriptionService,
-                    dollyRestClient,
-                    rapidsMediator,
+                    subscriptionService = subscriptionService,
+                    dollyRestClient = dollyRestClient,
+                    rapidsMediator = rapidsMediator,
+                    azureAdAppConfig = azureAdAppConfig
                 )
             }.build()
 
@@ -81,20 +86,24 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
+    azureAdAppConfig: AzureAdAppConfig,
 ) {
     installJacksonFeature()
     install(WebSockets)
+    azureAdAppAuthentication(azureAdAppConfig)
 
     routing {
-        registerAuthApi()
-        registerDollyApi(dollyRestClient)
-        registerBehovApi(rapidsMediator)
-        registerSubscriptionApi(subscriptionService)
+        authenticate("oidc") {
+            registerAuthApi()
+            registerDollyApi(dollyRestClient)
+            registerBehovApi(rapidsMediator)
+            registerSubscriptionApi(subscriptionService)
 
-        static("/") {
-            staticRootFolder = File("public")
-            files("")
-            default("index.html")
+            static("/") {
+                staticRootFolder = File("public")
+                files("")
+                default("index.html")
+            }
         }
     }
 }
@@ -104,6 +113,14 @@ internal fun Application.installJacksonFeature() {
         jackson {
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             registerModule(JavaTimeModule())
+        }
+    }
+}
+
+internal fun Application.azureAdAppAuthentication(config: AzureAdAppConfig) {
+    authentication {
+        jwt("oidc") {
+            config.configureAuthentication(this)
         }
     }
 }

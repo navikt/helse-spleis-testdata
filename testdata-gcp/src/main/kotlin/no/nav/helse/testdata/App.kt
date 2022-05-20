@@ -8,7 +8,6 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.*
@@ -85,20 +84,17 @@ internal fun Application.installKtorModule(
 ) {
     installJacksonFeature()
     install(WebSockets)
-    install(Authentication)
 
     routing {
-        authenticate {
-            registerAuthApi()
-            registerDollyApi(dollyRestClient)
-            registerBehovApi(rapidsMediator)
-            registerSubscriptionApi(subscriptionService)
+        registerAuthApi()
+        registerDollyApi(dollyRestClient)
+        registerBehovApi(rapidsMediator)
+        registerSubscriptionApi(subscriptionService)
 
-            static("/") {
-                staticRootFolder = File("public")
-                files("")
-                default("index.html")
-            }
+        static("/") {
+            staticRootFolder = File("public")
+            files("")
+            default("index.html")
         }
     }
 }

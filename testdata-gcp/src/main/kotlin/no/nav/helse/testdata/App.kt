@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -50,8 +49,6 @@ fun main() {
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
-        httpClient = httpClient,
-        config = env,
     ).start()
 }
 
@@ -59,8 +56,6 @@ internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
-    private val httpClient: HttpClient,
-    private val config: Environment,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -71,8 +66,6 @@ internal class ApplicationBuilder(
                     subscriptionService,
                     dollyRestClient,
                     rapidsMediator,
-                    httpClient,
-                    config,
                 )
             }.build()
 
@@ -89,31 +82,13 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
-    httpClient: HttpClient,
-    config: Environment,
 ) {
     installJacksonFeature()
     install(WebSockets)
-    install(Authentication) {
-        oauth("oauth") {
-            urlProvider = { "https://spleis-testdata-gcp.dev.intern.nav.no/oauth2/callback" }
-            providerLookup = {
-                OAuthServerSettings.OAuth2ServerSettings(
-                    name = "AAD",
-                    authorizeUrl = config.azureADConfig.authorizationUrl,
-                    accessTokenUrl = config.azureADConfig.tokenEndpoint,
-                    requestMethod = HttpMethod.Post,
-                    clientId = config.azureADConfig.clientId,
-                    clientSecret = config.azureADConfig.clientSecret,
-                    defaultScopes = listOf("openid", "${config.azureADConfig.clientId}/.default")
-                )
-            }
-            client = httpClient
-        }
-    }
+    install(Authentication)
 
     routing {
-        authenticate("oauth") {
+        authenticate {
             registerAuthApi()
             registerDollyApi(dollyRestClient)
             registerBehovApi(rapidsMediator)

@@ -17,4 +17,4 @@ internal fun Route.registerAuthApi() {
     }
 }
 
-data class UserSession(val accessToken: String)
+data class UserSession(val accessToken: String?) : Principal

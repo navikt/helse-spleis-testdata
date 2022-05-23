@@ -97,6 +97,9 @@ internal fun Application.installKtorModule(
     installJacksonFeature()
     install(WebSockets)
     installAuthentication(config = azureADConfig, httpClient = httpClient)
+    install(Sessions) {
+        cookie<UserSession>("testdata", storage = SessionStorageMemory())
+    }
 
     routing {
         authenticate("oauth") {

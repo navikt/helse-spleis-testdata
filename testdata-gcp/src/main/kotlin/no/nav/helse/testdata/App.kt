@@ -99,15 +99,17 @@ internal fun Application.installKtorModule(
     installAuthentication(config = azureADConfig, httpClient = httpClient)
 
     routing {
-        registerAuthApi()
-        registerDollyApi(dollyRestClient)
-        registerBehovApi(rapidsMediator)
-        registerSubscriptionApi(subscriptionService)
+        authenticate("oauth") {
+            registerAuthApi()
+            registerDollyApi(dollyRestClient)
+            registerBehovApi(rapidsMediator)
+            registerSubscriptionApi(subscriptionService)
 
-        static("/") {
-            staticRootFolder = File("public")
-            files("")
-            default("index.html")
+            static("/") {
+                staticRootFolder = File("public")
+                files("")
+                default("index.html")
+            }
         }
     }
 }

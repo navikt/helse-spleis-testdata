@@ -6,15 +6,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.testdata.api.*
 import no.nav.helse.testdata.api.registerAuthApi
 import no.nav.helse.testdata.api.registerBehovApi
 import no.nav.helse.testdata.api.registerDollyApi
@@ -49,7 +52,8 @@ fun main() {
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
-        azureAdAppConfig = env.azureAdAppConfig,
+        azureADConfig = env.azureADConfig,
+        httpClient = httpClient,
     ).start()
 }
 
@@ -57,7 +61,8 @@ internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
-    private val azureAdAppConfig: AzureAdAppConfig,
+    private val azureADConfig: AzureADConfig,
+    private val httpClient: HttpClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -68,7 +73,8 @@ internal class ApplicationBuilder(
                     subscriptionService = subscriptionService,
                     dollyRestClient = dollyRestClient,
                     rapidsMediator = rapidsMediator,
-                    azureAdAppConfig = azureAdAppConfig
+                    azureADConfig = azureADConfig,
+                    httpClient = httpClient,
                 )
             }.build()
 
@@ -85,11 +91,12 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
-    azureAdAppConfig: AzureAdAppConfig,
+    azureADConfig: AzureADConfig,
+    httpClient: HttpClient,
 ) {
     installJacksonFeature()
     install(WebSockets)
-//    installAuthentication(azureAdAppConfig)
+    installAuthentication(config = azureADConfig, httpClient = httpClient)
 
     routing {
         registerAuthApi()
@@ -114,10 +121,24 @@ internal fun Application.installJacksonFeature() {
     }
 }
 
-internal fun Application.installAuthentication(config: AzureAdAppConfig) {
+internal fun Application.installAuthentication(config: AzureADConfig, httpClient: HttpClient) {
     install(Authentication) {
-//        oauth("oauth") {
-//            config.configureAuthentication(this)
-//        }
+        oauth("oauth") {
+            urlProvider = { "https://spleis-testdata-gcp.dev.intern.nav.no/oauth2/callback" }
+            skipWhen { call -> call.sessions.get<UserSession>() != null }
+
+            providerLookup = {
+                OAuthServerSettings.OAuth2ServerSettings(
+                    name = "AAD",
+                    authorizeUrl = config.authorizationEndpoint,
+                    accessTokenUrl = config.tokenEndpoint,
+                    requestMethod = HttpMethod.Post,
+                    clientId = config.clientId,
+                    clientSecret = config.clientSecret,
+                    defaultScopes = listOf("openid", "${config.clientId}/.default")
+                )
+            }
+            client = httpClient
+        }
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.helse.testdata
 
+import io.ktor.client.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -11,17 +12,12 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 fun main() {
-    val rapidsConnection = TestRapid()
-
-    val dollyRestClient = mockk<DollyRestClient>(relaxed = true)
-
-    val rapidsMediator = RapidsMediator(rapidsConnection)
-
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
-        dollyRestClient = dollyRestClient,
-        rapidsMediator = rapidsMediator,
-        mockk(relaxed = true),
+        dollyRestClient = mockk(relaxed = true),
+        rapidsMediator = RapidsMediator(TestRapid()),
+        azureADConfig = mockk(relaxed = true),
+        httpClient = mockk(relaxed = true),
     ).start()
 }
 
@@ -29,7 +25,8 @@ internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
     private val rapidsMediator: RapidsMediator,
-    private val azureAdAppConfig: AzureAdAppConfig,
+    private val azureADConfig: AzureADConfig,
+    private val httpClient: HttpClient,
 ) : RapidsConnection.StatusListener {
 
     fun start() = runLocalServer {
@@ -37,7 +34,8 @@ internal class LocalApplicationBuilder(
             subscriptionService = subscriptionService,
             dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
-            azureAdAppConfig = azureAdAppConfig,
+            azureADConfig = azureADConfig,
+            httpClient = httpClient,
         )
     }
 }

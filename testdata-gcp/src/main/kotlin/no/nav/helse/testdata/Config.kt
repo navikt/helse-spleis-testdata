@@ -1,8 +1,10 @@
 package no.nav.helse.testdata
 
-import com.auth0.jwk.JwkProvider
-import com.auth0.jwk.JwkProviderBuilder
-import io.ktor.server.auth.jwt.*
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
 import java.net.URL
 
 internal fun setUpEnvironment() =
@@ -12,10 +14,11 @@ internal fun setUpEnvironment() =
         kafkaTruststorePath = System.getenv("KAFKA_TRUSTSTORE_PATH"),
         kafkaKeystorePath = System.getenv("KAFKA_KEYSTORE_PATH"),
         dollyRestUrl = "https://dolly-backend.dev.intern.nav.no/api/v1",
-        azureAdAppConfig = AzureAdAppConfig(
+        azureADConfig = AzureADConfig(
+            discoveryUrl = System.getenv("AZURE_APP_WELL_KNOWN_URL"),
             clientId = System.getenv("AZURE_APP_CLIENT_ID"),
-            issuer = System.getenv("AZURE_OPENID_CONFIG_ISSUER"),
-            jwkProvider = JwkProviderBuilder(URL(System.getenv("AZURE_OPENID_CONFIG_JWKS_URI"))).build()
+            clientSecret = System.getenv("AZURE_APP_CLIENT_SECRET"),
+            authorizationUrl = System.getenv("AUTHORIZATION_URL"),
         )
     )
 
@@ -25,18 +28,32 @@ internal data class Environment(
     val kafkaTruststorePath: String,
     val kafkaKeystorePath: String,
     val dollyRestUrl: String,
-    val azureAdAppConfig: AzureAdAppConfig,
+    val azureADConfig: AzureADConfig,
 )
 
-internal class AzureAdAppConfig(
-    private val clientId: String,
-    private val issuer: String,
-    private val jwkProvider: JwkProvider
+internal class AzureADConfig(
+    val discoveryUrl: String,
+    val clientId: String,
+    val clientSecret: String,
+    authorizationUrl: String? = null,
 ) {
-    fun configureAuthentication(configuration: JWTAuthenticationProvider.Config) {
-        configuration.verifier(jwkProvider, issuer) {
-            withAudience(clientId)
-        }
-        configuration.validate { credentials -> JWTPrincipal(credentials.payload) }
-    }
+    private val discovered: JsonNode = discoveryUrl.discover()
+
+    val tokenEndpoint = discovered["token_endpoint"]?.textValue()
+        ?: throw RuntimeException("Unable to discover token endpoint")
+
+    val authorizationEndpoint = authorizationUrl ?: discovered["authorization_endpoint"]?.textValue()
+        ?: throw RuntimeException("Unable to discover authorization endpoint")
+}
+
+private fun String.discover(): JsonNode {
+    val (responseCode, responseBody) = this.fetchUrl()
+    if (responseCode >= 300 || responseBody == null) throw IOException("got status $responseCode from ${this}.")
+    return jacksonObjectMapper().readTree(responseBody)
+}
+
+private fun String.fetchUrl() = with(URL(this).openConnection() as HttpURLConnection) {
+    requestMethod = "GET"
+    val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
+    responseCode to stream?.bufferedReader()?.readText()
 }

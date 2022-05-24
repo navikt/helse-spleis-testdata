@@ -17,12 +17,15 @@ import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.testdata.api.*
+import no.nav.helse.testdata.api.registerBehovApi
+import no.nav.helse.testdata.api.registerDollyApi
+import no.nav.helse.testdata.api.registerSubscriptionApi
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
+import no.nav.helse.testdata.log as logger
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -107,15 +110,15 @@ internal fun Application.installKtorModule(
 
     routing {
         authenticate("oidc") {
-            registerAuthApi()
             registerDollyApi(dollyRestClient)
             registerBehovApi(rapidsMediator)
             registerSubscriptionApi(subscriptionService)
 
             static("/") {
-                get("/") {
-                    val principal = call.principal<UserSession>()
-                    no.nav.helse.testdata.log.info(principal?.accessToken)
+                handle {
+                    val accessToken = call.principal<UserSession>()?.accessToken.toString()
+                    logger.info(accessToken)
+                    call.sessions.set(UserSession(accessToken = accessToken))
                 }
                 staticRootFolder = File("public")
                 files("")
@@ -134,3 +137,4 @@ internal fun Application.installJacksonFeature() {
     }
 }
 
+data class UserSession(val accessToken: String?) : Principal

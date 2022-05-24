@@ -111,7 +111,10 @@ internal fun Application.installKtorModule(
     routing {
         get("/callback") {
             val principal = call.principal<JWTPrincipal>()
-            no.nav.helse.testdata.log.info(principal?.payload?.toString())
+            no.nav.helse.testdata.log.info(principal?.payload?.issuer)
+            no.nav.helse.testdata.log.info(principal?.payload?.subject)
+            no.nav.helse.testdata.log.info(principal?.payload?.audience.toString())
+            no.nav.helse.testdata.log.info(principal?.payload?.claims.toString())
             call.respondRedirect("/")
         }
         authenticate("oidc") {

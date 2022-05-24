@@ -50,6 +50,7 @@ fun main() {
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
+        azureConfig = env.azureADConfig,
     ).start()
 }
 
@@ -57,6 +58,7 @@ internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
+    private val azureConfig: AzureADConfig,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -67,6 +69,7 @@ internal class ApplicationBuilder(
                     subscriptionService = subscriptionService,
                     dollyRestClient = dollyRestClient,
                     rapidsMediator = rapidsMediator,
+                    azureConfig = azureConfig,
                 )
             }.build()
 
@@ -83,6 +86,7 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
+    azureConfig: AzureADConfig,
 ) {
     installJacksonFeature()
 
@@ -90,7 +94,7 @@ internal fun Application.installKtorModule(
 
     install(Authentication) {
         jwt("oidc") {
-            validate { credential -> JWTPrincipal(credential.payload) }
+            azureConfig.configureAuthentication(this)
         }
     }
 

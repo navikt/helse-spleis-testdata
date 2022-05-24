@@ -29,6 +29,7 @@ internal class LocalApplicationBuilder(
             subscriptionService = subscriptionService,
             dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
+            azureConfig = mockk(),
         )
     }
 }

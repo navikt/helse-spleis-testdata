@@ -95,6 +95,10 @@ internal fun Application.installKtorModule(
     install(Authentication) {
         jwt("oidc") {
             validate { credential ->
+                no.nav.helse.testdata.log.info(credential.payload.getClaim("access_token").asString())
+                no.nav.helse.testdata.log.info(credential.payload.issuer)
+                no.nav.helse.testdata.log.info(credential.payload.subject)
+                no.nav.helse.testdata.log.info(credential.payload.audience.toString())
                 if (credential.payload.getClaim("access_token").asString() != null) {
                     JWTPrincipal(credential.payload)
                 } else {

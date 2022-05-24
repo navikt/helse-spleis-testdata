@@ -12,6 +12,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
@@ -108,14 +109,16 @@ internal fun Application.installKtorModule(
             registerBehovApi(rapidsMediator)
             registerSubscriptionApi(subscriptionService)
 
+            get("/test") {
+                val principal = call.principal<JWTPrincipal>()
+                no.nav.helse.testdata.log.info(principal?.payload?.issuer)
+                no.nav.helse.testdata.log.info(principal?.payload?.subject)
+                no.nav.helse.testdata.log.info(principal?.payload?.audience.toString())
+                no.nav.helse.testdata.log.info(principal?.payload?.claims.toString())
+                call.respondRedirect("/")
+            }
+
             static("/") {
-                handle {
-                    val principal = call.principal<JWTPrincipal>()
-                    no.nav.helse.testdata.log.info(principal?.payload?.issuer)
-                    no.nav.helse.testdata.log.info(principal?.payload?.subject)
-                    no.nav.helse.testdata.log.info(principal?.payload?.audience.toString())
-                    no.nav.helse.testdata.log.info(principal?.payload?.claims.toString())
-                }
                 staticRootFolder = File("public")
                 files("")
                 default("index.html")

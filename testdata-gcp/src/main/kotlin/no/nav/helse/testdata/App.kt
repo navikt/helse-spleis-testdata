@@ -14,7 +14,6 @@ import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -45,6 +44,8 @@ fun main() {
         }
     }
 
+    val accessTokenClient = env.azureADConfig.accessTokenClient(httpClient)
+
     val dollyRestClient = DollyRestClient(env.dollyRestUrl, httpClient)
 
     ApplicationBuilder(
@@ -52,6 +53,7 @@ fun main() {
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
         azureConfig = env.azureADConfig,
+        accessTokenClient = accessTokenClient,
     ).start()
 }
 
@@ -60,6 +62,7 @@ internal class ApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
     private val azureConfig: AzureADConfig,
+    private val accessTokenClient: AccessTokenClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -71,6 +74,7 @@ internal class ApplicationBuilder(
                     dollyRestClient = dollyRestClient,
                     rapidsMediator = rapidsMediator,
                     azureConfig = azureConfig,
+                    accessTokenClient = accessTokenClient,
                 )
             }.build()
 
@@ -88,6 +92,7 @@ internal fun Application.installKtorModule(
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
     azureConfig: AzureADConfig,
+    accessTokenClient: AccessTokenClient,
 ) {
     installJacksonFeature()
 
@@ -99,10 +104,6 @@ internal fun Application.installKtorModule(
         }
     }
 
-    install(Sessions) {
-        cookie<UserSession>("testdata", storage = SessionStorageMemory())
-    }
-
     routing {
         authenticate("oidc") {
             registerDollyApi(dollyRestClient)
@@ -111,10 +112,8 @@ internal fun Application.installKtorModule(
 
             get("/test") {
                 val principal = call.principal<JWTPrincipal>()
-                no.nav.helse.testdata.log.info(principal?.payload?.issuer)
-                no.nav.helse.testdata.log.info(principal?.payload?.subject)
-                no.nav.helse.testdata.log.info(principal?.payload?.audience.toString())
-                no.nav.helse.testdata.log.info(principal?.payload?.claims.toString())
+                val accessToken = accessTokenClient.hentAccessToken("787eb670-2731-49b4-8be1-2385990370a9")
+                no.nav.helse.testdata.log.info(accessToken)
                 call.respondRedirect("/")
             }
 
@@ -135,5 +134,3 @@ internal fun Application.installJacksonFeature() {
         }
     }
 }
-
-data class UserSession(val accessToken: String?) : Principal

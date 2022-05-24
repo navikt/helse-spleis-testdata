@@ -9,6 +9,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.response.*
@@ -28,7 +29,6 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLEncoder
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
-import no.nav.helse.testdata.log as logger
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
@@ -93,15 +93,15 @@ internal fun Application.installKtorModule(
     install(WebSockets)
 
     install(Authentication) {
-        session<UserSession>("oidc") {
-            validate { session: UserSession ->
-                if (session.accessToken != null) {
-                    session
+        jwt("oidc") {
+            validate { credential ->
+                if (credential.payload.getClaim("access_token").asString() != null) {
+                    JWTPrincipal(credential.payload)
                 } else {
                     null
                 }
             }
-            challenge {
+            challenge { _, _ ->
                 val callback = withContext(Dispatchers.IO) {
                     URLEncoder.encode("/callback", "utf-8")
                 }
@@ -115,12 +115,6 @@ internal fun Application.installKtorModule(
     }
 
     routing {
-        get("/callback") {
-            val accessToken = call.principal<UserSession>()?.accessToken.toString()
-            logger.info(accessToken)
-            call.sessions.set(UserSession(accessToken = accessToken))
-            call.respondRedirect("/")
-        }
         authenticate("oidc") {
             registerDollyApi(dollyRestClient)
             registerBehovApi(rapidsMediator)

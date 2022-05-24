@@ -12,12 +12,9 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.testdata.api.registerBehovApi
@@ -27,7 +24,6 @@ import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.net.URLEncoder
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
@@ -95,12 +91,6 @@ internal fun Application.installKtorModule(
     install(Authentication) {
         jwt("oidc") {
             validate { credential -> JWTPrincipal(credential.payload) }
-            challenge { _, _ ->
-                val callback = withContext(Dispatchers.IO) {
-                    URLEncoder.encode("/callback", "utf-8")
-                }
-                call.respondRedirect("/oauth2/login?redirect=${callback}")
-            }
         }
     }
 
@@ -109,20 +99,19 @@ internal fun Application.installKtorModule(
     }
 
     routing {
-        get("/callback") {
-            val principal = call.principal<JWTPrincipal>()
-            no.nav.helse.testdata.log.info(principal?.payload?.issuer)
-            no.nav.helse.testdata.log.info(principal?.payload?.subject)
-            no.nav.helse.testdata.log.info(principal?.payload?.audience.toString())
-            no.nav.helse.testdata.log.info(principal?.payload?.claims.toString())
-            call.respondRedirect("/")
-        }
         authenticate("oidc") {
             registerDollyApi(dollyRestClient)
             registerBehovApi(rapidsMediator)
             registerSubscriptionApi(subscriptionService)
 
             static("/") {
+                handle {
+                    val principal = call.principal<JWTPrincipal>()
+                    no.nav.helse.testdata.log.info(principal?.payload?.issuer)
+                    no.nav.helse.testdata.log.info(principal?.payload?.subject)
+                    no.nav.helse.testdata.log.info(principal?.payload?.audience.toString())
+                    no.nav.helse.testdata.log.info(principal?.payload?.claims.toString())
+                }
                 staticRootFolder = File("public")
                 files("")
                 default("index.html")

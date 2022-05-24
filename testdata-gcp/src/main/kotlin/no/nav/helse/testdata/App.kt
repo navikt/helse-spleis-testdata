@@ -15,6 +15,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.testdata.api.registerBehovApi
@@ -24,6 +26,7 @@ import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URLEncoder
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 import no.nav.helse.testdata.log as logger
 
@@ -99,7 +102,10 @@ internal fun Application.installKtorModule(
                 }
             }
             challenge {
-                call.respondRedirect("/oauth2/login")
+                val callback = withContext(Dispatchers.IO) {
+                    URLEncoder.encode("/callback", "utf-8")
+                }
+                call.respondRedirect("/oauth2/login?redirect=${callback}")
             }
         }
     }
@@ -109,17 +115,18 @@ internal fun Application.installKtorModule(
     }
 
     routing {
+        get("/callback") {
+            val accessToken = call.principal<UserSession>()?.accessToken.toString()
+            logger.info(accessToken)
+            call.sessions.set(UserSession(accessToken = accessToken))
+            call.respondRedirect("/")
+        }
         authenticate("oidc") {
             registerDollyApi(dollyRestClient)
             registerBehovApi(rapidsMediator)
             registerSubscriptionApi(subscriptionService)
 
             static("/") {
-                handle {
-                    val accessToken = call.principal<UserSession>()?.accessToken.toString()
-                    logger.info(accessToken)
-                    call.sessions.set(UserSession(accessToken = accessToken))
-                }
                 staticRootFolder = File("public")
                 files("")
                 default("index.html")

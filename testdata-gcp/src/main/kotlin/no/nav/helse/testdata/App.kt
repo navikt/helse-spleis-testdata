@@ -94,17 +94,7 @@ internal fun Application.installKtorModule(
 
     install(Authentication) {
         jwt("oidc") {
-            validate { credential ->
-                no.nav.helse.testdata.log.info(credential.payload.getClaim("access_token").asString())
-                no.nav.helse.testdata.log.info(credential.payload.issuer)
-                no.nav.helse.testdata.log.info(credential.payload.subject)
-                no.nav.helse.testdata.log.info(credential.payload.audience.toString())
-                if (credential.payload.getClaim("access_token").asString() != null) {
-                    JWTPrincipal(credential.payload)
-                } else {
-                    null
-                }
-            }
+            validate { credential -> JWTPrincipal(credential.payload) }
             challenge { _, _ ->
                 val callback = withContext(Dispatchers.IO) {
                     URLEncoder.encode("/callback", "utf-8")
@@ -119,6 +109,11 @@ internal fun Application.installKtorModule(
     }
 
     routing {
+        get("/callback") {
+            val principal = call.principal<JWTPrincipal>()
+            no.nav.helse.testdata.log.info(principal?.payload?.toString())
+            call.respondRedirect("/")
+        }
         authenticate("oidc") {
             registerDollyApi(dollyRestClient)
             registerBehovApi(rapidsMediator)

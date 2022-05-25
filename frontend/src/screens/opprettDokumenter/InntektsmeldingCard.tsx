@@ -5,6 +5,8 @@ import { get } from "../../io/api";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {validateFødselsnummer, validateInntekt, validateRefusjonsbeløp} from "../formValidation";
+import format from "date-fns/format";
+import {startOfMonth, subMonths} from "date-fns";
 
 const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
@@ -43,7 +45,9 @@ export const InntektsmeldingCard = React.memo(() => {
   useUnregisterInntektsmeldingCard();
   useFetchInntekt();
 
-  return (
+    const defaultDate = format(startOfMonth(subMonths(new Date(), 3)), "yyyy-MM-dd")
+
+    return (
     <Card>
       <h2 className={styles.Title}>Inntektsmelding</h2>
       <div className={styles.CardContainer}>
@@ -52,7 +56,7 @@ export const InntektsmeldingCard = React.memo(() => {
           type="date"
           label="Første fraværsdag"
           errors={formState.errors}
-          defaultValue="2021-07-01"
+          defaultValue={defaultDate}
           {...register("førsteFraværsdag", {
             required: "Første fraværsdag må angis",
           })}

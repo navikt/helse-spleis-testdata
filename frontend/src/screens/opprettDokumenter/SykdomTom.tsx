@@ -1,8 +1,9 @@
 import React from "react";
-import { useFormContext } from "react-hook-form";
-import { FormInput } from "../../components/FormInput";
+import {useFormContext} from "react-hook-form";
+import {FormInput} from "../../components/FormInput";
 import addDays from "date-fns/addDays";
 import format from "date-fns/format";
+import {endOfMonth, subMonths} from "date-fns";
 
 export const SykdomTom = () => {
   const { formState, register, setValue } = useFormContext();
@@ -19,13 +20,15 @@ export const SykdomTom = () => {
     return sykdomTomRegister.onChange(event);
   };
 
+  const defaultTom = format(endOfMonth(subMonths(new Date(), 3)), "yyyy-MM-dd")
+
   return (
     <FormInput
       data-testid="sykdomTom"
       label="Sykdom t.o.m."
       errors={formState.errors}
       type="date"
-      defaultValue="2021-07-31"
+      defaultValue={defaultTom}
       {...sykdomTomRegister}
       onChange={onChange}
     />

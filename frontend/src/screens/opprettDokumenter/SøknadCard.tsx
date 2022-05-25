@@ -7,6 +7,7 @@ import { FormInput } from "../../components/FormInput";
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { validateArbeidsgrad, validateSykdomsgrad } from "../formValidation";
+import {endOfMonth, subMonths} from "date-fns";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -40,6 +41,8 @@ export const SøknadCard = React.memo(() => {
     }
   }, [skalSendeSykmelding]);
 
+  const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
+
   return (
     <Card>
       <h2 className={styles.Title}>Søknad</h2>
@@ -52,7 +55,7 @@ export const SøknadCard = React.memo(() => {
           defaultValue={
             sykdomTom
               ? formatDateString(nextDay(new Date(sykdomTom)))
-              : "2021-08-01"
+              : defaultDate
           }
           {...register("sendtNav")}
         />

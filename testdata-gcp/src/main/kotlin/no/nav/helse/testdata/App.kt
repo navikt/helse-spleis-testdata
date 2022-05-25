@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 
-val log: Logger = LoggerFactory.getLogger("spleis-testdata")
-val objectMapper: ObjectMapper = jacksonObjectMapper()
+internal val log: Logger = LoggerFactory.getLogger("spleis-testdata")
+internal val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())
 
@@ -44,8 +44,6 @@ fun main() {
         }
     }
 
-    val accessTokenClient = env.azureADConfig.accessTokenClient(httpClient)
-
     val dollyRestClient = DollyRestClient(env.dollyRestUrl, httpClient)
 
     ApplicationBuilder(
@@ -53,7 +51,6 @@ fun main() {
         subscriptionService = ConcreteSubscriptionService,
         dollyRestClient = dollyRestClient,
         azureConfig = env.azureADConfig,
-        accessTokenClient = accessTokenClient,
     ).start()
 }
 
@@ -62,7 +59,6 @@ internal class ApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val dollyRestClient: DollyRestClient,
     private val azureConfig: AzureADConfig,
-    private val accessTokenClient: AccessTokenClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -74,7 +70,6 @@ internal class ApplicationBuilder(
                     dollyRestClient = dollyRestClient,
                     rapidsMediator = rapidsMediator,
                     azureConfig = azureConfig,
-                    accessTokenClient = accessTokenClient,
                 )
             }.build()
 
@@ -92,7 +87,6 @@ internal fun Application.installKtorModule(
     dollyRestClient: DollyRestClient,
     rapidsMediator: RapidsMediator,
     azureConfig: AzureADConfig,
-    accessTokenClient: AccessTokenClient,
 ) {
     installJacksonFeature()
 
@@ -111,10 +105,14 @@ internal fun Application.installKtorModule(
             registerSubscriptionApi(subscriptionService)
 
             get("/test") {
-                val principal = call.principal<JWTPrincipal>()
-                val accessToken = accessTokenClient.hentAccessToken("787eb670-2731-49b4-8be1-2385990370a9")
-                no.nav.helse.testdata.log.info(accessToken)
-                call.respondRedirect("/")
+                try {
+                    val principal = call.principal<JWTPrincipal>()
+                    if (principal != null) {
+                        no.nav.helse.testdata.log.info("${principal.payload.claims}, ${principal["access_token"]}")
+                    }
+                } finally {
+                    call.respondRedirect("/")
+                }
             }
 
             static("/") {

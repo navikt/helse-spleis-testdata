@@ -30,7 +30,6 @@ internal class LocalApplicationBuilder(
             dollyRestClient = dollyRestClient,
             rapidsMediator = rapidsMediator,
             azureConfig = mockk(),
-            accessTokenClient = mockk()
         )
     }
 }

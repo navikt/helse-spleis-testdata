@@ -140,15 +140,17 @@ export const OpprettDokumenter = React.memo(() => {
       if (status >= 400) return;
     }
 
-    const response = await postPayload(data);
-    const { status } = response
-    setStatus(status);
-    const errorBody = await response.text()
-    setErrorBody(errorBody);
+    setTimeout(async () => {
+      const response = await postPayload(data);
+      const {status} = response
+      setStatus(status);
+      const errorBody = await response.text()
+      setErrorBody(errorBody);
 
-    if (status < 400) {
-      subscribe(data.fnr);
-    }
+      if (status < 400) {
+        subscribe(data.fnr);
+      }
+    }, 1000)
   };
 
   return (

@@ -128,17 +128,19 @@ export const OpprettDokumenter = React.memo(() => {
   };
 
   const postPayload = async (data: Record<string, any>): Promise<Response> => {
-    setIsFetching(true);
     return post("/vedtaksperiode", createPayload(data)).finally(() =>
       setIsFetching(false)
     );
   };
 
   const onSubmit = async (data: Record<string, any>) => {
+
     if (skalSlettePerson) {
       const { status } = await deletePerson(data.fnr);
       if (status >= 400) return;
     }
+
+    setIsFetching(true);
 
     setTimeout(async () => {
       const response = await postPayload(data);

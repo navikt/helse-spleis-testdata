@@ -25,12 +25,6 @@ import type {
   EndringIRefusjonDto,
 } from "../../io/api.d";
 
-type Period = {
-  fom: string;
-  tom: string;
-  id: string;
-};
-
 type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
     sykmelding?: SykmeldingDTO;
@@ -134,13 +128,18 @@ export const OpprettDokumenter = React.memo(() => {
   };
 
   const onSubmit = async (data: Record<string, any>) => {
+    setIsFetching(true);
 
     if (skalSlettePerson) {
-      const { status } = await deletePerson(data.fnr);
-      if (status >= 400) return;
+      const response = await deletePerson(data.fnr);
+      setStatus(response.status);
+      const errorBody = await response.text()
+      setErrorBody(errorBody);
+      if (status >= 400) {
+        setIsFetching(false);
+        return;
+      }
     }
-
-    setIsFetching(true);
 
     setTimeout(async () => {
       const response = await postPayload(data);

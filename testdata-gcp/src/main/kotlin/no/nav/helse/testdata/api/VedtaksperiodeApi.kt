@@ -39,7 +39,7 @@ internal fun Route.registerVedtaksperiodeApi(mediator: RapidsMediator) {
         }
 
         call.respond(HttpStatusCode.OK)
-            .also { log.info("produsert data for vedtak på aktør: $aktørId") }
+        log.info("produsert data for vedtak på aktør: $aktørId")
     }
 }
 

@@ -26,6 +26,7 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator, aktørR
 
         val aktørIdResult = aktørRestClient.hentAktørId(vedtak.fnr)
         if (aktørIdResult is Result.Error) {
+            log.info("fikk ikke slått opp aktørId for angitt fødselsnummer")
             call.respond(HttpStatusCode.InternalServerError, aktørIdResult.error.message!!)
             return@post
         }

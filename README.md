@@ -6,7 +6,7 @@ Oppretter og manipulerer testdata for [spleis](https://www.github.com/navikt/hel
 
 ## Kjøretidsavhengigheter
 
-* JDK 15
+* JDK 17
 * Kafka
 
 ## Kjøre lokalt

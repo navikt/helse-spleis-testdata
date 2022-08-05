@@ -22,9 +22,6 @@ fun søknad(
     return vedtak.søknad?.let { søknad ->
         """
         {
-            "@event_name": "${if (søknad.sendtNav != null) "sendt_søknad_nav" else "sendt_søknad_arbeidsgiver"}",
-            "@id":"${UUID.randomUUID()}",
-            "@opprettet":"${LocalDateTime.now()}",
             "id":"${UUID.randomUUID()}",
             "fnr":"${vedtak.fnr}",
             "type":"ARBEIDSTAKERE",

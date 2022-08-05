@@ -51,9 +51,6 @@ fun inntektsmelding(
 
         return """
             {
-                "@event_name": "inntektsmelding",
-                "@id":"${UUID.randomUUID()}",
-                "@opprettet":"${LocalDateTime.now()}",
                 "inntektsmeldingId":"${UUID.randomUUID()}",
                 "arbeidstakerFnr":"${vedtak.fnr}",
                 "arbeidstakerAktorId":"$aktørId",

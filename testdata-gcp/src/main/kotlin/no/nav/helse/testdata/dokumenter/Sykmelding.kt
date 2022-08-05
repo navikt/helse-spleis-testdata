@@ -15,9 +15,6 @@ fun sykmelding(
 ): String? = vedtak.sykmelding?.let { sykmelding ->
     """
     {
-        "@event_name": "ny_søknad",
-        "@id":"${UUID.randomUUID()}",
-        "@opprettet":"${LocalDateTime.now()}",
         "id":"${UUID.randomUUID()}",
         "type":"ARBEIDSTAKERE",
         "fnr":"${vedtak.fnr}",

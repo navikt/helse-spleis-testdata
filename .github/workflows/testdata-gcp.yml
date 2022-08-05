@@ -24,8 +24,10 @@ jobs:
       - name: create docker tag
         run: echo "TAG=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
 
-      - name: Build backend
-        run: ./gradlew :testdata-gcp:test :testdata-gcp:build
+      - name: Gradle build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: :testdata-gcp:build
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}

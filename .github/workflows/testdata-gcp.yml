@@ -1,9 +1,9 @@
-name: Bygg og deploy (GCP)
+name: Bygg og deploy (GCP) (Foreløpig skrudd av)
 
 on:
   push:
     branches:
-      - master
+      - gcp
 env:
   APP: spleis-testdata
   TEAM: tbd

@@ -71,7 +71,7 @@ fun inntektsmelding(
                 "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},
                 "ferieperioder": ${inntektsmelding.ferieperioder.tilJson()},
                 "status":"GYLDIG",
-                "arkivreferanse":"ENARKIVREFERANSE",
+                "arkivreferanse":"${UUID.randomUUID()}",
                 "hendelseId":"${UUID.randomUUID()}",
                 "foersteFravaersdag":"$førstefraværsdag",
                 "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"

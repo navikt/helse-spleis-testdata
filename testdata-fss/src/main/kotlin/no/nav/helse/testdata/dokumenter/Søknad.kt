@@ -2,7 +2,6 @@ package no.nav.helse.testdata.dokumenter
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,8 +15,7 @@ data class Søknad(
 )
 
 fun søknad(
-    vedtak: Vedtak,
-    aktørId: String
+    vedtak: Vedtak
 ): String? {
     return vedtak.søknad?.let { søknad ->
         """
@@ -26,7 +24,6 @@ fun søknad(
             "fnr":"${vedtak.fnr}",
             "type":"ARBEIDSTAKERE",
             "status":"SENDT",
-            "aktorId":"$aktørId",
             "sykmeldingId":"${UUID.randomUUID()}",
             "arbeidsgiver":{
             "navn":"Nærbutikken AS",

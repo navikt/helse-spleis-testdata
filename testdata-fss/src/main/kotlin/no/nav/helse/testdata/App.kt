@@ -94,7 +94,7 @@ internal fun Application.installKtorModule(
 
     routing {
         registerPersonApi(rapidsMediator, aktørRestClient)
-        registerVedtaksperiodeApi(rapidsMediator, aktørRestClient)
+        registerVedtaksperiodeApi(rapidsMediator)
         registerInntektApi(inntektRestClient)
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)

@@ -26,7 +26,7 @@ internal class InntektsmeldingTest {
                 refusjon = Refusjon()
             )
         )
-        val json = inntektsmelding(vedtak, "aktørId")
+        val json = inntektsmelding(vedtak)
         assertValidJson(json)
     }
 }

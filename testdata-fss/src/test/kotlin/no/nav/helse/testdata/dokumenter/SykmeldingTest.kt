@@ -23,7 +23,7 @@ internal class SykmeldingTest {
                 sykmeldingsgrad = 100
             )
         )
-        val json = sykmelding(vedtak,"aktørId")
+        val json = sykmelding(vedtak)
         assertValidJson(json)
     }
 }

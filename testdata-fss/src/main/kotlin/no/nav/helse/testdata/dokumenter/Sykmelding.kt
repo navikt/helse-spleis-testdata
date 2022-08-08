@@ -1,7 +1,6 @@
 package no.nav.helse.testdata.dokumenter
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import java.time.LocalDateTime
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,8 +9,7 @@ data class Sykmelding(
 )
 
 fun sykmelding(
-    vedtak: Vedtak,
-    aktørId: String
+    vedtak: Vedtak
 ): String? = vedtak.sykmelding?.let { sykmelding ->
     """
     {
@@ -19,7 +17,6 @@ fun sykmelding(
         "type":"ARBEIDSTAKERE",
         "fnr":"${vedtak.fnr}",
         "status":"NY",
-        "aktorId":"$aktørId",
         "sykmeldingId":"${UUID.randomUUID()}",
         "arbeidsgiver":{
         "navn":"Nærbutikken AS",

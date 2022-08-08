@@ -29,7 +29,7 @@ internal class SøknadTest {
                 )
             )
         )
-        val json = søknad(vedtak, "aktørId")
+        val json = søknad(vedtak)
         assertValidJson(json)
     }
 }

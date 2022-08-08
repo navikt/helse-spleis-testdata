@@ -6,8 +6,6 @@ import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.isSuccess
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
-import io.mockk.coEvery
-import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
@@ -56,8 +54,8 @@ class AppTest {
             application {
                 routing {
                     registerVedtaksperiodeApi(
-                        mediator = RapidsMediator(testRapid),
-                        aktørRestClient = mockk { coEvery { hentAktørId(any()) }.returns(Result.Ok("aktørId")) })
+                        mediator = RapidsMediator(testRapid)
+                    )
                 }
                 installJacksonFeature()
             }

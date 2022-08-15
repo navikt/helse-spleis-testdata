@@ -36,6 +36,7 @@ fun sykmelding(
         "arbeidGjenopptatt":null,
         "sykmeldingSkrevet":"${vedtak.sykdomFom.atStartOfDay()}",
         "opprettet":"${vedtak.sykdomFom.atStartOfDay()}",
+        "testdataOpprettet":"${LocalDateTime.now()}",
         "sendtNav":null,
         "sendtArbeidsgiver":null,
         "egenmeldinger":[],

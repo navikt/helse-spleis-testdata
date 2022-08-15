@@ -1,6 +1,7 @@
 package no.nav.helse.testdata.dokumenter
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.time.LocalDateTime
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -33,6 +34,7 @@ fun sykmelding(
         "arbeidGjenopptatt":null,
         "sykmeldingSkrevet":"${vedtak.sykdomFom.atStartOfDay()}",
         "opprettet":"${vedtak.sykdomFom.atStartOfDay()}",
+        "testdataOpprettet":"${LocalDateTime.now()}",
         "sendtNav":null,
         "sendtArbeidsgiver":null,
         "egenmeldinger":[],

@@ -74,8 +74,9 @@ fun inntektsmelding(
                 "arkivreferanse":"ENARKIVREFERANSE",
                 "hendelseId":"${UUID.randomUUID()}",
                 "foersteFravaersdag":"$førstefraværsdag",
+                "testdataOpprettet":"${LocalDateTime.now()}",
                 "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"
-                } 
+            } 
         """
     }
 }

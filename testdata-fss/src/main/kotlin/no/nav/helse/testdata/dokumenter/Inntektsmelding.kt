@@ -5,6 +5,7 @@ import no.nav.helse.testdata.dokumenter.EndringIRefusjon.Companion.tilJson
 import no.nav.helse.testdata.objectMapper
 import org.intellij.lang.annotations.Language
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -71,8 +72,9 @@ fun inntektsmelding(
                 "arkivreferanse":"${UUID.randomUUID()}",
                 "hendelseId":"${UUID.randomUUID()}",
                 "foersteFravaersdag":"$førstefraværsdag",
+                "testdataOpprettet":"${LocalDateTime.now()}",
                 "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"
-                } 
+            } 
         """
     }
 }

@@ -43,6 +43,7 @@ fun søknad(
             "arbeidGjenopptatt":null,
             "sykmeldingSkrevet":"${vedtak.sykdomFom.atStartOfDay()}",
             "opprettet":"${vedtak.sykdomFom.atStartOfDay()}",
+            "testdataOpprettet":"${LocalDateTime.now()}",
             "sendtNav":${søknad.sendtNav?.atStartOfDay()?.let { "\"$it\"" }},
             "sendtArbeidsgiver":${søknad.sendtArbeidsgiver?.atStartOfDay()?.let { "\"$it\"" }},
             "egenmeldinger":[],

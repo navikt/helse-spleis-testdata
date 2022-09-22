@@ -1,15 +1,15 @@
 package no.nav.helse.testdata
 
 import io.ktor.client.request.*
-import io.ktor.http.ContentType
+import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Accept
-import io.ktor.http.isSuccess
-import io.ktor.server.routing.routing
-import io.ktor.server.testing.testApplication
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
 import no.nav.helse.testdata.api.registerVedtaksperiodeApi
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -23,11 +23,11 @@ class AppTest {
         private const val fnr1 = "123"
     }
 
-    private lateinit var testRapid: TestRapid
+    private val testRapid: TestRapid = TestRapid()
 
     @BeforeEach
     fun beforeEach() {
-        testRapid = TestRapid()
+        testRapid.reset()
     }
 
     @Test
@@ -61,22 +61,7 @@ class AppTest {
             }
             val response = client.post("/vedtaksperiode") {
                 header("Content-Type", "application/json")
-                setBody(
-                    """
-                    {
-                        "fnr": "fnr",
-                        "orgnummer": "orgnummer",
-                        "sykdomFom": "2020-01-10",
-                        "sykdomTom": "2020-01-30",
-                        "inntekt": 0.0,
-                        "harAndreInntektskilder": true,
-                        "skalSendeInntektsmelding": true,
-                        "førstefraværsdag": "2019-12-31",
-                        "arbeidsgiverperiode": [{"fom": "2019-12-31", "tom": "2020-01-14"}, {"fom": "2019-12-31", "tom": "2020-01-14"}],
-                        "ferieperioder": []
-                    }
-                    """
-                )
+                setBody(data())
             }
             assertTrue(response.status.isSuccess())
         }
@@ -116,4 +101,33 @@ class AppTest {
             assertTrue(response.status.isSuccess())
         }
     }
+
+    @Language("json")
+    private fun data() = """
+        {
+            "fnr": "fnr",
+            "orgnummer": "orgnummer",
+            "sykdomFom": "2020-01-10",
+            "sykdomTom": "2020-01-30",
+            "harAndreInntektskilder": true,
+            "skalSendeInntektsmelding": true,
+            "inntektsmelding": ${inntektsmelding()}
+        }
+    """
+
+    @Language("json")
+    private fun inntektsmelding() = """
+        {
+            "inntekt": 0.0,
+            "ferieperioder": [],
+            "arbeidsgiverperiode": [
+                { "fom": "2019-12-31", "tom": "2020-01-14" },
+                { "fom": "2019-12-31", "tom": "2020-01-14" }
+            ],
+            "endringRefusjon": [],
+            "refusjon": {},
+            "førsteFraværsdag": "2019-12-31"
+        }
+    """
+
 }

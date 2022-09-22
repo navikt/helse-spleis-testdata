@@ -49,4 +49,11 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.validate(
     if (vedtak.sykdomFom > vedtak.sykdomTom) {
         call.respond(HttpStatusCode.BadRequest, "FOM må være før TOM")
     }
+    vedtak.inntektsmelding?.arbeidsgiverperiode?.map {
+        val (fom, tom) = it
+        if (fom > tom) {
+            call.respond(HttpStatusCode.BadRequest, "Arbeidsgiverperioder: FOM $fom må være før TOM $tom")
+            return
+        }
+    }
 }

@@ -1,9 +1,7 @@
 package no.nav.helse.testdata.dokumenter
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class Vedtak(
     val fnr: String,
     val orgnummer: String,
@@ -14,5 +12,4 @@ data class Vedtak(
     val inntektsmelding: Inntektsmelding? = null
 )
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class Periode(val fom: LocalDate, val tom: LocalDate)

@@ -1,11 +1,9 @@
 package no.nav.helse.testdata.dokumenter
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class Søknad(
     val sykmeldingsgrad: Int,
     val harAndreInntektskilder: Boolean,

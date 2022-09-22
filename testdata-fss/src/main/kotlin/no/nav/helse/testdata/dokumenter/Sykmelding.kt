@@ -1,10 +1,8 @@
 package no.nav.helse.testdata.dokumenter
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
 import java.util.*
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class Sykmelding(
     val sykmeldingsgrad: Int,
 )

@@ -17,8 +17,13 @@ import no.nav.helse.testdata.log
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
-        val vedtak = call.receive<Vedtak>().also {
-            validate(it)
+        val vedtak: Vedtak = try {
+            call.receive<Vedtak>().also {
+                validate(it)
+            }
+        } catch (e: Exception) {
+            log.warn("Feil i input, lar seg ikke deserialisere", e)
+            throw e
         }
 
         sykmelding(vedtak)?.also {

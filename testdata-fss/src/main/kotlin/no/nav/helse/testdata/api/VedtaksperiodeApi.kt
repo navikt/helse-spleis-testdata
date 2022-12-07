@@ -14,6 +14,7 @@ import no.nav.helse.testdata.dokumenter.inntektsmelding
 import no.nav.helse.testdata.dokumenter.sykmelding
 import no.nav.helse.testdata.dokumenter.søknad
 import no.nav.helse.testdata.log
+import no.nav.helse.testdata.sikkerlogg
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
@@ -28,22 +29,28 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
 
         val fnr = vedtak.fnr
         sykmelding(vedtak)?.also {
-            log.info("produserer sykmelding for fnr=$fnr")
+            log.info("produserer sykmelding, se sikkerlogg/tjenestekall for fnr")
+            sikkerlogg.info("produserer sykmelding for fnr=$fnr")
             mediator.publiser(fnr, it)
         }
 
         søknad(vedtak)?.also {
-            log.info("produserer søknad for fnr=$fnr")
+            log.info("produserer søknad, se sikkerlogg/tjenestekall for fnr")
+            sikkerlogg.info("produserer søknad for fnr=$fnr")
             mediator.publiser(fnr, it)
         }
 
         inntektsmelding(vedtak)?.also {
-            log.info("produserer inntektsmelding for fnr=$fnr")
+            log.info("produserer inntektsmelding, se sikkerlogg/tjenestekall for fnr")
+            sikkerlogg.info("produserer inntektsmelding for fnr=$fnr")
             mediator.publiser(fnr, it)
         }
 
         call.respond(HttpStatusCode.OK)
-            .also { log.info("produsert dokumenter for fnr=$fnr") }
+            .also {
+                log.info("produsert dokumenter, se sikkerlogg/tjenestekall for fnr")
+                sikkerlogg.info("produsert dokumenter for fnr=$fnr")
+            }
     }
 }
 

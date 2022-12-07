@@ -26,6 +26,7 @@ import java.io.File
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
+val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
 val objectMapper: ObjectMapper = jacksonObjectMapper()
     .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     .registerModule(JavaTimeModule())

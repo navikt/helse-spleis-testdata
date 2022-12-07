@@ -26,23 +26,24 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
             throw e
         }
 
+        val fnr = vedtak.fnr
         sykmelding(vedtak)?.also {
-            log.info("produserer sykmelding")
-            mediator.publiser(vedtak.fnr, it)
+            log.info("produserer sykmelding for fnr=$fnr")
+            mediator.publiser(fnr, it)
         }
 
         søknad(vedtak)?.also {
-            log.info("produserer søknad")
-            mediator.publiser(vedtak.fnr, it)
+            log.info("produserer søknad for fnr=$fnr")
+            mediator.publiser(fnr, it)
         }
 
         inntektsmelding(vedtak)?.also {
-            log.info("produserer inntektsmelding")
-            mediator.publiser(vedtak.fnr, it)
+            log.info("produserer inntektsmelding for fnr=$fnr")
+            mediator.publiser(fnr, it)
         }
 
         call.respond(HttpStatusCode.OK)
-            .also { log.info("produsert data for vedtak") }
+            .also { log.info("produsert dokumenter for fnr=$fnr") }
     }
 }
 

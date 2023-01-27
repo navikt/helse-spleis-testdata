@@ -15,6 +15,7 @@ import no.nav.helse.testdata.dokumenter.sykmelding
 import no.nav.helse.testdata.dokumenter.søknad
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.sikkerlogg
+import org.intellij.lang.annotations.Language
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
@@ -28,6 +29,15 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
         }
 
         val fnr = vedtak.fnr
+
+        @Language("JSON")
+        val medlemskapavklaring = """{
+  "@event_name": "mock_medlemskap_avklaring",
+  "ident": "$fnr",
+  "avklartMedlemskap": ${vedtak.medlemskapAvklart}
+}"""
+        mediator.publiser(fnr, medlemskapavklaring)
+
         sykmelding(vedtak)?.also {
             log.info("produserer sykmelding, se sikkerlogg/tjenestekall for fnr")
             sikkerlogg.info("produserer sykmelding for fnr=$fnr")

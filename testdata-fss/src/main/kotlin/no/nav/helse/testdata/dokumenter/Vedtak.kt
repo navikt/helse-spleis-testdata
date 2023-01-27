@@ -9,7 +9,8 @@ data class Vedtak(
     val sykdomTom: LocalDate,
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
-    val inntektsmelding: Inntektsmelding? = null
+    val inntektsmelding: Inntektsmelding? = null,
+    val medlemskapAvklart: Boolean = true
 )
 
 data class Periode(val fom: LocalDate, val tom: LocalDate)

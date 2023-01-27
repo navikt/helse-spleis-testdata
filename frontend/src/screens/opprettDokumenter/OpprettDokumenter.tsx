@@ -5,6 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { del, post } from "../../io/api";
 import { useSubscribe } from "../../io/subscription";
 
+import { DiverseCard } from "./DiverseCard";
 import { PersonCard } from "./PersonCard";
 import { SøknadCard } from "./SøknadCard";
 import { Ferieperioder } from "./Ferieperioder";
@@ -30,6 +31,7 @@ type OpprettVedtaksperiodePayload = PersonDTO &
     sykmelding?: SykmeldingDTO;
     søknad?: SøknadDTO;
     inntektsmelding?: InntektsmeldingDTO;
+    medlemskapAvklart: boolean;
   };
 
 const createPayload = (
@@ -84,6 +86,7 @@ const createPayload = (
     sykdomTom: values.sykdomTom,
     sykmelding: values.skalSendeSykmelding ? sykmelding() : undefined,
     søknad: values.skalSendeSøknad ? søknad() : undefined,
+    medlemskapAvklart: values.medlemskapAvklart,
     inntektsmelding: values.skalSendeInntektsmelding
       ? inntektsmelding()
       : undefined,
@@ -97,6 +100,7 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSykmelding: true,
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
+      medlemskapAvklart: true
     },
   });
 
@@ -163,6 +167,7 @@ export const OpprettDokumenter = React.memo(() => {
             {skalSendeSykmelding && <SykmeldingCard />}
             {skalSendeSøknad && <SøknadCard />}
             {skalSendeInntektsmelding && <InntektsmeldingCard />}
+            <DiverseCard />
           </div>
           {skalSendeInntektsmelding && (
             <>

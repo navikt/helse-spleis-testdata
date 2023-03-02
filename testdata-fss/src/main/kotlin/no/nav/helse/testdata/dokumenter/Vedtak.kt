@@ -1,7 +1,9 @@
 package no.nav.helse.testdata.dokumenter
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Vedtak(
     val fnr: String,
     val orgnummer: String,

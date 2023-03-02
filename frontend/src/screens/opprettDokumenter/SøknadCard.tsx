@@ -66,6 +66,12 @@ export const SøknadCard = React.memo(() => {
           {...register("sendtArbeidsgiver")}
         />
         <FormInput
+          label="Arbeid gjenopptatt"
+          type="date"
+          errors={formState.errors}
+          {...register("arbeidGjenopptatt")}
+        />
+        <FormInput
           data-testid="faktiskgrad"
           label="Faktisk arbeidsgrad"
           errors={formState.errors}

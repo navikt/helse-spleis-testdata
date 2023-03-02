@@ -23,6 +23,7 @@ export interface SøknadDTO extends SykmeldingDTO {
   faktiskgrad: number;
   sendtNav?: string;
   sendtArbeidsgiver?: string;
+  arbeidGjenopptatt?: string;
 }
 
 export interface InntektsmeldingDTO {

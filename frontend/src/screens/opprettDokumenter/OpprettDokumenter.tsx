@@ -65,6 +65,7 @@ const createPayload = (
     faktiskgrad: values.faktiskgrad || undefined,
     sendtNav: values.sendtNav || undefined,
     sendtArbeidsgiver: values.sendtArbeidsgiver || undefined,
+    arbeidGjenopptatt: values.arbeidGjenopptatt || undefined,
   });
 
   const inntektsmelding = (): InntektsmeldingDTO => ({

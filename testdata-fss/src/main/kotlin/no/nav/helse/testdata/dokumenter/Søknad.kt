@@ -11,6 +11,7 @@ data class Søknad(
     val faktiskgrad: Int? = null,
     val sendtNav: LocalDate? = null,
     val sendtArbeidsgiver: LocalDate? = null,
+    val arbeidGjenopptatt: LocalDate? = null,
 )
 
 fun søknad(
@@ -36,7 +37,7 @@ fun søknad(
             "fom":"${vedtak.sykdomFom}",
             "tom":"${vedtak.sykdomTom}",
             "startSyketilfelle":"${vedtak.sykdomFom}",
-            "arbeidGjenopptatt":null,
+            "arbeidGjenopptatt":${søknad.arbeidGjenopptatt},
             "sykmeldingSkrevet":"${vedtak.sykdomFom.atStartOfDay()}",
             "opprettet":"${vedtak.sykdomFom.atStartOfDay()}",
             "testdataOpprettet":"${LocalDateTime.now()}",

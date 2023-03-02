@@ -37,7 +37,7 @@ fun søknad(
             "fom":"${vedtak.sykdomFom}",
             "tom":"${vedtak.sykdomTom}",
             "startSyketilfelle":"${vedtak.sykdomFom}",
-            "arbeidGjenopptatt":${søknad.arbeidGjenopptatt},
+            "arbeidGjenopptatt":${søknad.arbeidGjenopptatt?.let { "\"$it\"" }},
             "sykmeldingSkrevet":"${vedtak.sykdomFom.atStartOfDay()}",
             "opprettet":"${vedtak.sykdomFom.atStartOfDay()}",
             "testdataOpprettet":"${LocalDateTime.now()}",

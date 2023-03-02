@@ -2,11 +2,17 @@ package no.nav.helse.testdata
 
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.intellij.lang.annotations.Language
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.*
 
 internal class RapidsMediator(private val connection: RapidsConnection) {
+    private companion object {
+        private val log: Logger = LoggerFactory.getLogger(RapidsMediator::class.java)
+    }
     internal fun publiser(nøkkel: String, melding: String) {
+        log.info("publiserer syntetisk testdatamelding key=$nøkkel record:\n$melding")
         connection.publish(nøkkel, melding)
     }
 

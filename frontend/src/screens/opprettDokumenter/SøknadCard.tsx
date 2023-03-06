@@ -32,6 +32,7 @@ export const SøknadCard = React.memo(() => {
 
   useUnregisterSøknadCard();
 
+  const sykdomFom = watch("sykdomFom");
   const sykdomTom = watch("sykdomTom");
   const skalSendeSykmelding = watch("skalSendeSykmelding");
 
@@ -69,7 +70,11 @@ export const SøknadCard = React.memo(() => {
           label="Arbeid gjenopptatt"
           type="date"
           errors={formState.errors}
-          {...register("arbeidGjenopptatt")}
+          {...register("arbeidGjenopptatt", {
+            required: false,
+            validate: (value?: string): boolean | string =>
+                value ? ((new Date(sykdomFom) <= new Date(value) && new Date(sykdomTom) >= new Date(value)) || 'Arbeid gjenopptatt kan ikke være eldre enn sykdomFom, eller nyere enn sykdomTom'): true,
+          })}
         />
         <FormInput
           data-testid="faktiskgrad"

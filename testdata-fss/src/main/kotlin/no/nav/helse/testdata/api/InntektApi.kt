@@ -11,6 +11,9 @@ import java.time.YearMonth
 import java.util.*
 import kotlin.math.round
 
+private const val InntekterForSykepengegrunnlag = "8-28"
+@Suppress("unused")
+private const val InntekterForSammenligningsgrunnlag = "8-30"
 
 internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) = get("/person/inntekt") {
     val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
@@ -20,7 +23,7 @@ internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) = 
         fnr = fnr,
         fom = start,
         tom = end,
-        filter = "8-30",
+        filter = InntekterForSykepengegrunnlag,
         callId = UUID.randomUUID().toString()
     )
     when (inntekterResult) {

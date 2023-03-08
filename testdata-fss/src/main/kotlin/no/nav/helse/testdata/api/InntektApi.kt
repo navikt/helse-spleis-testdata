@@ -28,11 +28,25 @@ internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) = 
     )
     when (inntekterResult) {
         is Result.Ok -> {
+            val inntekterPerAg = inntekterResult.value
+                .flatMap { it.inntektsliste }
+                .groupBy { it.orgnummer }
+                .mapValues { it.value.sumOf { it.beløp } / 12.0 }
+                .mapValues { (_, månedsinntekt) ->
+                    (månedsinntekt * 100).toInt() / 100.0 // bevarer to desimaler, fjerner resten
+                }
+                .map { (orgnummer, beregnetInntekt) ->
+                    mapOf(
+                        "organisasjonsnummer" to orgnummer,
+                        "beregnetMånedsinntekt" to beregnetInntekt
+                    )
+                }
             val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumOf { it.beløp }
             val beregnetMånedsinntekt = round(beregnetÅrsinntekt / 12)
             call.respond(
                 mapOf(
-                    "beregnetMånedsinntekt" to beregnetMånedsinntekt
+                    "beregnetMånedsinntekt" to beregnetMånedsinntekt,
+                    "arbeidsgivere" to inntekterPerAg
                 )
             )
         }

@@ -4,7 +4,7 @@ import { FormInput } from "../../components/FormInput";
 import { get } from "../../io/api";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import {validateFødselsnummer, validateInntekt, validateRefusjonsbeløp} from "../formValidation";
+import {validateFødselsnummer, validateInntekt, validateOrganisasjonsnummer, validateRefusjonsbeløp} from "../formValidation";
 import format from "date-fns/format";
 import {startOfMonth, subMonths} from "date-fns";
 
@@ -21,22 +21,25 @@ const useUnregisterInntektsmeldingCard = () => {
 const useFetchInntekt = () => {
   const { watch, setValue, clearErrors } = useFormContext();
   const fødselsnummer = watch("fnr");
+  const orgnummer = watch("orgnummer");
   const [fetchedInntekt, setFetchedInntekt] = useState(false);
 
   useEffect(() => {
-    if (!fetchedInntekt && validateFødselsnummer(fødselsnummer) === true) {
+    if (validateFødselsnummer(fødselsnummer) === true && validateOrganisasjonsnummer(orgnummer) === true) {
       setFetchedInntekt(true);
       get("/person/inntekt", { ident: fødselsnummer })
         .then(async (result) => {
           const response = await result.json();
+          let beregnetMånedsinntekt = response.arbeidsgivere.find((it) => it.organisasjonsnummer == orgnummer)?.beregnetMånedsinntekt ?? response.beregnetMånedsinntekt
+
           clearErrors("inntekt");
           clearErrors("refusjonsbeløp");
-          setValue("inntekt", String(response.beregnetMånedsinntekt));
-          setValue("refusjonsbeløp", String(response.beregnetMånedsinntekt));
+          setValue("inntekt", String(beregnetMånedsinntekt));
+          setValue("refusjonsbeløp", String(beregnetMånedsinntekt));
         })
         .catch((error) => console.log(error));
     }
-  }, [fetchedInntekt, fødselsnummer]);
+  }, [fetchedInntekt, fødselsnummer, orgnummer]);
 };
 
 export const InntektsmeldingCard = React.memo(() => {

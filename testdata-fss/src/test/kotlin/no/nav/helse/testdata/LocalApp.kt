@@ -26,7 +26,10 @@ fun main() {
             Result.Ok(
                 (1..12).map {
                     Måned(
-                        YearMonth.of(2019, it), listOf(Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "orgnummer"))
+                        YearMonth.of(2019, it), listOf(
+                            Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "123456789"),
+                            Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "987654321")
+                        )
                     )
                 }
             )

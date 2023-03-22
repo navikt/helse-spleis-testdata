@@ -42,7 +42,7 @@ export const useClearSystemMessages = (): UseClearSystemMessagesResult => {
         removeLastMessage();
         i++;
       } else clearInterval(interval);
-    }, 250);
+    }, 50);
   };
 
   return () => removeMessages();

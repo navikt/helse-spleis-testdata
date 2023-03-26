@@ -9,9 +9,9 @@ import no.nav.helse.testdata.InntektRestClient
 import no.nav.helse.testdata.Result
 import java.time.YearMonth
 import java.util.*
-import kotlin.math.round
 
 private const val InntekterForSykepengegrunnlag = "8-28"
+
 @Suppress("unused")
 private const val InntekterForSammenligningsgrunnlag = "8-30"
 
@@ -41,15 +41,9 @@ internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) = 
                         "beregnetMånedsinntekt" to beregnetInntekt
                     )
                 }
-            val beregnetÅrsinntekt = inntekterResult.value.flatMap { it.inntektsliste }.sumOf { it.beløp }
-            val beregnetMånedsinntekt = round(beregnetÅrsinntekt / 12)
-            call.respond(
-                mapOf(
-                    "beregnetMånedsinntekt" to beregnetMånedsinntekt,
-                    "arbeidsgivere" to inntekterPerAg
-                )
-            )
+            call.respond(mapOf("arbeidsgivere" to inntekterPerAg))
         }
+
         is Result.Error -> call.respond(inntekterResult.error.statusCode, inntekterResult.error.response)
     }
 }

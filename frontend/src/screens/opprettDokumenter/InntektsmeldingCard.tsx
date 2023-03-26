@@ -22,24 +22,36 @@ const useFetchInntekt = () => {
   const { watch, setValue, clearErrors } = useFormContext();
   const fødselsnummer = watch("fnr");
   const orgnummer = watch("orgnummer");
-  const [fetchedInntekt, setFetchedInntekt] = useState(false);
+  const [alleInntekter, setAlleInntekter] = useState({});
 
   useEffect(() => {
-    if (validateFødselsnummer(fødselsnummer) === true && validateOrganisasjonsnummer(orgnummer) === true) {
-      setFetchedInntekt(true);
+    if (validateFødselsnummer(fødselsnummer) === true && alleInntekter[fødselsnummer] === undefined) {
       get("/person/inntekt", { ident: fødselsnummer })
         .then(async (result) => {
           const response = await result.json();
-          let beregnetMånedsinntekt = response.arbeidsgivere.find((it) => it.organisasjonsnummer == orgnummer)?.beregnetMånedsinntekt ?? response.beregnetMånedsinntekt
+          const inntekterForFnr = response.arbeidsgivere.reduce((acc, ag) => {
+            acc[ag.organisasjonsnummer] = ag.beregnetMånedsinntekt
+            return acc
+          }, {})
 
-          clearErrors("inntekt");
-          clearErrors("refusjonsbeløp");
-          setValue("inntekt", String(beregnetMånedsinntekt));
-          setValue("refusjonsbeløp", String(beregnetMånedsinntekt));
+          setAlleInntekter((previous) => ({...previous, [fødselsnummer]: inntekterForFnr}))
         })
         .catch((error) => console.log(error));
     }
-  }, [fetchedInntekt, fødselsnummer, orgnummer]);
+  }, [fødselsnummer]);
+
+  useEffect(() => {
+    if (!validateFødselsnummer(fødselsnummer) || !validateOrganisasjonsnummer(orgnummer)) return
+
+    const beregnetMånedsinntekt = alleInntekter[fødselsnummer]?.[orgnummer]
+    if (beregnetMånedsinntekt === undefined) return
+
+    clearErrors("inntekt");
+    clearErrors("refusjonsbeløp");
+    setValue("inntekt", String(beregnetMånedsinntekt));
+    setValue("refusjonsbeløp", String(beregnetMånedsinntekt));
+  }, [alleInntekter, fødselsnummer, orgnummer])
+
 };
 
 export const InntektsmeldingCard = React.memo(() => {

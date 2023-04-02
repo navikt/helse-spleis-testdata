@@ -4,13 +4,14 @@ import { Checkbox } from "../../components/Checkbox";
 import { Card } from "../../components/Card";
 import { ErrorMessage } from "../../components/ErrorMessage";
 import { useFormContext } from "react-hook-form";
-import React from "react";
+import React, { useState } from "react";
 import {
   validateFødselsnummer,
   validateOrganisasjonsnummer,
 } from "../formValidation";
 import { SykdomTom } from "./SykdomTom";
 import { SykdomFom } from "./SykdomFom";
+import { DeleteButton } from "./DeleteButton";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -28,12 +29,21 @@ const useDocumentsValidator = () => {
 
 export const PersonCard = React.memo(() => {
   const { register, formState } = useFormContext();
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined)
 
   const validateSendsDocuments = useDocumentsValidator();
 
+  const deleteFailed = (errorMessage) => {
+    setDeleteErrorMessage(errorMessage)
+  }
+
   return (
     <Card>
-      <h2 className={styles.Title}>Person</h2>
+      <div className={styles.PersonHeader}>
+        <h2 className={styles.PersonTitle}>Person</h2>
+        <DeleteButton errorCallback={deleteFailed} />
+        {deleteErrorMessage && <div className={styles.SlettPersonFeilmelding}>{deleteErrorMessage}</div>}
+      </div>
       <div className={styles.CardContainer}>
         <FormInput
           data-testid="fnr"

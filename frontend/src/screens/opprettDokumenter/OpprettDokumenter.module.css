@@ -24,6 +24,43 @@
   margin-bottom: var(--block-small);
 }
 
+.PersonHeader {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: var(--block-medium);
+}
+.PersonHeader > h2 {
+  margin-bottom: 0;
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+.PersonHeader > .SlettPersonButton {
+  justify-self: end;
+}
+.SlettPersonButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--background-color-primary);
+  border: #dddddd 1px solid;
+  border-radius: 0.25rem;
+  height: 1.6rem;
+  aspect-ratio: 1/1;
+  font-size: 0.6rem;
+  transition: all 0.2s ease;
+}
+.SlettPersonButton:hover {
+  background: var(--active-color-secondary);
+  border-color: #00a6ff;
+}
+.SlettPersonFeilmelding {
+  color: red;
+  grid-column: 1 / span 2;
+  justify-self: end;
+  margin-top: 0.3rem;
+  margin-bottom: -2rem;
+}
+
 .PeriodContainer {
   display: flex;
   position: relative;
@@ -57,4 +94,12 @@
 
 .DocumentError {
   font-size: 12px;
+}
+
+.SlettPersonButton.success {
+  /*filter: invert(100%);*/
+}
+.SlettPersonButton.error {
+  background: #161616;
+  font-size: 1.2rem;
 }

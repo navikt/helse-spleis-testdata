@@ -26,13 +26,20 @@ describe("OpprettDokumenter", () => {
   it("oppretter dokumenter", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    mockFetchResponse({ json: () => ({ beregnetMånedsinntekt: 54321 }) });
+    const orgnr = "987654321";
+    const inntekt = "54321";
+    mockStandardInntekt(orgnr, inntekt)
+
     userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
-    userEvent.type(screen.getByTestId("orgnummer"), "987654321");
-
-    mockFetchResponse({ status: 204 });
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(inntekt)
+    );
+    mockFetchResponse({ status: 200, text: () => jest.fn() });
     userEvent.click(screen.getByText("Opprett dokumenter"));
+
+    await new Promise((r) => setTimeout(r, 1100));
 
     await waitFor(() => {
       expect(screen.getByTestId("success")).toBeVisible();
@@ -56,7 +63,9 @@ describe("OpprettDokumenter", () => {
   it("mapper skjemaverdier til payload", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    mockFetchResponse({ json: () => ({ beregnetMånedsinntekt: 54321 }) });
+    const orgnr = "987654321";
+    mockStandardInntekt(orgnr, "54321");
+
     userEvent.type(screen.getByTestId("fnr"), "01234567890");
 
     await waitFor(() => {
@@ -69,8 +78,11 @@ describe("OpprettDokumenter", () => {
       );
     });
 
-    userEvent.type(screen.getByTestId("orgnummer"), "987654321");
+    userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+
     userEvent.type(screen.getByTestId("faktiskgrad"), "80");
+    userEvent.type(screen.getByTestId("sykdomFom"), "2021-07-01");
+    userEvent.type(screen.getByTestId("sykdomTom"), "2021-07-31");
 
     userEvent.clear(screen.getByTestId("refusjonsbeløp"))
     userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000")
@@ -87,9 +99,10 @@ describe("OpprettDokumenter", () => {
     userEvent.click(screen.getByTestId("endringButton"));
     userEvent.type(screen.getByTestId("endringsdato0"), "2021-07-17");
     userEvent.type(screen.getByTestId("endringsbeløp0"), "19000");
-
-    mockFetchResponse({ status: 204 });
+    mockFetchResponse({ status: 200,text: () => jest.fn() });
     userEvent.click(screen.getByText("Opprett dokumenter"));
+
+    await new Promise((r) => setTimeout(r, 1100));
 
     await waitFor(() => {
       expect(fetch as jest.Mock).toHaveBeenLastCalledWith(
@@ -108,6 +121,7 @@ describe("OpprettDokumenter", () => {
               faktiskgrad: "80",
               sendtNav: "2021-08-01",
             },
+            medlemskapAvklart: true,
             inntektsmelding: {
               inntekt: "54321",
               refusjon: {
@@ -130,14 +144,20 @@ describe("OpprettDokumenter", () => {
   it("sletter person", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    mockFetchResponse({ json: () => ({ beregnetMånedsinntekt: 54321 }) });
+    const orgnr = "987654321";
+    const inntekt = "54321"
+    mockStandardInntekt(orgnr, inntekt);
     userEvent.type(screen.getByTestId("fnr"), "01234567890");
     userEvent.click(screen.getByTestId("slettPerson"));
-    userEvent.type(screen.getByTestId("orgnummer"), "987654321");
+    userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
-    mockFetchResponse({ status: 204 }).mockImplementationOnce(() =>
-      Promise.resolve({ status: 204 })
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+        inntekt
+      )
     );
+
+    mockFetchResponse({ status: 200, text: () => jest.fn() });
     userEvent.click(screen.getByText("Opprett dokumenter"));
 
     await waitFor(() => {
@@ -167,4 +187,15 @@ describe("OpprettDokumenter", () => {
       expect(screen.getByTestId("førsteFraværsdag")).toHaveValue("2021-07-31");
     });
   });
+
+  const mockStandardInntekt = (orgnr: string, månedsinntekt: string) => {
+    mockFetchResponse({
+      json: () => ({
+        beregnetMånedsinntekt: månedsinntekt,
+        arbeidsgivere: [
+          { organisasjonsnummer: orgnr, beregnetMånedsinntekt: månedsinntekt },
+        ],
+      }),
+    });
+  };
 });

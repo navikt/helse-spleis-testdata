@@ -33,7 +33,7 @@ describe("SystemMessages", () => {
     render(<SystemMessages />, { wrapper });
     expect(screen.queryByText("En melding")).toBeVisible();
 
-    userEvent.click(screen.getByRole("button"));
+    userEvent.click(screen.getByRole("button", { name: /Fjern alle meldinger/ }));
     expect(screen.queryByText("En melding")).toBeNull();
   });
 });

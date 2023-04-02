@@ -17,14 +17,14 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          java-version: '17.x'
-          distribution: 'temurin'
+          java-version: "17.x"
+          distribution: "temurin"
 
       - uses: actions/setup-node@v3
         with:
           node-version: "14"
-          cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
 
       - name: create docker tag
         run: echo "TAG=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
@@ -41,10 +41,13 @@ jobs:
         run: export TZ=utc
 
       - name: Install dependencies
-        run: npm --prefix frontend i
+        run: npm --prefix frontend ci
 
       - name: Test frontend
         run: npm --prefix frontend run test
+
+      - name: Prune dependencies
+        run: npm --prefix frontend prune --production
 
       - name: Build frontend
         run: npm --prefix frontend run build

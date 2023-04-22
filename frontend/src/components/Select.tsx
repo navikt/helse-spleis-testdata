@@ -13,8 +13,6 @@ interface SelectProps extends React.InputHTMLAttributes<HTMLSelectElement> {
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, options, ...rest }, ref) => {
-      console.log(`select`)
-      console.log(rest)
       return (
         <select
               className={classNames(styles.Input, className)}

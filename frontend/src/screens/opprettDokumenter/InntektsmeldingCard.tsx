@@ -8,6 +8,7 @@ import {validateFødselsnummer, validateInntekt, validateOrganisasjonsnummer, va
 import format from "date-fns/format";
 import {startOfMonth, subMonths} from "date-fns";
 import {FormSelect} from "../../components/FormSelect";
+import {Checkbox} from "../../components/Checkbox";
 
 const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
@@ -127,6 +128,12 @@ export const InntektsmeldingCard = React.memo(() => {
                 setValue("begrunnelseForReduksjonEllerIkkeUtbetalt", verdi)
             } }
         />
+          <Checkbox
+              data-testid="harOpphørAvNaturalytelser"
+              label="Har opphør av naturalytelser"
+              errors={formState.errors}
+              {...register("harOpphørAvNaturalytelser")}
+          />
       </div>
     </Card>
   );

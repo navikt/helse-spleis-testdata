@@ -48,7 +48,6 @@ export const DeleteButton = ({
   };
 
   useEffect(() => {
-    console.error(`hei, ${status}`);
     let errorMessage =
       status && status !== 200 ? "Sletting av person feilet" : undefined;
     errorCallback(errorMessage);

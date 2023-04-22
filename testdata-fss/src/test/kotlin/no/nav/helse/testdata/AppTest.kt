@@ -125,7 +125,8 @@ class AppTest {
             ],
             "endringRefusjon": [],
             "refusjon": {},
-            "førsteFraværsdag": "2019-12-31"
+            "førsteFraværsdag": "2019-12-31",
+            "begrunnelseForReduksjonEllerIkkeUtbetalt": ""
         }
     """
 

@@ -14,6 +14,7 @@ data class Inntektsmelding(
     val endringRefusjon: List<EndringIRefusjon> = emptyList(),
     val refusjon: Refusjon,
     val førsteFraværsdag: LocalDate? = null,
+    val begrunnelseForReduksjonEllerIkkeUtbetalt: String
 )
 
 data class Refusjon(
@@ -61,6 +62,7 @@ fun inntektsmelding(
                 },
                 "endringIRefusjoner": ${inntektsmelding.endringRefusjon.tilJson()},
                 "opphoerAvNaturalytelser":[],
+                "begrunnelseForReduksjonEllerIkkeUtbetalt": "${inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt}",
                 "gjenopptakelseNaturalytelser":[],
                 "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},
                 "ferieperioder": ${inntektsmelding.ferieperioder.tilJson()},

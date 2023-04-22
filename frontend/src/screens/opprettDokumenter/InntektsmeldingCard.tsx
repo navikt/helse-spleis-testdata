@@ -7,6 +7,7 @@ import { useFormContext } from "react-hook-form";
 import {validateFødselsnummer, validateInntekt, validateOrganisasjonsnummer, validateRefusjonsbeløp} from "../formValidation";
 import format from "date-fns/format";
 import {startOfMonth, subMonths} from "date-fns";
+import {FormSelect} from "../../components/FormSelect";
 
 const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
@@ -55,7 +56,7 @@ const useFetchInntekt = () => {
 };
 
 export const InntektsmeldingCard = React.memo(() => {
-  const { register, formState } = useFormContext();
+  const { register, formState, setValue } = useFormContext();
 
   useUnregisterInntektsmeldingCard();
   useFetchInntekt();
@@ -99,6 +100,32 @@ export const InntektsmeldingCard = React.memo(() => {
           {...register("refusjonsbeløp", {
             validate: validateRefusjonsbeløp,
           })}
+        />
+        <FormSelect
+            label="Begrunnelse for reduksjon"
+            options={[
+                { value: "", label: "(Ingen)" },
+                "LovligFravaer",
+                "FravaerUtenGyldigGrunn",
+                "ArbeidOpphoert",
+                "BeskjedGittForSent",
+                "ManglerOpptjening",
+                "IkkeLoenn",
+                "BetvilerArbeidsufoerhet",
+                "IkkeFravaer",
+                "StreikEllerLockout",
+                "Permittering",
+                "FiskerMedHyre",
+                "Saerregler",
+                "FerieEllerAvspasering",
+                "IkkeFullStillingsandel",
+                "TidligereVirksomhet"
+            ]}
+            {...register("begrunnelseForReduksjonEllerIkkeUtbetalt")}
+            onChange={val => {
+                const verdi = val.target.options[val.target.options.selectedIndex].value
+                setValue("begrunnelseForReduksjonEllerIkkeUtbetalt", verdi)
+            } }
         />
       </div>
     </Card>

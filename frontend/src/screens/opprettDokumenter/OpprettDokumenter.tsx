@@ -78,6 +78,7 @@ const createPayload = (
     arbeidsgiverperiode: mapPeriodArray(values, "arbFom", "arbTom"),
     endringRefusjon: mapEndringIRefusjon(values),
     førsteFraværsdag: values.førsteFraværsdag,
+    begrunnelseForReduksjonEllerIkkeUtbetalt: values.begrunnelseForReduksjonEllerIkkeUtbetalt
   });
 
   return {

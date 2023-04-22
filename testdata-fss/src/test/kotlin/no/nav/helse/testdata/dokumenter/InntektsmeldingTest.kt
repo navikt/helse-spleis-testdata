@@ -23,7 +23,8 @@ internal class InntektsmeldingTest {
                 førsteFraværsdag = mandag,
                 arbeidsgiverperiode = listOf(Periode(mandag, mandag.plusDays(15))),
                 ferieperioder = listOf(Periode(mandag.plusDays(1), mandag.plusDays(2))),
-                refusjon = Refusjon()
+                refusjon = Refusjon(),
+                begrunnelseForReduksjonEllerIkkeUtbetalt = ""
             )
         )
         val json = inntektsmelding(vedtak)

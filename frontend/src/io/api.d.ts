@@ -34,6 +34,7 @@ export interface InntektsmeldingDTO {
   opphørRefusjon?: string;
   førsteFraværsdag?: string;
   refusjon: RefusjonDto;
+  begrunnelseForReduksjonEllerIkkeUtbetalt: string
 }
 
 export interface RefusjonDto {

@@ -9,7 +9,6 @@ import java.util.*
 
 data class Inntektsmelding(
     val inntekt: Double,
-    val ferieperioder: List<Periode>,
     val arbeidsgiverperiode: List<Periode> = emptyList(),
     val endringRefusjon: List<EndringIRefusjon> = emptyList(),
     val refusjon: Refusjon,
@@ -66,7 +65,7 @@ fun inntektsmelding(
                 "begrunnelseForReduksjonEllerIkkeUtbetalt": "${inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt}",
                 "gjenopptakelseNaturalytelser":[],
                 "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},
-                "ferieperioder": ${inntektsmelding.ferieperioder.tilJson()},
+                "ferieperioder": [],
                 "status":"GYLDIG",
                 "arkivreferanse":"${UUID.randomUUID()}",
                 "hendelseId":"${UUID.randomUUID()}",

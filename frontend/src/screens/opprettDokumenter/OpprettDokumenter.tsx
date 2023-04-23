@@ -74,13 +74,15 @@ const createPayload = (
       opphørRefusjon: values.opphørRefusjon || null,
       refusjonsbeløp: values.refusjonsbeløp || null
     },
-    ferieperioder: mapPeriodArray(values, "ferieFom", "ferieTom"),
     arbeidsgiverperiode: mapPeriodArray(values, "arbFom", "arbTom"),
     endringRefusjon: mapEndringIRefusjon(values),
     førsteFraværsdag: values.førsteFraværsdag,
     begrunnelseForReduksjonEllerIkkeUtbetalt: values.begrunnelseForReduksjonEllerIkkeUtbetalt,
     harOpphørAvNaturalytelser: values.harOpphørAvNaturalytelser ?? false
   });
+
+  console.log(`Record object:`)
+  console.log(values)
 
   return {
     fnr: values.fnr,
@@ -178,7 +180,7 @@ export const OpprettDokumenter = React.memo(() => {
               <EndringRefusjon />
             </>
           )}
-          {(skalSendeInntektsmelding || skalSendeSøknad) && <Ferieperioder />}
+          {skalSendeSøknad && <Ferieperioder />}
           <div className={styles.Flex}>
             <FetchButton status={status} isFetching={isFetching} type="submit">
               Opprett dokumenter

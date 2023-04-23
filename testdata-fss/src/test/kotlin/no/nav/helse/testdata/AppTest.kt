@@ -118,7 +118,6 @@ class AppTest {
     private fun inntektsmelding() = """
         {
             "inntekt": 0.0,
-            "ferieperioder": [],
             "arbeidsgiverperiode": [
                 { "fom": "2019-12-31", "tom": "2020-01-14" },
                 { "fom": "2019-12-31", "tom": "2020-01-14" }

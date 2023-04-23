@@ -128,7 +128,6 @@ describe("OpprettDokumenter", () => {
                 opphørRefusjon: "2021-08-01",
                 refusjonsbeløp: "20000"
               },
-              ferieperioder: [{ fom: "2021-07-02", tom: "2021-07-04" }],
               arbeidsgiverperiode: [{ fom: "2021-07-01", tom: "2021-07-16" }],
               endringRefusjon: [{ endringsdato: "2021-07-17", beløp: "19000"}],
               førsteFraværsdag: "2021-07-01",

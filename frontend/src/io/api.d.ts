@@ -28,7 +28,6 @@ export interface SøknadDTO extends SykmeldingDTO {
 
 export interface InntektsmeldingDTO {
   inntekt: number;
-  ferieperioder: PeriodeDTO[];
   arbeidsgiverperiode: PeriodeDTO[];
   endringRefusjon: EndringIRefusjonDto[];
   opphørRefusjon?: string;

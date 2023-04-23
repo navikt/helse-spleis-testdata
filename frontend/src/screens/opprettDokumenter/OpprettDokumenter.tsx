@@ -47,13 +47,6 @@ const createPayload = (
     const second = valuesWithName(values, k2);
     return first.map((it, i) => ({ fom: it, tom: second[i] })) ?? [];
   };
-
-  const mapEndringIRefusjon = (values): EndringIRefusjonDto[] => {
-    const endringsdato = valuesWithName(values, "endringsdato");
-    const beløp = valuesWithName(values, "endringsbeløp");
-    return endringsdato.map((it, i) => ({ endringsdato: it as string, beløp: beløp[i] as number })) ?? [];
-  }
-
   const sykmelding = (): SykmeldingDTO => ({
     sykmeldingsgrad: values.sykmeldingsgrad,
   });
@@ -69,16 +62,16 @@ const createPayload = (
   });
 
   const inntektsmelding = (): InntektsmeldingDTO => ({
-    inntekt: values.inntekt,
+    inntekt: values.inntektsmelding.inntekt,
     refusjon: {
-      opphørRefusjon: values.opphørRefusjon || null,
-      refusjonsbeløp: values.refusjonsbeløp || null
+      opphørRefusjon: values.inntektsmelding.opphørRefusjon || null,
+      refusjonsbeløp: values.inntektsmelding.refusjonsbeløp || null
     },
-    arbeidsgiverperiode: values?.inntektsmelding?.arbeidsgiverperiode?.map((it) => ({ fom: it.fom, tom: it.tom })) ?? [],
-    endringRefusjon: mapEndringIRefusjon(values),
-    førsteFraværsdag: values.førsteFraværsdag,
-    begrunnelseForReduksjonEllerIkkeUtbetalt: values.begrunnelseForReduksjonEllerIkkeUtbetalt,
-    harOpphørAvNaturalytelser: values.harOpphørAvNaturalytelser ?? false
+    arbeidsgiverperiode: values.inntektsmelding.arbeidsgiverperiode?.map((it) => ({ fom: it.fom, tom: it.tom })) ?? [],
+    endringRefusjon: values.inntektsmelding.endringIRefusjon?.map((it) => ({ endringsdato: it.endringsdato, beløp: it.endringsbeløp as number })) ?? [],
+    førsteFraværsdag: values.inntektsmelding.førsteFraværsdag,
+    begrunnelseForReduksjonEllerIkkeUtbetalt: values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
+    harOpphørAvNaturalytelser: values.inntektsmelding.harOpphørAvNaturalytelser ?? false
   });
 
   return {

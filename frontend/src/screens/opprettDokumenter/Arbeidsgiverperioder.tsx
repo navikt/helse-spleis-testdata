@@ -13,15 +13,15 @@ const formattedDateString = (date: Date): string =>
   date.toLocaleDateString("nb-NO", { dateStyle: "short" });
 
 export const Arbeidsgiverperioder = React.memo(() => {
-  const { getValues, register, unregister, formState } = useFormContext();
-  const [perioder, setPerioder] = useState<PeriodeId[]>(getValues(`inntektsmelding.arbeidsgiverperiode`)?.map(it => nanoid()) ?? []);
+  const { register, unregister, formState } = useFormContext();
+  const [perioder, setPerioder] = useState<PeriodeId[]>([]);
 
   const addArbeidsgiverperiode = () => {
     setPerioder((old) => [...old, nanoid()]);
   };
 
   const removeArbeidsgiverperiode = (index: number) => {
-    perioder.forEach((val,index) => unregister(`inntektsmelding.arbeidsgiverperiode.${index}`))
+    unregister(`inntektsmelding.arbeidsgiverperiode`)
     setPerioder((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 

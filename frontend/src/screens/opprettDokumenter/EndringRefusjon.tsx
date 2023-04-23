@@ -26,10 +26,8 @@ export const EndringRefusjon = React.memo(() => {
     setOpphør((old) => [...old, nanoid()]);
   };
 
-  const removeEndring = (id: OpphørId) => {
-    const index = opphør.findIndex((it) => it === id);
-    unregister(`endringsdato-${id}`);
-    unregister(`endringsbeløp-${id}`);
+  const removeEndring = (index: number) => {
+    unregister(`inntektsmelding.endringIRefusjon`)
     setOpphør((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
@@ -48,17 +46,17 @@ export const EndringRefusjon = React.memo(() => {
                 label="Dato for endring"
                 errors={formState.errors}
                 defaultValue={formattedDateString(new Date("2021-07-01"))}
-                {...register(`endringsdato-${id}`, {
+                {...register(`inntektsmelding.endringIRefusjon.${i}.endringsdato`, {
                   required: "Dato for endring må angis",
                 })}
               />
-              <DeleteButton onClick={() => removeEndring(id)} />
+              <DeleteButton onClick={() => removeEndring(i)} />
             </div>
             <FormInput
                 data-testid={`endringsbeløp${i}`}
                 label="Beløp for endring"
                 errors={formState.errors}
-                {...register(`endringsbeløp-${id}`, {
+                {...register(`inntektsmelding.endringIRefusjon.${i}.endringsbeløp`, {
                   required: "Beløp for endring må angis",
                   validate: validateInntekt,
                 })}

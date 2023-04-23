@@ -14,8 +14,8 @@ const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
   useEffect(() => {
     return () => {
-      unregister("førsteFraværsdag");
-      unregister("inntekt");
+        console.log(`Avregistrerer inntektsmelding`)
+      unregister("inntektsmelding");
     };
   }, []);
 };
@@ -48,10 +48,10 @@ const useFetchInntekt = () => {
     const beregnetMånedsinntekt = alleInntekter[fødselsnummer]?.[orgnummer]
     if (beregnetMånedsinntekt === undefined) return
 
-    clearErrors("inntekt");
-    clearErrors("refusjonsbeløp");
-    setValue("inntekt", String(beregnetMånedsinntekt));
-    setValue("refusjonsbeløp", String(beregnetMånedsinntekt));
+    clearErrors("inntektsmelding.inntekt");
+    clearErrors("inntektsmelding.refusjonsbeløp");
+    setValue("inntektsmelding.inntekt", String(beregnetMånedsinntekt));
+    setValue("inntektsmelding.refusjonsbeløp", String(beregnetMånedsinntekt));
   }, [alleInntekter, fødselsnummer, orgnummer])
 
 };
@@ -74,7 +74,7 @@ export const InntektsmeldingCard = React.memo(() => {
           label="Første fraværsdag"
           errors={formState.errors}
           defaultValue={defaultDate}
-          {...register("førsteFraværsdag", {
+          {...register("inntektsmelding.førsteFraværsdag", {
             required: "Første fraværsdag må angis",
           })}
         />
@@ -83,13 +83,13 @@ export const InntektsmeldingCard = React.memo(() => {
           type="date"
           label="Siste dag med refusjon"
           errors={formState.errors}
-          {...register("opphørRefusjon")}
+          {...register("inntektsmelding.opphørRefusjon")}
         />
         <FormInput
           data-testid="inntekt"
           label="Inntekt"
           errors={formState.errors}
-          {...register("inntekt", {
+          {...register("inntektsmelding.inntekt", {
             required: "Inntekt må angis",
             validate: validateInntekt,
           })}
@@ -98,7 +98,7 @@ export const InntektsmeldingCard = React.memo(() => {
           data-testid="refusjonsbeløp"
           label="Refusjonsbeløp"
           errors={formState.errors}
-          {...register("refusjonsbeløp", {
+          {...register("inntektsmelding.refusjonsbeløp", {
             validate: validateRefusjonsbeløp,
           })}
         />
@@ -122,17 +122,17 @@ export const InntektsmeldingCard = React.memo(() => {
                 "IkkeFullStillingsandel",
                 "TidligereVirksomhet"
             ]}
-            {...register("begrunnelseForReduksjonEllerIkkeUtbetalt")}
+            {...register("inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt")}
             onChange={val => {
                 const verdi = val.target.options[val.target.options.selectedIndex].value
-                setValue("begrunnelseForReduksjonEllerIkkeUtbetalt", verdi)
+                setValue("inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt", verdi)
             } }
         />
           <Checkbox
               data-testid="harOpphørAvNaturalytelser"
               label="Har opphør av naturalytelser"
               errors={formState.errors}
-              {...register("harOpphørAvNaturalytelser")}
+              {...register("inntektsmelding.harOpphørAvNaturalytelser")}
           />
       </div>
     </Card>

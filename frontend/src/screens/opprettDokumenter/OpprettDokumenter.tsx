@@ -37,28 +37,18 @@ type OpprettVedtaksperiodePayload = PersonDTO &
 const createPayload = (
   values: Record<string, any>
 ): OpprettVedtaksperiodePayload => {
-  const valuesWithName = (values, name) =>
-    Object.entries(values)
-      .filter(([key]) => key.includes(name))
-      .map((it) => it[1]);
-
-  const mapPeriodArray = (values, k1, k2): any[] => {
-    const first = valuesWithName(values, k1);
-    const second = valuesWithName(values, k2);
-    return first.map((it, i) => ({ fom: it, tom: second[i] })) ?? [];
-  };
   const sykmelding = (): SykmeldingDTO => ({
     sykmeldingsgrad: values.sykmeldingsgrad,
   });
 
   const søknad = (): SøknadDTO => ({
-    sykmeldingsgrad: values.sykmeldingsgrad ?? values.sykmeldingsgradSøknad,
-    harAndreInntektskilder: values.harAndreInntektskilder ?? false,
-    ferieperioder: mapPeriodArray(values, "ferieFom", "ferieTom"),
-    faktiskgrad: values.faktiskgrad || undefined,
-    sendtNav: values.sendtNav || undefined,
-    sendtArbeidsgiver: values.sendtArbeidsgiver || undefined,
-    arbeidGjenopptatt: values.arbeidGjenopptatt || undefined,
+    sykmeldingsgrad: values.sykmeldingsgrad ?? values.søknad.sykmeldingsgrad,
+    harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
+    ferieperioder: values.søknad.ferieperioder?.map(it => ({fom: it.fom, tom: it.tom})) ?? [],
+    faktiskgrad: values.søknad.faktiskgrad || undefined,
+    sendtNav: values.søknad.sendtNav || undefined,
+    sendtArbeidsgiver: values.søknad.sendtArbeidsgiver || undefined,
+    arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
   });
 
   const inntektsmelding = (): InntektsmeldingDTO => ({

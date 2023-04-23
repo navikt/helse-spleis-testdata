@@ -14,7 +14,7 @@ export const SykdomTom = () => {
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(
-      "sendtNav",
+      "søknad.sendtNav",
       format(addDays(new Date(event.target.value), 1), "yyyy-MM-dd")
     );
     return sykdomTomRegister.onChange(event);

@@ -21,10 +21,8 @@ export const Ferieperioder = React.memo(() => {
     setPerioder((old) => [...old, nanoid()]);
   };
 
-  const removeFerieperiode = (id: PeriodeId) => {
-    const index = perioder.findIndex((it) => it === id);
-    unregister(`ferieFom-${id}`);
-    unregister(`ferieTom-${id}`);
+  const removeFerieperiode = (index: number) => {
+    unregister(`søknad.ferieperioder`);
     setPerioder((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
@@ -42,7 +40,7 @@ export const Ferieperioder = React.memo(() => {
               label="Ferieperiode f.o.m."
               errors={formState.errors}
               defaultValue={formattedDateString(new Date("2021-07-01"))}
-              {...register(`ferieFom-${id}`, {
+              {...register(`søknad.ferieperioder.${i}.fom`, {
                 required: "Start av ferieperioden må angis",
               })}
             />
@@ -52,11 +50,11 @@ export const Ferieperioder = React.memo(() => {
               label="Ferieperiode t.o.m."
               errors={formState.errors}
               defaultValue={formattedDateString(new Date("2021-07-10"))}
-              {...register(`ferieTom-${id}`, {
+              {...register(`søknad.ferieperioder.${i}.tom`, {
                 required: "Slutt av ferieperioden må angis",
               })}
             />
-            <DeleteButton onClick={() => removeFerieperiode(id)} />
+            <DeleteButton onClick={() => removeFerieperiode(i)} />
           </div>
         </Card>
       ))}

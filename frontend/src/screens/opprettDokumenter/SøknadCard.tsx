@@ -18,11 +18,7 @@ const useUnregisterSøknadCard = () => {
 
   useEffect(() => {
     return () => {
-      unregister("sendtNav");
-      unregister("sendtArbeidsgiver");
-      unregister("faktiskgrad");
-      unregister("harAndreInntektskilder");
-      unregister("sykmeldingsgradSøknad");
+      unregister("søknad");
     };
   }, []);
 };
@@ -38,7 +34,7 @@ export const SøknadCard = React.memo(() => {
 
   useEffect(() => {
     if (skalSendeSykmelding) {
-      unregister("sykmeldingsgradSøknad");
+      unregister("søknad.sykmeldingsgrad");
     }
   }, [skalSendeSykmelding]);
 
@@ -58,19 +54,19 @@ export const SøknadCard = React.memo(() => {
               ? formatDateString(nextDay(new Date(sykdomTom)))
               : defaultDate
           }
-          {...register("sendtNav")}
+          {...register("søknad.sendtNav")}
         />
         <FormInput
           label="Søknad sendt arbeidsgiver"
           type="date"
           errors={formState.errors}
-          {...register("sendtArbeidsgiver")}
+          {...register("søknad.sendtArbeidsgiver")}
         />
         <FormInput
           label="Arbeid gjenopptatt"
           type="date"
           errors={formState.errors}
-          {...register("arbeidGjenopptatt", {
+          {...register("søknad.arbeidGjenopptatt", {
             required: false,
             validate: (value?: string): boolean | string =>
                 value ? ((new Date(sykdomFom) <= new Date(value) && new Date(sykdomTom) >= new Date(value)) || 'Arbeid gjenopptatt kan ikke være eldre enn sykdomFom, eller nyere enn sykdomTom'): true,
@@ -80,7 +76,7 @@ export const SøknadCard = React.memo(() => {
           data-testid="faktiskgrad"
           label="Faktisk arbeidsgrad"
           errors={formState.errors}
-          {...register("faktiskgrad", {
+          {...register("søknad.faktiskgrad", {
             required: false,
             validate: validateArbeidsgrad,
           })}
@@ -89,14 +85,14 @@ export const SøknadCard = React.memo(() => {
           data-testid="harAndreInntektskilder"
           label="Har andre inntektskilder"
           errors={formState.errors}
-          {...register("harAndreInntektskilder")}
+          {...register("søknad.harAndreInntektskilder")}
         />
         {!skalSendeSykmelding && (
           <FormInput
             label="Sykdomsgrad i sykmeldingen"
             errors={formState.errors}
             defaultValue={100}
-            {...register("sykmeldingsgradSøknad", {
+            {...register("søknad.sykmeldingsgrad", {
               required: "Sykmeldingsgrad må fylles ut",
               validate: validateSykdomsgrad,
             })}

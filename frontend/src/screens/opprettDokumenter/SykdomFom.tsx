@@ -12,7 +12,7 @@ export const SykdomFom = () => {
   });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue("førsteFraværsdag", event.target.value);
+    setValue("inntektsmelding.førsteFraværsdag", event.target.value);
     return sykdomFomRegister.onChange(event);
   };
 

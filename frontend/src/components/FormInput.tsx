@@ -5,6 +5,8 @@ import { ErrorMessage } from "./ErrorMessage";
 import type { FieldErrors } from "react-hook-form";
 import classNames from "classnames";
 import { nanoid } from "nanoid";
+import {Simulate} from "react-dom/test-utils";
+import input = Simulate.input;
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -14,6 +16,10 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   ({ name, label, type, errors, ...rest }, ref) => {
     const id = nanoid();
+    var inputErrors = errors
+    name.split('.').forEach(it => {
+        if (inputErrors) inputErrors = inputErrors[it]
+    })
     return (
       <InputLabel>
         {label}
@@ -21,13 +27,13 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           id={id}
           name={name}
           type={type ?? "text"}
-          className={classNames(errors?.[name] && "error")}
-          aria-invalid={errors?.[name] ? "true" : "false"}
+          className={classNames(inputErrors && "error")}
+          aria-invalid={inputErrors ? "true" : "false"}
           {...rest}
           ref={ref}
         />
-        {errors?.[name] && (
-          <ErrorMessage label-for={id}>{errors[name].message}</ErrorMessage>
+        {inputErrors && (
+          <ErrorMessage label-for={id}>{inputErrors.message}</ErrorMessage>
         )}
       </InputLabel>
     );

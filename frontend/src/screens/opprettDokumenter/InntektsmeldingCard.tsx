@@ -14,7 +14,6 @@ const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
   useEffect(() => {
     return () => {
-        console.log(`Avregistrerer inntektsmelding`)
       unregister("inntektsmelding");
     };
   }, []);
@@ -63,7 +62,6 @@ export const InntektsmeldingCard = React.memo(() => {
   useFetchInntekt();
 
     const defaultDate = format(startOfMonth(subMonths(new Date(), 3)), "yyyy-MM-dd")
-
     return (
     <Card>
       <h2 className={styles.Title}>Inntektsmelding</h2>

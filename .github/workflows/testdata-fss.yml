@@ -54,6 +54,7 @@ jobs:
         run: export TZ=utc
 
       - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm --prefix frontend ci
 
       - name: Test frontend

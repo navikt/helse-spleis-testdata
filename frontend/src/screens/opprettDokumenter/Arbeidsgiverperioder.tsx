@@ -13,17 +13,15 @@ const formattedDateString = (date: Date): string =>
   date.toLocaleDateString("nb-NO", { dateStyle: "short" });
 
 export const Arbeidsgiverperioder = React.memo(() => {
-  const { register, unregister, formState } = useFormContext();
-  const [perioder, setPerioder] = useState<PeriodeId[]>([]);
+  const { getValues, register, unregister, formState } = useFormContext();
+  const [perioder, setPerioder] = useState<PeriodeId[]>(getValues(`inntektsmelding.arbeidsgiverperiode`)?.map(it => nanoid()) ?? []);
 
   const addArbeidsgiverperiode = () => {
     setPerioder((old) => [...old, nanoid()]);
   };
 
-  const removeArbeidsgiverperiode = (id: PeriodeId) => {
-    const index = perioder.findIndex((it) => it === id);
-    unregister(`arbFom-${id}`);
-    unregister(`arbTom-${id}`);
+  const removeArbeidsgiverperiode = (index: number) => {
+    perioder.forEach((val,index) => unregister(`inntektsmelding.arbeidsgiverperiode.${index}`))
     setPerioder((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
@@ -44,7 +42,7 @@ export const Arbeidsgiverperioder = React.memo(() => {
               label="Arbeidsgiverperiode f.o.m."
               errors={formState.errors}
               defaultValue={formattedDateString(new Date("2021-07-01"))}
-              {...register(`arbFom-${id}`, {
+              {...register(`inntektsmelding.arbeidsgiverperiode.${i}.fom`, {
                 required: "Start av arbeidsgiverperioden må angis",
               })}
             />
@@ -54,11 +52,11 @@ export const Arbeidsgiverperioder = React.memo(() => {
               label="Arbeidsgiverperiode t.o.m."
               errors={formState.errors}
               defaultValue={formattedDateString(new Date("2021-07-16"))}
-              {...register(`arbTom-${id}`, {
+              {...register(`inntektsmelding.arbeidsgiverperiode.${i}.tom`, {
                 required: "Slutt av arbeidsgiverperioden må angis",
               })}
             />
-            <DeleteButton onClick={() => removeArbeidsgiverperiode(id)} />
+            <DeleteButton onClick={() => removeArbeidsgiverperiode(i)} />
           </div>
         </Card>
       ))}

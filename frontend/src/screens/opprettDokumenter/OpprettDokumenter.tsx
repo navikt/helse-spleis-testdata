@@ -74,15 +74,12 @@ const createPayload = (
       opphørRefusjon: values.opphørRefusjon || null,
       refusjonsbeløp: values.refusjonsbeløp || null
     },
-    arbeidsgiverperiode: mapPeriodArray(values, "arbFom", "arbTom"),
+    arbeidsgiverperiode: values?.inntektsmelding?.arbeidsgiverperiode?.map((it) => ({ fom: it.fom, tom: it.tom })) ?? [],
     endringRefusjon: mapEndringIRefusjon(values),
     førsteFraværsdag: values.førsteFraværsdag,
     begrunnelseForReduksjonEllerIkkeUtbetalt: values.begrunnelseForReduksjonEllerIkkeUtbetalt,
     harOpphørAvNaturalytelser: values.harOpphørAvNaturalytelser ?? false
   });
-
-  console.log(`Record object:`)
-  console.log(values)
 
   return {
     fnr: values.fnr,

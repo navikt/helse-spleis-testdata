@@ -37,7 +37,7 @@
   background: var(--background-color-secondary);
 }
 
-.ThemeButton.dark > img {
+.ThemeButton.dark > i {
   filter: invert(100%);
 }
 

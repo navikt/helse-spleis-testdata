@@ -20,12 +20,6 @@
   min-height: unset;
 }
 
-.Button > img {
-  width: 1.5rem;
-  height: 1.5rem;
-  filter: invert(100%);
-}
-
 .Button.copied {
   background-color: var(--color-success);
 }

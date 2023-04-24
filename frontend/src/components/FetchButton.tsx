@@ -4,9 +4,6 @@ import classNames from "classnames";
 import { Button } from "./Button";
 import { Spinner } from "./Spinner";
 
-import errorIcon from "material-design-icons/alert/svg/production/ic_error_18px.svg";
-import successIcon from "material-design-icons/action/svg/production/ic_check_circle_24px.svg";
-
 const error = (status?: number): boolean =>
   status !== undefined && status !== null && status >= 400;
 
@@ -38,15 +35,13 @@ export const FetchButton: React.FC<FetchButtonProps> = ({
   >
     {children}
     {success(status) && (
-      <img
-        className={styles.Icon}
-        src={successIcon}
-        alt=""
+      <i
+        className={classNames(styles.Icon, "material-icons check_circle")}
         data-testid="success"
       />
     )}
     {error(status) && (
-      <img className={styles.Icon} src={errorIcon} alt="" data-testid="error" />
+      <i className={classNames(styles.Icon, "material-icons error")} data-testid="error" />
     )}
     {isFetching && <Spinner />}
   </Button>

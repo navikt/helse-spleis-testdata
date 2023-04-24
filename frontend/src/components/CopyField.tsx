@@ -5,9 +5,6 @@ import { Input } from "./Input";
 import { Button } from "./Button";
 import { ErrorMessage } from "./ErrorMessage";
 
-import copyIcon from "material-design-icons/content/svg/production/ic_content_copy_24px.svg";
-import copiedIcon from "material-design-icons/action/svg/production/ic_check_circle_24px.svg";
-import errorIcon from "material-design-icons/alert/svg/production/ic_error_18px.svg";
 
 interface CopyFieldProps {
   label: string;
@@ -48,9 +45,9 @@ export const CopyField: React.FC<CopyFieldProps> = (props) => {
           )}
           onClick={copyValueToClipboard}
         >
-          {copied && <img src={copiedIcon} alt="" />}
-          {error && <img src={errorIcon} alt="" />}
-          {!copied && !error && <img src={copyIcon} alt="" />}
+          {copied && <i className="material-icons check_circle" />}
+          {error && <i className="material-icons error" />}
+          {!copied && !error && <i className="material-icons content_copy" />}
         </Button>
       </span>
       {error && (

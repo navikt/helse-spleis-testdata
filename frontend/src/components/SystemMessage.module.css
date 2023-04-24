@@ -34,6 +34,6 @@
     filter: brightness(50%);
 }
 
-.DismissButton > img {
+.DismissButton > i {
     filter: invert(var(--invert));
 }

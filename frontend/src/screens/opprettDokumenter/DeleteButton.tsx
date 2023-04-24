@@ -59,7 +59,6 @@ export const DeleteButton = ({
       role={"button"}
       className={classNames(
         styles.SlettPersonButton,
-        success(status) && styles.success,
         error(status) && styles.error
       )}
       onClick={slettPerson}

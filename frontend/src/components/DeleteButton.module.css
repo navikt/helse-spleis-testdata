@@ -10,10 +10,6 @@
   outline: none;
 }
 
-.DeleteButton > img {
-  filter: invert(1);
-}
-
 .DeleteButton:focus-visible {
   box-shadow: var(--focus-shadow);
 }

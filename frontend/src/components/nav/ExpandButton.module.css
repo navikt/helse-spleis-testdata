@@ -38,10 +38,6 @@
   transition: all 0.2s ease;
 }
 
-.ExpandButton > img {
-  filter: invert(100%);
-}
-
 .minified:after {
   transform: rotate(90deg);
 }

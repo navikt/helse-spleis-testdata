@@ -20,6 +20,5 @@
 
 .Icon {
   margin-right: 0.5rem;
-  filter: invert(var(--invert));
   transition: filter 0.2s ease;
 }

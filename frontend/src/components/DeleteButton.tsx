@@ -1,6 +1,5 @@
 import styles from "./DeleteButton.module.css";
 
-import slettPersonIcon from "material-design-icons/action/svg/production/ic_delete_forever_24px.svg";
 import React from "react";
 import classNames from "classnames";
 
@@ -13,7 +12,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   ...rest
 }) => (
   <button className={classNames(styles.DeleteButton, className)} {...rest}>
-    <img src={slettPersonIcon} alt="" />
+      <i className="material-icons delete_forever" />
     {children}
   </button>
 );

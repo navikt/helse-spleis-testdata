@@ -18,13 +18,12 @@
   box-shadow: var(--focus-shadow);
 }
 
-.Link > a > img:first-child {
+.Link > a > i:first-child {
   margin-right: 0.5rem;
 }
 
-.Link > a > img {
+.Link > a > i {
   transition: filter 0.2s ease;
-  filter: invert(var(--invert));
 }
 
 .Link > a:before {

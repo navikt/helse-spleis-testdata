@@ -5,14 +5,12 @@ import {startOfMonth, subMonths} from "date-fns";
 import format from "date-fns/format";
 
 export const SykdomFom = () => {
-  const { watch, formState, register, setValue } = useFormContext();
-
-  const sykdomTom = watch("sykdomTom");
+  const { getValues, formState, register, setValue } = useFormContext();
 
   const sykdomFomRegister = register("sykdomFom", {
     required: "Start av sykdomsforløp må angis",
     validate: (value: string): boolean | string =>
-        (new Date(value) >= new Date(sykdomTom) || 'Fom kan ikke være senere enn tom'),
+        (new Date(value) <= new Date(getValues("sykdomTom")) || 'Fom kan ikke være senere enn tom'),
   });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {

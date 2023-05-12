@@ -6,14 +6,12 @@ import format from "date-fns/format";
 import {endOfMonth, subMonths} from "date-fns";
 
 export const SykdomTom = () => {
-  const { watch, formState, register, setValue } = useFormContext();
-
-  const sykdomFom = watch("sykdomFom");
+  const { getValues, formState, register, setValue } = useFormContext();
 
   const sykdomTomRegister = register("sykdomTom", {
     required: "Slutt av sykdomsforløp må angis",
     validate: (value: string): boolean | string =>
-        (new Date(value) >= new Date(sykdomFom) || 'Tom kan ikke være tidligere enn fom'),
+        (new Date(value) >= new Date(getValues("sykdomFom")) || 'Tom kan ikke være tidligere enn fom'),
   });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {

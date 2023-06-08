@@ -8,6 +8,7 @@ import java.time.LocalDate
 internal class SøknadTest {
 
     companion object {
+        val torsdag: LocalDate = LocalDate.of(2020, 3, 19)
         val mandag: LocalDate = LocalDate.of(2020, 3, 23)
         val fredag: LocalDate = LocalDate.of(2020, 3, 27)
     }
@@ -26,7 +27,8 @@ internal class SøknadTest {
                 ferieperioder = listOf(
                     Periode(mandag.plusDays(1), mandag.plusDays(2)),
                     Periode(mandag.plusDays(100), mandag.plusDays(101))
-                )
+                ),
+                egenmeldingsdagerFraSykmelding = listOf(torsdag)
             )
         )
         val json = søknad(vedtak)

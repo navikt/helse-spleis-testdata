@@ -20,6 +20,7 @@ export interface SykmeldingDTO {
 export interface SøknadDTO extends SykmeldingDTO {
   harAndreInntektskilder: boolean;
   ferieperioder: PeriodeDTO[];
+  egenmeldingsdagerFraSykmelding: string[];
   faktiskgrad: number;
   sendtNav?: string;
   sendtArbeidsgiver?: string;

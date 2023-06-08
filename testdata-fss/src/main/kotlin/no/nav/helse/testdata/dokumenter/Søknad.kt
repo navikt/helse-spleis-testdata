@@ -8,6 +8,7 @@ data class Søknad(
     val sykmeldingsgrad: Int,
     val harAndreInntektskilder: Boolean,
     val ferieperioder: List<Periode> = emptyList(),
+    val egenmeldingsdagerFraSykmelding: List<LocalDate>?,
     val faktiskgrad: Int? = null,
     val sendtNav: LocalDate? = null,
     val sendtArbeidsgiver: LocalDate? = null,
@@ -44,6 +45,7 @@ fun søknad(
             "sendtNav":${søknad.sendtNav?.atStartOfDay()?.let { "\"$it\"" }},
             "sendtArbeidsgiver":${søknad.sendtArbeidsgiver?.atStartOfDay()?.let { "\"$it\"" }},
             "egenmeldinger":[],
+            "egenmeldingsdagerFraSykmelding": ${søknad.egenmeldingsdagerFraSykmelding?.map { "\"$it\"" }},
             "papirsykmeldinger":[],
             "fravar":${søknad.ferieperioder.somSøknadsferie()},
             "andreInntektskilder":[${

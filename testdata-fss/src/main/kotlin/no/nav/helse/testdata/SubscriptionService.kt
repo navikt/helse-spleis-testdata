@@ -1,50 +1,29 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package no.nav.helse.testdata
 
-import io.ktor.websocket.Frame
-import io.ktor.websocket.close
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import no.nav.helse.testdata.api.EndringFrame
-import no.nav.helse.testdata.api.Subscription
 
 internal interface SubscriptionService {
-    fun addSubscription(subscription: Subscription)
+    fun addSubscription(fødselsnummer: String): SharedFlow<EndringFrame>
     fun update(fødselsnummer: String, nyTilstand: String)
-    fun close(fødselsnummer: String)
 }
 
-internal object ConcreteSubscriptionService : SubscriptionService {
-    private val subscriptions = mutableListOf<Subscription>()
-
-    override fun addSubscription(subscription: Subscription) {
-        subscriptions.add(subscription)
+internal object ConcreteSubscriptionService: SubscriptionService {
+    private val subscriptions = mutableMapOf<String, MutableSharedFlow<EndringFrame>>()
+    override fun addSubscription(fødselsnummer: String): SharedFlow<EndringFrame> {
+        val flow = subscriptions.getOrPut(fødselsnummer) { MutableSharedFlow() }
+        return flow.asSharedFlow()
     }
 
     override fun update(fødselsnummer: String, nyTilstand: String) {
-        val frameText = objectMapper.writeValueAsString(EndringFrame("endring", nyTilstand))
-        var antallAbonnementerPåFnr: Int
-        subscriptions.filter { it.fødselsnummer == fødselsnummer }
-            .also { antallAbonnementerPåFnr = it.size }
-            .map { it.session }
-            .filter { it.isActive }
-            .also { log.info("Sender oppdatering til ${it.size} aktive sesjoner, av totalt $antallAbonnementerPåFnr sesjoner for fnr.") }
-            .forEach { session ->
-                runBlocking {
-                    launch {
-                        session.outgoing.send(Frame.Text(frameText))
-                    }
-                }
-            }
-    }
-
-    override fun close(fødselsnummer: String) {
-        subscriptions.filter { it.fødselsnummer == fødselsnummer }.forEach {
-            subscriptions.remove(it)
-            runBlocking {
-                launch {
-                    it.session.close()
-                }
+        subscriptions[fødselsnummer]?.also {
+            GlobalScope.launch {
+                it.emit(EndringFrame("endring", nyTilstand))
             }
         }
     }

@@ -9,10 +9,10 @@ import java.util.*
 
 internal class RapidsMediator(private val connection: RapidsConnection) {
     private companion object {
-        private val log: Logger = LoggerFactory.getLogger(RapidsMediator::class.java)
+        private val logg: Logger = LoggerFactory.getLogger(RapidsMediator::class.java)
     }
     internal fun publiser(nøkkel: String, melding: String) {
-        log.info("publiserer syntetisk testdatamelding key=$nøkkel record:\n$melding")
+        logg.info("publiserer syntetisk testdatamelding key=$nøkkel record:\n$melding")
         connection.publish(nøkkel, melding)
     }
 

@@ -23,7 +23,6 @@ import type {
   PersonDTO,
   SykmeldingDTO,
   SøknadDTO,
-  EndringIRefusjonDto,
 } from "../../io/api.d";
 import {Egenmeldingsdager} from "./Egenmeldingsdager";
 
@@ -53,7 +52,6 @@ const createPayload = (
     arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
   });
 
-  console.log(values)
   const inntektsmelding = (): InntektsmeldingDTO => ({
     inntekt: values.inntektsmelding.inntekt,
     refusjon: {

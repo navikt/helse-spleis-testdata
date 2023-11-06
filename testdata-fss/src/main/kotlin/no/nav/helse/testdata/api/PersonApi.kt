@@ -10,11 +10,16 @@ import io.ktor.server.routing.get
 import no.nav.helse.testdata.AktørRestClient
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.Result
+import no.nav.helse.testdata.log
+import no.nav.helse.testdata.sikkerlogg
 
 internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, aktørRestClient: AktørRestClient) {
     delete("/person") {
         val fnr = call.request.header("ident")
         rapidsMediator.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
+        log.info("produserte slettemelding, se sikkerlogg for fnr")
+        sikkerlogg.info("produserte slettemelding for fnr=$fnr")
+
         call.respond(HttpStatusCode.OK)
     }
     get("/person/aktorid") {

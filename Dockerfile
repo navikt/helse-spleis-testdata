@@ -1,6 +1,6 @@
 FROM ghcr.io/navikt/baseimages/temurin:17
 
-COPY testdata-fss/build/libs/*.jar ./
+COPY backend/build/libs/*.jar ./
 COPY public ./public/
 
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 \

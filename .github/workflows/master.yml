@@ -7,7 +7,7 @@ on:
 env:
   APP: spleis-testdata
   TEAM: tbd
-  IMAGE: ghcr.io/${{ github.repository }}/spleis-testdata-fss
+  IMAGE: ghcr.io/${{ github.repository }}/spleis-testdata
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :testdata-fss:build
+          arguments: :backend:build
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}

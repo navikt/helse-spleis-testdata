@@ -55,7 +55,7 @@ jobs:
         run: npm --prefix frontend run build
 
       - name: Build docker image
-        run: docker build -f Dockerfile-fss . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
+        run: docker build -f Dockerfile . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
 
       - name: Push docker image
         run: |

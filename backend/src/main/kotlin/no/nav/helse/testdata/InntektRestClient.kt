@@ -14,8 +14,9 @@ import java.time.YearMonth
 
 internal class InntektRestClient(
     private val baseUrl: String,
+    private val inntektClientId: String,
+    private val tokenSupplier: TokenSupplier,
     private val httpClient: HttpClient,
-    private val stsRestClient: StsRestClient
 ) {
     suspend fun hentInntektsliste(
         fnr: String,
@@ -25,8 +26,8 @@ internal class InntektRestClient(
         callId: String
     ): Result<List<Måned>, ResponseFailure> =
         httpClient.post("$baseUrl/api/v1/hentinntektliste") {
-            header("Authorization", "Bearer ${stsRestClient.token()}")
-            header("Nav-Consumer-Id", "srvspleistestdata")
+            header("Authorization", "Bearer ${tokenSupplier(inntektClientId)}")
+            header("Nav-Consumer-Id", "spleis-testdata")
             header("Nav-Call-Id", callId)
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -37,15 +38,14 @@ internal class InntektRestClient(
                         "aktoerType" to "NATURLIG_IDENT"
                     ),
                     "ainntektsfilter" to filter,
-                    // TODO: Bruker Foreldrepenger midlertidig på grunn av mangel på tilgang til 8-28 og 8-30 som Sykepenger
-                    "formaal" to "Foreldrepenger",
+                    "formaal" to "Sykepenger",
                     "maanedFom" to fom,
-                    "maanedTom" to tom
+                    "maanedTom" to tom,
                 )
             )
         }.let {
             Result.Ok(toMånedListe(objectMapper.readValue(it.body<String>())))
-            }
+        }
 }
 
 private fun toMånedListe(node: JsonNode) = node.path("arbeidsInntektMaaned").map(::tilMåned)

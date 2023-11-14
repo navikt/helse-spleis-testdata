@@ -6,7 +6,6 @@ val junitJupiterVersion = "5.8.2"
 val ktorVersion = "2.0.1"
 val hikariVersion = "3.3.1"
 val flywayVersion = "6.1.3"
-val vaultJdbcVersion = "1.3.1"
 val kotliqueryVersion = "1.3.0"
 val testContainersVersion = "1.16.3"
 

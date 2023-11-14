@@ -7,14 +7,13 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.fullPath
-import io.ktor.http.headersOf
 import io.ktor.serialization.jackson.jackson
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 
 internal val inntektRestClient = InntektRestClient(
-    "http://localhost.no", HttpClient(MockEngine) {
+    "http://localhost.no",
+    "clientId",
+    { "token" },
+    HttpClient(MockEngine) {
         install(ContentNegotiation) {
             jackson {
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -35,34 +34,5 @@ internal val inntektRestClient = InntektRestClient(
                 }
             }
         }
-    },
-    mockk { every { runBlocking { token() } }.returns("token") }
-)
-
-internal val aktørRestClient = AktørRestClient(
-    "http://localhost.no", HttpClient(MockEngine) {
-        install(ContentNegotiation) { jackson() }
-        engine {
-            addHandler { request ->
-                if (request.url.fullPath.startsWith("/identer")) {
-                    respond("""
-                {
-                    "fnr": {
-                        "identer": [
-                            {
-                                "ident": "aktørId",
-                                "identgruppe": "AKTOR_ID",
-                                "gjeldende": true
-                            }
-                        ]
-                    }
-                }""", headers = headersOf("Content-Type" to listOf("application/json"))
-                    )
-                } else {
-                    error("Endepunktet finnes ikke ${request.url.fullPath}")
-                }
-            }
-        }
-    },
-    mockk { every { runBlocking { token() } }.returns("token") }
+    }
 )

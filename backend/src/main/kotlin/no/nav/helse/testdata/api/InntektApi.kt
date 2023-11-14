@@ -7,6 +7,7 @@ import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import no.nav.helse.testdata.InntektRestClient
 import no.nav.helse.testdata.Result
+import no.nav.helse.testdata.log
 import java.time.YearMonth
 import java.util.*
 
@@ -44,6 +45,9 @@ internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) = 
             call.respond(mapOf("arbeidsgivere" to inntekterPerAg))
         }
 
-        is Result.Error -> call.respond(inntekterResult.error.statusCode, inntekterResult.error.response)
+        is Result.Error -> {
+            log.info("Henting av inntekt feilet: ${inntekterResult.error}")
+            call.respond(inntekterResult.error.statusCode, inntekterResult.error.response)
+        }
     }
 }

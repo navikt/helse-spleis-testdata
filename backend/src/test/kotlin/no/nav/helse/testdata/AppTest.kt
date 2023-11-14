@@ -35,7 +35,7 @@ class AppTest {
         testApplication {
             application {
                 routing {
-                    registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
+                    registerPersonApi(RapidsMediator(testRapid))
                 }
             }
             val response = client.delete("/person") {
@@ -80,24 +80,6 @@ class AppTest {
                 header(Accept, ContentType.Application.Json)
                 header("ident", "fnr")
             }
-            assertTrue(response.status.isSuccess())
-        }
-    }
-
-    @Test
-    fun `slå opp aktørId`() {
-        testApplication {
-            application {
-                installJacksonFeature()
-                routing {
-                    registerPersonApi(RapidsMediator(testRapid), aktørRestClient)
-                }
-            }
-            val response = client.get("/person/aktorid") {
-                header(Accept, ContentType.Application.Json)
-                header("ident", "fnr")
-            }
-
             assertTrue(response.status.isSuccess())
         }
     }

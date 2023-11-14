@@ -16,11 +16,6 @@ import java.util.concurrent.TimeUnit
 fun main() {
     val rapidsConnection = TestRapid()
 
-    val aktørRestClientMock =
-        mockk<AktørRestClient> {
-            every { runBlocking { hentAktørId(any()) } }.returns(Result.Ok("aktørId"))
-        }
-
     val inntektRestClientMock = mockk<InntektRestClient> {
         every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
             Result.Ok(
@@ -40,7 +35,6 @@ fun main() {
 
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
-        aktørRestClient = aktørRestClientMock,
         inntektRestClient = inntektRestClientMock,
         rapidsMediator = rapidsMediator,
     ).start()
@@ -48,7 +42,6 @@ fun main() {
 
 internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
-    private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
     private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
@@ -56,7 +49,6 @@ internal class LocalApplicationBuilder(
     fun start() = runLocalServer {
         installKtorModule(
             subscriptionService = subscriptionService,
-            aktørRestClient = aktørRestClient,
             inntektRestClient = inntektRestClient,
             rapidsMediator = rapidsMediator,
         )

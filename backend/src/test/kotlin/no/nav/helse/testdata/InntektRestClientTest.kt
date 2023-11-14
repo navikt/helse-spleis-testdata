@@ -51,11 +51,13 @@ class InntektRestClientTest {
 
 
     private val inntektRestClient = InntektRestClient(
-        "http://localhost.no", HttpClient(MockEngine) {
+        "http://localhost.no",
+        "clientId",
+        { "token " },
+        HttpClient(MockEngine) {
             install(ContentNegotiation) {
                 jackson {
                     registerModule(JavaTimeModule())
-
                 }
             }
             engine {
@@ -68,7 +70,6 @@ class InntektRestClientTest {
                 }
             }
         },
-        mockk { every { runBlocking { token() } }.returns("token") }
     )
 }
 

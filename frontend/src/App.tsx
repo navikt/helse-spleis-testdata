@@ -4,7 +4,6 @@ import classNames from "classnames";
 
 import { useTheme, useUpdateBodyBackgroundColor } from "./state/useTheme";
 import { HentInntekt } from "./screens/HentInntekt";
-import { HentAktørId } from "./screens/HentAktørId";
 import { SlettPerson } from "./screens/SlettPerson";
 import { HentTestgruppe } from "./screens/HentTestgruppe";
 import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
@@ -29,9 +28,6 @@ export const App = () => {
         </Route>
         <Route path="/inntekt/hent">
           <HentInntekt />
-        </Route>
-        <Route path="/aktorid/hent">
-          <HentAktørId />
         </Route>
         <Route path="/person/slett">
           <SlettPerson />

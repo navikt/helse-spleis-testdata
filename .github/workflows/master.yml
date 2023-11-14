@@ -68,7 +68,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
-          RESOURCE: deploy/dev-fss.yml
+          CLUSTER: dev-gcp
+          RESOURCE: deploy/dev-gcp.yml
           WAIT: false
           VAR: "image=${{env.IMAGE}},tag=${{env.TAG}},team=${{env.TEAM}},app=${{env.APP}}"

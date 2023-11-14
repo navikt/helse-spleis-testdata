@@ -44,14 +44,13 @@ fun main() {
         }
     }
 
-    val stsRestClient = StsRestClient("http://security-token-service.default.svc.nais.local", env.serviceUser)
-    val inntektRestClient = InntektRestClient(env.inntektRestUrl, httpClient, stsRestClient)
-    val aktørRestClient = AktørRestClient(env.aktørRestUrl, httpClient, stsRestClient)
+    val azureAd = AzureAd(AzureAdProperties(env))
+    val inntektRestClient =
+        InntektRestClient(env.inntektRestUrl, env.inntektResourceId, azureAd::accessToken, httpClient)
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
-        aktørRestClient = aktørRestClient,
         inntektRestClient = inntektRestClient,
     ).start()
 }
@@ -59,7 +58,6 @@ fun main() {
 internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
-    private val aktørRestClient: AktørRestClient,
     private val inntektRestClient: InntektRestClient,
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
@@ -69,7 +67,6 @@ internal class ApplicationBuilder(
             .withKtorModule {
                 installKtorModule(
                     subscriptionService,
-                    aktørRestClient,
                     inntektRestClient,
                     rapidsMediator
                 )
@@ -86,7 +83,6 @@ internal class ApplicationBuilder(
 
 internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
-    aktørRestClient: AktørRestClient,
     inntektRestClient: InntektRestClient,
     rapidsMediator: RapidsMediator,
 ) {
@@ -94,7 +90,7 @@ internal fun Application.installKtorModule(
     install(WebSockets)
 
     routing {
-        registerPersonApi(rapidsMediator, aktørRestClient)
+        registerPersonApi(rapidsMediator)
         registerVedtaksperiodeApi(rapidsMediator)
         registerInntektApi(inntektRestClient)
         registerBehovApi(rapidsMediator)

@@ -24,42 +24,34 @@
   margin-bottom: var(--block-small);
 }
 
-.PersonHeader {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  margin-bottom: var(--block-medium);
+.Fødselsnummer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
 }
-.PersonHeader > h2 {
-  margin-bottom: 0;
-  margin-top: 0;
-  font-size: 1.25rem;
-}
-.PersonHeader > .SlettPersonButton {
-  justify-self: end;
+.Fødselsnummer input {
+  width: 96%;
 }
 .SlettPersonButton {
+  align-self: end;
   display: flex;
   justify-content: center;
   align-items: center;
   background: var(--background-color-primary);
   border: #dddddd 1px solid;
   border-radius: 0.25rem;
-  height: 1.6rem;
+  height: 1.8rem;
   aspect-ratio: 1/1;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 .SlettPersonButton:hover {
   background: var(--active-color-secondary);
   border-color: #00a6ff;
-}
-.SlettPersonFeilmelding {
-  color: red;
-  grid-column: 1 / span 2;
-  justify-self: end;
-  margin-top: 0.3rem;
-  margin-bottom: -2rem;
 }
 
 .PeriodContainer {
@@ -95,6 +87,7 @@
 
 .DocumentError {
   font-size: 12px;
+  width: 220px; /* For å unngå at PersonCard utvider seg når feilmelding skal vises */
 }
 
 .SlettPersonButton.error {

@@ -29,31 +29,30 @@ const useDocumentsValidator = () => {
 
 export const PersonCard = React.memo(() => {
   const { register, formState } = useFormContext();
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined)
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
 
   const validateSendsDocuments = useDocumentsValidator();
 
-  const deleteFailed = (errorMessage) => {
-    setDeleteErrorMessage(errorMessage)
-  }
+  const deleteFailed = (errorMessage: string) => {
+    setDeleteErrorMessage(errorMessage);
+  };
 
   return (
     <Card>
-      <div className={styles.PersonHeader}>
-        <h2 className={styles.PersonTitle}>Person</h2>
-        <DeleteButton errorCallback={deleteFailed} />
-        {deleteErrorMessage && <div className={styles.SlettPersonFeilmelding}>{deleteErrorMessage}</div>}
-      </div>
+      <h2 className={styles.Title}>Person</h2>
       <div className={styles.CardContainer}>
-        <FormInput
-          data-testid="fnr"
-          label="Fødselsnummer"
-          errors={formState.errors}
-          {...register("fnr", {
-            required: "Fødselsnummer må fylles ut",
-            validate: validateFødselsnummer,
-          })}
-        />
+        <span className={styles.Fødselsnummer}>
+          <FormInput
+            data-testid="fnr"
+            label="Fødselsnummer"
+            errors={formState.errors}
+            {...register("fnr", {
+              required: "Fødselsnummer må fylles ut",
+              validate: validateFødselsnummer,
+            })}
+          />
+          <DeleteButton errorCallback={deleteFailed} />
+        </span>
         <FormInput
           data-testid="orgnummer"
           label="Organisasjonsnummer"
@@ -65,11 +64,6 @@ export const PersonCard = React.memo(() => {
         />
         <SykdomFom />
         <SykdomTom />
-        <Checkbox
-          data-testid="slettPerson"
-          label="Slett og gjenskap data for personen"
-          {...register("slettPerson")}
-        />
         <Checkbox
           label="Send sykmelding"
           {...register("skalSendeSykmelding", {
@@ -91,11 +85,15 @@ export const PersonCard = React.memo(() => {
           })}
           aria-invalid={!!validateSendsDocuments()}
         />
-        {validateSendsDocuments() && (
+        {typeof validateSendsDocuments() === "string" && (
           <ErrorMessage className={styles.DocumentError}>
             {validateSendsDocuments()}
           </ErrorMessage>
         )}
+        {/* Rendres alltid for å unngå resizing av card-et, som har width: max-content */}
+        <ErrorMessage className={styles.DocumentError}>
+          {deleteErrorMessage}
+        </ErrorMessage>
       </div>
     </Card>
   );

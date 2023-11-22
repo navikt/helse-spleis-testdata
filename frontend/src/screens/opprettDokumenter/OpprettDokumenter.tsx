@@ -2,7 +2,7 @@ import styles from "./OpprettDokumenter.module.css";
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { del, post } from "../../io/api";
+import { post } from "../../io/api";
 import { useSubscribe } from "../../io/subscription";
 
 import { DiverseCard } from "./DiverseCard";
@@ -82,7 +82,6 @@ const createPayload = (
 export const OpprettDokumenter = React.memo(() => {
   const form = useForm({
     defaultValues: {
-      slettPerson: false,
       skalSendeSykmelding: true,
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
@@ -90,7 +89,6 @@ export const OpprettDokumenter = React.memo(() => {
     },
   });
 
-  const skalSlettePerson = form.watch("slettPerson");
   const skalSendeSykmelding = form.watch("skalSendeSykmelding");
   const skalSendeSøknad = form.watch("skalSendeSøknad");
   const skalSendeInntektsmelding = form.watch("skalSendeInntektsmelding");
@@ -101,16 +99,6 @@ export const OpprettDokumenter = React.memo(() => {
 
   const [subscribe] = useSubscribe();
 
-  const deletePerson = async (fødselsnummer: string): Promise<Response> => {
-    setIsFetching(true);
-    return del("/person", { ident: fødselsnummer })
-      .catch((error) => {
-        setStatus(error.status);
-        return error;
-      })
-      .finally(() => setIsFetching(false));
-  };
-
   const postPayload = async (data: Record<string, any>): Promise<Response> => {
     return post("/vedtaksperiode", createPayload(data)).finally(() =>
       setIsFetching(false)
@@ -119,17 +107,6 @@ export const OpprettDokumenter = React.memo(() => {
 
   const onSubmit = async (data: Record<string, any>) => {
     setIsFetching(true);
-
-    if (skalSlettePerson) {
-      const response = await deletePerson(data.fnr);
-      setStatus(response.status);
-      const errorBody = await response.text()
-      setErrorBody(errorBody);
-      if (status >= 400) {
-        setIsFetching(false);
-        return;
-      }
-    }
 
     setTimeout(async () => {
       const response = await postPayload(data);

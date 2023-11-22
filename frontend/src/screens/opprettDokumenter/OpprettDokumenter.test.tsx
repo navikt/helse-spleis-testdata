@@ -21,8 +21,11 @@ const mockFetchResponse = (body: object) =>
   (fetch as jest.Mock).mockImplementationOnce(() => Promise.resolve(body));
 
 const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
-
 describe("OpprettDokumenter", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  })
+
   it("oppretter dokumenter", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
@@ -143,29 +146,36 @@ describe("OpprettDokumenter", () => {
   });
 
   it("sletter person", async () => {
-    render(<OpprettDokumenter />, { wrapper });
+    mockStandardInntekt("orgnr", "54321");
+    mockFetchResponse({ status: 204 });
 
-    const orgnr = "987654321";
-    const inntekt = "54321"
-    mockStandardInntekt(orgnr, inntekt);
-    userEvent.type(screen.getByTestId("fnr"), "01234567890");
-    userEvent.click(screen.getByTestId("slettPerson"));
-    userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    render(<OpprettDokumenter />);
 
-    await waitFor(() =>
-      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
-        inntekt
-      )
-    );
-
-    mockFetchResponse({ status: 200, text: () => jest.fn() });
-    userEvent.click(screen.getByText("Opprett dokumenter"));
+    const fnr = "12345678900";
+    userEvent.type(screen.getByTestId("fnr"), fnr);
+    userEvent.click(screen.getByText("❌"));
 
     await waitFor(() => {
-      expect(fetch as jest.Mock).toHaveBeenLastCalledWith(
-        "http://0.0.0.0:8080/person",
-        { headers: { ident: "01234567890" }, method: "delete" }
+      expect(fetch).toHaveBeenLastCalledWith(
+          "http://0.0.0.0:8080/person",
+          { headers: { ident: fnr }, method: "delete" }
       );
+      expect(screen.getByText("✔️️")).toBeVisible();
+    });
+  });
+
+  it("viser feilmelding om sletting feiler", async () => {
+    mockStandardInntekt("orgnr", "54321");
+    mockFetchResponse({ status: 404, text: () => jest.fn() });
+
+    render(<OpprettDokumenter />);
+
+    userEvent.type(screen.getByTestId("fnr"), "12345678900");
+    userEvent.click(screen.getByText("❌"));
+
+    await waitFor(() => {
+      expect(screen.getByText("☠️")).toBeVisible();
+      expect(screen.getByText("Sletting av person feilet")).toBeVisible();
     });
   });
 

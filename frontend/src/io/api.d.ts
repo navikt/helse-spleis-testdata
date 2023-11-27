@@ -17,7 +17,14 @@ export interface SykmeldingDTO {
   sykmeldingsgrad: number;
 }
 
+export enum ArbeidssituasjonDTO {
+  Arbeidstaker = 'ARBEIDSTAKER',
+  Arbeidsledig = 'ARBEIDSLEDIG',
+  Frilanser = 'FRILANSER',
+  SelvstendigNæringsdrivende = 'SELVSTENDIG_NARINGSDRIVENDE'
+}
 export interface SøknadDTO extends SykmeldingDTO {
+  arbeidssituasjon: ArbeidssituasjonDTO,
   harAndreInntektskilder: boolean;
   ferieperioder: PeriodeDTO[];
   egenmeldingsdagerFraSykmelding: string[];

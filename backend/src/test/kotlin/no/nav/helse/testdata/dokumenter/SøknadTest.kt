@@ -28,7 +28,8 @@ internal class SøknadTest {
                     Periode(mandag.plusDays(1), mandag.plusDays(2)),
                     Periode(mandag.plusDays(100), mandag.plusDays(101))
                 ),
-                egenmeldingsdagerFraSykmelding = listOf(torsdag)
+                egenmeldingsdagerFraSykmelding = listOf(torsdag),
+                arbeidssituasjon = "ARBEIDSTAKER"
             )
         )
         val json = søknad(vedtak)

@@ -42,6 +42,7 @@ const createPayload = (
   });
 
   const søknad = (): SøknadDTO => ({
+    arbeidssituasjon: values.søknad.arbeidssituasjon,
     sykmeldingsgrad: values.sykmeldingsgrad ?? values.søknad.sykmeldingsgrad,
     harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
     ferieperioder: values.søknad.ferieperioder?.map(it => ({fom: it.fom, tom: it.tom})) ?? [],

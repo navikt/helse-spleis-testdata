@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Søknad(
+    val arbeidssituasjon: String,
     val sykmeldingsgrad: Int,
     val harAndreInntektskilder: Boolean,
     val ferieperioder: List<Periode> = emptyList(),
@@ -23,14 +24,14 @@ fun søknad(
         {
             "id":"${UUID.randomUUID()}",
             "fnr":"${vedtak.fnr}",
-            "type":"ARBEIDSTAKERE",
+            "type":"${vedtak.søknad.arbeidssituasjon.somSøknadstype()}",
             "status":"SENDT",
             "sykmeldingId":"${UUID.randomUUID()}",
             "arbeidsgiver":{
             "navn":"Nærbutikken AS",
             "orgnummer":"${vedtak.orgnummer}"
             },
-            "arbeidssituasjon":"ARBEIDSTAKER",
+            "arbeidssituasjon":"${vedtak.søknad.arbeidssituasjon}",
             "korrigerer":null,
             "korrigertAv":null,
             "soktUtenlandsopphold":null,
@@ -71,6 +72,12 @@ fun søknad(
             }   
     """
     }
+}
+
+private fun String.somSøknadstype() = when (this) {
+    "FRILANSER" -> "SELVSTENDIGE_OG_FRILANSERE"
+    "SELVSTENDIG_NARINGSDRIVENDE" -> "SELVSTENDIGE_OG_FRILANSERE"
+    else -> this
 }
 
 private fun List<Periode>.somSøknadsferie() =

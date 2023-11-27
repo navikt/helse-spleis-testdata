@@ -8,6 +8,8 @@ import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { validateArbeidsgrad, validateSykdomsgrad } from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
+import {FormSelect} from "../../components/FormSelect";
+import {ArbeidssituasjonDTO} from "../../io/api.d";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -24,7 +26,7 @@ const useUnregisterSøknadCard = () => {
 };
 
 export const SøknadCard = React.memo(() => {
-  const { watch, register, unregister, formState } = useFormContext();
+  const { watch, register, unregister, setValue, formState } = useFormContext();
 
   useUnregisterSøknadCard();
 
@@ -44,6 +46,13 @@ export const SøknadCard = React.memo(() => {
     <Card>
       <h2 className={styles.Title}>Søknad</h2>
       <div className={styles.CardContainer}>
+        <FormSelect
+            label="Arbeidssituasjon"
+            options={Object.values(ArbeidssituasjonDTO).map(it => it.toString())}
+          {...register("søknad.arbeidssituasjon")}
+        >
+        </FormSelect>
+
         <FormInput
           data-testid="sendtNav"
           label="Søknad sendt Nav"

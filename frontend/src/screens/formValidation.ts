@@ -1,4 +1,4 @@
-import { ArbeidssituasjonDTO } from "../io/api.d";
+import { ArbeidssituasjonDTO } from "../utils/types";
 
 const isNumerical = (value?: string): boolean =>
   value !== undefined && !isNaN(Number(value));

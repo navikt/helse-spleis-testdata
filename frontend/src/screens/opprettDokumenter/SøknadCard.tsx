@@ -9,7 +9,7 @@ import { useFormContext } from "react-hook-form";
 import { validateArbeidsgrad, validateSykdomsgrad } from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
 import {FormSelect} from "../../components/FormSelect";
-import {ArbeidssituasjonDTO} from "../../io/api.d";
+import {ArbeidssituasjonDTO} from "../../utils/types";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 

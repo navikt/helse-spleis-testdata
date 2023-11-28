@@ -11,7 +11,7 @@ jest.mock("../../io/subscription", () => ({
 
 jest.mock("../../io/environment", () => ({
   Environment: {
-    Mode: "development",
+    Mode: "development"
   },
 }));
 
@@ -118,6 +118,7 @@ describe("OpprettDokumenter", () => {
             sykdomTom: "2021-07-31",
             sykmelding: { sykmeldingsgrad: "100" },
             søknad: {
+              arbeidssituasjon: "ARBEIDSTAKER",
               sykmeldingsgrad: "100",
               harAndreInntektskilder: false,
               ferieperioder: [{ fom: "2021-07-02", tom: "2021-07-04" }],

@@ -20,7 +20,6 @@ data class Søknad(
 fun søknad(
     vedtak: Vedtak
 ): String? {
-    // TODO: hvis orgnummer ikke er satt er hele arbeidsgiver-objektet null?
     return vedtak.søknad?.let { søknad ->
         """
         {
@@ -29,10 +28,7 @@ fun søknad(
             "type":"${vedtak.søknad.arbeidssituasjon.somSøknadstype()}",
             "status":"SENDT",
             "sykmeldingId":"${UUID.randomUUID()}",
-            "arbeidsgiver":{
-            "navn":"Nærbutikken AS",
-            "orgnummer":"${vedtak.orgnummer}"
-            },
+            "arbeidsgiver": ${vedtak.somArbeidsgiver()},
             "arbeidssituasjon":"${vedtak.søknad.arbeidssituasjon}",
             "tidligereArbeidsgiverOrgnummer":"${vedtak.søknad.tidligereArbeidsgiverOrgnummer}",
             "korrigerer":null,
@@ -77,6 +73,14 @@ fun søknad(
     }
 }
 
+private fun Vedtak.somArbeidsgiver(): String? {
+    if (søknad?.arbeidssituasjon == "ARBEIDSLEDIG") {
+        return null
+    } else {
+        return "{\"navn\": \"Nærbutikken AS\", \"orgnummer\": \"${orgnummer}\" }"
+    }
+}
+
 private fun String.somSøknadstype() = when (this) {
     "FRILANSER" -> "SELVSTENDIGE_OG_FRILANSERE"
     "SELVSTENDIG_NARINGSDRIVENDE" -> "SELVSTENDIGE_OG_FRILANSERE"
@@ -93,4 +97,5 @@ private fun List<Periode>.somSøknadsferie() =
                 "tom": "${it.tom}"
             }"""
     }
+
 

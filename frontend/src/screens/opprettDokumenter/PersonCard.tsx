@@ -40,7 +40,7 @@ export const PersonCard = React.memo(() => {
   useEffect(() => {
     setSkalKreveOrgnummer(arbeidssituasjon === "ARBEIDSTAKER");
     if (arbeidssituasjon !== "ARBEIDSTAKER") {
-      unregister(`orgnummer`)
+      unregister("orgnummer")
     }
   }, [arbeidssituasjon]);
 

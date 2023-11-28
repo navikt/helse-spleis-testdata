@@ -28,6 +28,7 @@ export interface SøknadDTO extends SykmeldingDTO {
   sendtNav?: string;
   sendtArbeidsgiver?: string;
   arbeidGjenopptatt?: string;
+  tidligereArbeidsgiverOrgnummer?: string;
 }
 
 export interface InntektsmeldingDTO {

@@ -14,11 +14,13 @@ data class Søknad(
     val sendtNav: LocalDate? = null,
     val sendtArbeidsgiver: LocalDate? = null,
     val arbeidGjenopptatt: LocalDate? = null,
+    val tidligereArbeidsgiverOrgnummer: String? = null,
 )
 
 fun søknad(
     vedtak: Vedtak
 ): String? {
+    // TODO: hvis orgnummer ikke er satt er hele arbeidsgiver-objektet null?
     return vedtak.søknad?.let { søknad ->
         """
         {
@@ -32,6 +34,7 @@ fun søknad(
             "orgnummer":"${vedtak.orgnummer}"
             },
             "arbeidssituasjon":"${vedtak.søknad.arbeidssituasjon}",
+            "tidligereArbeidsgiverOrgnummer":"${vedtak.søknad.tidligereArbeidsgiverOrgnummer}",
             "korrigerer":null,
             "korrigertAv":null,
             "soktUtenlandsopphold":null,

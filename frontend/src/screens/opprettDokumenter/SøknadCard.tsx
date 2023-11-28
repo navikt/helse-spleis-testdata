@@ -4,11 +4,17 @@ import format from "date-fns/format";
 import { Card } from "../../components/Card";
 import { Checkbox } from "../../components/Checkbox";
 import { FormInput } from "../../components/FormInput";
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import { useFormContext } from "react-hook-form";
-import { validateArbeidsgrad, validateSykdomsgrad } from "../formValidation";
+import {
+  validateArbeidsgrad,
+  validateOptionalOrganisasjonsnummer,
+  validateOrganisasjonsnummer,
+  validateSykdomsgrad
+} from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
 import {FormSelect} from "../../components/FormSelect";
+import {ArbeidssituasjonDTO} from "../../utils/types";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -40,6 +46,17 @@ export const SøknadCard = React.memo(() => {
   }, [skalSendeSykmelding]);
 
   const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
+  const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
+  const [skalViseTidligereArbeidsgiverOrgnummer, setSkalViseTidligereArbeidsgiverOrgnummer] = useState(false)
+
+  useEffect(() => {
+    if (arbeidssituasjon === "ARBEIDSLEDIG") {
+      setSkalViseTidligereArbeidsgiverOrgnummer(true)
+    } else {
+      setSkalViseTidligereArbeidsgiverOrgnummer(false)
+      unregister("søknad.tidligereArbeidsgiverOrgnummer")
+    }
+  }, [arbeidssituasjon]);
 
   return (
     <Card>
@@ -55,7 +72,14 @@ export const SøknadCard = React.memo(() => {
           {...register("søknad.arbeidssituasjon")}
         >
         </FormSelect>
-
+        {skalViseTidligereArbeidsgiverOrgnummer && <FormInput
+            data-testid="tidligereArbeidsgiverOrgnummer"
+            label="Tidligere arbeidsgiver sitt orgnummer"
+            errors={formState.errors}
+            {...register("søknad.tidligereArbeidsgiverOrgnummer", {
+              validate: validateOptionalOrganisasjonsnummer,
+            })}
+        />}
         <FormInput
           data-testid="sendtNav"
           label="Søknad sendt Nav"

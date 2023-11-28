@@ -124,6 +124,7 @@ describe("OpprettDokumenter", () => {
               ferieperioder: [{ fom: "2021-07-02", tom: "2021-07-04" }],
               faktiskgrad: "80",
               sendtNav: "2021-08-01",
+              tidligereArbeidsgiverOrgnummer: null,
             },
             medlemskapAvklart: true,
             inntektsmelding: {

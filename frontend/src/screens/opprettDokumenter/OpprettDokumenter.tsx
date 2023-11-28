@@ -51,6 +51,7 @@ const createPayload = (
     sendtNav: values.søknad.sendtNav || undefined,
     sendtArbeidsgiver: values.søknad.sendtArbeidsgiver || undefined,
     arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
+    tidligereArbeidsgiverOrgnummer: values.søknad.tidligereArbeidsgiverOrgnummer || null
   });
 
   const inntektsmelding = (): InntektsmeldingDTO => ({

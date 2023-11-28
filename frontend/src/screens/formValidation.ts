@@ -28,6 +28,15 @@ export const validateOrganisasjonsnummer = (value: string): boolean | string =>
     ? "Organisasjonsnummeret må bestå av 9 siffere"
     : true;
 
+export const validateOptionalOrganisasjonsnummer = (value: string): boolean | string =>
+    value === ""
+    ? true
+    : !isNumerical(value)
+    ? "Organisasjonsnummeret må være numerisk"
+    : value?.length !== 9
+    ? "Organisasjonsnummeret må bestå av 9 siffere"
+    : true;
+
 export const validateSykdomsgrad = (value?: string): boolean | string =>
   !isInteger(value)
     ? "Sykdomsgraden må være et heltall"

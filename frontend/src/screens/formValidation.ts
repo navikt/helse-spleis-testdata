@@ -1,4 +1,3 @@
-import { ArbeidssituasjonDTO } from "../utils/types";
 
 const isNumerical = (value?: string): boolean =>
   value !== undefined && !isNaN(Number(value));
@@ -22,23 +21,12 @@ export const validateInntekt = (value: string): boolean | string =>
 export const validateRefusjonsbeløp = (value?: string): boolean | string =>
   !value || isNumerical(value) || "Refusjonsbeløp må være numerisk";
 
-const validateOrganisasjonsnummerNumerisk = (value: string): boolean | string =>
-    value?.length !== 9
+export const validateOrganisasjonsnummer = (value: string): boolean | string =>
+    !isNumerical(value)
+    ? "Organisasjonsnummeret må være numerisk"
+    : value?.length !== 9
     ? "Organisasjonsnummeret må bestå av 9 siffere"
     : true;
-
-const gyldigeArbeidssituasjoner = [ArbeidssituasjonDTO.Arbeidsledig.valueOf(), ArbeidssituasjonDTO.SelvstendigNæringsdrivende.valueOf(), ArbeidssituasjonDTO.Frilanser.valueOf()]
-const validateOrganisasjonsnummerTekstlig = (value: string): boolean | string =>
-    !gyldigeArbeidssituasjoner.includes(value)
-    ? `Tekstlige orgnummere må være en av følgende verdier:${gyldigeArbeidssituasjoner}`
-    : true
-
-export const validateOrganisasjonsnummer = (value: string): boolean | string => {
-    if (!isNaturalNumber(value)) {
-        return validateOrganisasjonsnummerTekstlig(value)
-    }
-    return validateOrganisasjonsnummerNumerisk(value)
-}
 
 export const validateSykdomsgrad = (value?: string): boolean | string =>
   !isInteger(value)

@@ -9,7 +9,6 @@ import { useFormContext } from "react-hook-form";
 import { validateArbeidsgrad, validateSykdomsgrad } from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
 import {FormSelect} from "../../components/FormSelect";
-import {ArbeidssituasjonDTO} from "../../utils/types";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -48,7 +47,11 @@ export const SøknadCard = React.memo(() => {
       <div className={styles.CardContainer}>
         <FormSelect
             label="Arbeidssituasjon"
-            options={Object.values(ArbeidssituasjonDTO).map(it => it.toString())}
+            options={['ARBEIDSTAKER',
+             'ARBEIDSLEDIG',
+             'FRILANSER',
+             'SELVSTENDIG_NARINGSDRIVENDE']}
+            defaultValue={"ARBEIDSTAKER"}
           {...register("søknad.arbeidssituasjon")}
         >
         </FormSelect>

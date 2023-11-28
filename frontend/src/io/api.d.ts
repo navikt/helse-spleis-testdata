@@ -1,4 +1,4 @@
-import {ArbeidssituasjonDTO} from "./api";
+import {ArbeidssituasjonDTO} from "../utils/types";
 
 export interface PeriodeDTO {
   fom: string;

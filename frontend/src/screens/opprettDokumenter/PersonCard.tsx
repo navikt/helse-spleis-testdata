@@ -4,7 +4,7 @@ import { Checkbox } from "../../components/Checkbox";
 import { Card } from "../../components/Card";
 import { ErrorMessage } from "../../components/ErrorMessage";
 import { useFormContext } from "react-hook-form";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
   validateFødselsnummer,
   validateOrganisasjonsnummer,
@@ -12,6 +12,7 @@ import {
 import { SykdomTom } from "./SykdomTom";
 import { SykdomFom } from "./SykdomFom";
 import { DeleteButton } from "./DeleteButton";
+import {ArbeidssituasjonDTO} from "../../utils/types";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -28,10 +29,21 @@ const useDocumentsValidator = () => {
 };
 
 export const PersonCard = React.memo(() => {
-  const { register, formState } = useFormContext();
+  const { register, unregister, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
 
   const validateSendsDocuments = useDocumentsValidator();
+
+  const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
+  const [skalKreveOrgnummer, setSkalKreveOrgnummer] = useState(true)
+
+  useEffect(() => {
+    setSkalKreveOrgnummer(arbeidssituasjon === "ARBEIDSTAKER");
+    if (arbeidssituasjon !== "ARBEIDSTAKER") {
+      unregister(`orgnummer`)
+    }
+  }, [arbeidssituasjon]);
+
 
   const deleteFailed = (errorMessage: string) => {
     setDeleteErrorMessage(errorMessage);
@@ -53,7 +65,7 @@ export const PersonCard = React.memo(() => {
           />
           <DeleteButton errorCallback={deleteFailed} />
         </span>
-        <FormInput
+        {skalKreveOrgnummer && <FormInput
           data-testid="orgnummer"
           label="Organisasjonsnummer"
           errors={formState.errors}
@@ -61,7 +73,7 @@ export const PersonCard = React.memo(() => {
             required: "Organisasjonsnummer må fylles ut",
             validate: validateOrganisasjonsnummer,
           })}
-        />
+        />}
         <SykdomFom />
         <SykdomTom />
         <Checkbox

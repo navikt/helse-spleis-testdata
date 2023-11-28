@@ -68,7 +68,7 @@ const createPayload = (
 
   return {
     fnr: values.fnr,
-    orgnummer: values.orgnummer,
+    orgnummer: values.orgnummer || null,
     sykdomFom: values.sykdomFom,
     sykdomTom: values.sykdomTom,
     sykmelding: values.skalSendeSykmelding ? sykmelding() : undefined,
@@ -86,7 +86,8 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSykmelding: true,
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
-      medlemskapAvklart: true
+      medlemskapAvklart: true,
+      skalKreveOrgnummer: true
     },
   });
 

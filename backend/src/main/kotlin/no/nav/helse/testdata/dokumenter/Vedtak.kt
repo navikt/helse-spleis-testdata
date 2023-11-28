@@ -6,7 +6,7 @@ import java.time.LocalDate
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Vedtak(
     val fnr: String,
-    val orgnummer: String,
+    val orgnummer: String?,
     val sykdomFom: LocalDate,
     val sykdomTom: LocalDate,
     val sykmelding: Sykmelding? = null,

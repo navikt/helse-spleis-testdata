@@ -80,6 +80,7 @@ fun søknad(
 private fun String.somSøknadstype() = when (this) {
     "FRILANSER" -> "SELVSTENDIGE_OG_FRILANSERE"
     "SELVSTENDIG_NARINGSDRIVENDE" -> "SELVSTENDIGE_OG_FRILANSERE"
+    "ARBEIDSTAKER" -> "ARBEIDSTAKERE"
     else -> this
 }
 

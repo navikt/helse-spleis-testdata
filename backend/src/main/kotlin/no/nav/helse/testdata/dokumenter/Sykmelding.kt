@@ -13,14 +13,12 @@ fun sykmelding(
     """
     {
         "id":"${UUID.randomUUID()}",
-        "type":"ARBEIDSTAKERE",
+        "type":"${vedtak.søknad?.arbeidssituasjon?.somSøknadstype()}",
         "fnr":"${vedtak.fnr}",
         "status":"NY",
         "sykmeldingId":"${UUID.randomUUID()}",
-        "arbeidsgiver":{
-        "navn":"Nærbutikken AS",
-        "orgnummer":"${vedtak.orgnummer}"
-        },
+        "arbeidsgiver":${vedtak.somArbeidsgiver()},
+        "tidligereArbeidsgiverOrgnummer":${vedtak.søknad?.tidligereArbeidsgiverOrgnummer?.somTidligereArbeidsgiverOrgnummer()},
         "arbeidssituasjon":"ARBEIDSTAKER",
         "korrigerer":null,
         "korrigertAv":null,

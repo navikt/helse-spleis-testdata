@@ -30,7 +30,7 @@ fun søknad(
             "sykmeldingId":"${UUID.randomUUID()}",
             "arbeidsgiver": ${vedtak.somArbeidsgiver()},
             "arbeidssituasjon":"${vedtak.søknad.arbeidssituasjon}",
-            "tidligereArbeidsgiverOrgnummer":"${vedtak.søknad.tidligereArbeidsgiverOrgnummer}",
+            "tidligereArbeidsgiverOrgnummer":${vedtak.søknad.tidligereArbeidsgiverOrgnummer?.somTidligereArbeidsgiverOrgnummer()},
             "korrigerer":null,
             "korrigertAv":null,
             "soktUtenlandsopphold":null,
@@ -71,21 +71,6 @@ fun søknad(
             }   
     """
     }
-}
-
-private fun Vedtak.somArbeidsgiver(): String? {
-    if (søknad?.arbeidssituasjon == "ARBEIDSLEDIG") {
-        return null
-    } else {
-        return "{\"navn\": \"Nærbutikken AS\", \"orgnummer\": \"${orgnummer}\" }"
-    }
-}
-
-private fun String.somSøknadstype() = when (this) {
-    "FRILANSER" -> "SELVSTENDIGE_OG_FRILANSERE"
-    "SELVSTENDIG_NARINGSDRIVENDE" -> "SELVSTENDIGE_OG_FRILANSERE"
-    "ARBEIDSTAKER" -> "ARBEIDSTAKERE"
-    else -> this
 }
 
 private fun List<Periode>.somSøknadsferie() =

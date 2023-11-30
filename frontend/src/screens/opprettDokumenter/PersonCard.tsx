@@ -38,8 +38,9 @@ export const PersonCard = React.memo(() => {
   const [skalKreveOrgnummer, setSkalKreveOrgnummer] = useState(true)
 
   useEffect(() => {
-    setSkalKreveOrgnummer(arbeidssituasjon === "ARBEIDSTAKER");
-    if (arbeidssituasjon !== "ARBEIDSTAKER") {
+    const skalViseOrgnummer = arbeidssituasjon === "ARBEIDSTAKER" || arbeidssituasjon === undefined
+    setSkalKreveOrgnummer(skalViseOrgnummer);
+    if (!skalViseOrgnummer) {
       unregister("orgnummer")
     }
   }, [arbeidssituasjon]);

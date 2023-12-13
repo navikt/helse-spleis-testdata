@@ -37,6 +37,7 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
   "avklartMedlemskap": ${vedtak.medlemskapAvklart},
   "medlemskapVerdi": ${vedtak.medlemskapVerdi}
 }"""
+        sikkerlogg.info("publiserer mock_medlemskap_avklaring for $fnr: $medlemskapavklaring")
         mediator.publiser(fnr, medlemskapavklaring)
 
         sykmelding(vedtak)?.also {

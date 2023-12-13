@@ -13,11 +13,6 @@ export const DiverseCard = React.memo(() => {
     <Card>
       <h2 className={styles.Title}>Diverse</h2>
       <div className={styles.CardContainer}>
-        <Checkbox
-          data-testid="medlemskap"
-          label="Medlemskap avklart"
-          {...register("medlemskapAvklart")}
-        />
           <FormSelect
               label="Medlemskapsvurdering"
               options={[

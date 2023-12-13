@@ -31,7 +31,6 @@ type OpprettVedtaksperiodePayload = PersonDTO &
     sykmelding?: SykmeldingDTO;
     søknad?: SøknadDTO;
     inntektsmelding?: InntektsmeldingDTO;
-    medlemskapAvklart: boolean;
     medlemskapVerdi: String;
   };
 
@@ -75,7 +74,6 @@ const createPayload = (
     sykdomTom: values.sykdomTom,
     sykmelding: values.skalSendeSykmelding ? sykmelding() : undefined,
     søknad: values.skalSendeSøknad ? søknad() : undefined,
-    medlemskapAvklart: values.medlemskapAvklart,
     medlemskapVerdi: values.medlemskapVerdi,
     inntektsmelding: values.skalSendeInntektsmelding
       ? inntektsmelding()
@@ -89,7 +87,6 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSykmelding: true,
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
-      medlemskapAvklart: true,
       medlemskapVerdi: "JA",
       skalKreveOrgnummer: true
     },

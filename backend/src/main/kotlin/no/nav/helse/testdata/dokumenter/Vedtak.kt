@@ -12,7 +12,6 @@ data class Vedtak(
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
     val inntektsmelding: Inntektsmelding? = null,
-    val medlemskapAvklart: Boolean = true,
     val medlemskapVerdi: String = "JA"
 ) {
 }

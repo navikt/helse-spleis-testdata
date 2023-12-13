@@ -3,9 +3,11 @@ import {Checkbox} from "../../components/Checkbox";
 import {Card} from "../../components/Card";
 import {useFormContext} from "react-hook-form";
 import React from "react";
+import {Select} from "../../components/Select";
+import {FormSelect} from "../../components/FormSelect";
 
 export const DiverseCard = React.memo(() => {
-  const { register } = useFormContext();
+  const { register , setValue} = useFormContext();
 
   return (
     <Card>
@@ -16,6 +18,21 @@ export const DiverseCard = React.memo(() => {
           label="Medlemskap avklart"
           {...register("medlemskapAvklart")}
         />
+          <FormSelect
+              label="Medlemskapsvurdering"
+              options={[
+                  { value: "", label: "(Ingen)" },
+                  "JA",
+                  "NEI",
+                  "UAVKLART",
+                  "UAVKLART_MED_BRUKERSPORMSMAAL"
+              ]}
+              {...register("medlemskapVerdi")}
+              onChange={val => {
+                  const verdi = val.target.options[val.target.options.selectedIndex].value
+                  setValue("medlemskapVerdi", verdi)
+              } }
+          />
       </div>
     </Card>
   );

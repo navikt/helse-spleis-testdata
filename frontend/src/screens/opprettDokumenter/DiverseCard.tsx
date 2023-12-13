@@ -25,7 +25,7 @@ export const DiverseCard = React.memo(() => {
                   "JA",
                   "NEI",
                   "UAVKLART",
-                  "UAVKLART_MED_BRUKERSPORMSMAAL"
+                  "UAVKLART_MED_BRUKERSPORSMAAL"
               ]}
               {...register("medlemskapVerdi")}
               onChange={val => {

@@ -127,6 +127,7 @@ describe("OpprettDokumenter", () => {
               tidligereArbeidsgiverOrgnummer: null,
             },
             medlemskapAvklart: true,
+            medlemskapVerdi: "JA",
             inntektsmelding: {
               inntekt: "54321",
               refusjon: {

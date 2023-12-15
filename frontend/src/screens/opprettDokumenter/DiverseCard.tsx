@@ -16,7 +16,6 @@ export const DiverseCard = React.memo(() => {
           <FormSelect
               label="Medlemskapsvurdering"
               options={[
-                  { value: "", label: "(Ingen)" },
                   "JA",
                   "NEI",
                   "UAVKLART",

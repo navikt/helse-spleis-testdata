@@ -31,10 +31,6 @@ export const Nav = React.memo(() => {
           <i className="material-icons attach_money" />
           Hent inntekt
         </NavLink>
-        <NavLink to="/person/slett" isExpanded={expanded}>
-          <i className="material-icons delete_forever" />
-          Slett person
-        </NavLink>
         <NavLink to="/testgruppe" isExpanded={expanded}>
           <i className="material-icons accessibility" />
           Hent testgruppe

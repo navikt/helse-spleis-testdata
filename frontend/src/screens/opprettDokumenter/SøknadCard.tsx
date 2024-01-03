@@ -1,17 +1,12 @@
 import styles from "./OpprettDokumenter.module.css";
 import addDays from "date-fns/addDays";
 import format from "date-fns/format";
-import { Card } from "../../components/Card";
-import { Checkbox } from "../../components/Checkbox";
-import { FormInput } from "../../components/FormInput";
-import React, {useEffect, useState} from "react";
-import { useFormContext } from "react-hook-form";
-import {
-  validateArbeidsgrad,
-  validateOptionalOrganisasjonsnummer,
-  validateOrganisasjonsnummer,
-  validateSykdomsgrad
-} from "../formValidation";
+import {Card} from "../../components/Card";
+import {Checkbox} from "../../components/Checkbox";
+import {FormInput} from "../../components/FormInput";
+import React, {useEffect} from "react";
+import {useFormContext} from "react-hook-form";
+import {validateArbeidsgrad, validateOptionalOrganisasjonsnummer, validateSykdomsgrad} from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
 import {FormSelect} from "../../components/FormSelect";
 import {ArbeidssituasjonDTO} from "../../utils/types";
@@ -39,24 +34,20 @@ export const SøknadCard = React.memo(() => {
   const sykdomTom = watch("sykdomTom");
   const skalSendeSykmelding = watch("skalSendeSykmelding");
 
+  const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
+  const skalViseTidligereArbeidsgiverOrgnummer = arbeidssituasjon == 'ARBEIDSLEDIG'
+
   useEffect(() => {
     if (skalSendeSykmelding) {
       unregister("søknad.sykmeldingsgrad");
     }
   }, [skalSendeSykmelding]);
 
-  const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
-  const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
-  const [skalViseTidligereArbeidsgiverOrgnummer, setSkalViseTidligereArbeidsgiverOrgnummer] = useState(false)
-
   useEffect(() => {
-    if (arbeidssituasjon === "ARBEIDSLEDIG") {
-      setSkalViseTidligereArbeidsgiverOrgnummer(true)
-    } else {
-      setSkalViseTidligereArbeidsgiverOrgnummer(false)
-      unregister("søknad.tidligereArbeidsgiverOrgnummer")
-    }
+    if (!skalViseTidligereArbeidsgiverOrgnummer) unregister("søknad.tidligereArbeidsgiverOrgnummer")
   }, [arbeidssituasjon]);
+
+  const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
 
   return (
     <Card>
@@ -68,7 +59,6 @@ export const SøknadCard = React.memo(() => {
              'ARBEIDSLEDIG',
              'FRILANSER',
              'SELVSTENDIG_NARINGSDRIVENDE']}
-            defaultValue={"ARBEIDSTAKER"}
           {...register("søknad.arbeidssituasjon")}
         >
         </FormSelect>

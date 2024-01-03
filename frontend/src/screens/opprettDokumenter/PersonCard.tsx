@@ -1,17 +1,14 @@
 import styles from "./OpprettDokumenter.module.css";
-import { FormInput } from "../../components/FormInput";
-import { Checkbox } from "../../components/Checkbox";
-import { Card } from "../../components/Card";
-import { ErrorMessage } from "../../components/ErrorMessage";
-import { useFormContext } from "react-hook-form";
+import {FormInput} from "../../components/FormInput";
+import {Checkbox} from "../../components/Checkbox";
+import {Card} from "../../components/Card";
+import {ErrorMessage} from "../../components/ErrorMessage";
+import {useFormContext} from "react-hook-form";
 import React, {useEffect, useState} from "react";
-import {
-  validateFødselsnummer,
-  validateOrganisasjonsnummer,
-} from "../formValidation";
-import { SykdomTom } from "./SykdomTom";
-import { SykdomFom } from "./SykdomFom";
-import { DeleteButton } from "./DeleteButton";
+import {validateFødselsnummer, validateOrganisasjonsnummer,} from "../formValidation";
+import {SykdomTom} from "./SykdomTom";
+import {SykdomFom} from "./SykdomFom";
+import {DeleteButton} from "./DeleteButton";
 import {ArbeidssituasjonDTO} from "../../utils/types";
 
 const useDocumentsValidator = () => {
@@ -28,23 +25,17 @@ const useDocumentsValidator = () => {
     "Huk av for å sende minst ett dokument";
 };
 
-export const PersonCard = React.memo(() => {
+export const PersonCard = () => {
   const { register, unregister, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
 
   const validateSendsDocuments = useDocumentsValidator();
-
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
-  const [skalKreveOrgnummer, setSkalKreveOrgnummer] = useState(true)
+  const skalKreveOrgnummer = arbeidssituasjon === "ARBEIDSTAKER"
 
   useEffect(() => {
-    const skalViseOrgnummer = arbeidssituasjon === "ARBEIDSTAKER" || arbeidssituasjon === undefined
-    setSkalKreveOrgnummer(skalViseOrgnummer);
-    if (!skalViseOrgnummer) {
-      unregister("orgnummer")
-    }
-  }, [arbeidssituasjon]);
-
+    if (!skalKreveOrgnummer) unregister("orgnummer")
+  }, [skalKreveOrgnummer]);
 
   const deleteFailed = (errorMessage: string) => {
     setDeleteErrorMessage(errorMessage);
@@ -110,4 +101,4 @@ export const PersonCard = React.memo(() => {
       </div>
     </Card>
   );
-});
+};

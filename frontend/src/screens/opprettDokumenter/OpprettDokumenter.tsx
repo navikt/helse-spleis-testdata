@@ -1,30 +1,25 @@
 import styles from "./OpprettDokumenter.module.css";
-import React, { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import React, {useState} from "react";
+import {FormProvider, useForm} from "react-hook-form";
 
-import { post } from "../../io/api";
-import { useSubscribe } from "../../io/subscription";
+import {post} from "../../io/api";
+import {useSubscribe} from "../../io/subscription";
 
-import { DiverseCard } from "./DiverseCard";
-import { PersonCard } from "./PersonCard";
-import { SøknadCard } from "./SøknadCard";
-import { Ferieperioder } from "./Ferieperioder";
-import { SykmeldingCard } from "./SykmeldingCard";
-import { EndringRefusjon } from "./EndringRefusjon";
-import { InntektsmeldingCard } from "./InntektsmeldingCard";
-import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
+import {DiverseCard} from "./DiverseCard";
+import {PersonCard} from "./PersonCard";
+import {SøknadCard} from "./SøknadCard";
+import {Ferieperioder} from "./Ferieperioder";
+import {SykmeldingCard} from "./SykmeldingCard";
+import {EndringRefusjon} from "./EndringRefusjon";
+import {InntektsmeldingCard} from "./InntektsmeldingCard";
+import {Arbeidsgiverperioder} from "./Arbeidsgiverperioder";
 
-import { FetchButton } from "../../components/FetchButton";
-import { ErrorMessage } from "../../components/ErrorMessage";
+import {FetchButton} from "../../components/FetchButton";
+import {ErrorMessage} from "../../components/ErrorMessage";
 
-import type {
-  FellesDTO,
-  InntektsmeldingDTO,
-  PersonDTO,
-  SykmeldingDTO,
-  SøknadDTO,
-} from "../../io/api.d";
+import type {FellesDTO, InntektsmeldingDTO, PersonDTO, SykmeldingDTO, SøknadDTO,} from "../../io/api.d";
 import {Egenmeldingsdager} from "./Egenmeldingsdager";
+import {ArbeidssituasjonDTO} from "../../utils/types";
 
 type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
@@ -88,7 +83,9 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
       medlemskapVerdi: "JA",
-      skalKreveOrgnummer: true
+      søknad: {
+        arbeidssituasjon: 'ARBEIDSTAKER' as ArbeidssituasjonDTO
+      }
     },
   });
 

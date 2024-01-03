@@ -10,6 +10,7 @@ import {SykdomTom} from "./SykdomTom";
 import {SykdomFom} from "./SykdomFom";
 import {DeleteButton} from "./DeleteButton";
 import {ArbeidssituasjonDTO} from "../../utils/types";
+import {get} from "../../io/api";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -25,13 +26,50 @@ const useDocumentsValidator = () => {
     "Huk av for å sende minst ett dokument";
 };
 
+interface Arbeidsgiver {
+  type: string,
+  arbeidsgiver: {
+    type: string
+    identifikator: string
+  },
+  detaljer: Arbeidsforholddetalje[]
+}
+interface Arbeidsforholddetalje {
+  yrke: string
+}
+
 export const PersonCard = () => {
   const { register, unregister, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
 
   const validateSendsDocuments = useDocumentsValidator();
+  const fnr = watch("fnr")
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
   const skalKreveOrgnummer = arbeidssituasjon === "ARBEIDSTAKER"
+
+  const [arbeidsgivere, setArbeidsgivere] = useState([] as Arbeidsgiver[])
+
+  useEffect(() => {
+    if (!fnr || fnr.length < 11) return setArbeidsgivere([])
+    get("/person/arbeidsforhold", { ident: fnr })
+        .then((result) => result.json() )
+        .then((response) => {
+          setArbeidsgivere(() => response.arbeidsforhold.map((it) => {
+            return {
+              type: it.type,
+              arbeidsgiver: {
+                type: it.arbeidsgiver.type,
+                identifikator: it.arbeidsgiver.identifikator
+              },
+              detaljer: it.detaljer.map((detalje) => {
+                return {
+                  yrke: detalje.yrke
+                }
+              })
+            } as Arbeidsgiver
+          }))
+        })
+  }, [fnr]);
 
   const deleteFailed = (errorMessage: string) => {
     setDeleteErrorMessage(errorMessage);
@@ -53,16 +91,19 @@ export const PersonCard = () => {
           />
           <DeleteButton errorCallback={deleteFailed} />
         </span>
-        {skalKreveOrgnummer && <FormInput
-          data-testid="orgnummer"
-          label="Organisasjonsnummer"
-          errors={formState.errors}
-          {...register("orgnummer", {
-            required: "Organisasjonsnummer må fylles ut",
-            validate: validateOrganisasjonsnummer,
-            shouldUnregister: true
-          })}
-        />}
+        {skalKreveOrgnummer && <>
+          <FormInput
+            data-testid="orgnummer"
+            label="Organisasjonsnummer"
+            errors={formState.errors}
+            {...register("orgnummer", {
+              required: "Organisasjonsnummer må fylles ut",
+              validate: validateOrganisasjonsnummer,
+              shouldUnregister: true
+            })}
+          />
+          { arbeidsgivere.length > 0 && <Arbeidsgivere arbeidsgivere={arbeidsgivere} /> }
+        </>}
         <SykdomFom />
         <SykdomTom />
         <Checkbox
@@ -99,3 +140,10 @@ export const PersonCard = () => {
     </Card>
   );
 };
+
+function Arbeidsgivere({ arbeidsgivere }: { arbeidsgivere: Arbeidsgiver[] }) {
+  return <small>Registrerte arbeidsforhold: <ul>
+    {arbeidsgivere.map((it, i) => {
+    return <li key={i}>{ it.arbeidsgiver.identifikator } ({ it.detaljer[0].yrke })</li>
+  })}</ul></small>
+}

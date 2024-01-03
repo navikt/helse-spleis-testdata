@@ -34,6 +34,7 @@ spec:
     outbound:
       external:
        - host: team-inntekt-proxy.dev-fss-pub.nais.io
+       - host: aareg-services-q1.dev-fss-pub.nais.io
   prometheus:
     enabled: true
     path: /metrics
@@ -48,3 +49,7 @@ spec:
       value: https://team-inntekt-proxy.dev-fss-pub.nais.io/proxy/inntektskomponenten-q1/rs
     - name: INNTEKTSKOMPONENTEN_RESOURCE_ID
       value: dev-fss.team-inntekt.inntektskomponenten
+    - name: AAREG_URL
+      value: https://aareg-services-q1.dev-fss-pub.nais.io
+    - name: AAREG_SCOPE
+      value: api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default

@@ -9,6 +9,8 @@ internal fun setUpEnvironment() =
         aadClientSecret = System.getenv("AZURE_APP_CLIENT_SECRET"),
         inntektRestUrl = System.getenv("INNTEKTSKOMPONENTEN_URL"),
         inntektResourceId = System.getenv("INNTEKTSKOMPONENTEN_RESOURCE_ID"),
+        aaregUrl = System.getenv("AAREG_URL"),
+        aaregScope = System.getenv("AAREG_SCOPE"),
         aktørRestUrl = "https://app-q1.adeo.no/aktoerregister/api/v1",
         dollyRestUrl = "https://dolly-backend.dev.intern.nav.no/api/v1",
     )
@@ -19,6 +21,8 @@ data class Environment(
     val aadClientSecret: Any,
     val inntektRestUrl: String,
     val inntektResourceId: String,
+    val aaregUrl: String,
+    val aaregScope: String,
     val aktørRestUrl: String,
     val dollyRestUrl: String,
 )

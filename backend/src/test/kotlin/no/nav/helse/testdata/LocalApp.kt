@@ -9,6 +9,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.*
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -31,11 +32,27 @@ fun main() {
         )
     }
 
+    val aaregClient = mockk<AaregClient> {
+        every {
+            runBlocking { hentArbeidsforhold(any(), any()) }
+        } returns listOf(
+            AaregArbeidsforhold(
+                type = Arbeidsforholdkode.ORDINÆRT,
+                arbeidssted = Arbeidssted(Arbeidsstedtype.Underenhet, listOf(Ident(Identtype.ORGANISASJONSNUMMER, "111111111"))),
+                ansettelsesperiode = Ansettelsesperiode(LocalDate.EPOCH, null),
+                ansettelsesdetaljer = listOf(
+                    Ansettelsesdetaljer(100, Yrke("10000", "UTVIKLER"), Ansettelseform("fast", "Fast stilling"), Rapporteringsmåneder(YearMonth.of(1970, 1), null))
+                )
+            )
+        )
+    }
+
     val rapidsMediator = RapidsMediator(rapidsConnection)
 
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
         inntektRestClient = inntektRestClientMock,
+        aaregClient = aaregClient,
         rapidsMediator = rapidsMediator,
     ).start()
 }
@@ -43,6 +60,7 @@ fun main() {
 internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val inntektRestClient: InntektRestClient,
+    private val aaregClient: AaregClient,
     private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
 
@@ -50,6 +68,7 @@ internal class LocalApplicationBuilder(
         installKtorModule(
             subscriptionService = subscriptionService,
             inntektRestClient = inntektRestClient,
+            aaregClient = aaregClient,
             rapidsMediator = rapidsMediator,
         )
     }

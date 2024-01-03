@@ -1,9 +1,10 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import {getByTestId, queryByTestId, render, screen, waitFor} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { OpprettDokumenter } from "./OpprettDokumenter";
 import { RecoilRoot } from "recoil";
 import userEvent from "@testing-library/user-event";
+import fn = jest.fn;
 
 jest.mock("../../io/subscription", () => ({
   useSubscribe: () => [() => {}],
@@ -31,9 +32,12 @@ describe("OpprettDokumenter", () => {
 
     const orgnr = "987654321";
     const inntekt = "54321";
+    const fnr = "01234567890";
+
+    mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, inntekt)
 
-    userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    userEvent.type(screen.getByTestId("fnr"), fnr);
     userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
     await waitFor(() =>
@@ -67,6 +71,7 @@ describe("OpprettDokumenter", () => {
     render(<OpprettDokumenter />, { wrapper });
 
     const orgnr = "987654321";
+    mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
 
     userEvent.type(screen.getByTestId("fnr"), "01234567890");
@@ -148,7 +153,9 @@ describe("OpprettDokumenter", () => {
   });
 
   it("sletter person", async () => {
-    mockStandardInntekt("orgnr", "54321");
+    const orgnr = "orgnr"
+    mockArbeidsforhold(orgnr)
+    mockStandardInntekt(orgnr, "54321");
     mockFetchResponse({ status: 204 });
 
     render(<OpprettDokumenter />);
@@ -167,7 +174,9 @@ describe("OpprettDokumenter", () => {
   });
 
   it("viser feilmelding om sletting feiler", async () => {
-    mockStandardInntekt("orgnr", "54321");
+    const orgnr = "orgnr"
+    mockArbeidsforhold(orgnr)
+    mockStandardInntekt(orgnr, "54321");
     mockFetchResponse({ status: 404, text: () => jest.fn() });
 
     render(<OpprettDokumenter />);
@@ -201,14 +210,31 @@ describe("OpprettDokumenter", () => {
     });
   });
 
-  const mockStandardInntekt = (orgnr: string, månedsinntekt: string) => {
-    mockFetchResponse({
-      json: () => ({
-        beregnetMånedsinntekt: månedsinntekt,
-        arbeidsgivere: [
-          { organisasjonsnummer: orgnr, beregnetMånedsinntekt: månedsinntekt },
-        ],
-      }),
-    });
-  };
+  const mockStandardInntekt = (orgnr: string, månedsinntekt: string) => mockFetchResponse({
+    json: () => ({
+      beregnetMånedsinntekt: månedsinntekt,
+      arbeidsgivere: [
+        { organisasjonsnummer: orgnr, beregnetMånedsinntekt: månedsinntekt },
+      ],
+    }),
+  });
+
+  const mockArbeidsforhold = (orgnr: string) => mockFetchResponse({
+    json: () => ({
+      arbeidsforhold: [
+          {
+            type: "ORDINÆRT",
+            arbeidsgiver: {
+              type: "Organisasjon",
+              identifikator: orgnr
+            },
+            detaljer: [
+              {
+                yrke: "UTVIKLER"
+              }
+            ]
+          }
+          ]
+    }),
+  });
 });

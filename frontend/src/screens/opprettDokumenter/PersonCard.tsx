@@ -33,10 +33,6 @@ export const PersonCard = () => {
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
   const skalKreveOrgnummer = arbeidssituasjon === "ARBEIDSTAKER"
 
-  useEffect(() => {
-    if (!skalKreveOrgnummer) unregister("orgnummer")
-  }, [skalKreveOrgnummer]);
-
   const deleteFailed = (errorMessage: string) => {
     setDeleteErrorMessage(errorMessage);
   };
@@ -64,6 +60,7 @@ export const PersonCard = () => {
           {...register("orgnummer", {
             required: "Organisasjonsnummer må fylles ut",
             validate: validateOrganisasjonsnummer,
+            shouldUnregister: true
           })}
         />}
         <SykdomFom />

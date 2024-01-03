@@ -37,16 +37,6 @@ export const SøknadCard = React.memo(() => {
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
   const skalViseTidligereArbeidsgiverOrgnummer = arbeidssituasjon == 'ARBEIDSLEDIG'
 
-  useEffect(() => {
-    if (skalSendeSykmelding) {
-      unregister("søknad.sykmeldingsgrad");
-    }
-  }, [skalSendeSykmelding]);
-
-  useEffect(() => {
-    if (!skalViseTidligereArbeidsgiverOrgnummer) unregister("søknad.tidligereArbeidsgiverOrgnummer")
-  }, [arbeidssituasjon]);
-
   const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
 
   return (
@@ -68,6 +58,7 @@ export const SøknadCard = React.memo(() => {
             errors={formState.errors}
             {...register("søknad.tidligereArbeidsgiverOrgnummer", {
               validate: validateOptionalOrganisasjonsnummer,
+              shouldUnregister: true
             })}
         />}
         <FormInput
@@ -121,6 +112,7 @@ export const SøknadCard = React.memo(() => {
             {...register("søknad.sykmeldingsgrad", {
               required: "Sykmeldingsgrad må fylles ut",
               validate: validateSykdomsgrad,
+              shouldUnregister: true
             })}
           />
         )}

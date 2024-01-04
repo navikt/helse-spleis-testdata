@@ -28,11 +28,12 @@ class AaregClient(
             "$baseUrl/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
         )
 
-        sikkerlogg.info("AaregResponse status:\n${response.bodyAsText()}")
+        if (response.status.value > 299) throw RuntimeException("feilkode fra aareg: ${response.status}")
 
         return try {
+            sikkerlogg.info("AaregResponse status:\n${response.bodyAsText()}")
             response.body<List<AaregArbeidsforhold>>()
-        } catch (e: JsonConvertException) {
+        } catch (e: Exception) {
             val responseValue = objectMapper.readTree(response.bodyAsText())
             throw RuntimeException(responseValue.path("melding").asText("Ukjent respons fra Aareg"))
         }

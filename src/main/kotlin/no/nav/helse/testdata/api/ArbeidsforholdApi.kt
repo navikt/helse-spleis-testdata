@@ -5,10 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.helse.testdata.AaregClient
-import no.nav.helse.testdata.Arbeidsforholdkode
-import no.nav.helse.testdata.Arbeidsstedtype
-import no.nav.helse.testdata.Identtype
+import no.nav.helse.testdata.*
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
@@ -56,6 +53,7 @@ internal fun Routing.registerArbeidsforholdApi(aaregClient: AaregClient) = get("
         )
         call.respond(response)
     } catch (err: Exception) {
+        log.error("feil ved oppslag i aareg: ${err.message}", err)
         call.respond(HttpStatusCode.InternalServerError, ErrorResponse(err))
     }
 }

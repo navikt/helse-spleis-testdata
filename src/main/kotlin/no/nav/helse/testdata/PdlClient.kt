@@ -38,7 +38,7 @@ class PdlClient(
             accept(ContentType.Application.Json)
             header("Nav-Call-Id", callId)
             header("behandlingsnummer", "B139")
-            sikkerlogg.info("sender $body til PDL callId=$callId")
+            sikkerlogg.info("sender POST $baseUrl/graphql med <$body> til PDL callId=$callId med $aadToken")
             setBody(body)
         }
         val result = objectMapper.readTree(response.bodyAsText())

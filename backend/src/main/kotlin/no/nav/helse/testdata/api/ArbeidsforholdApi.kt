@@ -1,12 +1,14 @@
 package no.nav.helse.testdata.api
 
-import io.ktor.server.application.call
-import io.ktor.server.request.header
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Routing
-import io.ktor.server.routing.get
-import io.micrometer.core.instrument.Meter.Id
-import no.nav.helse.testdata.*
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import no.nav.helse.testdata.AaregClient
+import no.nav.helse.testdata.Arbeidsforholdkode
+import no.nav.helse.testdata.Arbeidsstedtype
+import no.nav.helse.testdata.Identtype
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
@@ -14,44 +16,52 @@ import java.util.*
 internal fun Routing.registerArbeidsforholdApi(aaregClient: AaregClient) = get("/person/arbeidsforhold") {
     val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
 
-    val response = ArbeidsforholdResponse(
-        arbeidsforhold = aaregClient.hentArbeidsforhold(fnr, UUID.randomUUID())
-            .map { aaregArbeidsforhold ->
-                ArbeidsforholdDto(
-                    type = when (aaregArbeidsforhold.type) {
-                        Arbeidsforholdkode.ORDINÆRT -> ArbeidsforholdtypeDto.ORDINÆRT
-                        Arbeidsforholdkode.MARITIMT -> ArbeidsforholdtypeDto.MARITIMT
-                        Arbeidsforholdkode.FRILANSER -> ArbeidsforholdtypeDto.FRILANSER
-                        Arbeidsforholdkode.FORENKLET_OPPGJØRSORDNING -> ArbeidsforholdtypeDto.FORENKLET_OPPGJØRSORDNING
-                    },
-                    arbeidsgiver = aaregArbeidsforhold.arbeidssted.let { arbeidssted ->
-                        ArbeidsgiverDto(
-                            type = when (arbeidssted.type) {
-                                Arbeidsstedtype.Underenhet -> ArbeidsgivertypeDto.Organisasjon
-                                Arbeidsstedtype.Person -> ArbeidsgivertypeDto.Person
-                            },
-                            identifikator = arbeidssted.identer.first {
-                                it.type in setOf(
-                                    Identtype.ORGANISASJONSNUMMER,
-                                    Identtype.FOLKEREGISTERIDENT
-                                )
-                            }.ident,
-                        )
-                    },
-                    ansettelseperiodeFom = aaregArbeidsforhold.ansettelsesperiode.startdato,
-                    ansettelseperiodeTom = aaregArbeidsforhold.ansettelsesperiode.sluttdato,
-                    detaljer = aaregArbeidsforhold.ansettelsesdetaljer.map { ansettelsesdetaljer ->
-                        AnsettelsedetaljeDto(
-                            yrke = ansettelsesdetaljer.yrke.beskrivelse,
-                            ansettelseform = ansettelsesdetaljer.ansettelsesform?.kode,
-                            rapporteringsmaanederFom = ansettelsesdetaljer.rapporteringsmaaneder.fra,
-                            rapporteringsmaanederTom = ansettelsesdetaljer.rapporteringsmaaneder.til
-                        )
-                    }
-                )
-            }
-    )
-    call.respond(response)
+    try {
+        val response = ArbeidsforholdResponse(
+            arbeidsforhold = aaregClient.hentArbeidsforhold(fnr, UUID.randomUUID())
+                .map { aaregArbeidsforhold ->
+                    ArbeidsforholdDto(
+                        type = when (aaregArbeidsforhold.type) {
+                            Arbeidsforholdkode.ORDINÆRT -> ArbeidsforholdtypeDto.ORDINÆRT
+                            Arbeidsforholdkode.MARITIMT -> ArbeidsforholdtypeDto.MARITIMT
+                            Arbeidsforholdkode.FRILANSER -> ArbeidsforholdtypeDto.FRILANSER
+                            Arbeidsforholdkode.FORENKLET_OPPGJØRSORDNING -> ArbeidsforholdtypeDto.FORENKLET_OPPGJØRSORDNING
+                        },
+                        arbeidsgiver = aaregArbeidsforhold.arbeidssted.let { arbeidssted ->
+                            ArbeidsgiverDto(
+                                type = when (arbeidssted.type) {
+                                    Arbeidsstedtype.Underenhet -> ArbeidsgivertypeDto.Organisasjon
+                                    Arbeidsstedtype.Person -> ArbeidsgivertypeDto.Person
+                                },
+                                identifikator = arbeidssted.identer.first {
+                                    it.type in setOf(
+                                        Identtype.ORGANISASJONSNUMMER,
+                                        Identtype.FOLKEREGISTERIDENT
+                                    )
+                                }.ident,
+                            )
+                        },
+                        ansettelseperiodeFom = aaregArbeidsforhold.ansettelsesperiode.startdato,
+                        ansettelseperiodeTom = aaregArbeidsforhold.ansettelsesperiode.sluttdato,
+                        detaljer = aaregArbeidsforhold.ansettelsesdetaljer.map { ansettelsesdetaljer ->
+                            AnsettelsedetaljeDto(
+                                yrke = ansettelsesdetaljer.yrke.beskrivelse,
+                                ansettelseform = ansettelsesdetaljer.ansettelsesform?.kode,
+                                rapporteringsmaanederFom = ansettelsesdetaljer.rapporteringsmaaneder.fra,
+                                rapporteringsmaanederTom = ansettelsesdetaljer.rapporteringsmaaneder.til
+                            )
+                        }
+                    )
+                }
+        )
+        call.respond(response)
+    } catch (err: Exception) {
+        call.respond(HttpStatusCode.InternalServerError, ErrorResponse(err))
+    }
+}
+
+class ErrorResponse(err: Exception) {
+    val feilmelding = err.message ?: "ukjent feil"
 }
 
 data class ArbeidsforholdResponse(

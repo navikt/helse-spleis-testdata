@@ -23,6 +23,7 @@ allprojects {
         implementation("com.github.navikt:rapids-and-rivers:2022.05.09-12.50.569dc0a4e492")
         implementation("io.ktor:ktor-server-netty:$ktorVersion")
         implementation("io.ktor:ktor-server-websockets:$ktorVersion")
+        implementation("io.ktor:ktor-server-call-id:$ktorVersion")
         implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
         implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 

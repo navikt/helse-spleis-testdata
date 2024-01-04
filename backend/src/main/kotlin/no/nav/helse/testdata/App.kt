@@ -8,25 +8,25 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.http.content.default
-import io.ktor.server.http.content.files
-import io.ktor.server.http.content.static
-import io.ktor.server.http.content.staticRootFolder
+import io.ktor.server.application.*
+import io.ktor.server.http.content.*
+import io.ktor.server.plugins.callid.*
+import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.routing.routing
-import io.ktor.server.websocket.WebSockets
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.testdata.api.*
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.event.Level
 import java.io.File
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 
@@ -102,6 +102,13 @@ internal fun Application.installKtorModule(
 ) {
     installJacksonFeature()
     install(WebSockets)
+    install(CallLogging) {
+        logger = LoggerFactory.getLogger("no.nav.helse.testdata.CallLogging")
+        level = Level.INFO
+        disableDefaultColors()
+        filter { call -> setOf("/metrics", "/isalive", "/isready").none { call.request.path().contains(it) } }
+    }
+    errorTracing(no.nav.helse.testdata.log)
 
     routing {
         registerPersonApi(rapidsMediator)
@@ -115,6 +122,16 @@ internal fun Application.installKtorModule(
             staticRootFolder = File("public")
             files("")
             default("index.html")
+        }
+    }
+}
+
+private fun Application.errorTracing(logger: Logger) {
+    intercept(ApplicationCallPipeline.Monitoring) {
+        try {
+            proceed()
+        } catch (err: Throwable) {
+            logger.error("exception thrown during processing: ${err.message} callId=${call.callId}", err)
         }
     }
 }

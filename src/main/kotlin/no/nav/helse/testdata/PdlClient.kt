@@ -16,7 +16,9 @@ class PdlClient(
         private val hentPersonQuery = "/pdl/hentPerson.graphql".lesFil()
 
         private fun String.lesFil() =
-            PdlClient::class.java.getResource(this)!!.readText()
+            PdlClient::class.java.getResource(this)!!
+                .readText()
+                .replace(Regex("[\n\r\t]"), "")
     }
     suspend fun hentNavn(ident: String, callId: String) = request(ident, callId, hentPersonQuery)
 

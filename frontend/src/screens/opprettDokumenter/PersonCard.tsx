@@ -54,8 +54,8 @@ export const PersonCard = () => {
     get("/person/arbeidsforhold", { ident: fnr })
         .then((result) => result.json() )
         .then((response) => {
-          if ('arbeidsforhold' !in response) return console.log(`ukjent response: `, response)
-          else setArbeidsgivere(() => typeof response.arbeidsforhold !== 'undefined' ? response.arbeidsforhold.map((it) => {
+          if (typeof response.arbeidsforhold === 'undefined') return console.log(`ukjent response: `, response)
+          setArbeidsgivere(() =>  response.arbeidsforhold.map((it) => {
             return {
               type: it.type,
               arbeidsgiver: {
@@ -68,7 +68,7 @@ export const PersonCard = () => {
                 }
               })
             } as Arbeidsgiver
-          }) : [])
+          }))
         })
   }, [fnr]);
 

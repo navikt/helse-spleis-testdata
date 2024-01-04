@@ -34,7 +34,7 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :backend:build
+          arguments: build
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}

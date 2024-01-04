@@ -53,6 +53,8 @@ fun main() {
         } returns EregResponse("Testnavn", emptyList())
     }
 
+    val pdlClient = mockk<PdlClient>()
+
     val rapidsMediator = RapidsMediator(rapidsConnection)
 
     LocalApplicationBuilder(
@@ -60,6 +62,7 @@ fun main() {
         inntektRestClient = inntektRestClientMock,
         aaregClient = aaregClient,
         eregClient = eregClient,
+        pdlClient = pdlClient,
         rapidsMediator = rapidsMediator,
     ).start()
 }
@@ -69,6 +72,7 @@ internal class LocalApplicationBuilder(
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
+    private val pdlClient: PdlClient,
     private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
 
@@ -78,6 +82,7 @@ internal class LocalApplicationBuilder(
             inntektRestClient = inntektRestClient,
             aaregClient = aaregClient,
             eregClient = eregClient,
+            pdlClient = pdlClient,
             rapidsMediator = rapidsMediator,
         )
     }

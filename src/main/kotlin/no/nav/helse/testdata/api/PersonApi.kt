@@ -1,16 +1,17 @@
 package no.nav.helse.testdata.api
 
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
-import io.ktor.server.request.header
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Routing
-import io.ktor.server.routing.delete
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import no.nav.helse.testdata.PdlClient
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.sikkerlogg
+import java.util.UUID
 
-internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator) {
+internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, pdlClient: PdlClient) {
     delete("/person") {
         val fnr = call.request.header("ident")
         rapidsMediator.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
@@ -18,5 +19,10 @@ internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator) {
         sikkerlogg.info("produserte slettemelding for fnr=$fnr")
 
         call.respond(HttpStatusCode.OK)
+    }
+    get("/person/{ident}") {
+        val ident = call.parameters["ident"] ?: throw IllegalArgumentException("mangler ident")
+        val response = pdlClient.hentNavn(ident, UUID.randomUUID().toString())
+        call.respondText(response.toString(), ContentType.Application.Json)
     }
 }

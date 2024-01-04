@@ -58,12 +58,15 @@ fun main() {
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd::accessToken, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd::accessToken, httpClient)
     val eregClient = EregClient(env.eregUrl, httpClient)
+    val pdlClient = PdlClient(env.pdlUrl, env.pdlScope, azureAd::accessToken, httpClient)
+
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         inntektRestClient = inntektRestClient,
         aaregClient = aaregClient,
-        eregClient = eregClient
+        eregClient = eregClient,
+        pdlClient = pdlClient
     ).start()
 }
 
@@ -72,7 +75,8 @@ internal class ApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
-    private val eregClient: EregClient
+    private val eregClient: EregClient,
+    private val pdlClient: PdlClient
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -84,6 +88,7 @@ internal class ApplicationBuilder(
                     inntektRestClient,
                     aaregClient,
                     eregClient,
+                    pdlClient,
                     rapidsMediator
                 )
             }.build()
@@ -102,6 +107,7 @@ internal fun Application.installKtorModule(
     inntektRestClient: InntektRestClient,
     aaregClient: AaregClient,
     eregClient: EregClient,
+    pdlClient: PdlClient,
     rapidsMediator: RapidsMediator,
 ) {
     installJacksonFeature()
@@ -115,7 +121,7 @@ internal fun Application.installKtorModule(
     errorTracing(no.nav.helse.testdata.log)
 
     routing {
-        registerPersonApi(rapidsMediator)
+        registerPersonApi(rapidsMediator, pdlClient)
         registerVedtaksperiodeApi(rapidsMediator)
         registerArbeidsforholdApi(aaregClient)
         registerOrganisasjonApi(eregClient)

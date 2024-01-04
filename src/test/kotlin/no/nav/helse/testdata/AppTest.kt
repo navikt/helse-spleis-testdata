@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
+import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
@@ -35,7 +36,7 @@ class AppTest {
         testApplication {
             application {
                 routing {
-                    registerPersonApi(RapidsMediator(testRapid))
+                    registerPersonApi(RapidsMediator(testRapid), mockk())
                 }
             }
             val response = client.delete("/person") {

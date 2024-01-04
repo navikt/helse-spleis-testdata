@@ -38,6 +38,7 @@ spec:
        - host: team-inntekt-proxy.dev-fss-pub.nais.io
        - host: aareg-services-q1.dev-fss-pub.nais.io
        - host: ereg-services-q1.dev-fss-pub.nais.io
+       - host: pdl-api.dev-fss-pub.nais.io
   prometheus:
     enabled: true
     path: /metrics
@@ -58,3 +59,7 @@ spec:
       value: api://dev-fss.arbeidsforhold.aareg-services-nais-q1/.default
     - name: EREG_BASE_URL
       value: https://ereg-services-q1.dev-fss-pub.nais.io
+    - name: PDL_BASE_URL
+      value: https://pdl-api.dev-fss-pub.nais.io
+    - name: PDL_SCOPE
+      value: api://dev-fss.pdl.pdl-api/.default

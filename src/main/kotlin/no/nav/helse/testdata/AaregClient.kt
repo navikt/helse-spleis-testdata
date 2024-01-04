@@ -27,7 +27,7 @@ class AaregClient(
             token,
             fnr,
             callId,
-            "$baseUrl/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
+            "$baseUrl/api/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
         )
 
         sikkerlogg.info("kontakter aareg med token:\n$token")

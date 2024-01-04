@@ -22,12 +22,15 @@ class AaregClient(
         fnr: String,
         callId: UUID
     ): List<AaregArbeidsforhold> {
+        val token = tokenSupplier(aaregScope)
         val response = hent(
+            token,
             fnr,
             callId,
             "$baseUrl/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
         )
 
+        sikkerlogg.info("kontakter aareg med token:\n$token")
         if (response.status.value > 299) throw RuntimeException("feilkode fra aareg: ${response.status}")
 
         return try {
@@ -39,9 +42,9 @@ class AaregClient(
         }
     }
 
-    private suspend fun hent(fnr: String, callId: UUID, url: String) =
+    private suspend fun hent(token: String, fnr: String, callId: UUID, url: String) =
         httpClient.get(url) {
-            header("Authorization", "Bearer ${tokenSupplier(aaregScope)}")
+            header("Authorization", "Bearer $token")
             System.getenv("NAIS_APP_NAME")?.also { header("Nav-Consumer-Id", it) }
             header("Nav-Call-Id", callId)
             accept(ContentType.Application.Json)

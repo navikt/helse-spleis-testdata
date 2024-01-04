@@ -50,9 +50,19 @@ export const PersonCard = () => {
   const skalKreveOrgnummer = skalSendeInntektsmelding || arbeidssituasjon === "ARBEIDSTAKER"
 
   const [arbeidsgivere, setArbeidsgivere] = useState([] as Arbeidsgiver[])
+  const [navn, setNavn] = useState(null)
 
   useEffect(() => {
-    if (!fnr || fnr.length < 11) return setArbeidsgivere([])
+    if (!fnr || fnr.length < 11) {
+      setNavn(null)
+      return setArbeidsgivere([])
+    }
+    get(`/person/${fnr}`)
+        .then((result) => result.json())
+        .then((json) => {
+          if (typeof json.fornavn === 'undefined') return
+          setNavn(`${json.fornavn} ${json.mellomnavn || ''} ${json.etternavn}`)
+        })
     get("/person/arbeidsforhold", { ident: fnr })
         .then((result) => result.json() )
         .then((response) => {
@@ -95,6 +105,7 @@ export const PersonCard = () => {
           />
           <DeleteButton errorCallback={deleteFailed} />
         </span>
+        { navn && <small>{ navn }</small> }
         {skalKreveOrgnummer && <>
           <FormInput
             data-testid="orgnummer"

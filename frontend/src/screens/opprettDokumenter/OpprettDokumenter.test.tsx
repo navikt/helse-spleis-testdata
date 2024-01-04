@@ -34,6 +34,7 @@ describe("OpprettDokumenter", () => {
     const inntekt = "54321";
     const fnr = "01234567890";
 
+    mockPersonNavn()
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, inntekt)
     mockOrganisasjonnavn(orgnr)
@@ -72,6 +73,7 @@ describe("OpprettDokumenter", () => {
     render(<OpprettDokumenter />, { wrapper });
 
     const orgnr = "987654321";
+    mockPersonNavn()
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
     mockOrganisasjonnavn(orgnr)
@@ -155,6 +157,7 @@ describe("OpprettDokumenter", () => {
 
   it("sletter person", async () => {
     const orgnr = "orgnr"
+    mockPersonNavn()
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
     mockOrganisasjonnavn(orgnr)
@@ -167,7 +170,7 @@ describe("OpprettDokumenter", () => {
 
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(
-          3,
+          4,
           `http://0.0.0.0:8080/organisasjon/${orgnr}`,
           { headers: { Accept: 'application/json' }, method: "get" }
       );
@@ -177,7 +180,7 @@ describe("OpprettDokumenter", () => {
 
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(
-          4,
+          5,
           "http://0.0.0.0:8080/person",
           { headers: { ident: fnr }, method: "delete" }
       );
@@ -187,6 +190,7 @@ describe("OpprettDokumenter", () => {
 
   it("viser feilmelding om sletting feiler", async () => {
     const orgnr = "orgnr"
+    mockPersonNavn()
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
     mockOrganisasjonnavn(orgnr)
@@ -197,7 +201,7 @@ describe("OpprettDokumenter", () => {
     userEvent.type(screen.getByTestId("fnr"), "12345678900");
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(
-          3,
+          4,
           `http://0.0.0.0:8080/organisasjon/${orgnr}`,
           { headers: { Accept: 'application/json' }, method: "get" }
       );
@@ -255,6 +259,14 @@ describe("OpprettDokumenter", () => {
             ]
           }
           ]
+    }),
+  });
+
+  const mockPersonNavn = () => mockFetchResponse({
+    json: () => ({
+      fornavn: "NORMAL",
+      mellomnavn: null,
+      etternavn: "MUFFINS"
     }),
   });
 

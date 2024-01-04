@@ -53,7 +53,23 @@ fun main() {
         } returns EregResponse("Testnavn", emptyList())
     }
 
-    val pdlClient = mockk<PdlClient>()
+    val pdlClient = mockk<PdlClient>() {
+        every {
+            runBlocking { hentNavn(any(), any()) }
+        } returns objectMapper.readTree("""{
+    "data": {
+        "hentPerson": {
+            "navn": [
+                {
+                    "fornavn": "NORMAL",
+                    "mellomnavn": null,
+                    "etternavn": "MUFFINS"
+                }
+            ]
+        }
+    }
+}""")
+    }
 
     val rapidsMediator = RapidsMediator(rapidsConnection)
 

@@ -55,7 +55,7 @@ export const PersonCard = () => {
         .then((result) => result.json() )
         .then((response) => {
           if ('arbeidsforhold' !in response) return console.log(`ukjent response: `, response)
-          setArbeidsgivere(() => response.arbeidsforhold.map((it) => {
+          else setArbeidsgivere(() => response.arbeidsforhold.map((it) => {
             return {
               type: it.type,
               arbeidsgiver: {

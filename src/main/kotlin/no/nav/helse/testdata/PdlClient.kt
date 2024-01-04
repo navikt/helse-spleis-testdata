@@ -36,11 +36,12 @@ class PdlClient(
             accept(ContentType.Application.Json)
             header("Nav-Call-Id", callId)
             header("behandlingsnummer", "B139")
+            sikkerlogg.info("sender $body til PDL callId=$callId")
             setBody(body)
         }
-        if (!response.status.isSuccess())
-            throw RuntimeException("error (responseCode=${response.status}) from PDL")
         val result = objectMapper.readTree(response.bodyAsText())
+        if (!response.status.isSuccess())
+            throw RuntimeException("error (responseCode=${response.status}) from PDL:\n$result")
         if (result.hasNonNull("errors")) {
             val feilmeldinger = result.path("errors").map { it.path("message").asText() }
             throw RuntimeException("fikk feil fra pdl: ${feilmeldinger.joinToString()}:\n$result")

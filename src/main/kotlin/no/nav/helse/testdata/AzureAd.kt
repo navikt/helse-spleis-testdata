@@ -13,16 +13,17 @@ class AzureAd(private val props: AzureAdProperties) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    private lateinit var cachedAccessToken: Token
+    private val cachedTokens = mutableMapOf<String, Token>()
 
     internal fun accessToken(scope: String): String {
-        if (!::cachedAccessToken.isInitialized || cachedAccessToken.expired) cachedAccessToken = try {
-            hentToken(scope)
+        return try {
+            cachedTokens.compute(scope) { _, eksisterendeVerdi ->
+                eksisterendeVerdi?.takeUnless(Token::expired) ?: hentToken(scope)
+            }!!.access_token
         } catch (e: Exception) {
             logger.warn("Kunne ikke hente token", e)
             throw e
         }
-        return cachedAccessToken.access_token
     }
 
     private fun hentToken(scope: String): Token {

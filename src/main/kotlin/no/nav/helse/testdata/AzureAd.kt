@@ -6,6 +6,7 @@ import java.net.http.HttpClient.newHttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 internal typealias TokenSupplier = (String) -> String
 
@@ -13,7 +14,7 @@ class AzureAd(private val props: AzureAdProperties) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    private val cachedTokens = mutableMapOf<String, Token>()
+    private val cachedTokens = ConcurrentHashMap<String, Token>()
 
     internal fun accessToken(scope: String): String {
         return try {

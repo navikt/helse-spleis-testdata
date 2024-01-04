@@ -57,12 +57,13 @@ fun main() {
     val azureAd = AzureAd(AzureAdProperties(env))
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd::accessToken, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd::accessToken, httpClient)
-
+    val eregClient = EregClient(env.eregUrl, httpClient)
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
         subscriptionService = ConcreteSubscriptionService,
         inntektRestClient = inntektRestClient,
-        aaregClient = aaregClient
+        aaregClient = aaregClient,
+        eregClient = eregClient
     ).start()
 }
 
@@ -70,7 +71,8 @@ internal class ApplicationBuilder(
     rapidsConfig: RapidApplication.RapidApplicationConfig,
     private val subscriptionService: SubscriptionService,
     private val inntektRestClient: InntektRestClient,
-    private val aaregClient: AaregClient
+    private val aaregClient: AaregClient,
+    private val eregClient: EregClient
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -81,6 +83,7 @@ internal class ApplicationBuilder(
                     subscriptionService,
                     inntektRestClient,
                     aaregClient,
+                    eregClient,
                     rapidsMediator
                 )
             }.build()
@@ -98,6 +101,7 @@ internal fun Application.installKtorModule(
     subscriptionService: SubscriptionService,
     inntektRestClient: InntektRestClient,
     aaregClient: AaregClient,
+    eregClient: EregClient,
     rapidsMediator: RapidsMediator,
 ) {
     installJacksonFeature()
@@ -114,6 +118,7 @@ internal fun Application.installKtorModule(
         registerPersonApi(rapidsMediator)
         registerVedtaksperiodeApi(rapidsMediator)
         registerArbeidsforholdApi(aaregClient)
+        registerOrganisasjonApi(eregClient)
         registerInntektApi(inntektRestClient)
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)

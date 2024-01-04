@@ -47,12 +47,15 @@ fun main() {
         )
     }
 
+    val eregClient = mockk<EregClient>()
+
     val rapidsMediator = RapidsMediator(rapidsConnection)
 
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
         inntektRestClient = inntektRestClientMock,
         aaregClient = aaregClient,
+        eregClient = eregClient,
         rapidsMediator = rapidsMediator,
     ).start()
 }
@@ -61,6 +64,7 @@ internal class LocalApplicationBuilder(
     private val subscriptionService: SubscriptionService,
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
+    private val eregClient: EregClient,
     private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
 
@@ -69,6 +73,7 @@ internal class LocalApplicationBuilder(
             subscriptionService = subscriptionService,
             inntektRestClient = inntektRestClient,
             aaregClient = aaregClient,
+            eregClient = eregClient,
             rapidsMediator = rapidsMediator,
         )
     }

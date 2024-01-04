@@ -25,8 +25,7 @@ class AzureAd(private val props: AzureAdProperties) {
         return cachedAccessToken.access_token
     }
 
-    private fun hentToken(resourceId: String): Token {
-        val scope = "api://$resourceId/.default"
+    private fun hentToken(scope: String): Token {
         val body = props.run {
             "client_id=$clientId&client_secret=$clientSecret&scope=${scope}&grant_type=client_credentials"
         }

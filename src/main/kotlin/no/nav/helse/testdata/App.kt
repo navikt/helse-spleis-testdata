@@ -55,7 +55,7 @@ fun main() {
     }
 
     val azureAd = AzureAd(AzureAdProperties(env))
-    val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektResourceId, azureAd::accessToken, httpClient)
+    val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd::accessToken, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd::accessToken, httpClient)
 
     ApplicationBuilder(

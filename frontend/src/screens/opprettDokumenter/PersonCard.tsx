@@ -32,6 +32,7 @@ interface Arbeidsgiver {
     type: string
     identifikator: string
   },
+  ansattFom: string,
   detaljer: Arbeidsforholddetalje[]
 }
 interface Arbeidsforholddetalje {
@@ -62,6 +63,7 @@ export const PersonCard = () => {
                 type: it.arbeidsgiver.type,
                 identifikator: it.arbeidsgiver.identifikator
               },
+              ansattFom: it.ansettelseperiodeFom,
               detaljer: it.detaljer.map((detalje) => {
                 return {
                   yrke: detalje.yrke
@@ -145,6 +147,6 @@ export const PersonCard = () => {
 function Arbeidsgivere({ arbeidsgivere }: { arbeidsgivere: Arbeidsgiver[] }) {
   return <small>Registrerte arbeidsforhold: <ul>
     {arbeidsgivere.map((it, i) => {
-    return <li key={i}>{ it.arbeidsgiver.identifikator } ({ it.detaljer[0].yrke })</li>
+    return <li key={i}>{ it.arbeidsgiver.identifikator } ({ it.detaljer[0].yrke }, fom. { it.ansattFom })</li>
   })}</ul></small>
 }

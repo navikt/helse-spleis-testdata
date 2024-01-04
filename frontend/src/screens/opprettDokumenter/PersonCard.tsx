@@ -46,7 +46,8 @@ export const PersonCard = () => {
   const validateSendsDocuments = useDocumentsValidator();
   const fnr = watch("fnr")
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
-  const skalKreveOrgnummer = arbeidssituasjon === "ARBEIDSTAKER"
+  const skalSendeInntektsmelding = watch("skalSendeInntektsmelding");
+  const skalKreveOrgnummer = skalSendeInntektsmelding || arbeidssituasjon === "ARBEIDSTAKER"
 
   const [arbeidsgivere, setArbeidsgivere] = useState([] as Arbeidsgiver[])
 

@@ -36,6 +36,7 @@ describe("OpprettDokumenter", () => {
 
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, inntekt)
+    mockOrganisasjonnavn(orgnr)
 
     userEvent.type(screen.getByTestId("fnr"), fnr);
     userEvent.type(screen.getByTestId("orgnummer"), orgnr);
@@ -73,7 +74,7 @@ describe("OpprettDokumenter", () => {
     const orgnr = "987654321";
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
-
+    mockOrganisasjonnavn(orgnr)
     userEvent.type(screen.getByTestId("fnr"), "01234567890");
 
     await waitFor(() => {
@@ -156,16 +157,27 @@ describe("OpprettDokumenter", () => {
     const orgnr = "orgnr"
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr)
     mockFetchResponse({ status: 204 });
 
     render(<OpprettDokumenter />);
 
     const fnr = "12345678900";
     userEvent.type(screen.getByTestId("fnr"), fnr);
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenNthCalledWith(
+          3,
+          `http://0.0.0.0:8080/organisasjon/${orgnr}`,
+          { headers: { Accept: 'application/json' }, method: "get" }
+      );
+    });
+
     userEvent.click(screen.getByText("❌"));
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenLastCalledWith(
+      expect(fetch).toHaveBeenNthCalledWith(
+          4,
           "http://0.0.0.0:8080/person",
           { headers: { ident: fnr }, method: "delete" }
       );
@@ -177,11 +189,19 @@ describe("OpprettDokumenter", () => {
     const orgnr = "orgnr"
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr)
     mockFetchResponse({ status: 404, text: () => jest.fn() });
 
     render(<OpprettDokumenter />);
 
     userEvent.type(screen.getByTestId("fnr"), "12345678900");
+    await waitFor(() => {
+      expect(fetch).toHaveBeenNthCalledWith(
+          3,
+          `http://0.0.0.0:8080/organisasjon/${orgnr}`,
+          { headers: { Accept: 'application/json' }, method: "get" }
+      );
+    });
     userEvent.click(screen.getByText("❌"));
 
     await waitFor(() => {
@@ -237,4 +257,11 @@ describe("OpprettDokumenter", () => {
           ]
     }),
   });
+
+  const mockOrganisasjonnavn = (orgnr: string) => mockFetchResponse({
+    json: () => ({
+      navn: `Testnavn for ${orgnr}`
+    }),
+  });
+
 });

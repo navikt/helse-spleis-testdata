@@ -47,7 +47,11 @@ fun main() {
         )
     }
 
-    val eregClient = mockk<EregClient>()
+    val eregClient = mockk<EregClient>() {
+        every {
+            runBlocking { hentOrganisasjon(any(), any()) }
+        } returns EregResponse("Testnavn", emptyList())
+    }
 
     val rapidsMediator = RapidsMediator(rapidsConnection)
 

@@ -7,7 +7,7 @@
     "start": "vite",
     "dev": "vite --host",
     "build": "vite build",
-    "watch": "vite build --watch --emptyOutDir",
+    "watch": "vite build --mode development --watch --emptyOutDir",
     "serve": "vite preview",
     "prettier": "prettier ./src --write"
   },

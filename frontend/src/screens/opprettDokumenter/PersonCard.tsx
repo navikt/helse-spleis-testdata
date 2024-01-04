@@ -145,9 +145,33 @@ export const PersonCard = () => {
   );
 };
 
+interface OrganisasjonResponse {
+  navn: string
+}
 function Arbeidsgivere({ arbeidsgivere }: { arbeidsgivere: Arbeidsgiver[] }) {
+  const [arbeidsgivernavn, setArbeidsgivernavn] = useState(arbeidsgivere.map(() => ({ navn: "ukjent" })) as OrganisasjonResponse[])
+
+  useEffect(() => {
+    Promise.all([...arbeidsgivere.map((arbeidsgiver) => {
+      return get(`/organisasjon/${arbeidsgiver.arbeidsgiver.identifikator}`)
+          .then((response) => response.json())
+          .then((json) => {
+            if (typeof json.navn !== 'undefined') return { navn: json.navn } as OrganisasjonResponse
+            return { navn: "[ukjent]" } as OrganisasjonResponse
+          })
+          .catch((error) => {
+            console.log(`Fikk feil ved oppslag av organisasjon ${arbeidsgiver.arbeidsgiver.identifikator}: ${error}`)
+            return {
+              navn: "[fikk feil]"
+            } as OrganisasjonResponse
+          })
+    })]).then((result) => {
+      setArbeidsgivernavn(result)
+    })
+  }, [arbeidsgivere]);
+
   return <small>Registrerte arbeidsforhold: <ul>
     {arbeidsgivere.map((it, i) => {
-    return <li key={i}>{ it.arbeidsgiver.identifikator } ({ it.detaljer[0].yrke }, fom. { it.ansattFom })</li>
+    return <li key={i}>{ arbeidsgivernavn[i].navn }:<br />{ it.arbeidsgiver.identifikator } ({ it.detaljer[0].yrke }, fom. { it.ansattFom })</li>
   })}</ul></small>
 }

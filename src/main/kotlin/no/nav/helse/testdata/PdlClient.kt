@@ -29,7 +29,7 @@ class PdlClient(
     ): JsonNode {
         val aadToken = tokenSupplier(scope)
 
-        val body = objectMapper.writeValueAsString(PdlQueryObject(query, Variables(ident)))
+        val body = PdlQueryObject(query, Variables(ident))
 
         val response = httpClient.post("$baseUrl/graphql") {
             header("TEMA", "SYK")

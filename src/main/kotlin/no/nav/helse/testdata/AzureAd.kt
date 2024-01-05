@@ -31,16 +31,30 @@ class AzureAd(private val props: AzureAdProperties) {
         val body = props.run {
             "client_id=$clientId&client_secret=$clientSecret&scope=${scope}&grant_type=client_credentials"
         }
-        logger.info("Henter token fra AAD")
+        logger.info("Henter token for $scope")
         val request = HttpRequest.newBuilder(props.url)
             .header("Accept", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build()
 
         val response = newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
-        val token = objectMapper.readValue(response.body(), Token::class.java)!!
-        logger.info("Hentet token fra AAD")
-        return token
+        try {
+            val token = objectMapper.readValue(response.body(), Token::class.java)!!
+            logger.info("Hentet token fra AAD")
+            return token
+        } catch (err: Exception) {
+            logger.error("Klarte ikke å hente token, noe galt skjedde: ${err.message}", err)
+            throw err
+        }
+    }
+
+    fun refreshTokens() {
+        cachedTokens.keys().asIterator().forEachRemaining { scope ->
+            try {
+                log.info("refresher $scope")
+                hentToken(scope)
+            } catch (_: Exception) { }
+        }
     }
 }
 

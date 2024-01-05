@@ -20,8 +20,7 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.*
 import no.nav.helse.testdata.api.*
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
@@ -66,7 +65,8 @@ fun main() {
         inntektRestClient = inntektRestClient,
         aaregClient = aaregClient,
         eregClient = eregClient,
-        pdlClient = pdlClient
+        pdlClient = pdlClient,
+        azureAd = azureAd
     ).start()
 }
 
@@ -76,7 +76,8 @@ internal class ApplicationBuilder(
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
-    private val pdlClient: PdlClient
+    private val pdlClient: PdlClient,
+    private val azureAd: AzureAd
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -97,6 +98,7 @@ internal class ApplicationBuilder(
         rapidsMediator = RapidsMediator(rapidsConnection)
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
+        TokenRefreshRiver(rapidsConnection, azureAd)
     }
 
     fun start() = rapidsConnection.start()
@@ -150,5 +152,18 @@ private fun Application.errorTracing(logger: Logger) {
 internal fun Application.installJacksonFeature() {
     install(ContentNegotiation) {
         register(ContentType.Application.Json, JacksonConverter(objectMapper))
+    }
+}
+
+private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val azureAd: AzureAd) : River.PacketListener {
+    init {
+        River(rapidsConnection)
+            .validate { it.demandValue("@event_name", "halv_time") }
+            .register(this)
+    }
+
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        log.info("refresher tokens som har gått ut")
+        azureAd.refreshTokens()
     }
 }

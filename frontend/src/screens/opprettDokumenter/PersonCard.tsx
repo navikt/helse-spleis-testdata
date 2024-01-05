@@ -11,6 +11,7 @@ import {SykdomFom} from "./SykdomFom";
 import {DeleteButton} from "./DeleteButton";
 import {ArbeidssituasjonDTO} from "../../utils/types";
 import {get} from "../../io/api";
+import {Button} from "../../components/Button";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -39,6 +40,18 @@ interface Arbeidsforholddetalje {
   yrke: string
 }
 
+function lagreSøk(fnr: string, navn: string) {
+  if (!localStorage.hasOwnProperty("historikk")) localStorage.historikk = '{ "historikk": [] }'
+  const historikk = JSON.parse(localStorage.historikk)
+  const navnesøk = historikk.historikk as {navn: string, fnr: string}[]
+  if (navnesøk.findIndex((it) => it.fnr === fnr) != -1) return
+  navnesøk.push({
+    fnr: fnr,
+    navn: navn
+  })
+  localStorage.historikk = JSON.stringify(historikk)
+}
+
 export const PersonCard = () => {
   const { register, unregister, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
@@ -61,7 +74,9 @@ export const PersonCard = () => {
         .then((result) => result.json())
         .then((json) => {
           if (typeof json.fornavn === 'undefined') return
-          setNavn(`${json.fornavn} ${json.mellomnavn || ''} ${json.etternavn}`)
+          const navn = `${json.fornavn}${json.mellomnavn ? ` ${json.mellomnavn}` : ''} ${json.etternavn}`
+          lagreSøk(fnr, navn)
+          setNavn(navn)
         })
     get("/person/arbeidsforhold", { ident: fnr })
         .then((result) => result.json() )
@@ -151,10 +166,27 @@ export const PersonCard = () => {
         <ErrorMessage className={styles.DocumentError}>
           {deleteErrorMessage}
         </ErrorMessage>
+        <TidligereSøk />
       </div>
     </Card>
   );
 };
+
+function TidligereSøk() {
+  if (!localStorage.hasOwnProperty("historikk")) return null
+  const historikk = JSON.parse(localStorage.historikk) as { historikk: { fnr: string, navn: string }[] }
+  return <>
+    <h4>Tidligere søk</h4>
+    <ul>
+      { historikk.historikk.map((it, i) =>
+        <li key={i}>{it.fnr}: { it.navn }</li>
+      )}
+    </ul>
+    <Button onClick={() => {
+      localStorage.removeItem("historikk")
+    } }>Tøm historikk</Button>
+  </>
+}
 
 interface OrganisasjonResponse {
   navn: string

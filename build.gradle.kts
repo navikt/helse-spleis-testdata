@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.9.22"
 }
 
 val junitJupiterVersion = "5.8.2"
@@ -13,12 +13,15 @@ group = "no.nav.helse"
 
 repositories {
     mavenCentral()
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven("https://jitpack.io")
 }
 
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
+val tbdLibsVersion: String by project
 dependencies {
+    implementation("com.github.navikt.tbd-libs:azure-token-client-default:2024.01.09-20.20-d52bae29")
     implementation("com.github.navikt:rapids-and-rivers:2022.05.09-12.50.569dc0a4e492")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-websockets:$ktorVersion")
@@ -55,11 +58,10 @@ dependencies {
 }
 
 tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "17"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "17"
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
 
     named<Jar>("jar") {

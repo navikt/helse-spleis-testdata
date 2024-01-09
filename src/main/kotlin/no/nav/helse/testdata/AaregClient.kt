@@ -2,12 +2,12 @@ package no.nav.helse.testdata
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.*
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
@@ -15,22 +15,20 @@ import java.util.*
 class AaregClient(
     private val baseUrl: String,
     private val aaregScope: String,
-    private val tokenSupplier: TokenSupplier,
+    private val tokenSupplier: AzureTokenProvider,
     private val httpClient: HttpClient
 ) {
     suspend fun hentArbeidsforhold(
         fnr: String,
         callId: UUID
     ): List<AaregArbeidsforhold> {
-        val token = tokenSupplier(aaregScope)
         val response = hent(
-            token,
+            tokenSupplier.bearerToken(aaregScope).token,
             fnr,
             callId,
             "$baseUrl/api/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
         )
 
-        sikkerlogg.info("kontakter aareg med token:\n$token")
         if (response.status.value > 299) throw RuntimeException("feilkode fra aareg: ${response.status}")
 
         return try {

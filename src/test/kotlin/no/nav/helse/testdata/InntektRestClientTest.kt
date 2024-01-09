@@ -1,12 +1,11 @@
 package no.nav.helse.testdata
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.fullPath
-import io.ktor.serialization.jackson.jackson
+import io.ktor.client.*
+import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.http.*
+import io.ktor.serialization.jackson.*
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -17,13 +16,12 @@ import java.time.YearMonth
 
 class InntektRestClientTest {
 
-    private val responsMock = mockk<Mock>()
-
     @Test
-    fun `person uten inntektshistorikk`() = runBlocking {
-        responsMock.apply { every { get() }.returns(tomRespons()) }
-        val inntektsliste =
+    fun `person uten inntektshistorikk`() {
+        val inntektRestClient = inntektRestClient(tomRespons())
+        val inntektsliste = runBlocking {
             inntektRestClient.hentInntektsliste("fnr", YearMonth.of(2019, 1), YearMonth.of(2019, 10), "8-30", "callId")
+        }
 
         when (inntektsliste) {
             is Ok -> {
@@ -35,10 +33,11 @@ class InntektRestClientTest {
     }
 
     @Test
-    fun `person med inntektshistorikk`() = runBlocking {
-        responsMock.apply { every { get() }.returns(responsMedInntekt()) }
-        val inntektsliste =
+    fun `person med inntektshistorikk`() {
+        val inntektRestClient = inntektRestClient(responsMedInntekt())
+        val inntektsliste = runBlocking {
             inntektRestClient.hentInntektsliste("fnr", YearMonth.of(2019, 1), YearMonth.of(2019, 10), "8-30", "callId")
+        }
         when (inntektsliste) {
             is Ok -> {
                 assertNotNull(inntektsliste.value)
@@ -50,10 +49,10 @@ class InntektRestClientTest {
 
 
 
-    private val inntektRestClient = InntektRestClient(
+    private fun inntektRestClient(response: String) = InntektRestClient(
         "http://localhost.no",
         "clientId",
-        { "token " },
+        MockAzureTokenProvider(),
         HttpClient(MockEngine) {
             install(ContentNegotiation) {
                 jackson {
@@ -63,7 +62,7 @@ class InntektRestClientTest {
             engine {
                 addHandler { request ->
                     if (request.url.fullPath.startsWith("/api/v1/hentinntektliste")) {
-                        respond(responsMock.get())
+                        respond(response)
                     } else {
                         error("Endepunktet finnes ikke ${request.url.fullPath}")
                     }
@@ -119,7 +118,3 @@ private fun responsMedInntekt() =
                     }
                 ]}
 """
-
-private class Mock {
-    fun get() = "{}"
-}

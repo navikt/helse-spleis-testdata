@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.github.navikt.tbd_libs.azure.AzureToken
+import com.github.navikt.tbd_libs.azure.AzureTokenProvider
+import com.github.navikt.tbd_libs.azure.createAzureTokenClientFromEnvironment
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.http.*
@@ -53,11 +56,11 @@ fun main() {
         }
     }
 
-    val azureAd = AzureAd(AzureAdProperties(env))
-    val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd::accessToken, httpClient)
-    val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd::accessToken, httpClient)
+    val azureAd = RefreshTokens(createAzureTokenClientFromEnvironment())
+    val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd, httpClient)
+    val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd, httpClient)
     val eregClient = EregClient(env.eregUrl, httpClient)
-    val pdlClient = PdlClient(env.pdlUrl, env.pdlScope, azureAd::accessToken, httpClient)
+    val pdlClient = PdlClient(env.pdlUrl, env.pdlScope, azureAd, httpClient)
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
@@ -77,7 +80,7 @@ internal class ApplicationBuilder(
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
     private val pdlClient: PdlClient,
-    private val azureAd: AzureAd
+    private val azureAd: RefreshTokens
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -155,7 +158,7 @@ internal fun Application.installJacksonFeature() {
     }
 }
 
-private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val azureAd: AzureAd) : River.PacketListener {
+private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val azureAd: RefreshTokens) : River.PacketListener {
     init {
         River(rapidsConnection)
             .validate { it.demandValue("@event_name", "halv_time") }
@@ -165,5 +168,23 @@ private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         log.info("refresher tokens som har gått ut")
         azureAd.refreshTokens()
+    }
+}
+
+class RefreshTokens(private val client: AzureTokenProvider) : AzureTokenProvider by (client) {
+    private val scopes = mutableSetOf<String>()
+    fun refreshTokens() {
+        scopes.forEach { scope ->
+            log.info("refresher $scope")
+            try {
+                client.bearerToken(scope)
+            } catch (err: Exception) {
+                log.info("refresh gikk ikke så bra: ${err.message}", err)
+            }
+        }
+    }
+    override fun bearerToken(scope: String): AzureToken {
+        scopes.add(scope)
+        return client.bearerToken(scope)
     }
 }

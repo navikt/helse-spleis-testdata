@@ -1,6 +1,7 @@
 package no.nav.helse.testdata
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -9,7 +10,7 @@ import io.ktor.http.*
 class PdlClient(
     private val baseUrl: String,
     private val scope: String,
-    private val tokenSupplier: TokenSupplier,
+    private val tokenSupplier: AzureTokenProvider,
     private val httpClient: HttpClient
 ) {
     private companion object {
@@ -27,18 +28,15 @@ class PdlClient(
         callId: String,
         query: String
     ): JsonNode {
-        val aadToken = tokenSupplier(scope)
-
         val body = PdlQueryObject(query, Variables(ident))
 
         val response = httpClient.post("$baseUrl/graphql") {
             header("TEMA", "SYK")
-            header("Authorization", "Bearer $aadToken")
+            bearerAuth(tokenSupplier.bearerToken(scope).token)
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
             header("Nav-Call-Id", callId)
             header("behandlingsnummer", "B139")
-            sikkerlogg.info("sender POST $baseUrl/graphql med <$body> til PDL callId=$callId med $aadToken")
             setBody(body)
         }
         val result = objectMapper.readTree(response.bodyAsText())

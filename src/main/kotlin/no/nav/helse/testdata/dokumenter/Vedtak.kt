@@ -13,8 +13,7 @@ data class Vedtak(
     val søknad: Søknad? = null,
     val inntektsmelding: Inntektsmelding? = null,
     val medlemskapVerdi: String = "JA"
-) {
-}
+)
 
 data class Periode(val fom: LocalDate, val tom: LocalDate)
 
@@ -23,7 +22,8 @@ internal fun Vedtak.somArbeidsgiver(): String? {
     if (yrkesAktiviteterUtenArbeidsgiver.contains(søknad?.arbeidssituasjon)) {
         return null
     } else {
-        return "{\"navn\": \"Nærbutikken AS\", \"orgnummer\": \"${orgnummer}\" }"
+        val orgnummer = if (orgnummer != null) "$orgnummer" else null
+        return """{"navn": "Nærbutikken AS", "orgnummer": $orgnummer }"""
     }
 }
 

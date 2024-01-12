@@ -1,22 +1,21 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: {{app}}
+  name: spleis-testdata
   namespace: tbd
   labels:
-    team: {{team}}
+    team: tbd
 spec:
-  image: {{image}}:{{tag}}
+  image: {{image}}
   port: 8080
   liveness:
     path: /isalive
-    initialDelay: 30
+    initialDelay: 10
   readiness:
     path: /isready
-    initialDelay: 30
+    initialDelay: 10
   resources:
     limits:
-      cpu: 200m
       memory: 512Mi
     requests:
       cpu: 50m

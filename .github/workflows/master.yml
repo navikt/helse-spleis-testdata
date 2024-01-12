@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - master
-env:
-  APP: spleis-testdata
-  TEAM: tbd
-  IMAGE: ghcr.io/${{ github.repository }}/spleis-testdata
 
 jobs:
   build:
@@ -28,15 +24,11 @@ jobs:
           cache: "npm"
           cache-dependency-path: "frontend/package-lock.json"
 
-      - name: create docker tag
-        run: echo "TAG=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
-
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
         env:
-          ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set timezone
@@ -54,21 +46,17 @@ jobs:
       - name: Build frontend
         run: npm --prefix frontend run build
 
-      - name: Build docker image
-        run: docker build -f Dockerfile . --pull -t ${{ env.IMAGE }}:${{ env.TAG }}
-
-      - name: Push docker image
-        run: |
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin ghcr.io
-          docker push ${{ env.IMAGE }}:${{ env.TAG }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: build docker image
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: tbd
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
       - name: Deploy to dev
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: deploy/dev-gcp.yml
-          WAIT: false
-          VAR: "image=${{env.IMAGE}},tag=${{env.TAG}},team=${{env.TEAM}},app=${{env.APP}}"
+          IMAGE: ${{ steps.docker-build-push.outputs.image }}

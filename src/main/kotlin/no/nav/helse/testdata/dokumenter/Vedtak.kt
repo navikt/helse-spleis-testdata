@@ -1,6 +1,7 @@
 package no.nav.helse.testdata.dokumenter
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,7 +23,7 @@ internal fun Vedtak.somArbeidsgiver(): String? {
     if (yrkesAktiviteterUtenArbeidsgiver.contains(søknad?.arbeidssituasjon)) {
         return null
     } else {
-        val orgnummer = if (orgnummer != null) "$orgnummer" else null
+        val orgnummer = if (orgnummer != null) "\"$orgnummer\"" else null
         return """{"navn": "Nærbutikken AS", "orgnummer": $orgnummer }"""
     }
 }

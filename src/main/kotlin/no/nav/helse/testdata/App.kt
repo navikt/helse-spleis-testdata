@@ -143,7 +143,7 @@ private fun Application.errorTracing(logger: Logger) {
         try {
             proceed()
         } catch (err: Throwable) {
-            logger.error("exception thrown during processing: ${err.message} callId=${call.callId}", err)
+            logger.error("En feil oppsto: ${err.message} callId=${call.callId}", err)
         }
     }
 }

@@ -80,7 +80,7 @@ internal class ApplicationBuilder(
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
     private val pdlClient: PdlClient,
-    private val azureAd: RefreshTokens
+    azureAd: RefreshTokens
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
 
@@ -134,11 +134,7 @@ internal fun Application.installKtorModule(
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)
 
-        static("/") {
-            staticRootFolder = File("public")
-            files("")
-            default("index.html")
-        }
+        staticFiles("/", File("public"))
     }
 }
 

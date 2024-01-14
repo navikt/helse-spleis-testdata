@@ -112,7 +112,9 @@ internal fun runLocalServer(applicationBlock: Application.() -> Unit) {
     }
 
     runBlocking(exceptionHandler + applicationContext) {
-        val server = embeddedServer(Netty, 8080) {
+        val port = 8080
+        log.info("Starter backend på port $port")
+        val server = embeddedServer(Netty, port) {
             applicationBlock()
         }.start(wait = false)
 

@@ -53,7 +53,7 @@ function lagreSøk(fnr: string, navn: string) {
 }
 
 export const PersonCard = () => {
-  const { register, unregister, formState, watch } = useFormContext();
+  const { register, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
 
   const validateSendsDocuments = useDocumentsValidator();
@@ -182,7 +182,7 @@ function TidligereSøk() {
         <li key={i}>{it.fnr}: { it.navn }</li>
       )}
     </ul>
-    <Button onClick={() => {
+    <Button type="button" onClick={() => {
       localStorage.removeItem("historikk")
     } }>Tøm historikk</Button>
   </>

@@ -56,12 +56,7 @@ fun main() {
         }
     }
 
-    val azureAd = try {
-        RefreshTokens(createJwkAzureTokenClientFromEnvironment())
-    } catch (ex: Exception) {
-        sikkerlogg.error("Feil ved tolking av JWK. ${System.getenv().getValue("AZURE_APP_JWK")}", ex)
-        throw ex
-    }
+    val azureAd = RefreshTokens(createJwkAzureTokenClientFromEnvironment())
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd, httpClient)
     val eregClient = EregClient(env.eregUrl, httpClient)

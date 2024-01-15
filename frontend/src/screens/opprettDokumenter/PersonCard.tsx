@@ -172,9 +172,15 @@ export const PersonCard = () => {
   );
 };
 
+type Historikk = {
+  historikk: { fnr: string; navn: string }[];
+};
+
 function TidligereSøk() {
-  if (!localStorage.hasOwnProperty("historikk")) return null
-  const historikk = JSON.parse(localStorage.historikk) as { historikk: { fnr: string, navn: string }[] }
+  const initialHistorikk = localStorage.hasOwnProperty("historikk") ? JSON.parse(localStorage.historikk) : null;
+  const [historikk, setHistorikk] = useState<Historikk>(initialHistorikk);
+  if (historikk == null) return null;
+
   return <>
     <h4>Tidligere søk</h4>
     <ul>
@@ -183,8 +189,9 @@ function TidligereSøk() {
       )}
     </ul>
     <Button type="button" onClick={() => {
-      localStorage.removeItem("historikk")
-    } }>Tøm historikk</Button>
+      localStorage.removeItem("historikk");
+      setHistorikk(null);
+    }}>Tøm historikk</Button>
   </>
 }
 

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.navikt.tbd_libs.azure.AzureToken
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
-import com.github.navikt.tbd_libs.azure.createAzureTokenClientFromEnvironment
+import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.http.*
@@ -56,7 +56,7 @@ fun main() {
         }
     }
 
-    val azureAd = RefreshTokens(createAzureTokenClientFromEnvironment())
+    val azureAd = RefreshTokens(createJwkAzureTokenClientFromEnvironment())
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd, httpClient)
     val eregClient = EregClient(env.eregUrl, httpClient)

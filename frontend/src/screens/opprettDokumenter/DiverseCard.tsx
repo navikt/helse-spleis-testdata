@@ -1,9 +1,7 @@
 import styles from "./OpprettDokumenter.module.css";
-import {Checkbox} from "../../components/Checkbox";
 import {Card} from "../../components/Card";
 import {useFormContext} from "react-hook-form";
 import React from "react";
-import {Select} from "../../components/Select";
 import {FormSelect} from "../../components/FormSelect";
 
 export const DiverseCard = React.memo(() => {

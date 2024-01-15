@@ -28,7 +28,7 @@ apply(plugin = "org.jetbrains.kotlin.jvm")
 
 val tbdLibsVersion: String by project
 dependencies {
-    implementation("com.github.navikt.tbd-libs:azure-token-client-default:2024.01.15-15.39-f7db373f")
+    implementation("com.github.navikt.tbd-libs:azure-token-client-default:2024.01.15-16.09-25430c4c")
     implementation("com.github.navikt:rapids-and-rivers:2024010209171704183456.6d035b91ffb4")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-websockets:$ktorVersion")

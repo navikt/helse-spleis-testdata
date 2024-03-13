@@ -16,6 +16,8 @@ import no.nav.helse.testdata.dokumenter.søknad
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.sikkerlogg
 import org.intellij.lang.annotations.Language
+import java.time.LocalDateTime
+import java.util.*
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
@@ -56,6 +58,15 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
             sikkerlogg.info("produserer inntektsmelding for fnr=$fnr")
             mediator.publiser(fnr, it)
         }
+
+        // pulserer spedisjon for å unngå mye venting
+        @Language("JSON")
+        val pulsering = """{
+            "@event_name": "spedisjon_pulser",
+            "@id": "${UUID.randomUUID()}",
+            "@opprettet": "${LocalDateTime.now()}"
+        }"""
+        mediator.publiser(fnr, pulsering)
 
         call.respond(HttpStatusCode.OK)
             .also {

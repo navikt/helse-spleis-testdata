@@ -71,7 +71,9 @@ fun inntektsmelding(
                 "hendelseId":"${UUID.randomUUID()}",
                 "foersteFravaersdag":"$førstefraværsdag",
                 "testdataOpprettet":"${LocalDateTime.now()}",
-                "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}"
+                "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}",
+                "innsenderFulltNavn": "spleis-testdata",
+                "innsenderTelefon": "123456789"
             } 
         """
     }

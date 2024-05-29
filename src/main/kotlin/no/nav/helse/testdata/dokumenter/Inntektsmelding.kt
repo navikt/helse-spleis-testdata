@@ -73,7 +73,8 @@ fun inntektsmelding(
                 "testdataOpprettet":"${LocalDateTime.now()}",
                 "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}",
                 "innsenderFulltNavn": "spleis-testdata",
-                "innsenderTelefon": "123456789"
+                "innsenderTelefon": "123456789",
+                "matcherSpleis":true
             } 
         """
     }

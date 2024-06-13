@@ -59,15 +59,6 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
             mediator.publiser(fnr, it)
         }
 
-        // pulserer spedisjon for å unngå mye venting
-        @Language("JSON")
-        val pulsering = """{
-            "@event_name": "spedisjon_pulser",
-            "@id": "${UUID.randomUUID()}",
-            "@opprettet": "${LocalDateTime.now()}"
-        }"""
-        mediator.publiser(fnr, pulsering)
-
         call.respond(HttpStatusCode.OK)
             .also {
                 log.info("produsert dokumenter, se sikkerlogg/tjenestekall for fnr")

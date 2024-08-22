@@ -56,7 +56,7 @@ spec:
     - name: AAREG_URL
       value: https://aareg-services-q2.dev-fss-pub.nais.io
     - name: AAREG_SCOPE
-      value: api://dev-fss.arbeidsforhold.aareg-services-nais-q2/.default
+      value: api://dev-fss.arbeidsforhold.aareg-services-nais/.default
     - name: EREG_BASE_URL
       value: https://ereg-services-q2.dev-fss-pub.nais.io
     - name: PDL_BASE_URL

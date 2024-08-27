@@ -23,6 +23,7 @@ export interface SøknadDTO extends SykmeldingDTO {
   arbeidssituasjon: ArbeidssituasjonDTO,
   harAndreInntektskilder: boolean;
   ferieperioder: PeriodeDTO[];
+  tilkomneInntekter: TilkommenInntektDTO[];
   egenmeldingsdagerFraSykmelding: string[];
   faktiskgrad: number;
   sendtNav?: string;
@@ -45,6 +46,13 @@ export interface InntektsmeldingDTO {
 export interface RefusjonDto {
   opphørRefusjon?: string;
   refusjonsbeløp?: number;
+}
+
+export interface TilkommenInntektDTO {
+  datoFom: string;
+  datoTom?: string;
+  beløp: number;
+  orgnummer: string,
 }
 
 export interface EndringIRefusjonDto {

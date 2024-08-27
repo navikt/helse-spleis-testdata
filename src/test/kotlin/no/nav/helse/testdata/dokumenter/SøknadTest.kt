@@ -28,6 +28,14 @@ internal class SøknadTest {
                     Periode(mandag.plusDays(1), mandag.plusDays(2)),
                     Periode(mandag.plusDays(100), mandag.plusDays(101))
                 ),
+                tilkomneInntekter = listOf(
+                    Søknad.TilkommenInntektDto(
+                        datoFom = mandag,
+                        datomTom = fredag,
+                        beløp = 10000,
+                        orgnummer = "gorgnummer"
+                    )
+                ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
                 arbeidssituasjon = "ARBEIDSTAKER"
             )
@@ -53,7 +61,15 @@ internal class SøknadTest {
                 ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
                 arbeidssituasjon = "ARBEIDSLEDIG",
-                tidligereArbeidsgiverOrgnummer = "orgnummer"
+                tidligereArbeidsgiverOrgnummer = "orgnummer",
+                tilkomneInntekter = listOf(
+                    Søknad.TilkommenInntektDto(
+                        datoFom = mandag,
+                        datomTom = fredag,
+                        beløp = 10000,
+                        orgnummer = "gorgnummer"
+                    )
+                )
             )
         )
         val json = søknad(vedtak)

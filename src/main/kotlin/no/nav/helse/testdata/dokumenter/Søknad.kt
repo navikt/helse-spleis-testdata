@@ -19,7 +19,7 @@ data class Søknad(
 ) {
     data class TilkommenInntektDto(
         val datoFom: LocalDate,
-        val datomTom: LocalDate?,
+        val datoTom: LocalDate?,
         val beløp: Int,
         val orgnummer: String
     )
@@ -88,7 +88,7 @@ private fun List<Søknad.TilkommenInntektDto>.somTilkomneInntekter() =
             {
                 "orgnummer": "${it.orgnummer}",
                 "fom": "${it.datoFom}",
-                "tom": "${it.datomTom}",
+                "tom": ${if (it.datoTom != null) "\"${it.datoTom}\"" else "null"},
                 "beløp": "${it.beløp}"
             }"""
     }

@@ -31,7 +31,7 @@ internal class SøknadTest {
                 tilkomneInntekter = listOf(
                     Søknad.TilkommenInntektDto(
                         datoFom = mandag,
-                        null,
+                        datoTom = fredag,
                         beløp = 10000,
                         orgnummer = "gorgnummer"
                     )

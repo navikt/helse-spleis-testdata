@@ -1,17 +1,14 @@
 import styles from "./OpprettDokumenter.module.css";
-import { nanoid } from "nanoid";
-import { Card } from "../../components/Card";
-import { FormInput } from "../../components/FormInput";
-import { DeleteButton } from "../../components/DeleteButton";
-import { AddButton } from "../../components/AddButton";
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import {nanoid} from "nanoid";
+import {Card} from "../../components/Card";
+import {FormInput} from "../../components/FormInput";
+import {DeleteButton} from "../../components/DeleteButton";
+import {AddButton} from "../../components/AddButton";
+import React, {useState} from "react";
+import {useFormContext} from "react-hook-form";
 import {validateInntekt, validateOrganisasjonsnummer} from "../formValidation";
 
 type TilkommenId = string;
-
-const formattedDateString = (date: Date): string =>
-  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
 
 export const TilkommenInntekt = React.memo(() => {
   const {
@@ -24,6 +21,8 @@ export const TilkommenInntekt = React.memo(() => {
   const { watch } = useFormContext();
 
   const tilkomneInntekter = watch("søknad.tilkomneInntekter");
+  const defaultFom = watch("sykdomFom")
+  const defaultTom = watch("sykdomTom")
 
   const addTilkommenInntekt = () => {
     setTilkommen((old) => [...old, nanoid()]);
@@ -48,7 +47,7 @@ export const TilkommenInntekt = React.memo(() => {
                 type="date"
                 label="Startdato for inntekt"
                 errors={formState.errors}
-                defaultValue={formattedDateString(new Date("2021-07-15"))}
+                defaultValue={defaultFom}
                 {...register(`søknad.tilkomneInntekter.${i}.datoFom`, {
                   required: "Startdato for inntekt må angis",
                 })}
@@ -58,13 +57,13 @@ export const TilkommenInntekt = React.memo(() => {
                 type="date"
                 label="Sluttdato for inntekt"
                 errors={formState.errors}
-                defaultValue={formattedDateString(new Date("2021-07-01"))}
+                defaultValue={defaultTom}
                 {...register(`søknad.tilkomneInntekter.${i}.datoTom`, {
                   validate: (value?: string): boolean | string => {
                     const startDato = tilkomneInntekter[i]['datoFom'] ?? "2021-07-01"
                     return value ? ((new Date(startDato) <= new Date(value)) || 'Sluttdato må være senere eller lik startdato') : true
                   },
-                  required: false
+                  required: "Startdato for inntekt må angis"
                 })}
               />
               <DeleteButton onClick={() => removeTilkommenInntekt(i)} />

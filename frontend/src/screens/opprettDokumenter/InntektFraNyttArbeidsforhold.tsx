@@ -8,37 +8,37 @@ import React, {useState} from "react";
 import {useFormContext} from "react-hook-form";
 import {validateInntekt, validateOrganisasjonsnummer} from "../formValidation";
 
-type TilkommenId = string;
+type InntektFraNyttArbeidsforholdId = string;
 
-export const TilkommenInntekt = React.memo(() => {
+export const InntektFraNyttArbeidsforhold = React.memo(() => {
   const {
     register,
     unregister,
     formState,
   } = useFormContext();
 
-  const [tilkommen, setTilkommen] = useState<TilkommenId[]>([]);
+  const [inntektFraNyttArbeidsforhold, setInntektFraNyttArbeidsforhold] = useState<InntektFraNyttArbeidsforholdId[]>([]);
   const { watch } = useFormContext();
 
-  const tilkomneInntekter = watch("søknad.tilkomneInntekter");
+  const inntekterFraNyeArbeidsforhold = watch("søknad.inntektFraNyttArbeidsforhold");
   const defaultFom = watch("sykdomFom")
   const defaultTom = watch("sykdomTom")
 
-  const addTilkommenInntekt = () => {
-    setTilkommen((old) => [...old, nanoid()]);
+  const addInntektFraNyttArbeidsforhold = () => {
+    setInntektFraNyttArbeidsforhold((old) => [...old, nanoid()]);
   };
 
-  const removeTilkommenInntekt = (index: number) => {
-    unregister(`søknad.tilkomneInntekter`)
-    setTilkommen((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
+  const removeInntektFraNyttArbeidsforhold = (index: number) => {
+    unregister(`søknad.inntektFraNyttArbeidsforhold`)
+    setInntektFraNyttArbeidsforhold((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
   return (
     <>
-      <AddButton onClick={addTilkommenInntekt} data-testid="tilkommenInntektButton">
+      <AddButton onClick={addInntektFraNyttArbeidsforhold} data-testid="inntektFraNyttArbeidsforholdButton">
         Legg til inntekt fra nytt arbeidsforhold
       </AddButton>
-      {tilkommen.map((id, i) => (
+      {inntektFraNyttArbeidsforhold.map((id, i) => (
         <Card key={id}>
           <div className={styles.CardContainer}>
             <div className={styles.PeriodContainer}>
@@ -48,7 +48,7 @@ export const TilkommenInntekt = React.memo(() => {
                 label="Startdato for inntekt"
                 errors={formState.errors}
                 defaultValue={defaultFom}
-                {...register(`søknad.tilkomneInntekter.${i}.datoFom`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.datoFom`, {
                   required: "Startdato for inntekt må angis",
                 })}
               />
@@ -58,21 +58,21 @@ export const TilkommenInntekt = React.memo(() => {
                 label="Sluttdato for inntekt"
                 errors={formState.errors}
                 defaultValue={defaultTom}
-                {...register(`søknad.tilkomneInntekter.${i}.datoTom`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.datoTom`, {
                   validate: (value?: string): boolean | string => {
-                    const startDato = tilkomneInntekter[i]['datoFom'] ?? "2021-07-01"
+                    const startDato = inntekterFraNyeArbeidsforhold[i]['datoFom'] ?? "2021-07-01"
                     return value ? ((new Date(startDato) <= new Date(value)) || 'Sluttdato må være senere eller lik startdato') : true
                   },
                   required: "Startdato for inntekt må angis"
                 })}
               />
-              <DeleteButton onClick={() => removeTilkommenInntekt(i)} />
+              <DeleteButton onClick={() => removeInntektFraNyttArbeidsforhold(i)} />
             </div>
             <FormInput
                 data-testid={`beløp${i}`}
-                label="Beløp"
+                label="Daglig beløp"
                 errors={formState.errors}
-                {...register(`søknad.tilkomneInntekter.${i}.beløp`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.beløp`, {
                   required: "Beløp må angis",
                   validate: validateInntekt,
                 })}
@@ -81,7 +81,7 @@ export const TilkommenInntekt = React.memo(() => {
                 data-testid={`orgnummer${i}`}
                 label="Organisasjonsnummer"
                 errors={formState.errors}
-                {...register(`søknad.tilkomneInntekter.${i}.orgnummer`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.orgnummer`, {
                   required: "orgnummer må angis",
                   validate: validateOrganisasjonsnummer,
                 })}

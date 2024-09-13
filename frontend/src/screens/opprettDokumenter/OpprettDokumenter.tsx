@@ -20,7 +20,7 @@ import {ErrorMessage} from "../../components/ErrorMessage";
 import type {FellesDTO, InntektsmeldingDTO, PersonDTO, SykmeldingDTO, SøknadDTO,} from "../../io/api.d";
 import {Egenmeldingsdager} from "./Egenmeldingsdager";
 import {ArbeidssituasjonDTO} from "../../utils/types";
-import {TilkommenInntekt} from "./TilkommenInntekt";
+import {InntektFraNyttArbeidsforhold} from "./InntektFraNyttArbeidsforhold";
 
 type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
@@ -47,7 +47,7 @@ const createPayload = (
     sendtNav: values.søknad.sendtNav || undefined,
     sendtArbeidsgiver: values.søknad.sendtArbeidsgiver || undefined,
     arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
-    tilkomneInntekter: values.søknad.tilkomneInntekter || undefined,
+    inntektFraNyttArbeidsforhold: values.søknad.inntektFraNyttArbeidsforhold || undefined,
     tidligereArbeidsgiverOrgnummer: values.søknad.tidligereArbeidsgiverOrgnummer || null
   });
 
@@ -141,7 +141,7 @@ export const OpprettDokumenter = React.memo(() => {
           )}
           {skalSendeSøknad && <Ferieperioder />}
           {skalSendeSøknad && <Egenmeldingsdager />}
-          {skalSendeSøknad && <TilkommenInntekt />}
+          {skalSendeSøknad && <InntektFraNyttArbeidsforhold />}
           <div className={styles.Flex}>
             <FetchButton status={status} isFetching={isFetching} type="submit">
               Opprett dokumenter

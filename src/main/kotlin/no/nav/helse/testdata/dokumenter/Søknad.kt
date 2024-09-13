@@ -20,8 +20,8 @@ data class Søknad(
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
         val datoTom: LocalDate,
-        val beløp: Int,
-        val orgnummer: String
+        val belopPerDag: Int,
+        val arbeidsstedOrgnummer: String
     )
 }
 
@@ -86,10 +86,10 @@ private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbei
     map {
         """
             {
-                "arbeidsstedOrgnummer": "${it.orgnummer}",
+                "arbeidsstedOrgnummer": "${it.arbeidsstedOrgnummer}",
                 "fom": "${it.datoFom}",
                 "tom": "${it.datoTom}",
-                "belopPerDag": "${it.beløp}"
+                "belopPerDag": "${it.belopPerDag}"
             }"""
     }
 

@@ -32,8 +32,8 @@ internal class SøknadTest {
                     Søknad.InntektFraNyttArbeidsforholdDto(
                         datoFom = mandag,
                         datoTom = fredag,
-                        beløp = 10000,
-                        orgnummer = "gorgnummer"
+                        belopPerDag = 10000,
+                        arbeidsstedOrgnummer = "gorgnummer"
                     )
                 ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
@@ -66,8 +66,8 @@ internal class SøknadTest {
                     Søknad.InntektFraNyttArbeidsforholdDto(
                         datoFom = mandag,
                         datoTom = fredag,
-                        beløp = 10000,
-                        orgnummer = "gorgnummer"
+                        belopPerDag = 10000,
+                        arbeidsstedOrgnummer = "gorgnummer"
                     )
                 )
             )

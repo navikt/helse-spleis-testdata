@@ -72,7 +72,7 @@ export const InntektFraNyttArbeidsforhold = React.memo(() => {
                 data-testid={`beløp${i}`}
                 label="Daglig beløp"
                 errors={formState.errors}
-                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.beløp`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.belopPerDag`, {
                   required: "Beløp må angis",
                   validate: validateInntekt,
                 })}
@@ -81,7 +81,7 @@ export const InntektFraNyttArbeidsforhold = React.memo(() => {
                 data-testid={`orgnummer${i}`}
                 label="Organisasjonsnummer"
                 errors={formState.errors}
-                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.orgnummer`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.arbeidsstedOrgnummer`, {
                   required: "orgnummer må angis",
                   validate: validateOrganisasjonsnummer,
                 })}

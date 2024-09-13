@@ -28,8 +28,8 @@ internal class SøknadTest {
                     Periode(mandag.plusDays(1), mandag.plusDays(2)),
                     Periode(mandag.plusDays(100), mandag.plusDays(101))
                 ),
-                tilkomneInntekter = listOf(
-                    Søknad.TilkommenInntektDto(
+                inntektFraNyttArbeidsforhold = listOf(
+                    Søknad.InntektFraNyttArbeidsforholdDto(
                         datoFom = mandag,
                         datoTom = fredag,
                         beløp = 10000,
@@ -62,8 +62,8 @@ internal class SøknadTest {
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
                 arbeidssituasjon = "ARBEIDSLEDIG",
                 tidligereArbeidsgiverOrgnummer = "orgnummer",
-                tilkomneInntekter = listOf(
-                    Søknad.TilkommenInntektDto(
+                inntektFraNyttArbeidsforhold = listOf(
+                    Søknad.InntektFraNyttArbeidsforholdDto(
                         datoFom = mandag,
                         datoTom = fredag,
                         beløp = 10000,

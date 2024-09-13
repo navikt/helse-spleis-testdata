@@ -36,7 +36,7 @@ export const TilkommenInntekt = React.memo(() => {
   return (
     <>
       <AddButton onClick={addTilkommenInntekt} data-testid="tilkommenInntektButton">
-        Legg til tilkommen inntekt
+        Legg til inntekt fra nytt arbeidsforhold
       </AddButton>
       {tilkommen.map((id, i) => (
         <Card key={id}>

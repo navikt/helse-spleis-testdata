@@ -10,14 +10,14 @@ data class Søknad(
     val harAndreInntektskilder: Boolean,
     val ferieperioder: List<Periode> = emptyList(),
     val egenmeldingsdagerFraSykmelding: List<LocalDate>?,
-    val tilkomneInntekter: List<TilkommenInntektDto>?,
+    val inntektFraNyttArbeidsforhold: List<InntektFraNyttArbeidsforholdDto>?,
     val faktiskgrad: Int? = null,
     val sendtNav: LocalDate? = null,
     val sendtArbeidsgiver: LocalDate? = null,
     val arbeidGjenopptatt: LocalDate? = null,
     val tidligereArbeidsgiverOrgnummer: String? = null,
 ) {
-    data class TilkommenInntektDto(
+    data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
         val datoTom: LocalDate,
         val beløp: Int,
@@ -54,7 +54,7 @@ fun søknad(
             "sendtArbeidsgiver":${søknad.sendtArbeidsgiver?.atStartOfDay()?.let { "\"$it\"" }},
             "egenmeldinger":[],
             "egenmeldingsdagerFraSykmelding": ${søknad.egenmeldingsdagerFraSykmelding?.map { "\"$it\"" }},
-            "tilkomneInntekter": ${søknad.tilkomneInntekter?.somTilkomneInntekter()},
+            "inntektFraNyttArbeidsforhold": ${søknad.inntektFraNyttArbeidsforhold?.somInntektFraNyttArbeidsforhold()},
             "papirsykmeldinger":[],
             "fravar":${søknad.ferieperioder.somSøknadsferie()},
             "andreInntektskilder":[${
@@ -82,14 +82,14 @@ fun søknad(
     }
 }
 
-private fun List<Søknad.TilkommenInntektDto>.somTilkomneInntekter() =
+private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbeidsforhold() =
     map {
         """
             {
-                "orgnummer": "${it.orgnummer}",
+                "arbeidsstedOrgnummer": "${it.orgnummer}",
                 "fom": "${it.datoFom}",
                 "tom": "${it.datoTom}",
-                "beløp": "${it.beløp}"
+                "belopPerDag": "${it.beløp}"
             }"""
     }
 

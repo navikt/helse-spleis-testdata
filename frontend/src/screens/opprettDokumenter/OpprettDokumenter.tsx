@@ -9,7 +9,6 @@ import {DiverseCard} from "./DiverseCard";
 import {PersonCard} from "./PersonCard";
 import {SøknadCard} from "./SøknadCard";
 import {Ferieperioder} from "./Ferieperioder";
-import {SykmeldingCard} from "./SykmeldingCard";
 import {EndringRefusjon} from "./EndringRefusjon";
 import {InntektsmeldingCard} from "./InntektsmeldingCard";
 import {Arbeidsgiverperioder} from "./Arbeidsgiverperioder";
@@ -87,7 +86,6 @@ export const OpprettDokumenter = React.memo(() => {
     shouldUnregister: true,
   });
 
-  const skalSendeSykmelding = form.watch("skalSendeSykmelding");
   const skalSendeSøknad = form.watch("skalSendeSøknad");
   const skalSendeInntektsmelding = form.watch("skalSendeInntektsmelding");
 
@@ -124,7 +122,6 @@ export const OpprettDokumenter = React.memo(() => {
         <div className={styles.OpprettDokumenter}>
           <div className={styles.DocumentContainer}>
             <PersonCard />
-            {skalSendeSykmelding && <SykmeldingCard />}
             {skalSendeSøknad && <SøknadCard />}
             {skalSendeInntektsmelding && <InntektsmeldingCard />}
             <DiverseCard />

@@ -11,7 +11,7 @@
 .Title {
   font-size: 1.25rem;
   margin-top: 0;
-  margin-bottom: var(--block-medium);
+  margin-bottom: var(--block-small);
 }
 
 .CardContainer {

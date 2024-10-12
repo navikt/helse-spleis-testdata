@@ -3,9 +3,11 @@ import {Card} from "../../components/Card";
 import {useFormContext} from "react-hook-form";
 import React from "react";
 import {FormSelect} from "../../components/FormSelect";
+import {Sykmelding} from "./Sykmelding";
 
 export const DiverseCard = React.memo(() => {
-  const { register , setValue} = useFormContext();
+  const { register, setValue, watch } = useFormContext();
+    const skalSendeSykmelding = watch("skalSendeSykmelding");
 
   return (
     <Card>
@@ -26,6 +28,7 @@ export const DiverseCard = React.memo(() => {
               } }
           />
       </div>
+      {skalSendeSykmelding && <Sykmelding />}
     </Card>
   );
 });

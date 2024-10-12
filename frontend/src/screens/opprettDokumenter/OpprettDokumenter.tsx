@@ -17,9 +17,8 @@ import {Arbeidsgiverperioder} from "./Arbeidsgiverperioder";
 import {FetchButton} from "../../components/FetchButton";
 import {ErrorMessage} from "../../components/ErrorMessage";
 
-import type {FellesDTO, InntektsmeldingDTO, PersonDTO, SykmeldingDTO, SøknadDTO,} from "../../io/api.d";
+import type {FellesDTO, InntektsmeldingDTO, PersonDTO, SykmeldingDTO, SøknadDTO} from "../../io/api.d";
 import {Egenmeldingsdager} from "./Egenmeldingsdager";
-import {ArbeidssituasjonDTO} from "../../utils/types";
 import {InntektFraNyttArbeidsforhold} from "./InntektFraNyttArbeidsforhold";
 
 type OpprettVedtaksperiodePayload = PersonDTO &
@@ -84,11 +83,8 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSykmelding: true,
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
-      medlemskapVerdi: "JA",
-      søknad: {
-        arbeidssituasjon: 'ARBEIDSTAKER' as ArbeidssituasjonDTO
-      }
     },
+    shouldUnregister: true,
   });
 
   const skalSendeSykmelding = form.watch("skalSendeSykmelding");

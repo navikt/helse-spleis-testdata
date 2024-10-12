@@ -54,6 +54,11 @@
   border-color: #00a6ff;
 }
 
+.Infotekst {
+  color: var(--text-color-secondary);
+  font-size: 12px;
+}
+
 .PeriodContainer {
   display: flex;
   position: relative;

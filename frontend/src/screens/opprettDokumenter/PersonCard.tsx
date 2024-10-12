@@ -121,7 +121,7 @@ export const PersonCard = () => {
           <DeleteButton errorCallback={deleteFailed} />
         </span>
         { navn && <small>{ navn }</small> }
-        {skalKreveOrgnummer && <>
+        {skalKreveOrgnummer ? <>
           <FormInput
             data-testid="orgnummer"
             label="Organisasjonsnummer"
@@ -133,6 +133,9 @@ export const PersonCard = () => {
             })}
           />
           { arbeidsgivere.length > 0 && <Arbeidsgivere arbeidsgivere={arbeidsgivere} /> }
+        </> : <>
+          <label className={styles.Infotekst}>Organisasjonsnummer</label>
+          <span className={styles.Infotekst}>Kun aktuelt ved IM/arb.tak.søknad</span>
         </>}
         <SykdomFom />
         <SykdomTom />

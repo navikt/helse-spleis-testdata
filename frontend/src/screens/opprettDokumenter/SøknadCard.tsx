@@ -15,20 +15,11 @@ const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
 const nextDay = (date: Date): Date => addDays(date, 1);
 
-const useUnregisterSøknadCard = () => {
-  const { unregister } = useFormContext();
-
-  useEffect(() => {
-    return () => {
-      unregister("søknad");
-    };
-  }, []);
-};
-
 export const SøknadCard = React.memo(() => {
-  const { watch, register, unregister, setValue, formState } = useFormContext();
+  const { watch, register, setValue, formState } = useFormContext();
 
-  useUnregisterSøknadCard();
+  // For at skalKreveOrgnummer i PersonCard skal fungere når søknad-sjekkboksen blir valgt
+  useEffect(() => setValue('søknad.arbeidssituasjon', 'ARBEIDSTAKER'), [])
 
   const sykdomFom = watch("sykdomFom");
   const sykdomTom = watch("sykdomTom");

@@ -24,10 +24,11 @@ jobs:
           cache: "npm"
           cache-dependency-path: "frontend/package-lock.json"
 
+      - name: Gradle setup
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Gradle build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+        run: ./gradlew build
         env:
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 

@@ -12,6 +12,7 @@ import {DeleteButton} from "./DeleteButton";
 import {ArbeidssituasjonDTO} from "../../utils/types";
 import {get} from "../../io/api";
 import {Button} from "../../components/Button";
+import {FormSelect} from "../../components/FormSelect";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -58,7 +59,7 @@ export const PersonCard = () => {
 
   const validateSendsDocuments = useDocumentsValidator();
   const fnr = watch("fnr")
-  const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
+  const arbeidssituasjon: ArbeidssituasjonDTO = watch("arbeidssituasjon")
   const skalSendeSykmelding = watch("skalSendeSykmelding");
   const skalSendeInntektsmelding = watch("skalSendeInntektsmelding");
   const skalKreveOrgnummer = skalSendeSykmelding || skalSendeInntektsmelding || arbeidssituasjon === "ARBEIDSTAKER"
@@ -140,6 +141,15 @@ export const PersonCard = () => {
         </>}
         <SykdomFom />
         <SykdomTom />
+        <FormSelect
+            label="Arbeidssituasjon"
+            options={['ARBEIDSTAKER',
+              'ARBEIDSLEDIG',
+              'FRILANSER',
+              'SELVSTENDIG_NARINGSDRIVENDE']}
+            {...register("arbeidssituasjon")}
+        >
+        </FormSelect>
         <Checkbox
           label="Send sykmelding"
           {...register("skalSendeSykmelding", {

@@ -1,7 +1,6 @@
 package no.nav.helse.testdata.dokumenter
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,6 +9,7 @@ data class Vedtak(
     val orgnummer: String?,
     val sykdomFom: LocalDate,
     val sykdomTom: LocalDate,
+    val arbeidssituasjon: String,
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
     val inntektsmelding: Inntektsmelding? = null,
@@ -20,7 +20,7 @@ data class Periode(val fom: LocalDate, val tom: LocalDate)
 
 internal fun Vedtak.somArbeidsgiver(): String? {
     val yrkesAktiviteterUtenArbeidsgiver = listOf("ARBEIDSLEDIG", "FRILANSER", "SELVSTENDIG_NARINGSDRIVENDE")
-    if (yrkesAktiviteterUtenArbeidsgiver.contains(søknad?.arbeidssituasjon)) {
+    if (yrkesAktiviteterUtenArbeidsgiver.contains(arbeidssituasjon)) {
         return null
     } else {
         val orgnummer = if (orgnummer != null) "\"$orgnummer\"" else null

@@ -13,6 +13,7 @@ export interface FellesDTO {
   orgnummer: string;
   sykdomFom: string;
   sykdomTom: string;
+  arbeidssituasjon: ArbeidssituasjonDTO,
 }
 
 export interface SykmeldingDTO {
@@ -20,7 +21,6 @@ export interface SykmeldingDTO {
 }
 
 export interface SøknadDTO extends SykmeldingDTO {
-  arbeidssituasjon: ArbeidssituasjonDTO,
   harAndreInntektskilder: boolean;
   ferieperioder: PeriodeDTO[];
   inntektFraNyttArbeidsforhold: InntektFraNyttArbeidsforholdDto[];

@@ -4,11 +4,10 @@ import format from "date-fns/format";
 import {Card} from "../../components/Card";
 import {Checkbox} from "../../components/Checkbox";
 import {FormInput} from "../../components/FormInput";
-import React, {useEffect} from "react";
+import React from "react";
 import {useFormContext} from "react-hook-form";
 import {validateArbeidsgrad, validateOptionalOrganisasjonsnummer, validateSykdomsgrad} from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
-import {FormSelect} from "../../components/FormSelect";
 import {ArbeidssituasjonDTO} from "../../utils/types";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
@@ -16,16 +15,13 @@ const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 const nextDay = (date: Date): Date => addDays(date, 1);
 
 export const SøknadCard = React.memo(() => {
-  const { watch, register, setValue, formState } = useFormContext();
-
-  // For at skalKreveOrgnummer i PersonCard skal fungere når søknad-sjekkboksen blir valgt
-  useEffect(() => setValue('søknad.arbeidssituasjon', 'ARBEIDSTAKER'), [])
+  const { watch, register, formState } = useFormContext();
 
   const sykdomFom = watch("sykdomFom");
   const sykdomTom = watch("sykdomTom");
   const skalSendeSykmelding = watch("skalSendeSykmelding");
 
-  const arbeidssituasjon: ArbeidssituasjonDTO = watch("søknad.arbeidssituasjon")
+  const arbeidssituasjon: ArbeidssituasjonDTO = watch("arbeidssituasjon")
   const skalViseTidligereArbeidsgiverOrgnummer = arbeidssituasjon == 'ARBEIDSLEDIG'
 
   const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
@@ -34,15 +30,6 @@ export const SøknadCard = React.memo(() => {
     <Card>
       <h2 className={styles.Title}>Søknad</h2>
       <div className={styles.CardContainer}>
-        <FormSelect
-            label="Arbeidssituasjon"
-            options={['ARBEIDSTAKER',
-             'ARBEIDSLEDIG',
-             'FRILANSER',
-             'SELVSTENDIG_NARINGSDRIVENDE']}
-          {...register("søknad.arbeidssituasjon")}
-        >
-        </FormSelect>
         {skalViseTidligereArbeidsgiverOrgnummer && <FormInput
             data-testid="tidligereArbeidsgiverOrgnummer"
             label="Tidligere arbeidsgiver sitt orgnummer"

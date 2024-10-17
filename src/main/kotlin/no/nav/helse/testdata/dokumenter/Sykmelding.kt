@@ -13,7 +13,7 @@ fun sykmelding(
     """
     {
         "id":"${UUID.randomUUID()}",
-        "type":"${vedtak.søknad?.arbeidssituasjon?.somSøknadstype()}",
+        "type":"${vedtak.arbeidssituasjon.somSøknadstype()}",
         "fnr":"${vedtak.fnr}",
         "status":"NY",
         "sykmeldingId":"${UUID.randomUUID()}",

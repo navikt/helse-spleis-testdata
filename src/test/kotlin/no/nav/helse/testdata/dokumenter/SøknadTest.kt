@@ -20,6 +20,7 @@ internal class SøknadTest {
             orgnummer = "orgnummer",
             sykdomFom = mandag,
             sykdomTom = fredag,
+            arbeidssituasjon = "ARBEIDSTAKER",
             søknad = Søknad(
                 sykmeldingsgrad = 100,
                 harAndreInntektskilder = false,
@@ -37,7 +38,6 @@ internal class SøknadTest {
                     )
                 ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
-                arbeidssituasjon = "ARBEIDSTAKER"
             )
         )
         val json = søknad(vedtak)
@@ -51,6 +51,7 @@ internal class SøknadTest {
             orgnummer = null,
             sykdomFom = mandag,
             sykdomTom = fredag,
+            arbeidssituasjon = "ARBEIDSLEDIG",
             søknad = Søknad(
                 sykmeldingsgrad = 100,
                 harAndreInntektskilder = false,
@@ -60,7 +61,6 @@ internal class SøknadTest {
                     Periode(mandag.plusDays(100), mandag.plusDays(101))
                 ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
-                arbeidssituasjon = "ARBEIDSLEDIG",
                 tidligereArbeidsgiverOrgnummer = "orgnummer",
                 inntektFraNyttArbeidsforhold = listOf(
                     Søknad.InntektFraNyttArbeidsforholdDto(

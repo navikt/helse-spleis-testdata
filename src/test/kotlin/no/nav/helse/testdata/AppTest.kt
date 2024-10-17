@@ -92,7 +92,8 @@ class AppTest {
             "orgnummer": "orgnummer",
             "sykdomFom": "2020-01-10",
             "sykdomTom": "2020-01-30",
-            "søknad": { "harAndreInntektskilder": true, "arbeidssituasjon": "ARBEIDSTAKER" },
+            "arbeidssituasjon": "ARBEIDSTAKER",
+            "søknad": { "harAndreInntektskilder": true },
             "inntektsmelding": ${inntektsmelding()}
         }
     """

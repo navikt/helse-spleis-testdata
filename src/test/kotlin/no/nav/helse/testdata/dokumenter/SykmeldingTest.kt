@@ -19,6 +19,7 @@ internal class SykmeldingTest {
             orgnummer = "orgnummer",
             sykdomFom = mandag,
             sykdomTom = fredag,
+            arbeidssituasjon = "ARBEIDSTAKER",
             sykmelding = Sykmelding(
                 sykmeldingsgrad = 100
             )

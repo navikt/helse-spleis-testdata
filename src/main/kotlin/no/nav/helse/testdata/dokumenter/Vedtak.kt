@@ -9,7 +9,7 @@ data class Vedtak(
     val orgnummer: String?,
     val sykdomFom: LocalDate,
     val sykdomTom: LocalDate,
-    val arbeidssituasjon: String,
+    val arbeidssituasjon: String? = null,
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
     val inntektsmelding: Inntektsmelding? = null,

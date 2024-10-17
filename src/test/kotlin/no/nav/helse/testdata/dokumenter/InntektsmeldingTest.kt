@@ -18,7 +18,6 @@ internal class InntektsmeldingTest {
             orgnummer = "orgnummer",
             sykdomFom = mandag,
             sykdomTom = fredag,
-            arbeidssituasjon = "ARBEIDSTAKERE",
             inntektsmelding = Inntektsmelding(
                 inntekt = 25000.0,
                 førsteFraværsdag = mandag,

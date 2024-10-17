@@ -1,10 +1,9 @@
 import React from "react";
-import {getByTestId, queryByTestId, render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { OpprettDokumenter } from "./OpprettDokumenter";
 import { RecoilRoot } from "recoil";
 import userEvent from "@testing-library/user-event";
-import fn = jest.fn;
 
 jest.mock("../../io/subscription", () => ({
   useSubscribe: () => [() => {}],
@@ -124,9 +123,9 @@ describe("OpprettDokumenter", () => {
             orgnummer: "987654321",
             sykdomFom: "2021-07-01",
             sykdomTom: "2021-07-31",
+            arbeidssituasjon: "ARBEIDSTAKER",
             sykmelding: { sykmeldingsgrad: "100" },
             søknad: {
-              arbeidssituasjon: "ARBEIDSTAKER",
               sykmeldingsgrad: "100",
               harAndreInntektskilder: false,
               ferieperioder: [{ fom: "2021-07-02", tom: "2021-07-04" }],

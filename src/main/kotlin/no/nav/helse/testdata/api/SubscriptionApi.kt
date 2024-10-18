@@ -10,6 +10,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytesWriter
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
+import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.errors.*
 import no.nav.helse.testdata.SubscriptionService
@@ -43,7 +44,7 @@ private suspend fun ByteWriteChannel.sendEndring(endring: EndringFrame) {
         flush()
     } catch (e: Exception) {
         if (e !is IOException) throw e
-        log.info("En feil skjedde: ${e.message}, lukker ByteWriteChannel", e)
+        if (e !is ChannelWriteException) log.info("En feil skjedde: ${e.message}, lukker ByteWriteChannel", e)
         close()
     }
 }

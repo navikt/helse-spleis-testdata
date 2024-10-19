@@ -33,7 +33,7 @@ export const SystemMessage = React.forwardRef<
   return (
     <div className={classNames(styles.SystemMessage)} ref={ref} {...rest}>
       <Text className={styles.MessageText}>{text}</Text>
-      {!dismissable && (
+      {dismissable && (
         <button
           className={styles.DismissButton}
           onClick={() => removeMessage(id)}

@@ -33,7 +33,6 @@ export const useSubscribe = (): UseSubscribeResult => {
     })
     eventSource.addEventListener('error', () => {
       console.log(`feil på tilkobling for ${data.fødselsnummer}`);
-      eventSource.close()
     })
 
     return () => {

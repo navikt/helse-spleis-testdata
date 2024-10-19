@@ -25,6 +25,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import no.nav.helse.rapids_rivers.*
 import no.nav.helse.testdata.api.*
+import no.nav.helse.testdata.rivers.PersonSlettetRiver
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -101,6 +102,7 @@ internal class ApplicationBuilder(
         rapidsMediator = RapidsMediator(rapidsConnection)
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
+        PersonSlettetRiver(rapidsConnection, subscriptionService)
         TokenRefreshRiver(rapidsConnection, azureAd)
     }
 

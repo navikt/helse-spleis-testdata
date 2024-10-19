@@ -7,7 +7,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.testdata.SubscriptionService
 import no.nav.helse.testdata.api.Oppdatering
 
-internal class VedtaksperiodeEndretRiver(
+internal class PersonSlettetRiver(
     rapidsConnection: RapidsConnection,
     private val subscriptionService: SubscriptionService,
 ) : River.PacketListener {
@@ -15,20 +15,17 @@ internal class VedtaksperiodeEndretRiver(
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandValue("@event_name", "vedtaksperiode_endret")
-                it.requireKey("vedtaksperiodeId")
+                it.demandValue("@event_name", "person_slettet")
                 it.requireKey("fødselsnummer")
-                it.requireKey("@id")
-                it.requireKey("gjeldendeTilstand")
+                it.requireKey("system_participating_services")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val fødselsnummer = packet["fødselsnummer"].asText()
-        val tilstand = packet["gjeldendeTilstand"].asText()
+        val app = packet["system_participating_services"][0].let { it["service"].asText() }
 
-        subscriptionService.update(fødselsnummer, Oppdatering.endring(tilstand))
+        subscriptionService.update(fødselsnummer, Oppdatering.sletting(app))
     }
-
 }

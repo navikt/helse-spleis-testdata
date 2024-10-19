@@ -1,13 +1,9 @@
 package no.nav.helse.testdata.api
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.ktor.http.CacheControl
-import io.ktor.http.ContentType
+import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
-import io.ktor.server.application.call
-import io.ktor.server.response.cacheControl
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondBytesWriter
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import io.ktor.utils.io.*
@@ -19,11 +15,12 @@ import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
 import java.util.*
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-internal data class EndringFrame(
-    val type: String,
-    val tilstand: String,
-)
+internal class Oppdatering private constructor(val type: String, val verdi: String) {
+    companion object {
+        fun endring(tilstand: String) = Oppdatering("endring", tilstand)
+        fun sletting(app: String) = Oppdatering("sletting", app)
+    }
+}
 
 internal fun Routing.registerSubscriptionApi(sseService: SubscriptionService) {
     get("/sse/{fødselsnummer}") {
@@ -39,7 +36,7 @@ internal fun Routing.registerSubscriptionApi(sseService: SubscriptionService) {
     }
 }
 
-private suspend fun ByteWriteChannel.sendEndring(endring: EndringFrame, coroutineScope: CoroutineScope) {
+private suspend fun ByteWriteChannel.sendEndring(oppdatering: Oppdatering, coroutineScope: CoroutineScope) {
     if (isClosedForWrite) {
         log.info("Avbryter coroutine for lukket ByteWriteChannel")
         coroutineScope.cancel()
@@ -47,7 +44,7 @@ private suspend fun ByteWriteChannel.sendEndring(endring: EndringFrame, coroutin
     }
     writeStringUtf8("id: ${UUID.randomUUID()}\n")
     writeStringUtf8("event: tilstandsendring\n")
-    writeStringUtf8("data: ${objectMapper.writeValueAsString(endring)}\n")
+    writeStringUtf8("data: ${objectMapper.writeValueAsString(oppdatering)}\n")
     writeStringUtf8("\n")
     flush()
 }

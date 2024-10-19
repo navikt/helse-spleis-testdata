@@ -4,6 +4,7 @@ import { nanoid } from "nanoid";
 
 enum MessageType {
   Endring = "endring",
+  Sletting = "sletting",
 }
 
 type UseSubscribeResult = [
@@ -13,7 +14,7 @@ type UseSubscribeResult = [
 
 type Message = {
   type: MessageType;
-  tilstand: string;
+  verdi: string;
 }
 
 export const useSubscribe = (): UseSubscribeResult => {
@@ -46,15 +47,23 @@ export const useSubscribe = (): UseSubscribeResult => {
     console.log('registrerer lyttere for tilstandsendring')
     eventSource.addEventListener('tilstandsendring', (event) => {
       const message: Message = JSON.parse(event.data);
-      addMessage({
-        id: nanoid(),
-        text: `Vedtaksperioden har tilstand: ${message.tilstand}`,
-        dismissable: true,
-      });
-
       switch (message.type) {
         case MessageType.Endring: {
-          setTilstand(message.tilstand);
+          addMessage({
+            id: nanoid(),
+            text: `Vedtaksperioden har tilstand: ${message.verdi}`,
+            dismissable: true,
+          });
+          setTilstand(message.verdi);
+          break;
+        }
+        case MessageType.Sletting: {
+          addMessage({
+            id: nanoid(),
+            text: `Personen er slettet fra ${message.verdi}`,
+            dismissable: true,
+            timeToLiveMs: 5000,
+          });
           break;
         }
         default: {

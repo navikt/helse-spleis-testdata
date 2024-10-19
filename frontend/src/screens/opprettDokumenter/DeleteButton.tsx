@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { del } from "../../io/api";
 import { Spinner } from "../../components/Spinner";
 import classNames from "classnames";
+import {nanoid} from "nanoid";
+import {useAddSystemMessage} from "../../state/useSystemMessages";
 
 const error = (status?: number): boolean =>
   status !== undefined && status !== null && status >= 400;
@@ -19,12 +21,11 @@ export const DeleteButton = ({
   const { getValues } = useFormContext();
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [status, setStatus] = useState<number>();
+  const addMessage = useAddSystemMessage();
 
   useEffect(() => {
     if (status !== undefined)
-      setTimeout(() => {
-        setStatus(undefined);
-      }, 3000);
+      setTimeout(() => setStatus(undefined), 3000);
   }, [status]);
 
   const ignorer = (event: React.SyntheticEvent) =>
@@ -39,7 +40,15 @@ export const DeleteButton = ({
     event.preventDefault();
     setIsFetching(true);
     await del("/person", { ident: fnr })
-      .then((res) => setStatus(res.status))
+      .then((res) => {
+        setStatus(res.status);
+        if (res.ok)
+          addMessage({
+            id: nanoid(),
+            text: "Sletting sendt",
+            timeToLiveMs: 4000,
+          });
+      })
       .catch((error) => {
         setStatus(error.status ?? 404);
         return error;
@@ -48,8 +57,7 @@ export const DeleteButton = ({
   };
 
   useEffect(() => {
-    let errorMessage =
-      status && status !== 200 ? "Sletting av person feilet" : undefined;
+    let errorMessage = status !== 200 ? "Sletting av person feilet" : undefined;
     errorCallback(errorMessage);
   }, [status]);
 

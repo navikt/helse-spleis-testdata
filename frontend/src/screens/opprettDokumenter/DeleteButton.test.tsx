@@ -66,7 +66,7 @@ describe("DeleteButton", () => {
     mockFetchError();
     let errorCallbackWasCalled = false;
     const errorCallback = (value) => {
-      if (value === undefined) return;
+      if (value == null) return;
       errorCallbackWasCalled = true;
       expect(value).toBe("Sletting av person feilet");
     };

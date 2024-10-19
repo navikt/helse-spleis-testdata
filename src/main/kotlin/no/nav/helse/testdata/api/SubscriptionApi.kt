@@ -10,9 +10,10 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytesWriter
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
-import io.ktor.util.cio.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.errors.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import no.nav.helse.testdata.SubscriptionService
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
@@ -30,21 +31,23 @@ internal fun Routing.registerSubscriptionApi(sseService: SubscriptionService) {
         call.response.cacheControl(CacheControl.NoCache(null))
         val flow = sseService.addSubscription(fødselsnummer)
         call.respondBytesWriter(contentType = ContentType.Text.EventStream) {
-            flow.collect(::sendEndring)
+            // wrap i coroutine for å kunne lukke ByteWriteChannel når klienten er borte
+            launch {
+                flow.collect { sendEndring(it, this) }
+            }.join()
         }
     }
 }
 
-private suspend fun ByteWriteChannel.sendEndring(endring: EndringFrame) {
-    try {
-        writeStringUtf8("id: ${UUID.randomUUID()}\n")
-        writeStringUtf8("event: tilstandsendring\n")
-        writeStringUtf8("data: ${objectMapper.writeValueAsString(endring)}\n")
-        writeStringUtf8("\n")
-        flush()
-    } catch (e: Exception) {
-        if (e !is IOException) throw e
-        if (e !is ChannelWriteException) log.info("En feil skjedde: ${e.message}, lukker ByteWriteChannel", e)
-        close()
+private suspend fun ByteWriteChannel.sendEndring(endring: EndringFrame, coroutineScope: CoroutineScope) {
+    if (isClosedForWrite) {
+        log.info("Avbryter coroutine for lukket ByteWriteChannel")
+        coroutineScope.cancel()
+        return
     }
+    writeStringUtf8("id: ${UUID.randomUUID()}\n")
+    writeStringUtf8("event: tilstandsendring\n")
+    writeStringUtf8("data: ${objectMapper.writeValueAsString(endring)}\n")
+    writeStringUtf8("\n")
+    flush()
 }

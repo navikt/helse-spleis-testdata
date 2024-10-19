@@ -19,6 +19,8 @@ import {ErrorMessage} from "../../components/ErrorMessage";
 import type {FellesDTO, InntektsmeldingDTO, PersonDTO, SykmeldingDTO, SøknadDTO} from "../../io/api.d";
 import {Egenmeldingsdager} from "./Egenmeldingsdager";
 import {InntektFraNyttArbeidsforhold} from "./InntektFraNyttArbeidsforhold";
+import {nanoid} from "nanoid";
+import {useAddSystemMessage} from "../../state/useSystemMessages";
 
 type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
@@ -94,6 +96,7 @@ export const OpprettDokumenter = React.memo(() => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const [subscribe] = useSubscribe();
+  const addMessage = useAddSystemMessage();
 
   const postPayload = async (data: Record<string, any>): Promise<Response> => {
     return post("/vedtaksperiode", createPayload(data)).finally(() =>
@@ -110,6 +113,11 @@ export const OpprettDokumenter = React.memo(() => {
     setErrorBody(errorBody);
 
     if (status < 400) {
+      addMessage({
+        id: nanoid(),
+        text: "Dokumenter er sendt.",
+        timeToLiveMs: 4000,
+      });
       subscribe(data.fnr);
     }
   };

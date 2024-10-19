@@ -24,15 +24,6 @@ export const useSubscribe = (): UseSubscribeResult => {
 
   useEffect(() => {
     if (!data?.fødselsnummer) return
-    addMessage({
-      id: nanoid(),
-      text: "Dokumenter er sendt.",
-      timeToLiveMs: 4000,
-    });
-  }, [data]);
-
-  useEffect(() => {
-    if (!data?.fødselsnummer) return
     const eventSource = new EventSource(`/sse/${data.fødselsnummer}`)
     console.log(`eventSource opprettet: ${eventSource.url}`)
     setEventSource(eventSource)

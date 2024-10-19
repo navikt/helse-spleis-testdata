@@ -103,17 +103,15 @@ export const OpprettDokumenter = React.memo(() => {
 
   const onSubmit = async (data: Record<string, any>) => {
     setIsFetching(true);
-    setTimeout(async () => {
-      const response = await postPayload(data);
-      const {status} = response
-      setStatus(status);
-      const errorBody = await response.text()
-      setErrorBody(errorBody);
+    const response = await postPayload(data);
+    const {status} = response
+    setStatus(status);
+    const errorBody = await response.text()
+    setErrorBody(errorBody);
 
-      if (status < 400) {
-        subscribe(data.fnr);
-      }
-    }, 1000)
+    if (status < 400) {
+      subscribe(data.fnr);
+    }
   };
 
   return (

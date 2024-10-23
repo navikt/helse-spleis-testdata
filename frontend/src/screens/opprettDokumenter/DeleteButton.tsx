@@ -35,7 +35,11 @@ export const DeleteButton = ({
 
   const slettPerson = async (event: React.SyntheticEvent) => {
     let fnr = getValues("fnr");
-    if (fnr.length !== 11 || ignorer(event)) return;
+    if (ignorer(event)) return
+    if (fnr.length !== 11) {
+      errorCallback(`Kan ikke slette! ${fnr} er ikke nøyaktig elleve tegn langt!`)
+      return;
+    }
 
     event.preventDefault();
     setIsFetching(true);

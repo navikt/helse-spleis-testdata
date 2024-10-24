@@ -12,6 +12,12 @@
   --color-black: #000000;
 }
 
+.OpprettDokumenterContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .light {
   --background-color-primary: #efefef;
   --background-color-secondary: #ffffff;

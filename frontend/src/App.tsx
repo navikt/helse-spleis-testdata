@@ -12,6 +12,7 @@ import { ThemeButton } from "./components/ThemeButton";
 import { SystemMessages } from "./components/SystemMessages";
 
 import styles from "./App.module.css";
+import { AppStatus } from "./components/AppStatus";
 
 export const App = () => {
   const theme = useTheme();
@@ -23,7 +24,10 @@ export const App = () => {
       <Nav />
       <Switch>
         <Route path="/" exact>
-          <OpprettDokumenter />
+          <div className={styles.OpprettDokumenterContainer}>
+            <OpprettDokumenter />
+            <AppStatus />
+          </div>
         </Route>
         <Route path="/inntekt/hent">
           <HentInntekt />

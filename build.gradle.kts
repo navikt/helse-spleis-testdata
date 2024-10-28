@@ -3,7 +3,7 @@ plugins {
 }
 
 val junitJupiterVersion = "5.10.2"
-val ktorVersion = "2.3.7"
+val ktorVersion = "2.3.12"
 
 group = "no.nav.helse"
 

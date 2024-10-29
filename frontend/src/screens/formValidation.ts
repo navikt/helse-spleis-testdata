@@ -18,6 +18,11 @@ export const validateFødselsnummer = (value?: string): boolean | string =>
 export const validateInntekt = (value: string): boolean | string =>
   isNumerical(value) || "Inntekten må være numerisk";
 
+export const validateOptionalInntekt = (value: string): boolean | string => {
+    if (value === "") return true
+    return isNumerical(value) || "Inntekten må være numerisk";
+};
+
 export const validateRefusjonsbeløp = (value?: string): boolean | string =>
   !value || isNumerical(value) || "Refusjonsbeløp må være numerisk";
 

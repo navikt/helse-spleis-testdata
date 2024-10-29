@@ -33,7 +33,38 @@ internal class SøknadTest {
                     Søknad.InntektFraNyttArbeidsforholdDto(
                         datoFom = mandag,
                         datoTom = fredag,
-                        belopPerDag = 10000,
+                        belop = 10000,
+                        arbeidsstedOrgnummer = "gorgnummer"
+                    )
+                ),
+                egenmeldingsdagerFraSykmelding = listOf(torsdag),
+            )
+        )
+        val json = søknad(vedtak)
+        assertValidJson(json)
+    }
+
+    @Test
+    fun `Søknad uten inntekt`() {
+        val vedtak = Vedtak(
+            fnr = "fnr",
+            orgnummer = "orgnummer",
+            sykdomFom = mandag,
+            sykdomTom = fredag,
+            arbeidssituasjon = "ARBEIDSTAKER",
+            søknad = Søknad(
+                sykmeldingsgrad = 100,
+                harAndreInntektskilder = false,
+                sendtNav = fredag,
+                ferieperioder = listOf(
+                    Periode(mandag.plusDays(1), mandag.plusDays(2)),
+                    Periode(mandag.plusDays(100), mandag.plusDays(101))
+                ),
+                inntektFraNyttArbeidsforhold = listOf(
+                    Søknad.InntektFraNyttArbeidsforholdDto(
+                        datoFom = mandag,
+                        datoTom = fredag,
+                        belop = null,
                         arbeidsstedOrgnummer = "gorgnummer"
                     )
                 ),
@@ -66,7 +97,7 @@ internal class SøknadTest {
                     Søknad.InntektFraNyttArbeidsforholdDto(
                         datoFom = mandag,
                         datoTom = fredag,
-                        belopPerDag = 10000,
+                        belop = 10000,
                         arbeidsstedOrgnummer = "gorgnummer"
                     )
                 )

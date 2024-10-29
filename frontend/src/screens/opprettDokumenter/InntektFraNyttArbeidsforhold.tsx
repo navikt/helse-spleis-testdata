@@ -6,7 +6,7 @@ import {DeleteButton} from "../../components/DeleteButton";
 import {AddButton} from "../../components/AddButton";
 import React, {useState} from "react";
 import {useFormContext} from "react-hook-form";
-import {validateInntekt, validateOrganisasjonsnummer} from "../formValidation";
+import {validateOptionalInntekt, validateOrganisasjonsnummer} from "../formValidation";
 
 type InntektFraNyttArbeidsforholdId = string;
 
@@ -70,11 +70,11 @@ export const InntektFraNyttArbeidsforhold = React.memo(() => {
             </div>
             <FormInput
                 data-testid={`beløp${i}`}
-                label="Daglig beløp"
+                label="Beløp"
                 errors={formState.errors}
-                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.belopPerDag`, {
+                {...register(`søknad.inntektFraNyttArbeidsforhold.${i}.belop`, {
                   required: "Beløp må angis",
-                  validate: validateInntekt,
+                  validate: validateOptionalInntekt,
                 })}
             />
             <FormInput

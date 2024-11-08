@@ -6,11 +6,7 @@ internal fun setUpEnvironment() =
         inntektScope = System.getenv("INNTEKTSKOMPONENTEN_SCOPE"),
         aaregUrl = System.getenv("AAREG_URL"),
         aaregScope = System.getenv("AAREG_SCOPE"),
-        eregUrl = System.getenv("EREG_BASE_URL"),
-        pdlUrl = System.getenv("PDL_BASE_URL"),
-        pdlScope = System.getenv("PDL_SCOPE"),
-        aktørRestUrl = "https://app-q1.adeo.no/aktoerregister/api/v1",
-        dollyRestUrl = "https://dolly-backend.dev.intern.nav.no/api/v1",
+        eregUrl = System.getenv("EREG_BASE_URL")
     )
 
 data class Environment(
@@ -18,9 +14,5 @@ data class Environment(
     val inntektScope: String,
     val aaregUrl: String,
     val aaregScope: String,
-    val eregUrl: String,
-    val pdlUrl: String,
-    val pdlScope: String,
-    val aktørRestUrl: String,
-    val dollyRestUrl: String,
+    val eregUrl: String
 )

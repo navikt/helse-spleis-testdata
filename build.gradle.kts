@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.21"
 }
 
+val tbdLibsVersion = "2024.11.08-08.30-f5ffe5d3"
 val junitJupiterVersion = "5.10.2"
 val ktorVersion = "2.3.12"
-
 group = "no.nav.helse"
 
 repositories {
@@ -26,9 +26,9 @@ repositories {
 
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
-val tbdLibsVersion: String by project
 dependencies {
-    implementation("com.github.navikt.tbd-libs:azure-token-client-default:2024.01.19-13.10-ef3c0f8d")
+    implementation("com.github.navikt.tbd-libs:azure-token-client-default:$tbdLibsVersion")
+    implementation("com.github.navikt.tbd-libs:speed-client:$tbdLibsVersion")
     implementation("com.github.navikt:rapids-and-rivers:2024010209171704183456.6d035b91ffb4")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-websockets:$ktorVersion")

@@ -1,18 +1,18 @@
 package no.nav.helse.testdata.api
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.result_object.getOrThrow
+import com.github.navikt.tbd_libs.speed.SpeedClient
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import no.nav.helse.testdata.PdlClient
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.sikkerlogg
 import java.util.UUID
 
-internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, pdlClient: PdlClient) {
+internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, speedClient: SpeedClient) {
     delete("/person") {
         val fnr = call.request.header("ident")
         rapidsMediator.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
@@ -23,13 +23,12 @@ internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, pdlClient
     }
     get("/person/{ident}") {
         val ident = call.parameters["ident"] ?: throw IllegalArgumentException("mangler ident")
-        val response = pdlClient.hentNavn(ident, UUID.randomUUID().toString())
-        val data = response.path("data").path("hentPerson").path("navn").firstOrNull() ?: return@get call.respond(HttpStatusCode.NoContent)
+        val response = speedClient.hentPersoninfo(ident, UUID.randomUUID().toString()).getOrThrow()
         call.respond(
             PersonResponse(
-                fornavn = data.path("fornavn").asText(),
-                mellomnavn = data.path("mellomnavn").takeIf(JsonNode::isTextual)?.asText(),
-                etternavn = data.path("etternavn").asText()
+                fornavn = response.fornavn,
+                mellomnavn = response.mellomnavn,
+                etternavn = response.etternavn
             )
         )
     }

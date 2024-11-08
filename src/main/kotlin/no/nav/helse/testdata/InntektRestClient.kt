@@ -3,6 +3,7 @@ package no.nav.helse.testdata
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
+import com.github.navikt.tbd_libs.result_object.getOrThrow
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -23,7 +24,7 @@ internal class InntektRestClient(
         callId: String
     ): Result<List<Måned>, ResponseFailure> =
         httpClient.post("$baseUrl/api/v1/hentinntektliste") {
-            bearerAuth(tokenSupplier.bearerToken(inntektClientId).token)
+            bearerAuth(tokenSupplier.bearerToken(inntektClientId).getOrThrow().token)
             header("Nav-Consumer-Id", "spleis-testdata")
             header("Nav-Call-Id", callId)
             contentType(ContentType.Application.Json)

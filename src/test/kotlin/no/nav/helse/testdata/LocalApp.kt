@@ -1,5 +1,7 @@
 package no.nav.helse.testdata
 
+import com.github.navikt.tbd_libs.result_object.ok
+import com.github.navikt.tbd_libs.speed.SpeedClient
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.stop
@@ -9,6 +11,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.*
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.helse.testdata.api.PersonResponse
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.concurrent.Executors
@@ -53,22 +56,16 @@ fun main() {
         } returns EregResponse("Testnavn", emptyList())
     }
 
-    val pdlClient = mockk<PdlClient>() {
-        every {
-            runBlocking { hentNavn(any(), any()) }
-        } returns objectMapper.readTree("""{
-    "data": {
-        "hentPerson": {
-            "navn": [
-                {
-                    "fornavn": "NORMAL",
-                    "mellomnavn": null,
-                    "etternavn": "MUFFINS"
-                }
-            ]
-        }
-    }
-}""")
+    val speedClient = mockk<SpeedClient>() {
+        every { hentPersoninfo(any(), any()) } returns com.github.navikt.tbd_libs.speed.PersonResponse(
+            fornavn = "NORMAL",
+            mellomnavn = null,
+            etternavn = "MUFFINS",
+            fødselsdato = LocalDate.EPOCH,
+            dødsdato = null,
+            adressebeskyttelse = com.github.navikt.tbd_libs.speed.PersonResponse.Adressebeskyttelse.UGRADERT,
+            kjønn = com.github.navikt.tbd_libs.speed.PersonResponse.Kjønn.UKJENT
+        ).ok()
     }
 
     val rapidsMediator = RapidsMediator(rapidsConnection)
@@ -78,7 +75,7 @@ fun main() {
         inntektRestClient = inntektRestClientMock,
         aaregClient = aaregClient,
         eregClient = eregClient,
-        pdlClient = pdlClient,
+        speedClient = speedClient,
         rapidsMediator = rapidsMediator,
     ).start()
 }
@@ -88,7 +85,7 @@ internal class LocalApplicationBuilder(
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
-    private val pdlClient: PdlClient,
+    private val speedClient: SpeedClient,
     private val rapidsMediator: RapidsMediator,
 ) : RapidsConnection.StatusListener {
 
@@ -98,7 +95,7 @@ internal class LocalApplicationBuilder(
             inntektRestClient = inntektRestClient,
             aaregClient = aaregClient,
             eregClient = eregClient,
-            pdlClient = pdlClient,
+            speedClient = speedClient,
             rapidsMediator = rapidsMediator,
         )
     }

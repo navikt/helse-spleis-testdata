@@ -3,6 +3,7 @@ package no.nav.helse.testdata
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
+import com.github.navikt.tbd_libs.result_object.getOrThrow
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -23,7 +24,7 @@ class AaregClient(
         callId: UUID
     ): List<AaregArbeidsforhold> {
         val response = hent(
-            tokenSupplier.bearerToken(aaregScope).token,
+            tokenSupplier.bearerToken(aaregScope).getOrThrow().token,
             fnr,
             callId,
             "$baseUrl/api/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
@@ -34,7 +35,7 @@ class AaregClient(
         return try {
             sikkerlogg.info("AaregResponse status:\n${response.bodyAsText()}")
             response.body<List<AaregArbeidsforhold>>()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             val responseValue = objectMapper.readTree(response.bodyAsText())
             throw RuntimeException(responseValue.path("melding").asText("Ukjent respons fra Aareg"))
         }

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.navikt.tbd_libs.azure.AzureToken
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
+import com.github.navikt.tbd_libs.result_object.Result
+import com.github.navikt.tbd_libs.speed.SpeedClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.http.*
@@ -61,7 +63,11 @@ fun main() {
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd, httpClient)
     val eregClient = EregClient(env.eregUrl, httpClient)
-    val pdlClient = PdlClient(env.pdlUrl, env.pdlScope, azureAd, httpClient)
+    val speedClient = SpeedClient(
+        httpClient = java.net.http.HttpClient.newHttpClient(),
+        objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()),
+        tokenProvider = azureAd
+    )
 
     ApplicationBuilder(
         rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
@@ -69,7 +75,7 @@ fun main() {
         inntektRestClient = inntektRestClient,
         aaregClient = aaregClient,
         eregClient = eregClient,
-        pdlClient = pdlClient,
+        speedClient = speedClient,
         azureAd = azureAd
     ).start()
 }
@@ -80,7 +86,7 @@ internal class ApplicationBuilder(
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
-    private val pdlClient: PdlClient,
+    private val speedClient: SpeedClient,
     azureAd: RefreshTokens
 ) : RapidsConnection.StatusListener {
     private lateinit var rapidsMediator: RapidsMediator
@@ -93,7 +99,7 @@ internal class ApplicationBuilder(
                     inntektRestClient,
                     aaregClient,
                     eregClient,
-                    pdlClient,
+                    speedClient,
                     rapidsMediator
                 )
             }.build()
@@ -114,7 +120,7 @@ internal fun Application.installKtorModule(
     inntektRestClient: InntektRestClient,
     aaregClient: AaregClient,
     eregClient: EregClient,
-    pdlClient: PdlClient,
+    speedClient: SpeedClient,
     rapidsMediator: RapidsMediator,
 ) {
     installJacksonFeature()
@@ -128,7 +134,7 @@ internal fun Application.installKtorModule(
     errorTracing(no.nav.helse.testdata.log)
 
     routing {
-        registerPersonApi(rapidsMediator, pdlClient)
+        registerPersonApi(rapidsMediator, speedClient)
         registerVedtaksperiodeApi(rapidsMediator)
         registerArbeidsforholdApi(aaregClient)
         registerOrganisasjonApi(eregClient)
@@ -181,7 +187,7 @@ class RefreshTokens(private val client: AzureTokenProvider) : AzureTokenProvider
             }
         }
     }
-    override fun bearerToken(scope: String): AzureToken {
+    override fun bearerToken(scope: String): Result<AzureToken> {
         scopes.add(scope)
         return client.bearerToken(scope)
     }

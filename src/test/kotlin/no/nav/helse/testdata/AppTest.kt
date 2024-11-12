@@ -1,12 +1,15 @@
 package no.nav.helse.testdata
 
+import com.github.navikt.tbd_libs.naisful.test.TestContext
+import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.server.routing.*
-import io.ktor.server.testing.*
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.helse.testdata.api.registerInntektApi
 import no.nav.helse.testdata.api.registerPersonApi
 import no.nav.helse.testdata.api.registerVedtaksperiodeApi
@@ -25,6 +28,15 @@ class AppTest {
     }
 
     private val testRapid: TestRapid = TestRapid()
+    private val rapidProducer = object : RapidProducer {
+        override fun publish(message: String) {
+            testRapid.publish(message)
+        }
+
+        override fun publish(key: String, message: String) {
+            testRapid.publish(key, message)
+        }
+    }
 
     @BeforeEach
     fun beforeEach() {
@@ -33,12 +45,7 @@ class AppTest {
 
     @Test
     fun `slett person`() {
-        testApplication {
-            application {
-                routing {
-                    registerPersonApi(RapidsMediator(testRapid), mockk())
-                }
-            }
+        e2e {
             val response = client.delete("/person") {
                 header("ident", fnr1)
             }
@@ -51,15 +58,7 @@ class AppTest {
 
     @Test
     fun `opprett vedtak`() {
-        testApplication {
-            application {
-                routing {
-                    registerVedtaksperiodeApi(
-                        mediator = RapidsMediator(testRapid)
-                    )
-                }
-                installJacksonFeature()
-            }
+        e2e {
             val response = client.post("/vedtaksperiode") {
                 header("Content-Type", "application/json")
                 setBody(data())
@@ -70,19 +69,28 @@ class AppTest {
 
     @Test
     fun `slå opp inntekt`() {
-        testApplication {
-            application {
-                installJacksonFeature()
-                routing {
-                    registerInntektApi(inntektRestClient)
-                }
-            }
+        e2e {
             val response = client.get("/person/inntekt") {
                 header(Accept, ContentType.Application.Json)
                 header("ident", "fnr")
             }
             assertTrue(response.status.isSuccess())
         }
+    }
+
+    private fun e2e(testblokk: suspend TestContext.() -> Unit) {
+        naisfulTestApp(
+            testApplicationModule = {
+                routing {
+                    registerPersonApi(RapidsMediator(rapidProducer), mockk())
+                    registerInntektApi(inntektRestClient)
+                    registerVedtaksperiodeApi(mediator = RapidsMediator(rapidProducer))
+                }
+            },
+            objectMapper = objectMapper,
+            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            testblokk = testblokk
+        )
     }
 
     @Language("json")

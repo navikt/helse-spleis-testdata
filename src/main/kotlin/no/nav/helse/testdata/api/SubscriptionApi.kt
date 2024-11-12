@@ -2,7 +2,6 @@ package no.nav.helse.testdata.api
 
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
@@ -10,6 +9,7 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.testdata.SubscriptionService
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
@@ -29,9 +29,11 @@ internal fun Routing.registerSubscriptionApi(sseService: SubscriptionService) {
         val flow = sseService.addSubscription(fødselsnummer)
         call.respondBytesWriter(contentType = ContentType.Text.EventStream) {
             // wrap i coroutine for å kunne lukke ByteWriteChannel når klienten er borte
-            launch {
-                flow.collect { sendEndring(it, this) }
-            }.join()
+            runBlocking {
+                launch {
+                    flow.collect { sendEndring(it, this) }
+                }.join()
+            }
         }
     }
 }

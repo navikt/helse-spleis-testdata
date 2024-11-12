@@ -1,13 +1,11 @@
 package no.nav.helse.testdata.api
 
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.post
-import io.ktor.util.pipeline.PipelineContext
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.dokumenter.Vedtak
 import no.nav.helse.testdata.dokumenter.inntektsmelding
@@ -16,8 +14,6 @@ import no.nav.helse.testdata.dokumenter.søknad
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.sikkerlogg
 import org.intellij.lang.annotations.Language
-import java.time.LocalDateTime
-import java.util.*
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
@@ -67,7 +63,7 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     }
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.validate(
+private suspend fun RoutingContext.validate(
     vedtak: Vedtak,
 ) {
     if (vedtak.sykdomFom > vedtak.sykdomTom) {

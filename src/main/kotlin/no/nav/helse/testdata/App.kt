@@ -11,29 +11,34 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.navikt.tbd_libs.azure.AzureToken
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
+import com.github.navikt.tbd_libs.kafka.AivenConfig
+import com.github.navikt.tbd_libs.kafka.ConsumerProducerFactory
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.result_object.Result
 import com.github.navikt.tbd_libs.speed.SpeedClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.callid.*
-import io.ktor.server.plugins.callloging.*
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.rapids_rivers.*
 import no.nav.helse.testdata.api.*
 import no.nav.helse.testdata.rivers.PersonSlettetRiver
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
 import java.io.File
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
@@ -54,7 +59,7 @@ fun main() {
 
     val httpClient = HttpClient(CIO) {
         expectSuccess = false
-        install(ClientContentNegotiation) {
+        install(ContentNegotiation) {
             register(ContentType.Application.Json, JacksonConverter(objectMapper))
         }
     }
@@ -70,7 +75,7 @@ fun main() {
     )
 
     ApplicationBuilder(
-        rapidsConfig = RapidApplication.RapidApplicationConfig.fromEnv(System.getenv()),
+        env = System.getenv(),
         subscriptionService = ConcreteSubscriptionService,
         inntektRestClient = inntektRestClient,
         aaregClient = aaregClient,
@@ -81,7 +86,7 @@ fun main() {
 }
 
 internal class ApplicationBuilder(
-    rapidsConfig: RapidApplication.RapidApplicationConfig,
+    env: Map<String, String>,
     private val subscriptionService: SubscriptionService,
     private val inntektRestClient: InntektRestClient,
     private val aaregClient: AaregClient,
@@ -89,23 +94,37 @@ internal class ApplicationBuilder(
     private val speedClient: SpeedClient,
     azureAd: RefreshTokens
 ) : RapidsConnection.StatusListener {
-    private lateinit var rapidsMediator: RapidsMediator
+    private val factory = ConsumerProducerFactory(AivenConfig.default)
+    private val rapidsMediator = RapidsMediator(object : RapidProducer {
+        private val producer = factory.createProducer()
+        override fun publish(message: String) {
+            producer.send(ProducerRecord(env.getValue("KAFKA_RAPID_TOPIC"), message))
+        }
+
+        override fun publish(key: String, message: String) {
+            producer.send(ProducerRecord(env.getValue("KAFKA_RAPID_TOPIC"), key, message))
+        }
+    })
 
     private val rapidsConnection =
-        RapidApplication.Builder(rapidsConfig)
-            .withKtorModule {
-                installKtorModule(
-                    subscriptionService,
-                    inntektRestClient,
-                    aaregClient,
-                    eregClient,
-                    speedClient,
-                    rapidsMediator
-                )
-            }.build()
+        RapidApplication.create(
+            env = env,
+            consumerProducerFactory = factory,
+            builder = {
+                withKtorModule {
+                    installKtorModule(
+                        subscriptionService,
+                        inntektRestClient,
+                        aaregClient,
+                        eregClient,
+                        speedClient,
+                        rapidsMediator
+                    )
+                }
+            }
+        )
 
     init {
-        rapidsMediator = RapidsMediator(rapidsConnection)
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
         PersonSlettetRiver(rapidsConnection, subscriptionService)
@@ -123,14 +142,7 @@ internal fun Application.installKtorModule(
     speedClient: SpeedClient,
     rapidsMediator: RapidsMediator,
 ) {
-    installJacksonFeature()
     install(WebSockets)
-    install(CallLogging) {
-        logger = LoggerFactory.getLogger("no.nav.helse.testdata.CallLogging")
-        level = Level.INFO
-        disableDefaultColors()
-        filter { call -> setOf("/metrics", "/isalive", "/isready").none { call.request.path().contains(it) } }
-    }
     errorTracing(no.nav.helse.testdata.log)
 
     routing {
@@ -156,12 +168,6 @@ private fun Application.errorTracing(logger: Logger) {
     }
 }
 
-internal fun Application.installJacksonFeature() {
-    install(ContentNegotiation) {
-        register(ContentType.Application.Json, JacksonConverter(objectMapper))
-    }
-}
-
 private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val azureAd: RefreshTokens) : River.PacketListener {
     init {
         River(rapidsConnection)
@@ -169,7 +175,7 @@ private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val 
             .register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         log.info("refresher tokens som har gått ut")
         azureAd.refreshTokens()
     }

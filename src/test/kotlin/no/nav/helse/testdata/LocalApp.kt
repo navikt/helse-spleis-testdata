@@ -1,17 +1,15 @@
 package no.nav.helse.testdata
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.result_object.ok
 import com.github.navikt.tbd_libs.speed.SpeedClient
 import io.ktor.server.application.Application
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stop
-import io.ktor.server.netty.Netty
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.*
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import no.nav.helse.testdata.api.PersonResponse
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.concurrent.Executors
@@ -68,7 +66,15 @@ fun main() {
         ).ok()
     }
 
-    val rapidsMediator = RapidsMediator(rapidsConnection)
+    val rapidsMediator = RapidsMediator(object : RapidProducer {
+        override fun publish(message: String) {
+            rapidsConnection.publish(message)
+        }
+
+        override fun publish(key: String, message: String) {
+            rapidsConnection.publish(key, message)
+        }
+    })
 
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
@@ -111,7 +117,7 @@ internal fun runLocalServer(applicationBlock: Application.() -> Unit) {
     runBlocking(exceptionHandler + applicationContext) {
         val port = 8080
         log.info("Starter backend på port $port")
-        val server = embeddedServer(Netty, port) {
+        val server = embeddedServer(CIO, port) {
             applicationBlock()
         }.start(wait = false)
 

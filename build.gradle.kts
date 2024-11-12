@@ -2,9 +2,10 @@ plugins {
     kotlin("jvm") version "2.0.21"
 }
 
-val tbdLibsVersion = "2024.11.08-08.30-f5ffe5d3"
+val tbdLibsVersion = "2024.11.12-11.09-16cf2599"
+val rapidsAndRiversVersion = "2024111211071731406062.648687519469"
 val junitJupiterVersion = "5.11.3"
-val ktorVersion = "2.3.12"
+val ktorVersion = "3.0.1"
 group = "no.nav.helse"
 
 repositories {
@@ -29,12 +30,8 @@ apply(plugin = "org.jetbrains.kotlin.jvm")
 dependencies {
     implementation("com.github.navikt.tbd-libs:azure-token-client-default:$tbdLibsVersion")
     implementation("com.github.navikt.tbd-libs:speed-client:$tbdLibsVersion")
-    implementation("com.github.navikt:rapids-and-rivers:2024010209171704183456.6d035b91ffb4")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("com.github.navikt:rapids-and-rivers:$rapidsAndRiversVersion")
     implementation("io.ktor:ktor-server-websockets:$ktorVersion")
-    implementation("io.ktor:ktor-server-call-id:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
@@ -43,16 +40,16 @@ dependencies {
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-websockets:$ktorVersion")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.github.navikt.tbd-libs:rapids-and-rivers-test:$tbdLibsVersion")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:$tbdLibsVersion")
+    testImplementation("io.mockk:mockk:1.13.9")
 
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
-        exclude("junit")
-    }
     testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion") {
         exclude("junit")
     }
-    testImplementation("io.mockk:mockk:1.13.9")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {

@@ -1,6 +1,6 @@
 package no.nav.helse.testdata
 
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -12,7 +12,15 @@ internal class RapidsMediatorTest {
     @BeforeEach
     fun beforeEach() {
         testRapid = TestRapid()
-        rapidsMediator = RapidsMediator(testRapid)
+        rapidsMediator = RapidsMediator(object : RapidProducer {
+            override fun publish(message: String) {
+                testRapid.publish(message)
+            }
+
+            override fun publish(key: String, message: String) {
+                testRapid.publish(key, message)
+            }
+        })
         testRapid.reset()
     }
 

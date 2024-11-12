@@ -3,7 +3,7 @@ plugins {
 }
 
 val tbdLibsVersion = "2024.11.08-08.30-f5ffe5d3"
-val junitJupiterVersion = "5.10.2"
+val junitJupiterVersion = "5.11.3"
 val ktorVersion = "2.3.12"
 group = "no.nav.helse"
 

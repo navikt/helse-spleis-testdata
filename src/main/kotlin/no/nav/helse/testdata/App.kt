@@ -171,7 +171,7 @@ private fun Application.errorTracing(logger: Logger) {
 private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val azureAd: RefreshTokens) : River.PacketListener {
     init {
         River(rapidsConnection)
-            .validate { it.demandValue("@event_name", "halv_time") }
+            .precondition { it.requireValue("@event_name", "halv_time") }
             .register(this)
     }
 

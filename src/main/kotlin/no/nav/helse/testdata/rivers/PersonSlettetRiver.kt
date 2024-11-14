@@ -16,8 +16,8 @@ internal class PersonSlettetRiver(
 
     init {
         River(rapidsConnection).apply {
+            precondition { it.requireValue("@event_name", "person_slettet") }
             validate {
-                it.demandValue("@event_name", "person_slettet")
                 it.requireKey("fødselsnummer")
                 it.requireKey("system_participating_services")
             }

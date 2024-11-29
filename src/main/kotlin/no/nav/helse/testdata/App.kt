@@ -13,6 +13,7 @@ import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
 import com.github.navikt.tbd_libs.kafka.AivenConfig
 import com.github.navikt.tbd_libs.kafka.ConsumerProducerFactory
+import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -28,9 +29,14 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.callid.*
+import io.ktor.server.request.header
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
+import io.micrometer.core.instrument.Clock
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 import no.nav.helse.rapids_rivers.*
 import no.nav.helse.testdata.api.*
 import no.nav.helse.testdata.rivers.PersonSlettetRiver
@@ -106,20 +112,42 @@ internal class ApplicationBuilder(
         }
     })
 
+    private val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT, PrometheusRegistry.defaultRegistry, Clock.SYSTEM)
     private val rapidsConnection =
         RapidApplication.create(
             env = env,
+            meterRegistry = meterRegistry,
             consumerProducerFactory = factory,
             builder = {
-                withKtorModule {
-                    installKtorModule(
-                        subscriptionService,
-                        inntektRestClient,
-                        aaregClient,
-                        eregClient,
-                        speedClient,
-                        rapidsMediator
-                    )
+                withKtor { preStopHook, rapid ->
+                    naisApp(
+                        meterRegistry = meterRegistry,
+                        objectMapper = objectMapper,
+                        applicationLogger = LoggerFactory.getLogger("no.nav.helse.testdata.App"),
+                        callLogger = LoggerFactory.getLogger("no.nav.helse.testdata.CallLogging"),
+                        naisEndpoints = com.github.navikt.tbd_libs.naisful.NaisEndpoints.Default,
+                        timersConfig = { call, _ ->
+                            this
+                                // https://github.com/linkerd/polixy/blob/main/DESIGN.md#l5d-client-id-client-id
+                                // eksempel: <APP>.<NAMESPACE>.serviceaccount.identity.linkerd.cluster.local
+                                .tag("konsument", call.request.header("L5d-Client-Id") ?: "n/a")
+                        },
+                        mdcEntries = mapOf(
+                            "konsument" to { call: ApplicationCall -> call.request.header("L5d-Client-Id") }
+                        ),
+                        aliveCheck = rapid::isReady,
+                        readyCheck = rapid::isReady,
+                        preStopHook = preStopHook::handlePreStopRequest
+                    ) {
+                        installKtorModule(
+                            subscriptionService,
+                            inntektRestClient,
+                            aaregClient,
+                            eregClient,
+                            speedClient,
+                            rapidsMediator
+                        )
+                    }
                 }
             }
         )

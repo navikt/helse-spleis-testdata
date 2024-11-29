@@ -3,7 +3,7 @@ plugins {
 }
 
 val tbdLibsVersion = "2024.11.25-10.59-6f263a10"
-val rapidsAndRiversVersion = "2024112511071732529266.253c42b70448"
+val rapidsAndRiversVersion = "2024112911471732877250.f6df6f41226b"
 val junitJupiterVersion = "5.11.3"
 val ktorVersion = "3.0.1"
 group = "no.nav.helse"
@@ -28,6 +28,7 @@ repositories {
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
 dependencies {
+    implementation("com.github.navikt.tbd-libs:naisful-app:$tbdLibsVersion")
     implementation("com.github.navikt.tbd-libs:azure-token-client-default:$tbdLibsVersion")
     implementation("com.github.navikt.tbd-libs:speed-client:$tbdLibsVersion")
     implementation("com.github.navikt:rapids-and-rivers:$rapidsAndRiversVersion")

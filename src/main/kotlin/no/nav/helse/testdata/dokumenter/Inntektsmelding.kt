@@ -61,7 +61,7 @@ fun inntektsmelding(
                     "opphoersdato": ${inntektsmelding.refusjon.opphørRefusjon?.let { "\"$it\"" }}
                 },
                 "endringIRefusjoner": ${inntektsmelding.endringRefusjon.tilJson()},
-                "opphoerAvNaturalytelser": ${ if (inntektsmelding.harOpphørAvNaturalytelser) """[{ "naturalytelse": "ANNET" }]""" else "[]"},
+                "opphoerAvNaturalytelser": ${ if (inntektsmelding.harOpphørAvNaturalytelser) """[{"naturalytelse":"ANNET", "beloepPrMnd":"1200.0", "fom":"${inntektsmelding.førsteFraværsdag ?: "2018-01-01"}"}]""" else "[]"},
                 "begrunnelseForReduksjonEllerIkkeUtbetalt": "${inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt}",
                 "gjenopptakelseNaturalytelser":[],
                 "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},

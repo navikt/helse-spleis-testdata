@@ -88,7 +88,8 @@ private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbei
                 "arbeidsstedOrgnummer": "${it.arbeidsstedOrgnummer}",
                 "fom": "${it.datoFom}",
                 "tom": "${it.datoTom}",
-                "belop": "${it.belop}"
+                "belop": "${it.belop}",
+                "harJobbet": true
             }"""
     }
 

@@ -74,7 +74,7 @@ fun inntektsmelding(
                 "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}",
                 "innsenderFulltNavn": "spleis-testdata",
                 "innsenderTelefon": "123456789",
-                "matcherSpleis":true
+                "format":"Inntektsmelding"
             } 
         """
     }

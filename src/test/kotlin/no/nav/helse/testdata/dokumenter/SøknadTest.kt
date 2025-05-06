@@ -106,4 +106,29 @@ internal class SøknadTest {
         val json = søknad(vedtak)
         assertValidJson(json)
     }
+
+    @Test
+    fun selvstendigSøknadTest() {
+        val vedtak = Vedtak(
+            fnr = "fnr",
+            orgnummer = null,
+            sykdomFom = mandag,
+            sykdomTom = fredag,
+            arbeidssituasjon = "SELVSTENDIG_NARINGSDRIVENDE",
+            søknad = Søknad(
+                sykmeldingsgrad = 100,
+                harAndreInntektskilder = false,
+                sendtNav = fredag,
+                ferieperioder = listOf(
+                    Periode(mandag.plusDays(1), mandag.plusDays(2)),
+                    Periode(mandag.plusDays(100), mandag.plusDays(101))
+                ),
+                egenmeldingsdagerFraSykmelding = listOf(torsdag),
+                inntektFraNyttArbeidsforhold = emptyList(),
+            )
+        )
+        val json = søknad(vedtak)
+
+        assertValidJson(json)
+    }
 }

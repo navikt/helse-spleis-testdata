@@ -15,6 +15,7 @@ data class Søknad(
     val sendtArbeidsgiver: LocalDate? = null,
     val arbeidGjenopptatt: LocalDate? = null,
     val tidligereArbeidsgiverOrgnummer: String? = null,
+    val inntektFraSigrun: Int? = null,
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
@@ -57,29 +58,47 @@ fun søknad(
             "papirsykmeldinger":[],
             "fravar":${søknad.ferieperioder.somSøknadsferie()},
             "andreInntektskilder":[${
-            if (søknad.harAndreInntektskilder) {
-                "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
-            } else {
-                ""
-            }
-        }],
+                if (søknad.harAndreInntektskilder) {
+                    "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
+                } else {
+                    ""
+                }
+            }],
             "soknadsperioder":[
-            {
-              "fom":"${vedtak.sykdomFom}",
-              "tom":"${vedtak.sykdomTom}",
-              "sykmeldingsgrad":${søknad.sykmeldingsgrad},
-              "faktiskGrad":${søknad.faktiskgrad},
-              "avtaltTimer":null,
-              "faktiskTimer":null,
-              "sykmeldingstype":null
-            }
+                {
+                  "fom":"${vedtak.sykdomFom}",
+                  "tom":"${vedtak.sykdomTom}",
+                  "sykmeldingsgrad":${søknad.sykmeldingsgrad},
+                  "faktiskGrad":${søknad.faktiskgrad},
+                  "avtaltTimer":null,
+                  "faktiskTimer":null,
+                  "sykmeldingstype":null
+                }
             ],
             "sporsmal":null,
-            "hendelseId":"${UUID.randomUUID()}"
-            }   
+            "hendelseId":"${UUID.randomUUID()}",
+            "selvstendigNaringsdrivende": ${vedtak.somSelvstendigNæringsdrivende()}
+        }
     """
     }
 }
+
+private fun Vedtak.somSelvstendigNæringsdrivende() =
+    if (arbeidssituasjon == "SELVSTENDIG_NARINGSDRIVENDE") {
+        """{
+                "sykepengegrunnlagNaeringsdrivende": {
+                    "gjennomsnittPerAar": ${(1..3).map {
+                        """{
+                            "aar": "${sykdomFom.year - it}",
+                            "verdi": ${søknad?.inntektFraSigrun}
+                        }"""
+                    }}
+                }
+            }
+        """
+    } else {
+        null
+    }
 
 private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbeidsforhold() =
     map {

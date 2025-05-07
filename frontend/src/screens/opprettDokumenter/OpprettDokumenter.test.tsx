@@ -132,6 +132,7 @@ describe("OpprettDokumenter", () => {
               faktiskgrad: "80",
               sendtNav: "2021-08-01",
               tidligereArbeidsgiverOrgnummer: null,
+              inntektFraSigrun: null
             },
             medlemskapVerdi: "JA",
             inntektsmelding: {

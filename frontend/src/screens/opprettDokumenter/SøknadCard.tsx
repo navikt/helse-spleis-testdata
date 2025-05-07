@@ -82,7 +82,7 @@ export const SøknadCard = React.memo(() => {
           })}
         />
         { arbeidssituasjon === 'SELVSTENDIG_NARINGSDRIVENDE' && <FormInput
-            label="Inntekt fra Sigrun"
+            label="Årsinntekt fra Sigrun"
             errors={formState.errors}
                 {...register("søknad.inntektFraSigrun", {
                   required: false,

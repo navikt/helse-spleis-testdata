@@ -86,15 +86,26 @@ fun søknad(
 private fun Vedtak.somSelvstendigNæringsdrivende() =
     if (arbeidssituasjon == "SELVSTENDIG_NARINGSDRIVENDE") {
         """{
-                "sykepengegrunnlagNaeringsdrivende": {
-                    "gjennomsnittPerAar": ${(1..3).map {
-                        """{
-                            "aar": "${sykdomFom.year - it}",
-                            "verdi": ${søknad?.inntektFraSigrun}
-                        }"""
-                    }}
-                }
+            "sykepengegrunnlagNaeringsdrivende": {
+                "inntekter": ${(1..3).map {
+                    """
+                    { 
+                        "norskPersonidentifikator": "${fnr}",
+                        "inntektsaar": "${sykdomFom.year - it}",
+                        "pensjonsgivendeInntekt": [
+                            {
+                                "datoForFastsetting": "${sykdomFom.year - it + 1}-10-01",
+                                "skatteordning": "FASTLAND",
+                                "pensjonsgivendeInntektAvLoennsinntekt": 0,
+                                "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 0,
+                                "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad?.inntektFraSigrun ?: 0},
+                                "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
+                            }
+                        ]
+                    }"""
+                }}
             }
+        }
         """
     } else {
         null

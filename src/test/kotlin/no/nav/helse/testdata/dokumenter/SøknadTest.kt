@@ -110,7 +110,7 @@ internal class SøknadTest {
     @Test
     fun selvstendigSøknadTest() {
         val vedtak = Vedtak(
-            fnr = "fnr",
+            fnr = "11111111111",
             orgnummer = null,
             sykdomFom = mandag,
             sykdomTom = fredag,
@@ -125,6 +125,7 @@ internal class SøknadTest {
                 ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
                 inntektFraNyttArbeidsforhold = emptyList(),
+                inntektFraSigrun = 600000
             )
         )
         val json = søknad(vedtak)

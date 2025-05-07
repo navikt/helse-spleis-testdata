@@ -6,7 +6,12 @@ import {Checkbox} from "../../components/Checkbox";
 import {FormInput} from "../../components/FormInput";
 import React from "react";
 import {useFormContext} from "react-hook-form";
-import {validateArbeidsgrad, validateOptionalOrganisasjonsnummer, validateSykdomsgrad} from "../formValidation";
+import {
+  validateArbeidsgrad,
+  validateInntekt,
+  validateOptionalOrganisasjonsnummer,
+  validateSykdomsgrad
+} from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
 import {ArbeidssituasjonDTO} from "../../utils/types";
 
@@ -76,6 +81,15 @@ export const SøknadCard = React.memo(() => {
             validate: validateArbeidsgrad,
           })}
         />
+        { arbeidssituasjon === 'SELVSTENDIG_NARINGSDRIVENDE' && <FormInput
+            label="Inntekt fra Sigrun"
+            errors={formState.errors}
+                {...register("søknad.inntektFraSigrun", {
+                  required: false,
+                  validate: validateInntekt
+                })}
+            />
+        }
         <Checkbox
           data-testid="harAndreInntektskilder"
           label="Har andre inntektskilder"

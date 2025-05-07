@@ -30,6 +30,7 @@ export interface SøknadDTO extends SykmeldingDTO {
   sendtArbeidsgiver?: string;
   arbeidGjenopptatt?: string;
   tidligereArbeidsgiverOrgnummer?: string;
+  inntektFraSigrun?: number;
 }
 
 export interface InntektsmeldingDTO {

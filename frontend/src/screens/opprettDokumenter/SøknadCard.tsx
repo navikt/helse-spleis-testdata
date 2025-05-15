@@ -85,7 +85,7 @@ export const SøknadCard = React.memo(() => {
             label="Årsinntekt fra Sigrun"
             errors={formState.errors}
                 {...register("søknad.inntektFraSigrun", {
-                  required: false,
+                  required: "Inntekt fra Sigrun må fylles ut",
                   validate: validateInntekt
                 })}
             />

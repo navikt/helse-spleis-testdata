@@ -89,8 +89,9 @@ export const OpprettDokumenter = React.memo(() => {
     shouldUnregister: true,
   });
 
+  const [erArbeidstaker, setErArbeidstaker] = useState<boolean>(true);
+
   const skalSendeSøknad = form.watch("skalSendeSøknad");
-  const skalSendeInntektsmelding = form.watch("skalSendeInntektsmelding");
 
   const [status, setStatus] = useState<number>();
   const [errorBody, setErrorBody] = useState<string>();
@@ -128,12 +129,12 @@ export const OpprettDokumenter = React.memo(() => {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className={styles.OpprettDokumenter}>
           <div className={styles.DocumentContainer}>
-            <PersonCard />
+            <PersonCard setErArbeidstaker={setErArbeidstaker}/>
             {skalSendeSøknad && <SøknadCard />}
-            {skalSendeInntektsmelding && <InntektsmeldingCard />}
+            {erArbeidstaker && <InntektsmeldingCard />}
             <DiverseCard />
           </div>
-          {skalSendeInntektsmelding && (
+          {erArbeidstaker && (
             <>
               <Arbeidsgiverperioder />
               <EndringRefusjon />

@@ -53,15 +53,15 @@ function lagreSøk(fnr: string, navn: string) {
   localStorage.historikk = JSON.stringify(historikk)
 }
 
-export const PersonCard = () => {
+export const PersonCard = ({setErArbeidstaker}) => {
   const { register, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState(undefined);
+  const [isChecked, setIsChecked] = useState(true);
 
   const validateSendsDocuments = useDocumentsValidator();
   const fnr = watch("fnr")
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("arbeidssituasjon")
-  const skalSendeInntektsmelding = watch("skalSendeInntektsmelding");
-  const skalKreveOrgnummer = skalSendeInntektsmelding || arbeidssituasjon === "ARBEIDSTAKER"
+  const skalKreveOrgnummer =  arbeidssituasjon === "ARBEIDSTAKER"
 
   const [arbeidsgivere, setArbeidsgivere] = useState([] as Arbeidsgiver[])
   const [navn, setNavn] = useState(null)
@@ -104,6 +104,12 @@ export const PersonCard = () => {
   const deleteFailed = (errorMessage: string) => {
     setDeleteErrorMessage(errorMessage);
   };
+
+  function getSendIMChecked(isChecked: boolean) {
+    const erArbeidstaker = arbeidssituasjon === "ARBEIDSTAKER" ? isChecked: false
+    setErArbeidstaker(erArbeidstaker)
+    return erArbeidstaker;
+  }
 
   return (
     <Card>
@@ -165,6 +171,9 @@ export const PersonCard = () => {
         />
         <Checkbox
           label="Send inntektsmelding"
+          disabled={arbeidssituasjon !== "ARBEIDSTAKER"}
+          onClick={() => setIsChecked(!isChecked)}
+          checked={getSendIMChecked(isChecked)}
           {...register("skalSendeInntektsmelding", {
             validate: validateSendsDocuments,
           })}

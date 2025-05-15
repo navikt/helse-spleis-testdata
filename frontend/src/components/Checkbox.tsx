@@ -11,14 +11,15 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ id, name, label, errors, className, ...rest }, ref) => {
+  ({ id, name, label, errors, className, disabled, ...rest }, ref) => {
+
     return (
       <InputLabel className={classNames(styles.Label, className)}>
         <input
           type="checkbox"
           id={id}
           name={name}
-          className={styles.Checkbox}
+          className={classNames(styles.Checkbox, disabled ? styles.disabled : "")}
           ref={ref}
           {...rest}
         />

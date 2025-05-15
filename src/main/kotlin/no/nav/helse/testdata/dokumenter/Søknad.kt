@@ -92,16 +92,12 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
                     { 
                         "norskPersonidentifikator": "${fnr}",
                         "inntektsaar": "${sykdomFom.year - it}",
-                        "pensjonsgivendeInntekt": [
-                            {
-                                "datoForFastsetting": "${sykdomFom.year - it + 1}-10-01",
-                                "skatteordning": "FASTLAND",
-                                "pensjonsgivendeInntektAvLoennsinntekt": 0,
-                                "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 0,
-                                "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad?.inntektFraSigrun ?: 0},
-                                "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
-                            }
-                        ]
+                        "pensjonsgivendeInntekt": {                      
+                            "pensjonsgivendeInntektAvLoennsinntekt": 0,
+                            "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 0,
+                            "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad?.inntektFraSigrun ?: 0},
+                            "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
+                        }
                     }"""
                 }}
             }

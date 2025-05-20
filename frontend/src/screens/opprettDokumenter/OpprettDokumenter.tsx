@@ -73,7 +73,7 @@ const createPayload = (
     sykmelding: values.skalSendeSykmelding ? sykmelding() : undefined,
     søknad: values.skalSendeSøknad ? søknad() : undefined,
     medlemskapVerdi: values.medlemskapVerdi,
-    inntektsmelding: values.skalSendeInntektsmelding
+    inntektsmelding: values.skalSendeInntektsmelding && values.arbeidssituasjon === "ARBEIDSTAKER"
       ? inntektsmelding()
       : undefined,
   };

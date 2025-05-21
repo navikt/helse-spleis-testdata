@@ -35,9 +35,9 @@ spec:
   accessPolicy:
     outbound:
       external:
-       - host: team-inntekt-proxy.dev-fss-pub.nais.io
-       - host: aareg-services-q2.dev-fss-pub.nais.io
-       - host: ereg-services-q2.dev-fss-pub.nais.io
+        - host: team-inntekt-proxy.dev-fss-pub.nais.io
+        - host: aareg-services-q2.dev-fss-pub.nais.io
+        - host: ereg-services-q2.dev-fss-pub.nais.io
       rules:
         - application: speed-api
   prometheus:
@@ -60,3 +60,7 @@ spec:
       value: api://dev-fss.arbeidsforhold.aareg-services-nais/.default
     - name: EREG_BASE_URL
       value: https://ereg-services-q2.dev-fss-pub.nais.io
+  observability:
+    logging:
+      destinations:
+        - id: elastic

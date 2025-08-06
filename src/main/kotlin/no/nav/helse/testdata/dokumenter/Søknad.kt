@@ -16,6 +16,8 @@ data class Søknad(
     val arbeidGjenopptatt: LocalDate? = null,
     val tidligereArbeidsgiverOrgnummer: String? = null,
     val inntektFraSigrun: Int? = null,
+    val venteperiodeFom: LocalDate? = null,
+    val venteperiodeTom: LocalDate? = null
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
@@ -84,8 +86,15 @@ fun søknad(
 }
 
 private fun Vedtak.somSelvstendigNæringsdrivende() =
-    if (arbeidssituasjon == "SELVSTENDIG_NARINGSDRIVENDE") {
+    if (arbeidssituasjon == "SELVSTENDIG_NARINGSDRIVENDE" &&
+        søknad?.venteperiodeFom != null &&
+        søknad?.venteperiodeTom != null)
+    {
         """{
+            "venteperiode": {
+                "fom": "${søknad.venteperiodeFom}",
+                "tom": "${søknad.venteperiodeTom}"
+            },
             "naringsdrivendeInntekt": {
                 "norskPersonidentifikator": "${fnr}",
                 "inntekt": ${(1..3).map {

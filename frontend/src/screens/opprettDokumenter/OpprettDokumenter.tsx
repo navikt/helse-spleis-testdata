@@ -48,7 +48,9 @@ const createPayload = (
     arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
     inntektFraNyttArbeidsforhold: values.søknad.inntektFraNyttArbeidsforhold || undefined,
     tidligereArbeidsgiverOrgnummer: values.søknad.tidligereArbeidsgiverOrgnummer || null,
-    inntektFraSigrun: values.søknad.inntektFraSigrun || null
+    inntektFraSigrun: values.søknad.inntektFraSigrun || null,
+    venteperiodeFom: values.søknad.venteperiodeFom || null,
+    venteperiodeTom: values.søknad.venteperiodeTom || null,
   });
 
   const inntektsmelding = (): InntektsmeldingDTO => ({

@@ -91,7 +91,7 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
         søknad?.venteperiodeTom != null)
     {
         """{
-            "venteperiode": {
+            "naringsdrivendeVenteperiode": {
                 "fom": "${søknad.venteperiodeFom}",
                 "tom": "${søknad.venteperiodeTom}"
             },

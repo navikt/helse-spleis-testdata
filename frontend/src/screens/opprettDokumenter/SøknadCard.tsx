@@ -92,8 +92,8 @@ export const SøknadCard = React.memo(() => {
                         })}
                     />
                     <FormInput
-                        data-testid="venteperiodeFom"
-                        label="Venteperiode fom"
+                        data-testid="ventetidFom"
+                        label="Ventetid fom"
                         type="date"
                         errors={formState.errors}
                         defaultValue={
@@ -104,8 +104,8 @@ export const SøknadCard = React.memo(() => {
                         {...register("søknad.venteperiodeFom")}
                     />
                     <FormInput
-                        data-testid="venteperiodeTom"
-                        label="Venteperiode tom"
+                        data-testid="ventetidTom"
+                        label="Ventetid tom"
                         type="date"
                         errors={formState.errors}
                         defaultValue={

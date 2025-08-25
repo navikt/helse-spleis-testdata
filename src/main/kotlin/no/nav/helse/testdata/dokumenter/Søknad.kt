@@ -16,8 +16,8 @@ data class Søknad(
     val arbeidGjenopptatt: LocalDate? = null,
     val tidligereArbeidsgiverOrgnummer: String? = null,
     val inntektFraSigrun: Int? = null,
-    val venteperiodeFom: LocalDate? = null,
-    val venteperiodeTom: LocalDate? = null
+    val ventetidFom: LocalDate? = null,
+    val ventetidTom: LocalDate? = null
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
@@ -87,24 +87,24 @@ fun søknad(
 
 private fun Vedtak.somSelvstendigNæringsdrivende() =
     if (arbeidssituasjon == "SELVSTENDIG_NARINGSDRIVENDE" &&
-        søknad?.venteperiodeFom != null &&
-        søknad?.venteperiodeTom != null)
+        søknad?.ventetidFom != null &&
+        søknad.ventetidTom != null)
     {
         """{
-            "naringsdrivendeVenteperiode": {
-                "fom": "${søknad.venteperiodeFom}",
-                "tom": "${søknad.venteperiodeTom}"
+            "ventetid": {
+                "fom": "${søknad.ventetidFom}",
+                "tom": "${søknad.ventetidTom}"
             },
-            "naringsdrivendeInntekt": {
+            "inntekt": {
                 "norskPersonidentifikator": "${fnr}",
-                "inntekt": ${(1..3).map {
+                "inntektsAar": ${(1..3).map {
                     """
                     { 
-                        "inntektsaar": "${sykdomFom.year - it}",
+                        "aar": "${sykdomFom.year - it}",
                         "pensjonsgivendeInntekt": { 
                             "pensjonsgivendeInntektAvLoennsinntekt": 0,
                             "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 0,
-                            "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad?.inntektFraSigrun ?: 0},
+                            "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad.inntektFraSigrun ?: 0},
                             "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
                         }
                     }"""

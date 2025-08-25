@@ -133,8 +133,8 @@ describe("OpprettDokumenter", () => {
               sendtNav: "2021-08-01",
               tidligereArbeidsgiverOrgnummer: null,
               inntektFraSigrun: null,
-              venteperiodeFom: null,
-              venteperiodeTom: null
+              ventetidFom: null,
+              ventetidTom: null
             },
             medlemskapVerdi: "JA",
             inntektsmelding: {

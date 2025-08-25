@@ -101,7 +101,7 @@ export const SøknadCard = React.memo(() => {
                                 ? formatDateString(new Date(sykdomFom))
                                 : defaultDate
                         }
-                        {...register("søknad.venteperiodeFom")}
+                        {...register("søknad.ventetidFom")}
                     />
                     <FormInput
                         data-testid="ventetidTom"
@@ -113,7 +113,7 @@ export const SøknadCard = React.memo(() => {
                                 ? formatDateString(addDays(new Date(sykdomFom), 15))
                                 : defaultDate
                         }
-                        {...register("søknad.venteperiodeTom")}
+                        {...register("søknad.ventetidTom")}
                     />
                 </>
                 }

@@ -35,7 +35,7 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: team-inntekt-proxy.dev-fss-pub.nais.io
+        - host: ikomp-q2.intern.dev.nav.no
         - host: aareg-services-q2.dev-fss-pub.nais.io
         - host: ereg-services-q2.dev-fss-pub.nais.io
       rules:

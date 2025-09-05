@@ -53,9 +53,9 @@ spec:
     - name: KAFKA_CONSUMER_GROUP_ID
       value: tbd-spleis-testdata-v1
     - name: INNTEKTSKOMPONENTEN_URL
-      value: https://team-inntekt-proxy.dev-fss-pub.nais.io/proxy/inntektskomponenten-q2/rs
+      value: https://ikomp-q2.intern.dev.nav.no/rs
     - name: INNTEKTSKOMPONENTEN_SCOPE
-      value: api://dev-fss.team-inntekt.inntektskomponenten/.default
+      value: api://dev-fss.team-inntekt.ikomp-q2/.default
     - name: AAREG_URL
       value: https://aareg-services-q2.dev-fss-pub.nais.io
     - name: AAREG_SCOPE

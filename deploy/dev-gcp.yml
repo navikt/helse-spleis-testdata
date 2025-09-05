@@ -35,7 +35,7 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: ikomp-q2.intern.dev.nav.no
+        - host: ikomp-q2.dev-fss-pub.nais.io
         - host: aareg-services-q2.dev-fss-pub.nais.io
         - host: ereg-services-q2.dev-fss-pub.nais.io
       rules:
@@ -53,7 +53,7 @@ spec:
     - name: KAFKA_CONSUMER_GROUP_ID
       value: tbd-spleis-testdata-v1
     - name: INNTEKTSKOMPONENTEN_URL
-      value: https://ikomp-q2.intern.dev.nav.no/rs
+      value: https://ikomp-q2.dev-fss-pub.nais.io/rs
     - name: INNTEKTSKOMPONENTEN_SCOPE
       value: api://dev-fss.team-inntekt.ikomp-q2/.default
     - name: AAREG_URL

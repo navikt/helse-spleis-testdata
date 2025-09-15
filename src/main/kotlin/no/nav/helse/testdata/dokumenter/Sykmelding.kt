@@ -19,7 +19,7 @@ fun sykmelding(
         "sykmeldingId":"${UUID.randomUUID()}",
         "arbeidsgiver":${vedtak.somArbeidsgiver()},
         "tidligereArbeidsgiverOrgnummer":${vedtak.søknad?.tidligereArbeidsgiverOrgnummer?.somTidligereArbeidsgiverOrgnummer()},
-        "arbeidssituasjon":"ARBEIDSTAKER",
+        "arbeidssituasjon":"${vedtak.arbeidssituasjon}",
         "korrigerer":null,
         "korrigertAv":null,
         "soktUtenlandsopphold":null,

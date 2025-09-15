@@ -86,7 +86,7 @@ fun søknad(
 }
 
 private fun Vedtak.somSelvstendigNæringsdrivende() =
-    if (arbeidssituasjon == "SELVSTENDIG_NARINGSDRIVENDE" &&
+    if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE") &&
         søknad?.ventetidFom != null &&
         søknad.ventetidTom != null)
     {

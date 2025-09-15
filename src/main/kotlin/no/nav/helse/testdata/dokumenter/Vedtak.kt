@@ -19,7 +19,7 @@ data class Vedtak(
 data class Periode(val fom: LocalDate, val tom: LocalDate)
 
 internal fun Vedtak.somArbeidsgiver(): String? {
-    val yrkesAktiviteterUtenArbeidsgiver = listOf("ARBEIDSLEDIG", "FRILANSER", "SELVSTENDIG_NARINGSDRIVENDE")
+    val yrkesAktiviteterUtenArbeidsgiver = listOf("ARBEIDSLEDIG", "FRILANSER", "SELVSTENDIG_NARINGSDRIVENDE", "BARNEPASSER")
     if (yrkesAktiviteterUtenArbeidsgiver.contains(arbeidssituasjon)) {
         return null
     } else {
@@ -36,8 +36,9 @@ internal fun String?.somTidligereArbeidsgiverOrgnummer(): String? {
 }
 internal fun String?.somSøknadstype() = when (this) {
     null -> "ARBEIDSTAKERE"
-    "FRILANSER" -> "SELVSTENDIGE_OG_FRILANSERE"
-    "SELVSTENDIG_NARINGSDRIVENDE" -> "SELVSTENDIGE_OG_FRILANSERE"
+    "FRILANSER",
+    "SELVSTENDIG_NARINGSDRIVENDE",
+    "BARNEPASSER" -> "SELVSTENDIGE_OG_FRILANSERE"
     "ARBEIDSTAKER" -> "ARBEIDSTAKERE"
     else -> this
 }

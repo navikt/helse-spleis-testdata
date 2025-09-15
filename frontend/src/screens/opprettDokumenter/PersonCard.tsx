@@ -151,7 +151,8 @@ export const PersonCard = ({setErArbeidstaker}) => {
             options={['ARBEIDSTAKER',
               'ARBEIDSLEDIG',
               'FRILANSER',
-              'SELVSTENDIG_NARINGSDRIVENDE']}
+              'SELVSTENDIG_NARINGSDRIVENDE',
+              'BARNEPASSER']}
             {...register("arbeidssituasjon")}
         >
         </FormSelect>

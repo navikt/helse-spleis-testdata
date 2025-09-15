@@ -3,3 +3,4 @@ export type ArbeidssituasjonDTO =
     | 'ARBEIDSLEDIG'
     | 'FRILANSER'
     | 'SELVSTENDIG_NARINGSDRIVENDE'
+    | 'BARNEPASSER'

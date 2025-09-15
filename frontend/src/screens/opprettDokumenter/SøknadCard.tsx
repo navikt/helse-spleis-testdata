@@ -82,7 +82,7 @@ export const SøknadCard = React.memo(() => {
                         validate: validateArbeidsgrad,
                     })}
                 />
-                {arbeidssituasjon === 'SELVSTENDIG_NARINGSDRIVENDE' && <>
+                {(arbeidssituasjon === 'SELVSTENDIG_NARINGSDRIVENDE' || arbeidssituasjon === 'BARNEPASSER') && <>
                     <FormInput
                         label="Årsinntekt fra Sigrun"
                         errors={formState.errors}

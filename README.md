@@ -1,4 +1,4 @@
-# <div style="display:flex;align-items:center"><img style="margin-right:16px;" src="https://raw.githubusercontent.com/navikt/helse-spleis-testdata/master/frontend/src/assets/logo.png" width="35" height="35">Spleis-testdata</div>
+# <div style="display:flex;align-items:center"><img style="margin-right:16px;" src="https://raw.githubusercontent.com/navikt/helse-spleis-testdata/main/frontend/src/assets/logo.png" width="35" height="35">Spleis-testdata</div>
 
 ## Beskrivelse
 

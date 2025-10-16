@@ -33,6 +33,8 @@ export interface SøknadDTO extends SykmeldingDTO {
   inntektFraSigrun?: number;
   ventetidFom?: string;
   ventetidTom?: string;
+  fraværFørSykmeldingen?: boolean;
+  harBrukerOppgittForsikring?: boolean;
 }
 
 export interface InntektsmeldingDTO {

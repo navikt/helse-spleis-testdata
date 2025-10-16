@@ -17,7 +17,9 @@ data class Søknad(
     val tidligereArbeidsgiverOrgnummer: String? = null,
     val inntektFraSigrun: Int? = null,
     val ventetidFom: LocalDate? = null,
-    val ventetidTom: LocalDate? = null
+    val ventetidTom: LocalDate? = null,
+    val fraværFørSykmeldingen: Boolean? = null,
+    val harBrukerOppgittForsikring: Boolean? = null
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
@@ -91,6 +93,13 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
         søknad.ventetidTom != null)
     {
         """{
+            "hovedSporsmalSvar": {
+             ${if (søknad.fraværFørSykmeldingen != null) {
+                "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen
+             } else { }
+        }
+            },
+            "harBrukerOppgittForsikring": ${søknad.harBrukerOppgittForsikring},
             "ventetid": {
                 "fom": "${søknad.ventetidFom}",
                 "tom": "${søknad.ventetidTom}"

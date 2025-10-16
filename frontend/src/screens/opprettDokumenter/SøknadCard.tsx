@@ -14,6 +14,7 @@ import {
 } from "../formValidation";
 import {endOfMonth, subMonths} from "date-fns";
 import {ArbeidssituasjonDTO} from "../../utils/types";
+import {FormSelect} from "../../components/FormSelect";
 
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
@@ -21,7 +22,7 @@ const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 const nextDay = (date: Date): Date => addDays(date, 1);
 
 export const SøknadCard = React.memo(() => {
-    const {watch, register, formState} = useFormContext();
+    const {watch, register, formState, setValue} = useFormContext();
 
     const sykdomFom = watch("sykdomFom");
     const sykdomTom = watch("sykdomTom");
@@ -33,7 +34,7 @@ export const SøknadCard = React.memo(() => {
     const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
 
     return (
-        <Card>
+        <Card >
             <h2 className={styles.Title}>Søknad</h2>
             <div className={styles.CardContainer}>
                 {skalViseTidligereArbeidsgiverOrgnummer && <FormInput
@@ -115,7 +116,28 @@ export const SøknadCard = React.memo(() => {
                         }
                         {...register("søknad.ventetidTom")}
                     />
+                    <FormSelect
+                        label="Fravær før sykmeldingen"
+                        options={[
+                            { value: "", label: "(Ikke spurt om)" },
+                            "Nei",
+                            "Ja"
+                        ]}
+                        {...register("søknad.fraværFørSykmeldingen")}
+                        onChange={val => {
+                            const verdi = val.target.options[val.target.options.selectedIndex].value
+                            setValue("søknad.fraværFørSykmeldingen", verdi)
+                        } }
+                    />
+                    <Checkbox
+                        data-testid="harAndreInntektskilder"
+                        label="Har brukere oppgitt forsikring?"
+                        defaultChecked={false}
+                        errors={formState.errors}
+                        {...register("søknad.brukereHarOppgittForsikring")}
+                    />
                 </>
+
                 }
                 <Checkbox
                     data-testid="harAndreInntektskilder"

@@ -125,7 +125,9 @@ internal class SøknadTest {
                 ),
                 egenmeldingsdagerFraSykmelding = listOf(torsdag),
                 inntektFraNyttArbeidsforhold = emptyList(),
-                inntektFraSigrun = 600000
+                inntektFraSigrun = 600000,
+                harBrukerOppgittForsikring = true,
+                fraværFørSykmeldingen = false
             )
         )
         val json = søknad(vedtak)

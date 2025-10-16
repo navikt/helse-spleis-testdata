@@ -17,7 +17,9 @@ data class Søknad(
     val tidligereArbeidsgiverOrgnummer: String? = null,
     val inntektFraSigrun: Int? = null,
     val ventetidFom: LocalDate? = null,
-    val ventetidTom: LocalDate? = null
+    val ventetidTom: LocalDate? = null,
+    val fraværFørSykmeldingen: Boolean? = null,
+    val harBrukerOppgittForsikring: Boolean = false
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
@@ -60,12 +62,12 @@ fun søknad(
             "papirsykmeldinger":[],
             "fravar":${søknad.ferieperioder.somSøknadsferie()},
             "andreInntektskilder":[${
-                if (søknad.harAndreInntektskilder) {
-                    "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
-                } else {
-                    ""
-                }
-            }],
+            if (søknad.harAndreInntektskilder) {
+                "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
+            } else {
+                ""
+            }
+        }],
             "soknadsperioder":[
                 {
                   "fom":"${vedtak.sykdomFom}",
@@ -88,17 +90,23 @@ fun søknad(
 private fun Vedtak.somSelvstendigNæringsdrivende() =
     if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE") &&
         søknad?.ventetidFom != null &&
-        søknad.ventetidTom != null)
-    {
+        søknad.ventetidTom != null) {
         """{
+            "hovedSporsmalSvar": {
+                ${if (søknad.fraværFørSykmeldingen != null) {
+                    "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen 
+                } else { }}
+            }
+            "harBrukerOppgittForsikring": ${søknad.harBrukerOppgittForsikring},
             "ventetid": {
                 "fom": "${søknad.ventetidFom}",
                 "tom": "${søknad.ventetidTom}"
             },
             "inntekt": {
                 "norskPersonidentifikator": "${fnr}",
-                "inntektsAar": ${(1..3).map {
-                    """
+                "inntektsAar": ${
+            (1..3).map {
+                """
                     { 
                         "aar": "${sykdomFom.year - it}",
                         "pensjonsgivendeInntekt": { 
@@ -108,7 +116,8 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
                             "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
                         }
                     }"""
-                }}
+            }
+        }
             }
         }
         """
@@ -127,7 +136,6 @@ private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbei
                 "harJobbet": true
             }"""
     }
-
 
 private fun List<Periode>.somSøknadsferie() =
     map {

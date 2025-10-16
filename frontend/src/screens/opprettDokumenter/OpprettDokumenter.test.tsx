@@ -134,7 +134,9 @@ describe("OpprettDokumenter", () => {
               tidligereArbeidsgiverOrgnummer: null,
               inntektFraSigrun: null,
               ventetidFom: null,
-              ventetidTom: null
+              ventetidTom: null,
+              fraværFørSykmeldingen: null,
+              harBrukerOppgittForsikring: null
             },
             medlemskapVerdi: "JA",
             inntektsmelding: {

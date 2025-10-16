@@ -1,19 +1,23 @@
 package no.nav.helse.testdata
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.result_object.ok
 import com.github.navikt.tbd_libs.speed.SpeedClient
-import io.ktor.server.application.Application
-import io.ktor.server.cio.CIO
-import io.ktor.server.engine.embeddedServer
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
 
 fun main() {
     val rapidsConnection = TestRapid()
@@ -24,9 +28,9 @@ fun main() {
                 (1..12).map {
                     Måned(
                         YearMonth.of(2019, it), listOf(
-                            Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "123456789"),
-                            Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "987654321")
-                        )
+                        Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "123456789"),
+                        Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "987654321")
+                    )
                     )
                 }
             )
@@ -96,6 +100,12 @@ internal class LocalApplicationBuilder(
 ) : RapidsConnection.StatusListener {
 
     fun start() = runLocalServer {
+        install(ContentNegotiation) {
+            jackson {
+                enable(SerializationFeature.INDENT_OUTPUT)
+                registerModule(JavaTimeModule())
+            }
+        }
         installKtorModule(
             subscriptionService = subscriptionService,
             inntektRestClient = inntektRestClient,

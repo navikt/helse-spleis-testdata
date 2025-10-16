@@ -96,7 +96,7 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
             "hovedSporsmalSvar": {
              ${if (søknad.fraværFørSykmeldingen != null) {
                 "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen
-             } else { }
+             } else { "" }
         }
             },
             "harBrukerOppgittForsikring": ${søknad.harBrukerOppgittForsikring},

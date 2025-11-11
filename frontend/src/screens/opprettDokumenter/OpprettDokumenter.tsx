@@ -37,23 +37,35 @@ const createPayload = (
     sykmeldingsgrad: values.sykmeldingsgrad,
   });
 
-  const søknad = (): SøknadDTO => ({
-    sykmeldingsgrad: values.sykmeldingsgrad ?? values.søknad.sykmeldingsgrad,
-    harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
-    ferieperioder: values.søknad.ferieperioder?.map(it => ({fom: it.fom, tom: it.tom})) ?? [],
-    egenmeldingsdagerFraSykmelding: values.søknad.egenmeldingsdager,
-    faktiskgrad: values.søknad.faktiskgrad || undefined,
-    sendtNav: values.søknad.sendtNav || undefined,
-    sendtArbeidsgiver: values.søknad.sendtArbeidsgiver || undefined,
-    arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
-    inntektFraNyttArbeidsforhold: values.søknad.inntektFraNyttArbeidsforhold || undefined,
-    tidligereArbeidsgiverOrgnummer: values.søknad.tidligereArbeidsgiverOrgnummer || null,
-    inntektFraSigrun: values.søknad.inntektFraSigrun || null,
-    ventetidFom: values.søknad.ventetidFom || null,
-    ventetidTom: values.søknad.ventetidTom || null,
-    fraværFørSykmeldingen: values.søknad.fraværFørSykmeldingen?.toLowerCase() === "ja" ?? null,
-    harBrukerOppgittForsikring: values.søknad.harBrukerOppgittForsikring || null
-  });
+  const søknad = (): SøknadDTO => {
+    let fraværFørSykmeldingen: boolean
+    switch (values.søknad.fraværFørSykmeldingen) {
+      case "Ja":
+        fraværFørSykmeldingen = true;
+        break;
+      case "Nei":
+        fraværFørSykmeldingen = false;
+        break;
+      default: fraværFørSykmeldingen = null;
+    }
+    return {
+      sykmeldingsgrad: values.sykmeldingsgrad ?? values.søknad.sykmeldingsgrad,
+      harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
+      ferieperioder: values.søknad.ferieperioder?.map((it) => ({ fom: it.fom, tom: it.tom, })) ?? [],
+      egenmeldingsdagerFraSykmelding: values.søknad.egenmeldingsdager,
+      faktiskgrad: values.søknad.faktiskgrad || undefined,
+      sendtNav: values.søknad.sendtNav || undefined,
+      sendtArbeidsgiver: values.søknad.sendtArbeidsgiver || undefined,
+      arbeidGjenopptatt: values.søknad.arbeidGjenopptatt || undefined,
+      inntektFraNyttArbeidsforhold: values.søknad.inntektFraNyttArbeidsforhold || undefined,
+      tidligereArbeidsgiverOrgnummer: values.søknad.tidligereArbeidsgiverOrgnummer || null,
+      inntektFraSigrun: values.søknad.inntektFraSigrun || null,
+      ventetidFom: values.søknad.ventetidFom || null,
+      ventetidTom: values.søknad.ventetidTom || null,
+      fraværFørSykmeldingen: fraværFørSykmeldingen,
+      harBrukerOppgittForsikring: values.søknad.harBrukerOppgittForsikring || null,
+    };
+  };
 
   const inntektsmelding = (): InntektsmeldingDTO => ({
     inntekt: values.inntektsmelding.inntekt,

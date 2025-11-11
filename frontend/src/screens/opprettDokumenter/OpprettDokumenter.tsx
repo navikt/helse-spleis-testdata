@@ -37,17 +37,6 @@ const createPayload = (
     sykmeldingsgrad: values.sykmeldingsgrad,
   });
 
-  let fraværFørSykmeldingen: boolean
-  switch (values.søknad.fraværFørSykmeldingen) {
-    case "Ja":
-      fraværFørSykmeldingen = true;
-      break;
-    case "Nei":
-      fraværFørSykmeldingen = false;
-      break;
-    default: fraværFørSykmeldingen = null;
-  }
-
   const søknad = (): SøknadDTO => ({
     sykmeldingsgrad: values.sykmeldingsgrad ?? values.søknad.sykmeldingsgrad,
     harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
@@ -62,7 +51,7 @@ const createPayload = (
     inntektFraSigrun: values.søknad.inntektFraSigrun || null,
     ventetidFom: values.søknad.ventetidFom || null,
     ventetidTom: values.søknad.ventetidTom || null,
-    fraværFørSykmeldingen: fraværFørSykmeldingen,
+    fraværFørSykmeldingen: values.søknad.fraværFørSykmeldingen?.toLowerCase() === "ja" ?? null,
     harBrukerOppgittForsikring: values.søknad.harBrukerOppgittForsikring || null
   });
 

@@ -45,6 +45,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.nio.file.Paths
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
@@ -182,7 +183,12 @@ internal fun Application.installKtorModule(
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)
 
-        staticFiles("/", File("public"))
+        val path = Paths.get("").toAbsolutePath().toString()
+        val dir = File("public")
+        check(dir.exists() && dir.isDirectory) {
+            "$dir (cwd: $path) is not a directory"
+        }
+        staticFiles("/", dir)
     }
 }
 

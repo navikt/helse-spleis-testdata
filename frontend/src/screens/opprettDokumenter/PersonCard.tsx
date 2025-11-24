@@ -151,6 +151,8 @@ export const PersonCard = ({setErArbeidstaker}) => {
             options={['ARBEIDSTAKER',
               'ARBEIDSLEDIG',
               'FRILANSER',
+              'JORDBRUKER',
+              'FISKER',
               'SELVSTENDIG_NARINGSDRIVENDE',
               'BARNEPASSER']}
             {...register("arbeidssituasjon")}

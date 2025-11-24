@@ -2,5 +2,7 @@ export type ArbeidssituasjonDTO =
     'ARBEIDSTAKER'
     | 'ARBEIDSLEDIG'
     | 'FRILANSER'
+    | 'FISKER'
+    | 'JORDBRUKER'
     | 'SELVSTENDIG_NARINGSDRIVENDE'
     | 'BARNEPASSER'

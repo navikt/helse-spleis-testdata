@@ -44,6 +44,8 @@ npx jest
 
 Lokal app med mocket rapids-and-rivers og embedded postgres-db kan kjøres ved å starte main-funksjonen i `LocalApp.kt`. Serveren svarer på `0.0.0.0:8080` og server filer fra `public`-mappen hvis du har bygd frontend-appen på forhånd.
 
+Husk at working directory må være satt til spleis-testdata-mappen, ellers finner ikke backenden ressursfilene.
+
 ## Henvendelser
 
 Spørsmål knyttet til koden eller prosjektet kan stilles som issues her på GitHub.

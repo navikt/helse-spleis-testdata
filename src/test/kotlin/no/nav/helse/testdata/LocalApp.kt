@@ -15,8 +15,6 @@ import io.mockk.every
 import io.mockk.mockk
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
 
 fun main() {
@@ -118,22 +116,9 @@ internal class LocalApplicationBuilder(
 }
 
 internal fun runLocalServer(applicationBlock: Application.() -> Unit) {
-    val applicationContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
-    val exceptionHandler = CoroutineExceptionHandler { context, e ->
-        log.error("Feil i lytter", e)
-        context.cancel(CancellationException("Feil i lytter", e))
-    }
-
-    runBlocking(exceptionHandler + applicationContext) {
-        val port = 8080
-        log.info("Starter backend på port $port")
-        val server = embeddedServer(CIO, port) {
-            applicationBlock()
-        }.start(wait = false)
-
-        Runtime.getRuntime().addShutdownHook(Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
-            applicationContext.close()
-        })
-    }
+    val port = 8080
+    log.info("Starter backend på port $port")
+    embeddedServer(CIO, port) {
+        applicationBlock()
+    }.start(wait = true)
 }

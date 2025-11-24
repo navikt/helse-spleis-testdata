@@ -30,6 +30,7 @@ export const SøknadCard = React.memo(() => {
 
     const arbeidssituasjon: ArbeidssituasjonDTO = watch("arbeidssituasjon")
     const skalViseTidligereArbeidsgiverOrgnummer = arbeidssituasjon == 'ARBEIDSLEDIG'
+    const skalViseSelvstendigInputs = arbeidssituasjon === 'SELVSTENDIG_NARINGSDRIVENDE' || arbeidssituasjon === 'BARNEPASSER' || arbeidssituasjon == 'FISKER' || arbeidssituasjon === 'JORDBRUKER'
 
     const defaultDate = format(addDays(endOfMonth(subMonths(new Date(), 3)), 1), "yyyy-MM-dd")
 
@@ -83,7 +84,7 @@ export const SøknadCard = React.memo(() => {
                         validate: validateArbeidsgrad,
                     })}
                 />
-                {(arbeidssituasjon === 'SELVSTENDIG_NARINGSDRIVENDE' || arbeidssituasjon === 'BARNEPASSER') && <>
+                {skalViseSelvstendigInputs && <>
                     <FormInput
                         label="Årsinntekt fra Sigrun"
                         errors={formState.errors}

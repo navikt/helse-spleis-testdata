@@ -19,12 +19,11 @@ data class Vedtak(
 data class Periode(val fom: LocalDate, val tom: LocalDate)
 
 internal fun Vedtak.somArbeidsgiver(): String? {
-    val yrkesAktiviteterUtenArbeidsgiver = listOf("ARBEIDSLEDIG", "FRILANSER", "SELVSTENDIG_NARINGSDRIVENDE", "BARNEPASSER")
-    if (yrkesAktiviteterUtenArbeidsgiver.contains(arbeidssituasjon)) {
-        return null
-    } else {
+    if (arbeidssituasjon == "ARBEIDSTAKERE") {
         val orgnummer = if (orgnummer != null) "\"$orgnummer\"" else null
         return """{"navn": "Nærbutikken AS", "orgnummer": $orgnummer }"""
+    } else {
+        return null
     }
 }
 
@@ -37,6 +36,8 @@ internal fun String?.somTidligereArbeidsgiverOrgnummer(): String? {
 internal fun String?.somSøknadstype() = when (this) {
     null -> "ARBEIDSTAKERE"
     "FRILANSER",
+    "JORDBRUKER",
+    "FISKER",
     "SELVSTENDIG_NARINGSDRIVENDE",
     "BARNEPASSER" -> "SELVSTENDIGE_OG_FRILANSERE"
     "ARBEIDSTAKER" -> "ARBEIDSTAKERE"

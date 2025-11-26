@@ -19,7 +19,7 @@ data class Vedtak(
 data class Periode(val fom: LocalDate, val tom: LocalDate)
 
 internal fun Vedtak.somArbeidsgiver(): String? {
-    if (arbeidssituasjon == "ARBEIDSTAKERE") {
+    if (arbeidssituasjon == "ARBEIDSTAKER") {
         val orgnummer = if (orgnummer != null) "\"$orgnummer\"" else null
         return """{"navn": "Nærbutikken AS", "orgnummer": $orgnummer }"""
     } else {

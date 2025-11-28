@@ -13,7 +13,9 @@ export const DiverseCard = React.memo(() => {
     <Card>
       <h2 className={styles.Title}>Diverse</h2>
       <div className={styles.CardContainer}>
-          <FormSelect
+          {
+              // akkurat nå finnes det ikke noen LovMe-mock som plukker opp denne verdien
+              /*<FormSelect
               label="Medlemskapsvurdering"
               options={[
                   "JA",
@@ -26,7 +28,7 @@ export const DiverseCard = React.memo(() => {
                   const verdi = val.target.options[val.target.options.selectedIndex].value
                   setValue("medlemskapVerdi", verdi)
               } }
-          />
+           />*/}
       </div>
       {skalSendeSykmelding && <Sykmelding />}
     </Card>

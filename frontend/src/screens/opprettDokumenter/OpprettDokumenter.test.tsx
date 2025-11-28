@@ -138,7 +138,6 @@ describe("OpprettDokumenter", () => {
               fraværFørSykmeldingen: null,
               harBrukerOppgittForsikring: null
             },
-            medlemskapVerdi: "JA",
             inntektsmelding: {
               inntekt: "54321",
               refusjon: {

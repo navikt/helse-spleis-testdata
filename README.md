@@ -17,20 +17,20 @@ Frontenden er skrevet i [React](https://reactjs.org) og bygges med [Vite](https:
 
 ```shell script
 # Installér avhengigheter i package.json:
-npm i
+pnpm install
 
 # Bygg frontenden og start dev-server:
-npm run start
+pnpm run start
 ```
 
 Skal du teste frontenden sammen med backenden må du først bygge appen slik at de bundlede filene kan serves av backenden fra `public`-mappen:
 
 ```shell script
 # Kjøres fra frontend/:
-npm run build
+pnpm run build
 
 # Evt watch mode dersom du ønsker å bygge mens du skriver kode:
-npm run watch
+pnpm run watch
 ```
 
 Deretter starte backend (se nedenfor) og navigere til `localhost:8080`

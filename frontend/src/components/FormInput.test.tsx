@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { FormInput } from "./FormInput";
+import { describe, it, expect } from "vitest";
 
 describe("FormInput", () => {
   it("viser ikke feilmelding når det ikke finnes feil", () => {
@@ -15,7 +15,7 @@ describe("FormInput", () => {
       <FormInput
         label="En label"
         name="input"
-        errors={{ input: { message: "En feilmelding" } }}
+        errors={{ input: { type: "required", message: "En feilmelding" } }}
       />
     );
 

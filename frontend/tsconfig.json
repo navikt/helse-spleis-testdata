@@ -7,6 +7,6 @@
     "esModuleInterop": true,
     "jsx": "react",
     "jsxImportSource": "react",
-    "types": ["vite/client", "jest"],
+    "types": ["vite/client", "vitest/globals"],
   },
 }

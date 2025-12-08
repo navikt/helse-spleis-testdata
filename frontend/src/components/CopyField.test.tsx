@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { CopyField } from "./CopyField";
-import { click } from "@testing-library/user-event/dist/click";
+import userEvent from "@testing-library/user-event";
+import { describe, it, expect } from "vitest";
 
 const mockNavigatorClipboard = (onWrite: (text: string) => void) => {
   Object.assign(navigator, {
@@ -13,20 +13,20 @@ const mockNavigatorClipboard = (onWrite: (text: string) => void) => {
 };
 
 describe("CopyField", () => {
-  it("kopierer verdien i input-feltet til utklippstavlen", () => {
+  it("kopierer verdien i input-feltet til utklippstavlen", async () => {
     let copiedValue: string;
 
     mockNavigatorClipboard((text: string) => (copiedValue = text));
 
     render(<CopyField label="En label" value="En verdi" />);
-    click(screen.getByRole("button"));
+    await userEvent.click(screen.getByRole("button"));
 
     expect(copiedValue).toEqual("En verdi");
   });
 
-  it("viser feilmelding om kopiering feilet", () => {
+  it("viser feilmelding om kopiering feilet", async () => {
     render(<CopyField label="En label" value="En verdi" />);
-    click(screen.getByRole("button"));
+    await userEvent.click(screen.getByRole("button"));
 
     const feilmelding = "Kunne ikke kopiere til utklippstavle";
     const errorElement = screen.getByText(feilmelding);

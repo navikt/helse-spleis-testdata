@@ -1,6 +1,7 @@
 import React from "react";
 import { act, renderHook } from "@testing-library/react-hooks";
 import { useLocalStorageState } from "./persistance";
+import { describe, it, expect } from "vitest";
 
 describe("useLocalStorageState", () => {
   const key = "key";

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { FetchButton } from "./FetchButton";
+import { describe, it, expect } from "vitest";
 
 describe("FetchButton", () => {
   it("viser ok-ikon om status < 400", () => {

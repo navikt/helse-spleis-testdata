@@ -1,28 +1,28 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { DeleteButton } from "./DeleteButton";
 import userEvent from "@testing-library/user-event";
 import { FormProvider, useForm } from "react-hook-form";
 import { validateFødselsnummer } from "../formValidation";
 import { FormInput } from "../../components/FormInput";
+import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
 
-jest.mock("../../io/environment", () => ({
+vi.mock("../../io/environment", () => ({
   Environment: {
     Mode: "development",
   },
 }));
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 const mockFetchSuccess = () => {
-  (fetch as jest.Mock).mockImplementationOnce(() =>
+  (fetch as Mock).mockImplementationOnce(() =>
     Promise.resolve({ status: 200 } as Response)
   );
 };
 
 const mockFetchError = () => {
-  (fetch as jest.Mock).mockImplementationOnce(() =>
+  (fetch as Mock).mockImplementationOnce(() =>
     Promise.resolve({ status: 500 } as Response)
   );
 };
@@ -48,14 +48,14 @@ const FormWrapper: React.FC = ({ children }) => {
 
 describe("DeleteButton", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("sletter person", async () => {
     mockFetchSuccess();
-    render(<DeleteButton errorCallback={jest.fn} />, { wrapper: FormWrapper });
-    userEvent.type(screen.getByRole("textbox"), "12345678900");
-    userEvent.click(screen.getByRole("button"));
+    render(<DeleteButton errorCallback={vi.fn()} />, { wrapper: FormWrapper });
+    await userEvent.type(screen.getByRole("textbox"), "12345678900");
+    await userEvent.click(screen.getByRole("button"));
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(screen.getByRole("button")).toHaveTextContent("✔️️");
@@ -73,8 +73,8 @@ describe("DeleteButton", () => {
     render(<DeleteButton errorCallback={errorCallback} />, {
       wrapper: FormWrapper,
     });
-    userEvent.type(screen.getByRole("textbox"), "12345678900");
-    userEvent.click(screen.getByRole("button"));
+    await userEvent.type(screen.getByRole("textbox"), "12345678900");
+    await userEvent.click(screen.getByRole("button"));
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(screen.getByRole("button")).toHaveTextContent("☠️");
@@ -83,9 +83,9 @@ describe("DeleteButton", () => {
   });
 
   it("gjør ingenting om fødselsnummer ikke inneholder elleve tegn", async () => {
-    render(<DeleteButton errorCallback={jest.fn} />, { wrapper: FormWrapper });
-    userEvent.type(screen.getByRole("textbox"), "1234567890");
-    userEvent.click(screen.getByRole("button"));
+    render(<DeleteButton errorCallback={vi.fn()} />, { wrapper: FormWrapper });
+    await userEvent.type(screen.getByRole("textbox"), "1234567890");
+    await userEvent.click(screen.getByRole("button"));
 
     // Må vente litt, før vi kan sjekke at det ikke skjedde noe
     await new Promise((r) => setTimeout(r, 500));

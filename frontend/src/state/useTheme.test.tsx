@@ -6,6 +6,7 @@ import {
   useUpdateBodyBackgroundColor,
 } from "./useTheme";
 import { RecoilRoot } from "recoil";
+import { describe, it, expect } from "vitest";
 
 const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
 

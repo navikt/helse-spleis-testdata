@@ -1,10 +1,10 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import {
   SystemMessage,
   SystemMessageInitializationError,
 } from "./SystemMessage";
+import { describe, it, expect } from "vitest";
 
 describe("SystemMessage", () => {
   it("thrower dersom den ikke er lukkbar eller lukkes etter et oppgitt antall millisekunder", () => {

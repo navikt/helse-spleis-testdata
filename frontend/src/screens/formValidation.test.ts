@@ -6,6 +6,7 @@ import {
   validateOrganisasjonsnummer,
   validateSykdomsgrad,
 } from "./formValidation";
+import { describe, it, expect } from "vitest";
 
 describe("isNumerical", () => {
   it("returns false when input is not a natural number", () => {

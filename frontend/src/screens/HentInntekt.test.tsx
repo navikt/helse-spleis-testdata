@@ -1,19 +1,19 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { HentInntekt } from "./HentInntekt";
 import userEvent from "@testing-library/user-event";
+import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
 
-jest.mock("../io/environment", () => ({
+vi.mock("../io/environment", () => ({
   Environment: {
     Mode: "development",
   },
 }));
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 const mockFetchSuccess = () => {
-  (fetch as jest.Mock).mockImplementationOnce(() =>
+  (fetch as Mock).mockImplementationOnce(() =>
     Promise.resolve({
       status: 204,
       json: () => Promise.resolve({ beregnetMånedsinntekt: 54321 }),
@@ -22,21 +22,21 @@ const mockFetchSuccess = () => {
 };
 
 const mockFetchError = () => {
-  (fetch as jest.Mock).mockImplementationOnce(() =>
+  (fetch as Mock).mockImplementationOnce(() =>
     Promise.resolve({ status: 404 } as Response)
   );
 };
 
 describe("HentInntekt", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("henter inntekt person", async () => {
     mockFetchSuccess();
     render(<HentInntekt />);
-    userEvent.type(screen.getAllByRole("textbox")[0], "12345678900");
-    userEvent.click(screen.getAllByRole("button")[0]);
+    await userEvent.type(screen.getAllByRole("textbox")[0], "12345678900");
+    await userEvent.click(screen.getAllByRole("button")[0]);
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("success")).toBeVisible();
@@ -47,8 +47,8 @@ describe("HentInntekt", () => {
   it("viser feilmelding om henting feiler", async () => {
     mockFetchError();
     render(<HentInntekt />);
-    userEvent.type(screen.getAllByRole("textbox")[0], "12345678900");
-    userEvent.click(screen.getAllByRole("button")[0]);
+    await userEvent.type(screen.getAllByRole("textbox")[0], "12345678900");
+    await userEvent.click(screen.getAllByRole("button")[0]);
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId("error")).toBeVisible();
@@ -58,7 +58,7 @@ describe("HentInntekt", () => {
 
   it("viser feilmelding om personnummer ikke er fylt ut", async () => {
     render(<HentInntekt />);
-    userEvent.click(screen.getAllByRole("button")[0]);
+    await userEvent.click(screen.getAllByRole("button")[0]);
     await waitFor(() => {
       expect(screen.getByText("Fødselsnummer må fylles ut")).toBeVisible();
     });

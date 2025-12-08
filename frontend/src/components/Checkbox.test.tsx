@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { Checkbox } from "./Checkbox";
+import { describe, it, expect } from "vitest";
 
 describe("Checkbox", () => {
   it("viser ikke feilmelding når det ikke finnes feil", () => {
@@ -16,7 +16,7 @@ describe("Checkbox", () => {
         label="En label"
         name="checkbox"
         id="checkbox"
-        errors={{ checkbox: { message: "En feilmelding" } }}
+        errors={{ checkbox: { type: "required", message: "En feilmelding" } }}
       />
     );
 

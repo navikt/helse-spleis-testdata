@@ -1,12 +1,12 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { RecoilRoot } from "recoil";
 import { SystemMessages } from "./SystemMessages";
 import { systemMessagesState } from "../state/useSystemMessages";
 import userEvent from "@testing-library/user-event";
+import { vi, describe, it, expect } from "vitest";
 
-jest.mock("react-spring", () => ({
+vi.mock("react-spring", () => ({
   animated: {
     div: ({ children }) => <div>{children}</div>,
   },
@@ -33,7 +33,7 @@ describe("SystemMessages", () => {
     render(<SystemMessages />, { wrapper });
     expect(screen.queryByText("En melding")).toBeVisible();
 
-    userEvent.click(screen.getByRole("button", { name: /Fjern alle meldinger/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Fjern alle meldinger/ }));
     expect(screen.queryByText("En melding")).toBeNull();
   });
 });

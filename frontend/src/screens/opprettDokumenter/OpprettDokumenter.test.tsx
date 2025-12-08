@@ -1,29 +1,29 @@
 import React from "react";
-import {render, screen, waitFor} from "@testing-library/react";
-import "@testing-library/jest-dom";
+import {render, screen, waitFor, fireEvent} from "@testing-library/react";
 import { OpprettDokumenter } from "./OpprettDokumenter";
 import { RecoilRoot } from "recoil";
 import userEvent from "@testing-library/user-event";
+import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
 
-jest.mock("../../io/subscription", () => ({
+vi.mock("../../io/subscription", () => ({
   useSubscribe: () => [() => {}],
 }));
 
-jest.mock("../../io/environment", () => ({
+vi.mock("../../io/environment", () => ({
   Environment: {
     Mode: "development"
   },
 }));
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 const mockFetchResponse = (body: object) =>
-  (fetch as jest.Mock).mockImplementationOnce(() => Promise.resolve(body));
+  (fetch as Mock).mockImplementationOnce(() => Promise.resolve(body));
 
 const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
 describe("OpprettDokumenter", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   })
 
   it("oppretter dokumenter", async () => {
@@ -38,14 +38,14 @@ describe("OpprettDokumenter", () => {
     mockStandardInntekt(orgnr, inntekt)
     mockOrganisasjonnavn(orgnr)
 
-    userEvent.type(screen.getByTestId("fnr"), fnr);
-    userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    await userEvent.type(screen.getByTestId("fnr"), fnr);
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
     await waitFor(() =>
       expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(inntekt)
     );
-    mockFetchResponse({ status: 200, text: () => jest.fn() });
-    userEvent.click(screen.getByText("Opprett dokumenter"));
+    mockFetchResponse({ status: 200, text: () => vi.fn() });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
 
     await new Promise((r) => setTimeout(r, 1100));
 
@@ -57,7 +57,7 @@ describe("OpprettDokumenter", () => {
   it("krever fødselsnummer, organisasjonsnummer og inntekt", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    userEvent.click(screen.getByText("Opprett dokumenter"));
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
 
     await waitFor(() => {
       expect(screen.getByText("Fødselsnummer må fylles ut")).toBeVisible();
@@ -76,10 +76,10 @@ describe("OpprettDokumenter", () => {
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
     mockOrganisasjonnavn(orgnr)
-    userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
 
     await waitFor(() => {
-      expect(fetch as jest.Mock).toHaveBeenCalledWith(
+      expect(fetch as Mock).toHaveBeenCalledWith(
         "http://0.0.0.0:8080/person/inntekt",
         {
           headers: { Accept: "application/json", ident: "01234567890" },
@@ -88,34 +88,34 @@ describe("OpprettDokumenter", () => {
       );
     });
 
-    userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
-    userEvent.type(screen.getByTestId("faktiskgrad"), "80");
-    userEvent.type(screen.getByTestId("sykdomFom"), "2021-07-01");
-    userEvent.type(screen.getByTestId("sykdomTom"), "2021-07-31");
+    await userEvent.type(screen.getByTestId("faktiskgrad"), "80");
+    fireEvent.change(screen.getByTestId("sykdomFom"), { target: { value: "2021-07-01" } });
+    fireEvent.change(screen.getByTestId("sykdomTom"), { target: { value: "2021-07-31" } });
 
-    userEvent.clear(screen.getByTestId("refusjonsbeløp"))
-    userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000")
-    userEvent.type(screen.getByTestId("opphørRefusjon"), "2021-08-01")
+    await userEvent.clear(screen.getByTestId("refusjonsbeløp"))
+    await userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000")
+    fireEvent.change(screen.getByTestId("opphørRefusjon"), { target: { value: "2021-08-01" } });
 
-    userEvent.click(screen.getByTestId("arbeidsgiverperioderButton"));
-    userEvent.type(screen.getByTestId("arbeidsgiverFom0"), "2021-07-01");
-    userEvent.type(screen.getByTestId("arbeidsgiverTom0"), "2021-07-16");
+    await userEvent.click(screen.getByTestId("arbeidsgiverperioderButton"));
+    fireEvent.change(screen.getByTestId("arbeidsgiverFom0"), { target: { value: "2021-07-01" } });
+    fireEvent.change(screen.getByTestId("arbeidsgiverTom0"), { target: { value: "2021-07-16" } });
 
-    userEvent.click(screen.getByTestId("ferieButton"));
-    userEvent.type(screen.getByTestId("ferieFom0"), "2021-07-02");
-    userEvent.type(screen.getByTestId("ferieTom0"), "2021-07-04");
+    await userEvent.click(screen.getByTestId("ferieButton"));
+    fireEvent.change(screen.getByTestId("ferieFom0"), { target: { value: "2021-07-02" } });
+    fireEvent.change(screen.getByTestId("ferieTom0"), { target: { value: "2021-07-04" } });
 
-    userEvent.click(screen.getByTestId("endringButton"));
-    userEvent.type(screen.getByTestId("endringsdato0"), "2021-07-17");
-    userEvent.type(screen.getByTestId("endringsbeløp0"), "19000");
-    mockFetchResponse({ status: 200,text: () => jest.fn() });
-    userEvent.click(screen.getByText("Opprett dokumenter"));
+    await userEvent.click(screen.getByTestId("endringButton"));
+    fireEvent.change(screen.getByTestId("endringsdato0"), { target: { value: "2021-07-17" } });
+    await userEvent.type(screen.getByTestId("endringsbeløp0"), "19000");
+    mockFetchResponse({ status: 200,text: () => vi.fn() });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
 
     await new Promise((r) => setTimeout(r, 1100));
 
     await waitFor(() => {
-      expect(fetch as jest.Mock).toHaveBeenLastCalledWith(
+      expect(fetch as Mock).toHaveBeenLastCalledWith(
         "http://0.0.0.0:8080/vedtaksperiode",
         {
           body: `${JSON.stringify({
@@ -159,17 +159,17 @@ describe("OpprettDokumenter", () => {
   });
 
   it("sletter person", async () => {
-    const orgnr = "orgnr"
+    const orgnr = "987654321"
     mockPersonNavn()
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
     mockOrganisasjonnavn(orgnr)
     mockFetchResponse({ status: 204 });
 
-    render(<OpprettDokumenter />);
+    render(<OpprettDokumenter />, { wrapper });
 
     const fnr = "12345678900";
-    userEvent.type(screen.getByTestId("fnr"), fnr);
+    await userEvent.type(screen.getByTestId("fnr"), fnr);
 
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(
@@ -179,7 +179,7 @@ describe("OpprettDokumenter", () => {
       );
     });
 
-    userEvent.click(screen.getByText("❌"));
+    await userEvent.click(screen.getByText("❌"));
 
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(
@@ -192,16 +192,16 @@ describe("OpprettDokumenter", () => {
   });
 
   it("viser feilmelding om sletting feiler", async () => {
-    const orgnr = "orgnr"
+    const orgnr = "987654321"
     mockPersonNavn()
     mockArbeidsforhold(orgnr)
     mockStandardInntekt(orgnr, "54321");
     mockOrganisasjonnavn(orgnr)
-    mockFetchResponse({ status: 404, text: () => jest.fn() });
+    mockFetchResponse({ status: 404, text: () => vi.fn() });
 
-    render(<OpprettDokumenter />);
+    render(<OpprettDokumenter />, { wrapper });
 
-    userEvent.type(screen.getByTestId("fnr"), "12345678900");
+    await userEvent.type(screen.getByTestId("fnr"), "12345678900");
     await waitFor(() => {
       expect(fetch).toHaveBeenNthCalledWith(
           4,
@@ -209,7 +209,7 @@ describe("OpprettDokumenter", () => {
           { headers: { Accept: 'application/json' }, method: "get" }
       );
     });
-    userEvent.click(screen.getByText("❌"));
+    await userEvent.click(screen.getByText("❌"));
 
     await waitFor(() => {
       expect(screen.getByText("☠️")).toBeVisible();
@@ -220,7 +220,7 @@ describe("OpprettDokumenter", () => {
   it("endring av sykdomTom endrer automatisk søknadSendt til sykdomTom + 1", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    userEvent.type(screen.getByTestId("sykdomTom"), "2021-08-31");
+    fireEvent.change(screen.getByTestId("sykdomTom"), { target: { value: "2021-08-31" } });
 
     await waitFor(() => {
       expect(screen.getByTestId("sendtNav")).toHaveValue("2021-09-01");
@@ -230,7 +230,7 @@ describe("OpprettDokumenter", () => {
   it("endring av sykdomFom endrer automatisk førsteFraværsdag til sykdomFom", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    userEvent.type(screen.getByTestId("sykdomFom"), "2021-07-31");
+    fireEvent.change(screen.getByTestId("sykdomFom"), { target: { value: "2021-07-31" } });
 
     await waitFor(() => {
       expect(screen.getByTestId("førsteFraværsdag")).toHaveValue("2021-07-31");

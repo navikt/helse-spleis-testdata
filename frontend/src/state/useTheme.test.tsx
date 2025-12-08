@@ -1,5 +1,4 @@
-import React from "react";
-import { act, renderHook } from "@testing-library/react-hooks";
+import React, {act, ReactNode} from "react";
 import {
   useTheme,
   useThemeState,
@@ -7,8 +6,9 @@ import {
 } from "./useTheme";
 import { AppProvider } from "./AppContext";
 import { describe, it, expect } from "vitest";
+import {renderHook} from "@testing-library/react";
 
-const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => <AppProvider>{children}</AppProvider>;
 
 describe("useTheme", () => {
   it('returnerer theme og defaulter til "light"', () => {

@@ -1,11 +1,11 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
 import { ThemeButton } from "./ThemeButton";
 import { AppProvider } from "../state/AppContext";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect } from "vitest";
 
-const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => <AppProvider>{children}</AppProvider>;
 
 describe("ThemeButton", () => {
   it("toggler theme", async () => {

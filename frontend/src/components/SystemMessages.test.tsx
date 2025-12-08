@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
 import { AppProvider } from "../state/AppContext";
 import { SystemMessages } from "./SystemMessages";
@@ -7,7 +7,7 @@ import { vi, describe, it, expect } from "vitest";
 
 vi.mock("react-spring", () => ({
   animated: {
-    div: ({ children }) => <div>{children}</div>,
+    div: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   },
   useTransition:
     (messages: SystemMessageObject[]) =>
@@ -15,7 +15,7 @@ vi.mock("react-spring", () => ({
       messages.map((it) => func({}, it)),
 }));
 
-const wrapper = ({ children }) => (
+const wrapper = ({ children }: { children: ReactNode }) => (
   <AppProvider
     initialMessages={[
       { id: "en-melding", text: "En melding", dismissable: true },

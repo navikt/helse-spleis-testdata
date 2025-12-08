@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import classNames from "classnames";
 
 import { useTheme, useUpdateBodyBackgroundColor } from "./state/useTheme";
@@ -22,20 +22,16 @@ export const App = () => {
   return (
     <div className={classNames(styles.App, styles[theme])}>
       <Nav />
-      <Switch>
-        <Route path="/" exact>
+      <Routes>
+        <Route path="/" element={
           <div className={styles.OpprettDokumenterContainer}>
             <OpprettDokumenter />
             <AppStatus />
           </div>
-        </Route>
-        <Route path="/inntekt/hent">
-          <HentInntekt />
-        </Route>
-        <Route path="/testgruppe">
-          <HentTestgruppe />
-        </Route>
-      </Switch>
+        } />
+        <Route path="/inntekt/hent" element={<HentInntekt />} />
+        <Route path="/testgruppe" element={<HentTestgruppe />} />
+      </Routes>
       <ThemeButton />
       <SystemMessages />
     </div>

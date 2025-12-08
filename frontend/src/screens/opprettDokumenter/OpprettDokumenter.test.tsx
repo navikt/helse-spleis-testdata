@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import {render, screen, waitFor, fireEvent} from "@testing-library/react";
 import { OpprettDokumenter } from "./OpprettDokumenter";
 import { AppProvider } from "../../state/AppContext";
@@ -20,7 +20,7 @@ global.fetch = vi.fn();
 const mockFetchResponse = (body: object) =>
   (fetch as Mock).mockImplementationOnce(() => Promise.resolve(body));
 
-const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => <AppProvider>{children}</AppProvider>;
 describe("OpprettDokumenter", () => {
   beforeEach(() => {
     vi.clearAllMocks();

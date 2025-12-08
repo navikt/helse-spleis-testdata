@@ -1,14 +1,14 @@
 import styles from "./NavLink.module.css";
 import { NavLink as Link } from "react-router-dom";
 import classNames from "classnames";
-import React from "react";
+import React, { PropsWithChildren } from "react";
 
 interface NavLinkProps {
   to: string;
   isExpanded: boolean;
 }
 
-export const NavLink: React.FC<NavLinkProps> = ({
+export const NavLink: React.FC<PropsWithChildren<NavLinkProps>> = ({
   to,
   isExpanded,
   children,
@@ -20,7 +20,7 @@ export const NavLink: React.FC<NavLinkProps> = ({
         isExpanded ? styles.isExpanded : styles.isMinified
       )}
     >
-      <Link to={to} exact={true}>
+      <Link to={to} end>
         {children}
       </Link>
     </li>

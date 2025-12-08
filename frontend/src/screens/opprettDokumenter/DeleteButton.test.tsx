@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { DeleteButton } from "./DeleteButton";
 import userEvent from "@testing-library/user-event";
@@ -28,7 +28,7 @@ const mockFetchError = () => {
   );
 };
 
-const FormWrapper: React.FC = ({ children }) => {
+const FormWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   const form = useForm();
   return (
     <AppProvider>

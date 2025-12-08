@@ -18,11 +18,15 @@ jobs:
           java-version: 21
           distribution: "temurin"
 
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: 'frontend/package.json'
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: "npm"
-          cache-dependency-path: "frontend/package-lock.json"
+          cache: "pnpm"
+          cache-dependency-path: "frontend/pnpm-lock.yaml"
 
       - name: Gradle setup
         uses: gradle/actions/setup-gradle@v4
@@ -36,15 +40,15 @@ jobs:
         run: export TZ=utc
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
         working-directory: "frontend"
 
       - name: Test frontend
-        run: npm run test
+        run: pnpm run test
         working-directory: "frontend"
 
       - name: Build frontend
-        run: npm run build
+        run: pnpm run build
         working-directory: "frontend"
 
       - name: build docker image

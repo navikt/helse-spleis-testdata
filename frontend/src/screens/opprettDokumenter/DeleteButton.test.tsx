@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { FormProvider, useForm } from "react-hook-form";
 import { validateFødselsnummer } from "../formValidation";
 import { FormInput } from "../../components/FormInput";
+import { AppProvider } from "../../state/AppContext";
 import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
 
 vi.mock("../../io/environment", () => ({
@@ -30,19 +31,21 @@ const mockFetchError = () => {
 const FormWrapper: React.FC = ({ children }) => {
   const form = useForm();
   return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(() => null)}>
-        {children}
-        <FormInput
-          data-testid="fnr"
-          label="Fødselsnummer"
-          {...form.register("fnr", {
-            required: "Fødselsnummer må fylles ut",
-            validate: validateFødselsnummer,
-          })}
-        />
-      </form>
-    </FormProvider>
+    <AppProvider>
+      <FormProvider {...form}>
+        <form onSubmit={form.handleSubmit(() => null)}>
+          {children}
+          <FormInput
+            data-testid="fnr"
+            label="Fødselsnummer"
+            {...form.register("fnr", {
+              required: "Fødselsnummer må fylles ut",
+              validate: validateFødselsnummer,
+            })}
+          />
+        </form>
+      </FormProvider>
+    </AppProvider>
   );
 };
 

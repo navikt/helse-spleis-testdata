@@ -1,10 +1,10 @@
 import React from "react";
 import { act, renderHook } from "@testing-library/react-hooks";
 import { useSystemMessages } from "./useSystemMessages";
-import { RecoilRoot } from "recoil";
+import { AppProvider } from "./AppContext";
 import { describe, it, expect } from "vitest";
 
-const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
+const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
 
 describe("useSystemMessages", () => {
   it("legger til melding", () => {

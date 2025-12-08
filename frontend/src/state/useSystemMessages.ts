@@ -1,14 +1,9 @@
-import {atom, useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
-
-export const systemMessagesState = atom<SystemMessageObject[]>({
-  key: "systemMessagesState",
-  default: [],
-});
+import { useAppContext } from "./AppContext";
 
 type UseAddSystemMessageResult = (message: SystemMessageObject) => void;
 
 export const useAddSystemMessage = (): UseAddSystemMessageResult => {
-  const setSystemMessages = useSetRecoilState(systemMessagesState);
+  const { setSystemMessages } = useAppContext();
 
   return (message: SystemMessageObject): void => {
     setSystemMessages((old) => [...old, message]);
@@ -18,7 +13,7 @@ export const useAddSystemMessage = (): UseAddSystemMessageResult => {
 type UseRemoveSystemMessageResult = (id: string) => void;
 
 export const useRemoveSystemMessage = (): UseRemoveSystemMessageResult => {
-  const setSystemMessages = useSetRecoilState(systemMessagesState);
+  const { setSystemMessages } = useAppContext();
 
   return (id: string): void => {
     setSystemMessages((old) => old.filter((it) => it.id !== id));
@@ -28,7 +23,7 @@ export const useRemoveSystemMessage = (): UseRemoveSystemMessageResult => {
 type UseClearSystemMessagesResult = () => void;
 
 export const useClearSystemMessages = (): UseClearSystemMessagesResult => {
-    const [systemMessages, setSystemMessages] = useRecoilState(systemMessagesState);
+  const { systemMessages, setSystemMessages } = useAppContext();
 
   const removeLastMessage = () => {
     setSystemMessages((prev) => prev.slice(0, prev.length - 1));
@@ -58,9 +53,9 @@ type UseSystemMessagesResult = [
 ];
 
 export const useSystemMessages = (): UseSystemMessagesResult => {
-  const messages = useRecoilValue(systemMessagesState);
+  const { systemMessages } = useAppContext();
   const addMessage = useAddSystemMessage();
   const removeMessage = useRemoveSystemMessage();
   const clearMessages = useClearSystemMessages();
-  return [messages, { addMessage, removeMessage, clearMessages }];
+  return [systemMessages, { addMessage, removeMessage, clearMessages }];
 };

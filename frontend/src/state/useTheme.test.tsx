@@ -5,10 +5,10 @@ import {
   useThemeState,
   useUpdateBodyBackgroundColor,
 } from "./useTheme";
-import { RecoilRoot } from "recoil";
+import { AppProvider } from "./AppContext";
 import { describe, it, expect } from "vitest";
 
-const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
+const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
 
 describe("useTheme", () => {
   it('returnerer theme og defaulter til "light"', () => {

@@ -1,29 +1,19 @@
-import { atom, selector, useRecoilState, useRecoilValue } from "recoil";
 import { useEffect } from "react";
+import { useAppContext, Theme } from "./AppContext";
 
-export type Theme = "light" | "dark";
+export type { Theme } from "./AppContext";
 
-const storage: Storage = localStorage;
+export const useTheme = (): Theme => {
+  const { theme } = useAppContext();
+  return theme;
+};
 
-const themeState = atom<Theme>({
-  key: "themeState",
-  default: (storage.getItem("theme") as Theme) ?? "light",
-});
+export const useThemeState = (): [Theme, (theme: Theme) => void] => {
+  const { theme, setTheme } = useAppContext();
+  return [theme, setTheme];
+};
 
-const derivedTheme = selector<Theme>({
-  key: "derivedTheme",
-  get: ({ get }) => get(themeState),
-  set: ({ set }, newValue) => {
-    storage.setItem("theme", newValue as string);
-    set(themeState, newValue);
-  },
-});
-
-export const useTheme = (): Theme => useRecoilValue(derivedTheme);
-
-export const useThemeState = () => useRecoilState<Theme>(derivedTheme);
-
-export const useUpdateBodyBackgroundColor = (theme) => {
+export const useUpdateBodyBackgroundColor = (theme: Theme) => {
   useEffect(() => {
     document.body.style.setProperty(
       "--body-background-color",

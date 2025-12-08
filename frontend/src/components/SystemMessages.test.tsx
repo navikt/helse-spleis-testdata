@@ -1,8 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { RecoilRoot } from "recoil";
+import { AppProvider } from "../state/AppContext";
 import { SystemMessages } from "./SystemMessages";
-import { systemMessagesState } from "../state/useSystemMessages";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 
@@ -17,15 +16,13 @@ vi.mock("react-spring", () => ({
 }));
 
 const wrapper = ({ children }) => (
-  <RecoilRoot
-    initializeState={({ set }) => {
-      set(systemMessagesState, [
-        { id: "en-melding", text: "En melding", dismissable: true },
-      ]);
-    }}
+  <AppProvider
+    initialMessages={[
+      { id: "en-melding", text: "En melding", dismissable: true },
+    ]}
   >
     {children}
-  </RecoilRoot>
+  </AppProvider>
 );
 
 describe("SystemMessages", () => {

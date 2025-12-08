@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { ThemeButton } from "./ThemeButton";
-import { RecoilRoot } from "recoil";
+import { AppProvider } from "../state/AppContext";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect } from "vitest";
 
-const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
+const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
 
 describe("ThemeButton", () => {
   it("toggler theme", async () => {

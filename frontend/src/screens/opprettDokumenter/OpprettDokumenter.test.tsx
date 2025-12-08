@@ -1,7 +1,7 @@
 import React from "react";
 import {render, screen, waitFor, fireEvent} from "@testing-library/react";
 import { OpprettDokumenter } from "./OpprettDokumenter";
-import { RecoilRoot } from "recoil";
+import { AppProvider } from "../../state/AppContext";
 import userEvent from "@testing-library/user-event";
 import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
 
@@ -20,7 +20,7 @@ global.fetch = vi.fn();
 const mockFetchResponse = (body: object) =>
   (fetch as Mock).mockImplementationOnce(() => Promise.resolve(body));
 
-const wrapper = ({ children }) => <RecoilRoot>{children}</RecoilRoot>;
+const wrapper = ({ children }) => <AppProvider>{children}</AppProvider>;
 describe("OpprettDokumenter", () => {
   beforeEach(() => {
     vi.clearAllMocks();

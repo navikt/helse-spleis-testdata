@@ -36,16 +36,20 @@ jobs:
         run: export TZ=utc
 
       - name: Install dependencies
-        run: npm --prefix frontend ci
+        run: npm ci
+        working-directory: "frontend"
 
       - name: Test frontend
-        run: npm --prefix frontend run test
+        run: npm run test
+        working-directory: "frontend"
 
       - name: Prune dependencies
-        run: npm --prefix frontend prune --production
+        run: npm prune --production
+        working-directory: "frontend"
 
       - name: Build frontend
-        run: npm --prefix frontend run build
+        run: npm run build
+        working-directory: "frontend"
 
       - name: build docker image
         uses: nais/docker-build-push@v0

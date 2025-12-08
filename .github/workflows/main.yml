@@ -43,10 +43,6 @@ jobs:
         run: npm run test
         working-directory: "frontend"
 
-      - name: Prune dependencies
-        run: npm prune --production
-        working-directory: "frontend"
-
       - name: Build frontend
         run: npm run build
         working-directory: "frontend"

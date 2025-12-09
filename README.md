@@ -37,7 +37,7 @@ Deretter starte backend (se nedenfor) og navigere til `localhost:8080`
 
 ```shell script
 # Kjøre tester
-npx jest
+pnpm run test
 ```
 
 ### Backend

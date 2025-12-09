@@ -14,11 +14,7 @@ const formattedDateString = (date: Date): string =>
   date.toLocaleDateString("nb-NO", { dateStyle: "short" });
 
 export const EndringRefusjon = React.memo(() => {
-  const {
-    register,
-    unregister,
-    formState,
-  } = useFormContext();
+  const { register, unregister, formState } = useFormContext();
 
   const [opphør, setOpphør] = useState<OpphørId[]>([]);
 
@@ -27,7 +23,7 @@ export const EndringRefusjon = React.memo(() => {
   };
 
   const removeEndring = (index: number) => {
-    unregister(`inntektsmelding.endringIRefusjon`)
+    unregister(`inntektsmelding.endringIRefusjon`);
     setOpphør((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
@@ -46,20 +42,26 @@ export const EndringRefusjon = React.memo(() => {
                 label="Dato for endring"
                 errors={formState.errors}
                 defaultValue={formattedDateString(new Date("2021-07-01"))}
-                {...register(`inntektsmelding.endringIRefusjon.${i}.endringsdato`, {
-                  required: "Dato for endring må angis",
-                })}
+                {...register(
+                  `inntektsmelding.endringIRefusjon.${i}.endringsdato`,
+                  {
+                    required: "Dato for endring må angis",
+                  },
+                )}
               />
               <DeleteButton onClick={() => removeEndring(i)} />
             </div>
             <FormInput
-                data-testid={`endringsbeløp${i}`}
-                label="Beløp for endring"
-                errors={formState.errors}
-                {...register(`inntektsmelding.endringIRefusjon.${i}.endringsbeløp`, {
+              data-testid={`endringsbeløp${i}`}
+              label="Beløp for endring"
+              errors={formState.errors}
+              {...register(
+                `inntektsmelding.endringIRefusjon.${i}.endringsbeløp`,
+                {
                   required: "Beløp for endring må angis",
                   validate: validateInntekt,
-                })}
+                },
+              )}
             />
           </div>
         </Card>

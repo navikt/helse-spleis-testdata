@@ -5,7 +5,6 @@ import { Input } from "./Input";
 import { Button } from "./Button";
 import { ErrorMessage } from "./ErrorMessage";
 
-
 interface CopyFieldProps {
   label: string;
   value: string;
@@ -41,7 +40,7 @@ export const CopyField: React.FC<CopyFieldProps> = (props) => {
           className={classNames(
             styles.Button,
             copied && styles.copied,
-            error && styles.error
+            error && styles.error,
           )}
           onClick={copyValueToClipboard}
         >

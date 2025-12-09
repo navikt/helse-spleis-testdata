@@ -9,36 +9,37 @@ import logo from "../../assets/logo.png";
 
 export const Nav = React.memo(() => {
   const [expanded, setExpanded] = useLocalStorageState<boolean>("expanded");
+  const isExpanded = expanded ?? false;
 
   return (
     <nav
       className={classNames(
         styles.Navigation,
-        expanded ? styles.isExpanded : styles.isMinified
+        isExpanded ? styles.isExpanded : styles.isMinified,
       )}
-      aria-expanded={expanded}
+      aria-expanded={isExpanded}
     >
       <ul className={styles.Links}>
         <h1 className={styles.Title}>
           <img className={styles.Logo} src={logo} alt="" />
           <span>Spleis testdata</span>
         </h1>
-        <NavLink to="/" isExpanded={expanded}>
+        <NavLink to="/" isExpanded={isExpanded}>
           <i className={classNames("material-icons", "description")} />
           Opprett dokumenter
         </NavLink>
-        <NavLink to="/inntekt/hent" isExpanded={expanded}>
+        <NavLink to="/inntekt/hent" isExpanded={isExpanded}>
           <i className="material-icons attach_money" />
           Hent inntekt
         </NavLink>
-        <NavLink to="/testgruppe" isExpanded={expanded}>
+        <NavLink to="/testgruppe" isExpanded={isExpanded}>
           <i className="material-icons accessibility" />
           Hent testgruppe
         </NavLink>
       </ul>
       <ExpandButton
-        expanded={expanded}
-        onExpand={() => setExpanded(!expanded)}
+        expanded={isExpanded}
+        onExpand={() => setExpanded(!isExpanded)}
       />
     </nav>
   );

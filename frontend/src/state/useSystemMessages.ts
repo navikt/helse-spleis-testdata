@@ -49,7 +49,7 @@ type UseSystemMessagesResult = [
     addMessage: (message: SystemMessageObject) => void;
     removeMessage: (id: string) => void;
     clearMessages: UseClearSystemMessagesResult;
-  }
+  },
 ];
 
 export const useSystemMessages = (): UseSystemMessagesResult => {

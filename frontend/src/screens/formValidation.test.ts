@@ -6,7 +6,7 @@ import {
   validateOrganisasjonsnummer,
   validateSykdomsgrad,
 } from "./formValidation";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("isNumerical", () => {
   it("returns false when input is not a natural number", () => {
@@ -63,18 +63,28 @@ describe("validateInntekt", () => {
 
 describe("validateOrganisasjonsnummer", () => {
   it("ensures input is a natural number", () => {
-    const feilmeldingNumerisk = "Organisasjonsnummeret må bestå av 9 siffere"
+    const feilmeldingNumerisk = "Organisasjonsnummeret må bestå av 9 siffere";
     expect(validateOrganisasjonsnummer("123456789")).toEqual(true);
-    expect(validateOrganisasjonsnummer("-123123123")).toEqual(feilmeldingNumerisk);
-    expect(validateOrganisasjonsnummer("12345abcde")).toEqual("Organisasjonsnummeret må være numerisk");
-    expect(validateOrganisasjonsnummer("12345.1234")).toEqual(feilmeldingNumerisk);
+    expect(validateOrganisasjonsnummer("-123123123")).toEqual(
+      feilmeldingNumerisk,
+    );
+    expect(validateOrganisasjonsnummer("12345abcde")).toEqual(
+      "Organisasjonsnummeret må være numerisk",
+    );
+    expect(validateOrganisasjonsnummer("12345.1234")).toEqual(
+      feilmeldingNumerisk,
+    );
   });
 
   it("ensures input has 9 digits", () => {
-    const feilmeldingNumerisk = "Organisasjonsnummeret må bestå av 9 siffere"
+    const feilmeldingNumerisk = "Organisasjonsnummeret må bestå av 9 siffere";
     expect(validateOrganisasjonsnummer("123456789")).toEqual(true);
-    expect(validateOrganisasjonsnummer("12345678")).toEqual(feilmeldingNumerisk);
-    expect(validateOrganisasjonsnummer("1234567890")).toEqual(feilmeldingNumerisk);
+    expect(validateOrganisasjonsnummer("12345678")).toEqual(
+      feilmeldingNumerisk,
+    );
+    expect(validateOrganisasjonsnummer("1234567890")).toEqual(
+      feilmeldingNumerisk,
+    );
   });
 });
 

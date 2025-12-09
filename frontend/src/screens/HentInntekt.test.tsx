@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { HentInntekt } from "./HentInntekt";
 import userEvent from "@testing-library/user-event";
-import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 
 vi.mock("../io/environment", () => ({
   Environment: {
@@ -17,13 +17,13 @@ const mockFetchSuccess = () => {
     Promise.resolve({
       status: 204,
       json: () => Promise.resolve({ beregnetMånedsinntekt: 54321 }),
-    } as Response)
+    } as Response),
   );
 };
 
 const mockFetchError = () => {
   (fetch as Mock).mockImplementationOnce(() =>
-    Promise.resolve({ status: 404 } as Response)
+    Promise.resolve({ status: 404 } as Response),
   );
 };
 

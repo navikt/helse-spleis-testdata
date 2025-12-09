@@ -9,13 +9,13 @@ enum MessageType {
 
 type UseSubscribeResult = [
   subscribeFunction: (fødselsnummer: string) => void,
-  tilstand: string
+  tilstand: string,
 ];
 
 type Message = {
   type: MessageType;
   verdi: string;
-}
+};
 
 export const useSubscribe = (): UseSubscribeResult => {
   const [data, setData] = useState<{ fødselsnummer: string; key: string }>();
@@ -24,28 +24,28 @@ export const useSubscribe = (): UseSubscribeResult => {
   const addMessage = useAddSystemMessage();
 
   useEffect(() => {
-    if (!data?.fødselsnummer) return
-    const eventSource = new EventSource(`/sse/${data.fødselsnummer}`)
-    console.log(`eventSource opprettet: ${eventSource.url}`)
-    setEventSource(eventSource)
+    if (!data?.fødselsnummer) return;
+    const eventSource = new EventSource(`/sse/${data.fødselsnummer}`);
+    console.log(`eventSource opprettet: ${eventSource.url}`);
+    setEventSource(eventSource);
 
-    eventSource.addEventListener('open', () => {
+    eventSource.addEventListener("open", () => {
       console.log(`mottar meldinger for ${data.fødselsnummer}`);
-    })
-    eventSource.addEventListener('error', () => {
+    });
+    eventSource.addEventListener("error", () => {
       console.log(`feil på tilkobling for ${data.fødselsnummer}`);
-    })
+    });
 
     return () => {
       console.log("lukker eventSource " + eventSource.url);
       eventSource.close();
     };
-  }, [data?.fødselsnummer])
+  }, [data?.fødselsnummer]);
 
   useEffect(() => {
     if (!eventSource) return;
-    console.log('registrerer lyttere for tilstandsendring')
-    eventSource.addEventListener('tilstandsendring', (event) => {
+    console.log("registrerer lyttere for tilstandsendring");
+    eventSource.addEventListener("tilstandsendring", (event) => {
       const message: Message = JSON.parse(event.data);
       switch (message.type) {
         case MessageType.Endring: {
@@ -71,10 +71,10 @@ export const useSubscribe = (): UseSubscribeResult => {
         }
       }
     });
-    }, [eventSource?.url]);
+  }, [eventSource?.url]);
 
   return [
     (fødselsnummer: string) => setData({ fødselsnummer, key: nanoid() }),
-    tilstand,
+    tilstand ?? "",
   ];
 };

@@ -6,11 +6,12 @@ import { Text } from "./Text";
 
 export const SystemMessageInitializationError = () =>
   Error(
-    "Kan ikke opprette systemmelding som hverken lukkes automatisk eller kan lukkes av bruker"
+    "Kan ikke opprette systemmelding som hverken lukkes automatisk eller kan lukkes av bruker",
   );
 
 interface SystemMessageProps
-  extends SystemMessageObject,
+  extends
+    SystemMessageObject,
     Omit<React.HTMLAttributes<HTMLDivElement>, "id"> {}
 
 export const SystemMessage = React.forwardRef<

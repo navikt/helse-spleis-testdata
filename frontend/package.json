@@ -11,6 +11,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "tsc": "tsc",
     "start": "vite",
     "dev": "vite --host",
     "build": "vite build",
@@ -25,15 +26,15 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.7.0",
-    "jsdom": "^25.0.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "jsdom": "^27.2.0",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
-    "vite": "^6.4.1",
-    "vitest": "^2.1.9"
+    "vite": "^7.2.6",
+    "classnames": "^2.5.1",
+    "vitest": "^4.0.14"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
     "material-design-icons-iconfont": "^6.7.0",
     "nanoid": "^5.1.6",

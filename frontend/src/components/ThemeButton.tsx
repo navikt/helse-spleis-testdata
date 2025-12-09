@@ -3,8 +3,7 @@ import classNames from "classnames";
 import { useThemeState } from "../state/useTheme";
 import React from "react";
 
-interface ThemeButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ThemeButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export const ThemeButton: React.FC<ThemeButtonProps> = ({
   className,

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { FormInput } from "./FormInput";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("FormInput", () => {
   it("viser ikke feilmelding når det ikke finnes feil", () => {
@@ -16,7 +16,7 @@ describe("FormInput", () => {
         label="En label"
         name="input"
         errors={{ input: { type: "required", message: "En feilmelding" } }}
-      />
+      />,
     );
 
     expect(screen.queryByText("En feilmelding")).toBeVisible();

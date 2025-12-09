@@ -21,7 +21,7 @@ export const Arbeidsgiverperioder = React.memo(() => {
   };
 
   const removeArbeidsgiverperiode = (index: number) => {
-    unregister(`inntektsmelding.arbeidsgiverperiode`)
+    unregister(`inntektsmelding.arbeidsgiverperiode`);
     setPerioder((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 

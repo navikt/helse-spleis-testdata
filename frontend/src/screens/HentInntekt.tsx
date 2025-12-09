@@ -9,10 +9,6 @@ import { FetchButton } from "../components/FetchButton";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { validateFødselsnummer } from "./formValidation";
 
-type HentInntektResponse = {
-  beregnetMånedsinntekt: number;
-};
-
 export const HentInntekt = React.memo(() => {
   const {
     register,
@@ -32,7 +28,7 @@ export const HentInntekt = React.memo(() => {
         setInntekt(beregnetMånedsinntekt);
         setStatus(response.status);
       })
-      .catch((error) => setStatus(404))
+      .catch((_) => setStatus(404))
       .finally(() => setIsFetching(false));
   };
 
@@ -44,7 +40,6 @@ export const HentInntekt = React.memo(() => {
           <div className={styles.CardContainer}>
             <FormInput
               id="fnr"
-              name="fnr"
               label="Fødselsnummer"
               errors={errors}
               {...register("fnr", {
@@ -55,7 +50,7 @@ export const HentInntekt = React.memo(() => {
             <FetchButton status={status} isFetching={isFetching}>
               Hent inntekt
             </FetchButton>
-            {status >= 400 && (
+            {typeof status === "number" && status >= 400 && (
               <ErrorMessage>Kunne ikke hente inntekt</ErrorMessage>
             )}
           </div>

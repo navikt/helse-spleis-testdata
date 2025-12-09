@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { AppProvider } from "../state/AppContext";
 import { SystemMessages } from "./SystemMessages";
 import userEvent from "@testing-library/user-event";
-import { vi, describe, it, expect } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("react-spring", () => ({
   animated: {
@@ -30,7 +30,9 @@ describe("SystemMessages", () => {
     render(<SystemMessages />, { wrapper });
     expect(screen.queryByText("En melding")).toBeVisible();
 
-    await userEvent.click(screen.getByRole("button", { name: /Fjern alle meldinger/ }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /Fjern alle meldinger/ }),
+    );
     expect(screen.queryByText("En melding")).toBeNull();
   });
 });

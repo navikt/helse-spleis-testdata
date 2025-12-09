@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Checkbox } from "./Checkbox";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("Checkbox", () => {
   it("viser ikke feilmelding når det ikke finnes feil", () => {
@@ -17,7 +17,7 @@ describe("Checkbox", () => {
         name="checkbox"
         id="checkbox"
         errors={{ checkbox: { type: "required", message: "En feilmelding" } }}
-      />
+      />,
     );
 
     expect(screen.getByText("En feilmelding")).toBeVisible();

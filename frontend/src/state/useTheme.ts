@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAppContext, Theme } from "./AppContext";
+import { Theme, useAppContext } from "./AppContext";
 
 export type { Theme } from "./AppContext";
 
@@ -17,7 +17,7 @@ export const useUpdateBodyBackgroundColor = (theme: Theme) => {
   useEffect(() => {
     document.body.style.setProperty(
       "--body-background-color",
-      theme === "light" ? "white" : "black"
+      theme === "light" ? "white" : "black",
     );
   }, [theme]);
 };

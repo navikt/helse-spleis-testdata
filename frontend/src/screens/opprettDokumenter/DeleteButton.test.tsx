@@ -6,7 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { validateFødselsnummer } from "../formValidation";
 import { FormInput } from "../../components/FormInput";
 import { AppProvider } from "../../state/AppContext";
-import { vi, Mock, describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 
 vi.mock("../../io/environment", () => ({
   Environment: {
@@ -18,13 +18,13 @@ global.fetch = vi.fn();
 
 const mockFetchSuccess = () => {
   (fetch as Mock).mockImplementationOnce(() =>
-    Promise.resolve({ status: 200 } as Response)
+    Promise.resolve({ status: 200 } as Response),
   );
 };
 
 const mockFetchError = () => {
   (fetch as Mock).mockImplementationOnce(() =>
-    Promise.resolve({ status: 500 } as Response)
+    Promise.resolve({ status: 500 } as Response),
   );
 };
 
@@ -68,7 +68,7 @@ describe("DeleteButton", () => {
   it("viser feilmelding om sletting feiler", async () => {
     mockFetchError();
     let errorCallbackWasCalled = false;
-    const errorCallback = (value) => {
+    const errorCallback = (value: string | null) => {
       if (value == null) return;
       errorCallbackWasCalled = true;
       expect(value).toBe("Sletting av person feilet");

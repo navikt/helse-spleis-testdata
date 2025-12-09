@@ -1,14 +1,16 @@
-import React, {act, ReactNode} from "react";
+import React, { act, ReactNode } from "react";
 import {
   useTheme,
   useThemeState,
   useUpdateBodyBackgroundColor,
 } from "./useTheme";
 import { AppProvider } from "./AppContext";
-import { describe, it, expect } from "vitest";
-import {renderHook} from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "@testing-library/react";
 
-const wrapper = ({ children }: { children: ReactNode }) => <AppProvider>{children}</AppProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <AppProvider>{children}</AppProvider>
+);
 
 describe("useTheme", () => {
   it('returnerer theme og defaulter til "light"', () => {

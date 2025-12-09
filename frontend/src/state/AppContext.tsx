@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -6,7 +6,9 @@ interface AppState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   systemMessages: SystemMessageObject[];
-  setSystemMessages: React.Dispatch<React.SetStateAction<SystemMessageObject[]>>;
+  setSystemMessages: React.Dispatch<
+    React.SetStateAction<SystemMessageObject[]>
+  >;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -27,7 +29,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({
     return (localStorage.getItem("theme") as Theme) ?? "light";
   });
 
-  const [systemMessages, setSystemMessages] = useState<SystemMessageObject[]>(initialMessages);
+  const [systemMessages, setSystemMessages] =
+    useState<SystemMessageObject[]>(initialMessages);
 
   const setTheme = (newTheme: Theme) => {
     localStorage.setItem("theme", newTheme);
@@ -55,4 +58,3 @@ export const useAppContext = (): AppState => {
   }
   return context;
 };
-

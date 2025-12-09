@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { CopyField } from "./CopyField";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const mockNavigatorClipboard = (onWrite: (text: string) => void) => {
   Object.assign(navigator, {
@@ -14,7 +14,7 @@ const mockNavigatorClipboard = (onWrite: (text: string) => void) => {
 
 describe("CopyField", () => {
   it("kopierer verdien i input-feltet til utklippstavlen", async () => {
-    let copiedValue: string;
+    let copiedValue: string = "";
 
     mockNavigatorClipboard((text: string) => (copiedValue = text));
 

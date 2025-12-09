@@ -8,23 +8,23 @@ import { ClearMessagesButton } from "./ClearMessagesButton";
 
 type UseSystemMessageTransitionsResult = [
   TransitionFn<SystemMessageObject, { opacity: number; height: number }>,
-  WeakMap<object, HTMLElement>
+  WeakMap<object, HTMLElement>,
 ];
 
 const useSystemMessageTransitions = (
-  messages: SystemMessageObject[]
+  messages: SystemMessageObject[],
 ): UseSystemMessageTransitionsResult => {
   const refs = useMemo(() => new WeakMap(), []);
 
   const transitions = useTransition(messages, {
     keys: (item) => item.id,
     from: { opacity: 0, height: 0 },
-    enter: (item) => async (start, stop) => {
+    enter: (item) => async (start, _) => {
       await start({ opacity: 1, height: refs.get(item).offsetHeight });
     },
     leave: [{ opacity: 0 }, { height: 0 }],
     onRest: (result, _spring, item) => {
-      result.finished && refs.delete(item);
+      if (item && result.finished) refs.delete(item);
     },
   });
 
@@ -43,7 +43,12 @@ export const SystemMessages: React.FC = React.memo(() => {
           <animated.div
             style={{ ...style, marginBottom: "var(--block-extra-small)" }}
           >
-            <SystemMessage ref={(ref) => ref && refs.set(it, ref)} {...it} />
+            <SystemMessage
+              ref={(ref) => {
+                if (ref) refs.set(it, ref);
+              }}
+              {...it}
+            />
           </animated.div>
         ))}
       </div>

@@ -10,8 +10,7 @@ const error = (status?: number): boolean =>
 const success = (status?: number): boolean =>
   status !== undefined && status !== null && status < 400;
 
-interface FetchButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface FetchButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isFetching: boolean;
   status?: number;
 }
@@ -29,7 +28,7 @@ export const FetchButton: React.FC<FetchButtonProps> = ({
       isFetching && styles.isFetching,
       success(status) && styles.success,
       error(status) && styles.error,
-      className
+      className,
     )}
     {...rest}
   >
@@ -41,7 +40,10 @@ export const FetchButton: React.FC<FetchButtonProps> = ({
       />
     )}
     {error(status) && (
-      <i className={classNames(styles.Icon, "material-icons error")} data-testid="error" />
+      <i
+        className={classNames(styles.Icon, "material-icons error")}
+        data-testid="error"
+      />
     )}
     {isFetching && <Spinner />}
   </Button>

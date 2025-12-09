@@ -11,21 +11,20 @@ import { FetchButton } from "../components/FetchButton";
 import { get } from "../io/api";
 import { ErrorMessage } from "../components/ErrorMessage";
 
-interface DollyTestProps {
-}
+interface DollyTestProps {}
 
 export const HentTestgruppe: React.FC<DollyTestProps> = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
   const [status, setStatus] = useState<number>();
   const [isFetching, setIsFetching] = useState(false);
 
   const onSubmit = (data: Record<string, any>) => {
-    setStatus(null);
+    setStatus(undefined);
     setIsFetching(true);
     get(`/gruppe/${data.gruppeId}`)
       .then((response) => setStatus(response.status))
@@ -41,19 +40,20 @@ export const HentTestgruppe: React.FC<DollyTestProps> = () => {
           <div className={styles.CardContainer}>
             <FormInput
               id="gruppeId"
-              name="gruppeId"
               label="Gruppe-ID"
               errors={errors}
               {...register("gruppeId", {
                 required: "Gruppe-ID må fylles ut",
-                validate: validateGruppeId
+                validate: validateGruppeId,
               })}
             />
             <FetchButton status={status} isFetching={isFetching}>
               Hent gruppe
             </FetchButton>
             {typeof status === "number" && status > 400 && (
-              <ErrorMessage>Det skjedde en feil. Prøv igjen senere.</ErrorMessage>
+              <ErrorMessage>
+                Det skjedde en feil. Prøv igjen senere.
+              </ErrorMessage>
             )}
           </div>
         </Card>

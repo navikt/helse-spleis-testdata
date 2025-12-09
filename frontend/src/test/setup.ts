@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { vi, beforeEach } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 // Mock console.error to reduce noise in tests
 Object.assign(console, {
@@ -10,4 +10,3 @@ Object.assign(console, {
 beforeEach(() => {
   localStorage.clear();
 });
-

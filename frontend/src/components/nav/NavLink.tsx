@@ -17,7 +17,7 @@ export const NavLink: React.FC<PropsWithChildren<NavLinkProps>> = ({
     <li
       className={classNames(
         styles.Link,
-        isExpanded ? styles.isExpanded : styles.isMinified
+        isExpanded ? styles.isExpanded : styles.isMinified,
       )}
     >
       <Link to={to} end>

@@ -1,4 +1,4 @@
-import {ArbeidssituasjonDTO} from "../utils/types";
+import { ArbeidssituasjonDTO } from "../utils/types";
 
 export interface PeriodeDTO {
   fom: string;
@@ -13,7 +13,7 @@ export interface FellesDTO {
   orgnummer: string;
   sykdomFom: string;
   sykdomTom: string;
-  arbeidssituasjon: ArbeidssituasjonDTO,
+  arbeidssituasjon: ArbeidssituasjonDTO;
 }
 
 export interface SykmeldingDTO {
@@ -29,12 +29,12 @@ export interface SøknadDTO extends SykmeldingDTO {
   sendtNav?: string;
   sendtArbeidsgiver?: string;
   arbeidGjenopptatt?: string;
-  tidligereArbeidsgiverOrgnummer?: string;
-  inntektFraSigrun?: number;
-  ventetidFom?: string;
-  ventetidTom?: string;
-  fraværFørSykmeldingen?: boolean;
-  harBrukerOppgittForsikring?: boolean;
+  tidligereArbeidsgiverOrgnummer?: string | null;
+  inntektFraSigrun?: number | null;
+  ventetidFom?: string | null;
+  ventetidTom?: string | null;
+  fraværFørSykmeldingen?: boolean | null;
+  harBrukerOppgittForsikring?: boolean | null;
 }
 
 export interface InntektsmeldingDTO {
@@ -45,7 +45,7 @@ export interface InntektsmeldingDTO {
   førsteFraværsdag?: string;
   refusjon: RefusjonDto;
   begrunnelseForReduksjonEllerIkkeUtbetalt: string;
-  harOpphørAvNaturalytelser: boolean
+  harOpphørAvNaturalytelser: boolean;
 }
 
 export interface RefusjonDto {
@@ -57,7 +57,7 @@ export interface InntektFraNyttArbeidsforholdDto {
   datoFom: string;
   datoTom?: string;
   belopPerDag: number;
-  arbeidsstedOrgnummer: string,
+  arbeidsstedOrgnummer: string;
 }
 
 export interface EndringIRefusjonDto {

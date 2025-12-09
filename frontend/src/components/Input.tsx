@@ -11,5 +11,5 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       {...rest}
       ref={ref}
     />
-  )
+  ),
 );

@@ -18,7 +18,7 @@ export const ExpandButton: React.FC<ExpandButtonProps> = ({
       className={classNames(
         styles.ExpandButton,
         expanded ? styles.expanded : styles.minified,
-        className
+        className,
       )}
       onClick={onExpand}
       {...rest}

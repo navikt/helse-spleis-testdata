@@ -12,24 +12,28 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ id, name, label, errors, className, disabled, ...rest }, ref) => {
-
     return (
       <InputLabel className={classNames(styles.Label, className)}>
         <input
           type="checkbox"
           id={id}
           name={name}
-          className={classNames(styles.Checkbox, disabled ? styles.disabled : "")}
+          className={classNames(
+            styles.Checkbox,
+            disabled ? styles.disabled : "",
+          )}
           ref={ref}
           {...rest}
         />
         <div>
           {label}
-          {errors?.[name] && (
-            <ErrorMessage label-for={id}>{errors[name].message}</ErrorMessage>
+          {name && errors?.[name] && (
+            <ErrorMessage label-for={id}>
+              {errors[name].message as string}
+            </ErrorMessage>
           )}
         </div>
       </InputLabel>
     );
-  }
+  },
 );

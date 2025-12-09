@@ -24,9 +24,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             typeof option === "object" ? (option as Option).label : option;
           const value =
             typeof option === "object" ? (option as Option).value : option;
-          return <option value={value} key={index}>{label}</option>;
+          return (
+            <option value={value} key={index}>
+              {label}
+            </option>
+          );
         })}
       </select>
     );
-  }
+  },
 );

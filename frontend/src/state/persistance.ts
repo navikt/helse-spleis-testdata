@@ -1,16 +1,19 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 type UsePersistedStateResult<T> = [
-  value: T,
-  set: Dispatch<SetStateAction<T>>,
-  clear: () => void
+  value: T | null,
+  set: Dispatch<SetStateAction<T | null>>,
+  clear: () => void,
 ];
 
 const usePersistedState = <T extends unknown>(
   storage: Storage,
-  key: string
+  key: string,
 ): UsePersistedStateResult<T> => {
-  const [value, setValue] = useState<T>(JSON.parse(storage.getItem(key)));
+  const [value, setValue] = useState<T | null>(() => {
+    const item = storage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  });
 
   const clearValue = () => {
     storage.removeItem(key);
@@ -25,5 +28,5 @@ const usePersistedState = <T extends unknown>(
 };
 
 export const useLocalStorageState = <T extends unknown>(
-  key: string
+  key: string,
 ): UsePersistedStateResult<T> => usePersistedState(localStorage, key);

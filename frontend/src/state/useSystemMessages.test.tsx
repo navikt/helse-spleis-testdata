@@ -1,15 +1,17 @@
-import React, {act, ReactNode} from "react";
+import React, { act, ReactNode } from "react";
 import { useSystemMessages } from "./useSystemMessages";
 import { AppProvider } from "./AppContext";
-import { describe, it, expect } from "vitest";
-import {renderHook} from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { renderHook } from "@testing-library/react";
 
-const wrapper = ({ children }: { children: ReactNode }) => <AppProvider>{children}</AppProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <AppProvider>{children}</AppProvider>
+);
 
 describe("useSystemMessages", () => {
   it("legger til melding", () => {
     const { result } = renderHook(() => useSystemMessages(), { wrapper });
-    const [messages, { addMessage, removeMessage }] = result.current;
+    const [messages, { addMessage }] = result.current;
 
     expect(messages).toHaveLength(0);
 

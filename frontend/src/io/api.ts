@@ -8,7 +8,7 @@ const baseUrl: string =
 export const post = (
   path: string,
   body?: any,
-  headers?: Headers
+  headers?: Headers,
 ): Promise<Response> => {
   return fetch(`${baseUrl}${path}`, {
     method: "post",

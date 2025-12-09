@@ -3,8 +3,7 @@ import styles from "./DeleteButton.module.css";
 import React from "react";
 import classNames from "classnames";
 
-interface DeleteButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface DeleteButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export const DeleteButton: React.FC<DeleteButtonProps> = ({
   className,
@@ -12,7 +11,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   ...rest
 }) => (
   <button className={classNames(styles.DeleteButton, className)} {...rest}>
-      <i className="material-icons delete_forever" />
+    <i className="material-icons delete_forever" />
     {children}
   </button>
 );

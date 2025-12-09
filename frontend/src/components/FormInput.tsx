@@ -5,8 +5,6 @@ import { ErrorMessage } from "./ErrorMessage";
 import type { FieldErrors } from "react-hook-form";
 import classNames from "classnames";
 import { nanoid } from "nanoid";
-import {Simulate} from "react-dom/test-utils";
-import input = Simulate.input;
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -16,10 +14,8 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   ({ name, label, type, errors, ...rest }, ref) => {
     const id = nanoid();
-    var inputErrors = errors
-    name.split('.').forEach(it => {
-        if (inputErrors) inputErrors = inputErrors[it]
-    })
+    const errorMessage = getErrorMessage(name, errors);
+
     return (
       <InputLabel>
         {label}
@@ -27,15 +23,39 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           id={id}
           name={name}
           type={type ?? "text"}
-          className={classNames(inputErrors && "error")}
-          aria-invalid={inputErrors ? "true" : "false"}
+          className={classNames(errorMessage != undefined && "error")}
+          aria-invalid={errorMessage != undefined ? "true" : "false"}
           {...rest}
           ref={ref}
         />
-        {inputErrors && (
-          <ErrorMessage label-for={id}>{inputErrors.message}</ErrorMessage>
+        {errorMessage && (
+          <ErrorMessage label-for={id}>{errorMessage}</ErrorMessage>
         )}
       </InputLabel>
     );
-  }
+  },
 );
+
+function getErrorMessage(
+  name: string | undefined,
+  errors: FieldErrors | undefined,
+): string | undefined {
+  if (!name || !errors) return undefined;
+
+  const path = name.split(".");
+  let current: unknown = errors;
+
+  for (const key of path) {
+    if (current && typeof current === "object" && key in current) {
+      current = (current as Record<string, unknown>)[key];
+    } else {
+      return undefined;
+    }
+  }
+
+  if (current && typeof current === "object" && "message" in current) {
+    return (current as { message?: string }).message;
+  }
+
+  return undefined;
+}

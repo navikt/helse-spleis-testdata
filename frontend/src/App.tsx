@@ -1,5 +1,5 @@
 import React from "react";
-import {Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import classNames from "classnames";
 
 import { useTheme, useUpdateBodyBackgroundColor } from "./state/useTheme";
@@ -23,12 +23,15 @@ export const App = () => {
     <div className={classNames(styles.App, styles[theme])}>
       <Nav />
       <Routes>
-        <Route path="/" element={
-          <div className={styles.OpprettDokumenterContainer}>
-            <OpprettDokumenter />
-            <AppStatus />
-          </div>
-        } />
+        <Route
+          path="/"
+          element={
+            <div className={styles.OpprettDokumenterContainer}>
+              <OpprettDokumenter />
+              <AppStatus />
+            </div>
+          }
+        />
         <Route path="/inntekt/hent" element={<HentInntekt />} />
         <Route path="/testgruppe" element={<HentTestgruppe />} />
       </Routes>

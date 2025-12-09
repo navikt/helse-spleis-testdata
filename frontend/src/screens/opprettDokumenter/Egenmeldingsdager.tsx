@@ -6,13 +6,9 @@ import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import format from "date-fns/format";
-import { subDays } from "date-fns";
+import { format, subDays } from "date-fns";
 
 type DagId = string;
-
-const formattedDateString = (date: Date): string =>
-  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
 
 export const Egenmeldingsdager = React.memo(() => {
   const { watch, register, unregister, formState } = useFormContext();
@@ -32,7 +28,10 @@ export const Egenmeldingsdager = React.memo(() => {
 
   return (
     <>
-      <AddButton onClick={addEgenmeldingsdager} data-testid="egenmeldingsButton">
+      <AddButton
+        onClick={addEgenmeldingsdager}
+        data-testid="egenmeldingsButton"
+      >
         Legg inn egenmeldingsdager
       </AddButton>
       {dager.map((id, i) => (
@@ -43,7 +42,10 @@ export const Egenmeldingsdager = React.memo(() => {
               type="date"
               label="Egenmeldingsdag"
               errors={formState.errors}
-              defaultValue={format(subDays(new Date(sykdomFom ), i+1), "yyyy-MM-dd")}
+              defaultValue={format(
+                subDays(new Date(sykdomFom), i + 1),
+                "yyyy-MM-dd",
+              )}
               {...register(`søknad.egenmeldingsdager.${i}`, {
                 required: "Dato for egenmelding må angis",
               })}

@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { del } from "../../io/api";
 import { Spinner } from "../../components/Spinner";
 import classNames from "classnames";
-import {nanoid} from "nanoid";
-import {useAddSystemMessage} from "../../state/useSystemMessages";
+import { nanoid } from "nanoid";
+import { useAddSystemMessage } from "../../state/useSystemMessages";
 
 const error = (status?: number): boolean =>
   status !== undefined && status !== null && status >= 400;
@@ -16,7 +16,7 @@ const success = (status?: number): boolean =>
 export const DeleteButton = ({
   errorCallback,
 }: {
-  errorCallback: (feilet: string) => void;
+  errorCallback: (feilet: string | null) => void;
 }) => {
   const { getValues } = useFormContext();
   const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -24,8 +24,7 @@ export const DeleteButton = ({
   const addMessage = useAddSystemMessage();
 
   useEffect(() => {
-    if (status !== undefined)
-      setTimeout(() => setStatus(undefined), 3000);
+    if (status !== undefined) setTimeout(() => setStatus(undefined), 3000);
   }, [status]);
 
   const ignorer = (event: React.SyntheticEvent) =>
@@ -35,9 +34,11 @@ export const DeleteButton = ({
 
   const slettPerson = async (event: React.SyntheticEvent) => {
     let fnr = getValues("fnr");
-    if (ignorer(event)) return
+    if (ignorer(event)) return;
     if (fnr.length !== 11) {
-      errorCallback(`Kan ikke slette! ${fnr} er ikke nøyaktig elleve tegn langt!`)
+      errorCallback(
+        `Kan ikke slette! ${fnr} er ikke nøyaktig elleve tegn langt!`,
+      );
       return;
     }
 
@@ -61,8 +62,9 @@ export const DeleteButton = ({
   };
 
   useEffect(() => {
-    if (status != null && status !== 200) errorCallback("Sletting av person feilet")
-    else errorCallback(null)
+    if (status != null && status !== 200)
+      errorCallback("Sletting av person feilet");
+    else errorCallback(null);
   }, [status]);
 
   return (
@@ -71,7 +73,7 @@ export const DeleteButton = ({
       role={"button"}
       className={classNames(
         styles.SlettPersonButton,
-        error(status) && styles.error
+        error(status) && styles.error,
       )}
       onClick={slettPerson}
       onKeyDown={slettPerson}

@@ -15,14 +15,6 @@ updates:
     schedule:
       interval: "daily"
 
-  # Maintain dependencies for docker
-  - package-ecosystem: "docker"
-    directory: "/"
-    commit-message:
-      prefix: "⬆ "
-    schedule:
-      interval: "daily"
-
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
     directory: "/frontend"

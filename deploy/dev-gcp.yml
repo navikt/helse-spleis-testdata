@@ -26,8 +26,6 @@ spec:
   ingresses:
     - https://spleis-testdata.intern.dev.nav.no
     - https://spleis-testdata.ansatt.dev.nav.no
-  secureLogs:
-    enabled: true
   azure:
     application:
       enabled: true

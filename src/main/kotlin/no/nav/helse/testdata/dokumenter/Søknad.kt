@@ -16,8 +16,6 @@ data class Søknad(
     val arbeidGjenopptatt: LocalDate? = null,
     val tidligereArbeidsgiverOrgnummer: String? = null,
     val inntektFraSigrun: Int? = null,
-    val ventetidFom: LocalDate? = null,
-    val ventetidTom: LocalDate? = null,
     val fraværFørSykmeldingen: Boolean? = null,
     val harBrukerOppgittForsikring: Boolean? = null,
     val meldingTilNavDagerFraSykmelding: Periode? = null
@@ -90,22 +88,16 @@ fun søknad(
 }
 
 private fun Vedtak.somSelvstendigNæringsdrivende() =
-    if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE", "JORDBRUKER") &&
-        søknad?.ventetidFom != null &&
-        søknad.ventetidTom != null)
+    if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE", "JORDBRUKER"))
     {
         """{
             "hovedSporsmalSvar": {
-             ${if (søknad.fraværFørSykmeldingen != null) {
+             ${if (søknad?.fraværFørSykmeldingen != null) {
                 "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen
              } else { "" }
         }
             },
-            "harBrukerOppgittForsikring": ${søknad.harBrukerOppgittForsikring},
-            "ventetid": {
-                "fom": "${søknad.ventetidFom}",
-                "tom": "${søknad.ventetidTom}"
-            },
+            "harBrukerOppgittForsikring": ${søknad?.harBrukerOppgittForsikring},
             "inntekt": {
                 "norskPersonidentifikator": "${fnr}",
                 "inntektsAar": ${(1..3).map {
@@ -115,7 +107,7 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
                         "pensjonsgivendeInntekt": { 
                             "pensjonsgivendeInntektAvLoennsinntekt": 0,
                             "pensjonsgivendeInntektAvLoennsinntektBarePensjonsdel": 0,
-                            "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad.inntektFraSigrun ?: 0},
+                            "pensjonsgivendeInntektAvNaeringsinntekt": ${søknad?.inntektFraSigrun ?: 0},
                             "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
                         }
                     }"""

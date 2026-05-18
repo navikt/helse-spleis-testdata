@@ -153,8 +153,6 @@ describe("OpprettDokumenter", () => {
               sendtNav: "2021-08-01",
               tidligereArbeidsgiverOrgnummer: null,
               inntektFraSigrun: null,
-              ventetidFom: null,
-              ventetidTom: null,
               fraværFørSykmeldingen: null,
               harBrukerOppgittForsikring: null,
               meldingTilNavDagerFraSykmelding: null,

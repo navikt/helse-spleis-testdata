@@ -105,28 +105,6 @@ export const SøknadCard = React.memo(() => {
                 validate: validateInntekt,
               })}
             />
-            <FormInput
-              data-testid="ventetidFom"
-              label="Ventetid fom"
-              type="date"
-              errors={formState.errors}
-              defaultValue={
-                sykdomFom ? formatDateString(new Date(sykdomFom)) : defaultDate
-              }
-              {...register("søknad.ventetidFom")}
-            />
-            <FormInput
-              data-testid="ventetidTom"
-              label="Ventetid tom"
-              type="date"
-              errors={formState.errors}
-              defaultValue={
-                sykdomFom
-                  ? formatDateString(addDays(new Date(sykdomFom), 15))
-                  : defaultDate
-              }
-              {...register("søknad.ventetidTom")}
-            />
             <FormSelect
               label="Fravær før sykmeldingen"
               options={[{ value: "", label: "Ikke spurt om" }, "Ja", "Nei"]}

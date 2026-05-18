@@ -70,8 +70,6 @@ const createPayload = (
       tidligereArbeidsgiverOrgnummer:
         values.søknad.tidligereArbeidsgiverOrgnummer || null,
       inntektFraSigrun: values.søknad.inntektFraSigrun || null,
-      ventetidFom: values.søknad.ventetidFom || null,
-      ventetidTom: values.søknad.ventetidTom || null,
       fraværFørSykmeldingen: fraværFørSykmeldingen,
       harBrukerOppgittForsikring:
         values.søknad.harBrukerOppgittForsikring || null,

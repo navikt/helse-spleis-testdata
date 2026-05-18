@@ -75,6 +75,14 @@ const createPayload = (
       fraværFørSykmeldingen: fraværFørSykmeldingen,
       harBrukerOppgittForsikring:
         values.søknad.harBrukerOppgittForsikring || null,
+      meldingTilNavDagerFraSykmelding:
+        values.søknad.meldingTilNavDagerFraSykmeldingFom &&
+        values.søknad.meldingTilNavDagerFraSykmeldingTom
+          ? {
+              fom: values.søknad.meldingTilNavDagerFraSykmeldingFom,
+              tom: values.søknad.meldingTilNavDagerFraSykmeldingTom,
+            }
+          : null,
     };
   };
 

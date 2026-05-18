@@ -35,6 +35,7 @@ export interface SøknadDTO extends SykmeldingDTO {
   ventetidTom?: string | null;
   fraværFørSykmeldingen?: boolean | null;
   harBrukerOppgittForsikring?: boolean | null;
+  meldingTilNavDagerFraSykmelding?: PeriodeDTO | null;
 }
 
 export interface InntektsmeldingDTO {

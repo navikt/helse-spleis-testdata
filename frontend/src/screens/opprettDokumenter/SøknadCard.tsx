@@ -144,6 +144,24 @@ export const SøknadCard = React.memo(() => {
               errors={formState.errors}
               {...register("søknad.harBrukerOppgittForsikring")}
             />
+            {skalViseSelvstendigInputs && (
+              <>
+                <FormInput
+                  data-testid="meldingTilNavDagerFraSykmeldingFom"
+                  label="Melding til Nav dager fom"
+                  type="date"
+                  errors={formState.errors}
+                  {...register("søknad.meldingTilNavDagerFraSykmeldingFom")}
+                />
+                <FormInput
+                  data-testid="meldingTilNavDagerFraSykmeldingTom"
+                  label="Melding til Nav dager tom"
+                  type="date"
+                  errors={formState.errors}
+                  {...register("søknad.meldingTilNavDagerFraSykmeldingTom")}
+                />
+              </>
+            )}
           </>
         )}
         <Checkbox

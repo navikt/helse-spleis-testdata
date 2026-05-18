@@ -157,6 +157,7 @@ describe("OpprettDokumenter", () => {
               ventetidTom: null,
               fraværFørSykmeldingen: null,
               harBrukerOppgittForsikring: null,
+              meldingTilNavDagerFraSykmelding: null,
             },
             inntektsmelding: {
               inntekt: "54321",
@@ -257,6 +258,112 @@ describe("OpprettDokumenter", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("førsteFraværsdag")).toHaveValue("2021-07-31");
+    });
+  });
+
+  it("viser meldingTilNavDagerFraSykmelding-felter kun for SELVSTENDIG_NARINGSDRIVENDE", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    // Skal ikke vises for ARBEIDSTAKER (default)
+    expect(
+      screen.queryByTestId("meldingTilNavDagerFraSykmeldingFom"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("meldingTilNavDagerFraSykmeldingTom"),
+    ).not.toBeInTheDocument();
+
+    // Bytt til SELVSTENDIG_NARINGSDRIVENDE
+    fireEvent.change(
+      screen.getAllByRole("combobox")[0],
+      { target: { value: "SELVSTENDIG_NARINGSDRIVENDE" } },
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("meldingTilNavDagerFraSykmeldingFom"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId("meldingTilNavDagerFraSykmeldingTom"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("sender meldingTilNavDagerFraSykmelding som periode når feltene er fylt ut for SELVSTENDIG", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    // Bytt til SELVSTENDIG_NARINGSDRIVENDE FØR fnr skrives inn, slik at
+    // InntektsmeldingCard forsvinner før fetch-kallene trigges
+    fireEvent.change(screen.getAllByRole("combobox")[0], {
+      target: { value: "SELVSTENDIG_NARINGSDRIVENDE" },
+    });
+
+    // Nå er InntektsmeldingCard borte; fnr-typing trigger bare 2 fetches:
+    // 1) person-navn, 2) arbeidsforhold
+    mockPersonNavn();
+    mockFetchResponse({ json: () => ({ arbeidsforhold: [] }) });
+
+    await userEvent.type(screen.getByTestId("fnr"), "11111111111");
+
+    // Fyll inn inntektFraSigrun (påkrevd for SELVSTENDIG)
+    await waitFor(() =>
+      expect(screen.getByLabelText(/Årsinntekt fra Sigrun/)).toBeInTheDocument(),
+    );
+    await userEvent.type(screen.getByLabelText(/Årsinntekt fra Sigrun/), "600000");
+
+    // Fyll inn periodefelter
+    fireEvent.change(screen.getByTestId("meldingTilNavDagerFraSykmeldingFom"), {
+      target: { value: "2021-07-01" },
+    });
+    fireEvent.change(screen.getByTestId("meldingTilNavDagerFraSykmeldingTom"), {
+      target: { value: "2021-07-31" },
+    });
+
+    mockFetchResponse({ status: 200, text: () => vi.fn() });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+
+    await waitFor(() => {
+      const [, lastCall] = (fetch as Mock).mock.calls.slice(-1);
+      expect(lastCall).toBeUndefined(); // fetch was called
+      const body = JSON.parse(
+        ((fetch as Mock).mock.calls.find(
+          ([url]) => url === "http://0.0.0.0:8080/vedtaksperiode",
+        ) ?? [])[1]?.body ?? "{}",
+      );
+      expect(body.søknad?.meldingTilNavDagerFraSykmelding).toEqual({
+        fom: "2021-07-01",
+        tom: "2021-07-31",
+      });
+    });
+  });
+
+  it("sender meldingTilNavDagerFraSykmelding som null når feltene ikke er fylt ut", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    const orgnr = "987654321";
+    mockPersonNavn();
+    mockArbeidsforhold(orgnr);
+    mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr);
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+        "54321",
+      ),
+    );
+
+    mockFetchResponse({ status: 200, text: () => vi.fn() });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+
+    await new Promise((r) => setTimeout(r, 1100));
+
+    await waitFor(() => {
+      const vedtaksperiodeCall = (fetch as Mock).mock.calls.find(
+          ([url]) => url === "http://0.0.0.0:8080/vedtaksperiode",
+      );
+      const body = JSON.parse(vedtaksperiodeCall?.[1]?.body ?? "{}");
+      expect(body.søknad?.meldingTilNavDagerFraSykmelding).toBeNull();
     });
   });
 

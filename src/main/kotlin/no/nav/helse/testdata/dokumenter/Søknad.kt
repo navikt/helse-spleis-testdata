@@ -19,7 +19,8 @@ data class Søknad(
     val ventetidFom: LocalDate? = null,
     val ventetidTom: LocalDate? = null,
     val fraværFørSykmeldingen: Boolean? = null,
-    val harBrukerOppgittForsikring: Boolean? = null
+    val harBrukerOppgittForsikring: Boolean? = null,
+    val meldingTilNavDagerFraSykmelding: Periode? = null
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
@@ -81,6 +82,7 @@ fun søknad(
             ],
             "sporsmal":null,
             "hendelseId":"${UUID.randomUUID()}",
+            "meldingTilNavDagerFraSykmelding":${if (vedtak.arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE", "JORDBRUKER")) søknad.meldingTilNavDagerFraSykmelding?.let {listOf("""{"fom":"${it.fom}","tom":"${it.tom}"}""") } else null},
             "selvstendigNaringsdrivende": ${vedtak.somSelvstendigNæringsdrivende()}
         }
     """

@@ -1,6 +1,10 @@
 package no.nav.helse.testdata.dokumenter
 
 import no.nav.helse.testdata.assertValidJson
+import no.nav.helse.testdata.objectMapper
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 import java.time.LocalDate
@@ -131,5 +135,90 @@ internal class SøknadTest {
         val json = søknad(vedtak)
 
         assertValidJson(json)
+    }
+
+    @Test
+    fun `selvstendig søknad med meldingTilNavDagerFraSykmelding inneholder periode i JSON`() {
+        val fom = mandag
+        val tom = fredag
+        val vedtak = Vedtak(
+            fnr = "11111111111",
+            orgnummer = null,
+            sykdomFom = mandag,
+            sykdomTom = fredag,
+            arbeidssituasjon = "SELVSTENDIG_NARINGSDRIVENDE",
+            søknad = Søknad(
+                sykmeldingsgrad = 100,
+                harAndreInntektskilder = false,
+                sendtNav = fredag,
+                ferieperioder = emptyList(),
+                egenmeldingsdagerFraSykmelding = emptyList(),
+                inntektFraNyttArbeidsforhold = emptyList(),
+                inntektFraSigrun = 600000,
+                meldingTilNavDagerFraSykmelding = Periode(fom, tom)
+            )
+        )
+        val json = søknad(vedtak)!!
+
+        assertValidJson(json)
+        val tree = objectMapper.readTree(json)
+        val meldingTilNav = tree.path("meldingTilNavDagerFraSykmelding")
+        assertFalse(meldingTilNav.isNull, "meldingTilNavDagerFraSykmelding skal ikke være null")
+        assertEquals(1, meldingTilNav.size())
+        assertEquals("$fom", meldingTilNav[0].path("fom").asText())
+        assertEquals("$tom", meldingTilNav[0].path("tom").asText())
+    }
+
+    @Test
+    fun `søknad uten meldingTilNavDagerFraSykmelding er null i JSON`() {
+        val vedtak = Vedtak(
+            fnr = "11111111111",
+            orgnummer = null,
+            sykdomFom = mandag,
+            sykdomTom = fredag,
+            arbeidssituasjon = "SELVSTENDIG_NARINGSDRIVENDE",
+            søknad = Søknad(
+                sykmeldingsgrad = 100,
+                harAndreInntektskilder = false,
+                sendtNav = fredag,
+                ferieperioder = emptyList(),
+                egenmeldingsdagerFraSykmelding = emptyList(),
+                inntektFraNyttArbeidsforhold = emptyList(),
+                inntektFraSigrun = 600000,
+                meldingTilNavDagerFraSykmelding = null
+            )
+        )
+        val json = søknad(vedtak)!!
+
+        assertValidJson(json)
+        val tree = objectMapper.readTree(json)
+        assertTrue(tree.path("meldingTilNavDagerFraSykmelding").isNull,
+            "meldingTilNavDagerFraSykmelding skal være null når den ikke er satt")
+    }
+
+    @Test
+    fun `meldingTilNavDagerFraSykmelding er null i JSON for ARBEIDSTAKER`() {
+        val vedtak = Vedtak(
+            fnr = "fnr",
+            orgnummer = "orgnummer",
+            sykdomFom = mandag,
+            sykdomTom = fredag,
+            arbeidssituasjon = "ARBEIDSTAKER",
+            søknad = Søknad(
+                sykmeldingsgrad = 100,
+                harAndreInntektskilder = false,
+                sendtNav = fredag,
+                ferieperioder = emptyList(),
+                egenmeldingsdagerFraSykmelding = emptyList(),
+                inntektFraNyttArbeidsforhold = emptyList(),
+                meldingTilNavDagerFraSykmelding = Periode(mandag, fredag)
+            )
+        )
+        val json = søknad(vedtak)!!
+
+        assertValidJson(json)
+        val tree = objectMapper.readTree(json)
+        assertTrue(tree.path("meldingTilNavDagerFraSykmelding").isNull,
+            "meldingTilNavDagerFraSykmelding skal være null for ARBEIDSTAKER selv om verdien er satt")
     }
 }

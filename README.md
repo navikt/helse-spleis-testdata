@@ -16,7 +16,7 @@ Oppretter og manipulerer testdata for [spleis](https://www.github.com/navikt/hel
 Frontenden er skrevet i [React](https://reactjs.org) og bygges med [Vite](https://vitejs.dev), og startes fra `frontend`-mappen slik:
 
 ```shell script
-# Installér avhengigheter i package.json:
+# Installer avhengigheter i package.json:
 pnpm install
 
 # Bygg frontenden og start dev-server:

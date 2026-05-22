@@ -5,7 +5,7 @@ import { SystemMessages } from "./SystemMessages";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("react-spring", () => ({
+vi.mock("@react-spring/web", () => ({
   animated: {
     div: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   },

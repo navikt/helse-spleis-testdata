@@ -2,8 +2,8 @@ import React, { useMemo } from "react";
 import styles from "./SystemMessages.module.css";
 import { useSystemMessages } from "../state/useSystemMessages";
 import { SystemMessage } from "./SystemMessage";
-import type { TransitionFn } from "react-spring";
-import { animated, useTransition } from "react-spring";
+import type { TransitionFn } from "@react-spring/web";
+import { animated, useTransition } from "@react-spring/web";
 import { ClearMessagesButton } from "./ClearMessagesButton";
 
 type UseSystemMessageTransitionsResult = [

@@ -4,11 +4,6 @@
 
 Oppretter og manipulerer testdata for [spleis](https://www.github.com/navikt/helse-spleis).
 
-## Kjøretidsavhengigheter
-
-- JDK 17
-- Kafka
-
 ## Kjøre lokalt
 
 ### Frontend

@@ -27,21 +27,21 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "classnames": "^2.5.1",
     "jsdom": "^27.2.0",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "vite": "^7.2.6",
-    "classnames": "^2.5.1",
     "vitest": "^4.0.14"
   },
   "dependencies": {
+    "@react-spring/web": "^10.0.3",
     "date-fns": "^4.1.0",
     "material-design-icons-iconfont": "^6.7.0",
     "nanoid": "^5.1.6",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.68.0",
-    "react-router-dom": "^7.10.1",
-    "react-spring": "^10.0.3"
+    "react-router-dom": "^7.10.1"
   }
 }

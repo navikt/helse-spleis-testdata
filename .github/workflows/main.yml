@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - periodevelger
   schedule:
     - cron: '0 4 * * 3'
       timezone: 'Europe/Oslo'

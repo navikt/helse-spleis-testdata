@@ -111,8 +111,8 @@ const createPayload = (
   return {
     fnr: values.fnr,
     orgnummer: values.orgnummer || null,
-    sykdomFom: values.sykdomFom,
-    sykdomTom: values.sykdomTom,
+    sykdomFom: values.sykdom.fom,
+    sykdomTom: values.sykdom.tom,
     arbeidssituasjon:
       values.skalSendeSykmelding || values.skalSendeSøknad
         ? values.arbeidssituasjon

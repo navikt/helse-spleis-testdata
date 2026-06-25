@@ -24,7 +24,7 @@ export const Egenmeldingsdager = React.memo(() => {
     setDager((old) => [...old.slice(0, index), ...old.slice(index + 1)]);
   };
 
-  const sykdomFom = watch("sykdomFom");
+  const sykdomFom = watch("sykdom.fom");
 
   return (
     <>

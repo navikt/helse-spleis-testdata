@@ -23,8 +23,8 @@ export const InntektFraNyttArbeidsforhold = React.memo(() => {
   const inntekterFraNyeArbeidsforhold = watch(
     "søknad.inntektFraNyttArbeidsforhold",
   );
-  const defaultFom = watch("sykdomFom");
-  const defaultTom = watch("sykdomTom");
+  const defaultFom = watch("sykdom.fom");
+  const defaultTom = watch("sykdom.tom");
 
   const addInntektFraNyttArbeidsforhold = () => {
     setInntektFraNyttArbeidsforhold((old) => [...old, nanoid()]);

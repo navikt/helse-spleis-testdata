@@ -21,8 +21,8 @@ const nextDay = (date: Date): Date => addDays(date, 1);
 export const SøknadCard = React.memo(() => {
   const { watch, register, formState, setValue } = useFormContext();
 
-  const sykdomFom = watch("sykdomFom");
-  const sykdomTom = watch("sykdomTom");
+  const sykdomFom = watch("sykdom.fom");
+  const sykdomTom = watch("sykdom.tom");
   const skalSendeSykmelding = watch("skalSendeSykmelding");
 
   const arbeidssituasjon: ArbeidssituasjonDTO = watch("arbeidssituasjon");
@@ -55,7 +55,6 @@ export const SøknadCard = React.memo(() => {
           />
         )}
         <FormInput
-          data-testid="sendtNav"
           label="Søknad sendt Nav"
           type="date"
           errors={formState.errors}
@@ -82,7 +81,7 @@ export const SøknadCard = React.memo(() => {
               value
                 ? (new Date(sykdomFom) <= new Date(value) &&
                     new Date(sykdomTom) >= new Date(value)) ||
-                  "Arbeid gjenopptatt kan ikke være eldre enn sykdomFom, eller nyere enn sykdomTom"
+                  "Arbeid gjenopptatt må være mellom første og siste dag i perioden"
                 : true,
           })}
         />

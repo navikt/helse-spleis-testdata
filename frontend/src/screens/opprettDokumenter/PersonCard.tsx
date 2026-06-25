@@ -9,8 +9,7 @@ import {
   validateFødselsnummer,
   validateOrganisasjonsnummer,
 } from "../formValidation";
-import { SykdomTom } from "./SykdomTom";
-import { SykdomFom } from "./SykdomFom";
+import { Sykdomsperiode } from "./Sykdomsperiode";
 import { DeleteButton } from "./DeleteButton";
 import { ArbeidssituasjonDTO } from "../../utils/types";
 import { get } from "../../io/api";
@@ -173,8 +172,7 @@ export const PersonCard = ({
             </span>
           </>
         )}
-        <SykdomFom />
-        <SykdomTom />
+        <Sykdomsperiode />
         <FormSelect
           label="Arbeidssituasjon"
           options={[

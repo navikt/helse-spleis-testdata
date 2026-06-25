@@ -4,6 +4,7 @@ import { OpprettDokumenter } from "./OpprettDokumenter";
 import { AppProvider } from "../../state/AppContext";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
+import { format, startOfMonth, subMonths} from "date-fns";
 
 vi.mock("../../io/subscription", () => ({
   useSubscribe: () => [() => {}],
@@ -95,12 +96,13 @@ describe("OpprettDokumenter", () => {
     await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
     await userEvent.type(screen.getByTestId("faktiskgrad"), "80");
-    fireEvent.change(screen.getByTestId("sykdomFom"), {
-      target: { value: "2021-07-01" },
-    });
-    fireEvent.change(screen.getByTestId("sykdomTom"), {
-      target: { value: "2021-07-31" },
-    });
+    const sykdomFraInput = screen.getByLabelText("Sykdom fra");
+    await userEvent.clear(sykdomFraInput);
+    await userEvent.type(sykdomFraInput, "01.07.2021");
+
+    const sykdomTilInput = screen.getByLabelText("Sykdom til");
+    await userEvent.clear(sykdomTilInput);
+    await userEvent.type(sykdomTilInput, "31.07.2021");
 
     await userEvent.clear(screen.getByTestId("refusjonsbeløp"));
     await userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000");
@@ -235,27 +237,42 @@ describe("OpprettDokumenter", () => {
     });
   });
 
-  it("endring av sykdomTom endrer automatisk søknadSendt til sykdomTom + 1", async () => {
+  it("endring av Sykdom til endrer sendtNav til dagen etter", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    fireEvent.change(screen.getByTestId("sykdomTom"), {
-      target: { value: "2021-08-31" },
-    });
+    const target = screen.getByLabelText("Søknad sendt Nav");
+    const nå = new Date();
+
+    // Samme logikk som i produksjonskoden. Kan også bare sjekke at verdien er ulik det vi expecter nederst i testen
+    const dagenEtterForTreMånederSiden = format(startOfMonth(subMonths(nå, 2)), "yyyy-MM-dd");
+    expect(target).toHaveValue(dagenEtterForTreMånederSiden);
+
+    // Sykdom fra må være satt for at til-feltet skal validere ok
+    const sykdomFraInput = screen.getByLabelText("Sykdom fra");
+    await userEvent.clear(sykdomFraInput);
+    await userEvent.type(sykdomFraInput, "01.08.2021");
+
+    const sykdomTilInput = screen.getByLabelText("Sykdom til");
+    await userEvent.clear(sykdomTilInput);
+    await userEvent.type(sykdomTilInput, "31.08.2021");
 
     await waitFor(() => {
-      expect(screen.getByTestId("sendtNav")).toHaveValue("2021-09-01");
+      expect(target).toHaveValue("2021-09-01");
     });
   });
 
-  it("endring av sykdomFom endrer automatisk førsteFraværsdag til sykdomFom", async () => {
+  it("endring av sykdom fra endrer førsteFraværsdag til samme dato", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    fireEvent.change(screen.getByTestId("sykdomFom"), {
-      target: { value: "2021-07-31" },
-    });
+    const target = screen.getByLabelText("Første fraværsdag");
+    expect(target).not.toHaveValue("2021-07-31");
+
+    const sykdomFraInput = screen.getByLabelText("Sykdom fra");
+    await userEvent.clear(sykdomFraInput);
+    await userEvent.type(sykdomFraInput, "31.07.2021");
 
     await waitFor(() => {
-      expect(screen.getByTestId("førsteFraværsdag")).toHaveValue("2021-07-31");
+      expect(target).toHaveValue("2021-07-31");
     });
   });
 

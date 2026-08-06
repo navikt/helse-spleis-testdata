@@ -108,6 +108,7 @@ export const SøknadCard = React.memo(() => {
             <FormSelect
               label="Fravær før sykmeldingen"
               options={[{ value: "", label: "Ikke spurt om" }, "Ja", "Nei"]}
+              defaultValue="Nei"
               {...register("søknad.fraværFørSykmeldingen")}
               onChange={(val) => {
                 const verdi =

@@ -12,7 +12,7 @@ data class Vedtak(
     val arbeidssituasjon: String? = null,
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
-    val inntektsmelding: Inntektsmelding? = null,
+    val arbeidsgiveropplysninger: Arbeidsgiveropplysninger? = null,
     val medlemskapVerdi: String = "JA"
 )
 

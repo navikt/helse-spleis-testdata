@@ -18,7 +18,7 @@ import { ErrorMessage } from "../../components/ErrorMessage";
 
 import type {
   FellesDTO,
-  InntektsmeldingDTO,
+  ArbeidsgiveropplysningerDTO,
   PersonDTO,
   SykmeldingDTO,
   SøknadDTO,
@@ -37,7 +37,7 @@ type OpprettVedtaksperiodePayload = PersonDTO &
 
 type ArbeidsgiverSvarerPayload = PersonDTO &
     FellesDTO & {
-    inntektsmelding?: InntektsmeldingDTO;
+    arbeidsgiveropplysninger: ArbeidsgiveropplysningerDTO;
 };
 
 const createOpprettVedtaksperiodePayload = (
@@ -105,9 +105,11 @@ const createOpprettVedtaksperiodePayload = (
 
 const createArbeidsgiverSvarerPayload = (
     values: Record<string, any>,
-    vedtaksperiodeId: string
+    vedtaksperiodeId: string,
+    forespurt: boolean,
+    aarsakTilEndring: string
 ): ArbeidsgiverSvarerPayload | undefined  => {
-    const inntektsmelding = (): InntektsmeldingDTO => ({
+    const arbeidsgiveropplysninger = (): ArbeidsgiveropplysningerDTO => ({
         inntekt: values.inntektsmelding.inntekt,
         refusjon: {
             opphørRefusjon: values.inntektsmelding.opphørRefusjon || null,
@@ -124,12 +126,11 @@ const createArbeidsgiverSvarerPayload = (
                     beløp: it.endringsbeløp as number,
                 }),
             ) ?? [],
-        førsteFraværsdag: values.inntektsmelding.førsteFraværsdag,
-        begrunnelseForReduksjonEllerIkkeUtbetalt:
-        values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
-        harOpphørAvNaturalytelser:
-            values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
-        vedtaksperiodeId: vedtaksperiodeId
+        begrunnelseForReduksjonEllerIkkeUtbetalt: values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
+        harOpphørAvNaturalytelser: values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
+        vedtaksperiodeId: vedtaksperiodeId,
+        forespurt: forespurt,
+        arsakTilInnsending: aarsakTilEndring,
     });
 
     if (values.arbeidssituasjon !== "ARBEIDSTAKER" || !values.skalSendeInntektsmelding) return undefined
@@ -140,7 +141,7 @@ const createArbeidsgiverSvarerPayload = (
         sykdomFom: values.sykdomFom,
         sykdomTom: values.sykdomTom,
         arbeidssituasjon: values.arbeidssituasjon,
-        inntektsmelding: inntektsmelding()
+        arbeidsgiveropplysninger: arbeidsgiveropplysninger()
     };
 };
 
@@ -192,8 +193,8 @@ export const OpprettDokumenter = React.memo(() => {
         timeToLiveMs: 4000,
       });
       subscribe(data.fnr, async (vedtaksperiodeId: string) => {
-          console.log(`Jeg er en forespørselcallback for vedtaksperiodeId ${vedtaksperiodeId}`);
-          const payload = createArbeidsgiverSvarerPayload(data, vedtaksperiodeId)
+          // Når det er svar på forespørsel er det alltid forespurt true og årsakTilEndring er "Ny"
+          const payload = createArbeidsgiverSvarerPayload(data, vedtaksperiodeId, true, "Ny")
           if (payload == undefined) return
           setIsFetching(true);
           const response = await postArbeidsgiverSvarer(payload);

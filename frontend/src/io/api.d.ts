@@ -36,16 +36,17 @@ export interface SøknadDTO extends SykmeldingDTO {
   meldingTilNavDagerFraSykmelding?: PeriodeDTO | null;
 }
 
-export interface InntektsmeldingDTO {
+export interface ArbeidsgiveropplysningerDTO {
   inntekt: number;
   arbeidsgiverperiode: PeriodeDTO[];
   endringRefusjon: EndringIRefusjonDto[];
   opphørRefusjon?: string;
-  førsteFraværsdag?: string;
   refusjon: RefusjonDto;
   begrunnelseForReduksjonEllerIkkeUtbetalt: string;
   harOpphørAvNaturalytelser: boolean;
   vedtaksperiodeId: string;
+  forespurt: boolean; // false == selvbestemt
+  arsakTilInnsending: string | null; // Ny == forespurt, Endring == korrigerte, null = selvbestemt
 }
 
 export interface RefusjonDto {

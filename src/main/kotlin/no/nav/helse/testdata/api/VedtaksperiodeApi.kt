@@ -8,7 +8,7 @@ import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.post
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.dokumenter.Vedtak
-import no.nav.helse.testdata.dokumenter.inntektsmelding
+import no.nav.helse.testdata.dokumenter.arbeidsgiveropplysninger
 import no.nav.helse.testdata.dokumenter.sykmelding
 import no.nav.helse.testdata.dokumenter.søknad
 import no.nav.helse.testdata.log
@@ -49,9 +49,9 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
             mediator.publiser(fnr, it)
         }
 
-        inntektsmelding(vedtak)?.also {
-            log.info("produserer inntektsmelding, se sikkerlogg/tjenestekall for fnr")
-            sikkerlogg.info("produserer inntektsmelding for fnr=$fnr")
+        arbeidsgiveropplysninger(vedtak)?.also {
+            log.info("produserer arbeidsgiveropplysninger, se sikkerlogg/tjenestekall for fnr")
+            sikkerlogg.info("produserer arbeidsgiveropplysninger for fnr=$fnr")
             mediator.publiser(fnr, it)
         }
 
@@ -69,7 +69,7 @@ private suspend fun RoutingContext.validate(
     if (vedtak.sykdomFom > vedtak.sykdomTom) {
         call.respond(HttpStatusCode.BadRequest, "FOM må være før TOM")
     }
-    vedtak.inntektsmelding?.arbeidsgiverperiode?.map {
+    vedtak.arbeidsgiveropplysninger?.arbeidsgiverperiode?.map {
         val (fom, tom) = it
         if (fom > tom) {
             call.respond(HttpStatusCode.BadRequest, "Arbeidsgiverperioder: FOM $fom må være før TOM $tom")

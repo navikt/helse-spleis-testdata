@@ -7,14 +7,16 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class Inntektsmelding(
+data class Arbeidsgiveropplysninger(
     val inntekt: Double,
     val arbeidsgiverperiode: List<Periode> = emptyList(),
     val endringRefusjon: List<EndringIRefusjon> = emptyList(),
     val refusjon: Refusjon,
-    val førsteFraværsdag: LocalDate? = null,
     val begrunnelseForReduksjonEllerIkkeUtbetalt: String = "",
-    val harOpphørAvNaturalytelser: Boolean = false
+    val harOpphørAvNaturalytelser: Boolean = false,
+    val vedtaksperiodeId: UUID,
+    val forespurt: Boolean,
+    val arsakTilInnsending: String? = null
 )
 
 data class Refusjon(
@@ -33,18 +35,13 @@ data class EndringIRefusjon(
     }
 }
 
-fun inntektsmelding(
+fun arbeidsgiveropplysninger(
     vedtak: Vedtak
 ): String? {
-    return vedtak.inntektsmelding?.let { inntektsmelding ->
-        val førstefraværsdag = inntektsmelding.førsteFraværsdag ?: vedtak.sykdomFom
-        val arbeidsgiverperioder = inntektsmelding.arbeidsgiverperiode.takeIf { it.isNotEmpty() } ?: listOf(
-            Periode(
-                førstefraværsdag,
-                førstefraværsdag.plusDays(15)
-            )
-        )
-
+    return vedtak.arbeidsgiveropplysninger?.let { arbeidsgiveropplysninger ->
+        val arbeidsgiverperioder = arbeidsgiveropplysninger.arbeidsgiverperiode
+        val opphoerAvNaturalytelserFom = arbeidsgiverperioder.minOfOrNull { it.fom }?.toString() ?: "2018-01-01"
+        @Language("JSON")
         return """
             {
                 "inntektsmeldingId":"${UUID.randomUUID()}",
@@ -54,30 +51,32 @@ fun inntektsmelding(
                 "arbeidsgiverAktorId":"Don't care",
                 "arbeidsgivertype":"VIRKSOMHET",
                 "arbeidsforholdId": "",
-                "beregnetInntekt":"${inntektsmelding.inntekt}",
+                "beregnetInntekt":"${arbeidsgiveropplysninger.inntekt}",
                 "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                 "refusjon":{
-                    "beloepPrMnd":"${inntektsmelding.refusjon.refusjonsbeløp}",
-                    "opphoersdato": ${inntektsmelding.refusjon.opphørRefusjon?.let { "\"$it\"" }}
+                    "beloepPrMnd":"${arbeidsgiveropplysninger.refusjon.refusjonsbeløp}",
+                    "opphoersdato": ${arbeidsgiveropplysninger.refusjon.opphørRefusjon?.let { "\"$it\"" }}
                 },
-                "endringIRefusjoner": ${inntektsmelding.endringRefusjon.tilJson()},
-                "opphoerAvNaturalytelser": ${ if (inntektsmelding.harOpphørAvNaturalytelser) """[{"naturalytelse":"ANNET", "beloepPrMnd":"1200.0", "fom":"${inntektsmelding.førsteFraværsdag ?: "2018-01-01"}"}]""" else "[]"},
-                "begrunnelseForReduksjonEllerIkkeUtbetalt": "${inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt}",
+                "endringIRefusjoner": ${arbeidsgiveropplysninger.endringRefusjon.tilJson()},
+                "opphoerAvNaturalytelser": ${ if (arbeidsgiveropplysninger.harOpphørAvNaturalytelser) """[{"naturalytelse":"ANNET", "beloepPrMnd":"1200.0", "fom":"$opphoerAvNaturalytelserFom"}]""" else "[]"},
+                "begrunnelseForReduksjonEllerIkkeUtbetalt": "${arbeidsgiveropplysninger.begrunnelseForReduksjonEllerIkkeUtbetalt}",
                 "gjenopptakelseNaturalytelser":[],
                 "arbeidsgiverperioder": ${arbeidsgiverperioder.tilJson()},
                 "ferieperioder": [],
                 "status":"GYLDIG",
                 "arkivreferanse":"${UUID.randomUUID()}",
                 "hendelseId":"${UUID.randomUUID()}",
-                "foersteFravaersdag":"$førstefraværsdag",
                 "testdataOpprettet":"${LocalDateTime.now()}",
                 "mottattDato":"${vedtak.sykdomFom.atStartOfDay()}",
                 "innsenderFulltNavn": "spleis-testdata",
                 "innsenderTelefon": "123456789",
-                "format":"Inntektsmelding"
-            } 
-        """
+                "format":"Arbeidsgiveropplysninger",
+                "vedtaksperiodeId": "${vedtak.arbeidsgiveropplysninger.vedtaksperiodeId}",
+                "forespurt": ${vedtak.arbeidsgiveropplysninger.forespurt}
+                ${if (vedtak.arbeidsgiveropplysninger.arsakTilInnsending in setOf("Ny", "Endring")) """, "arsakTilInnsending": "${vedtak.arbeidsgiveropplysninger.arsakTilInnsending}"""" else ""}
+            }
+            """
+            }
     }
-}
 
 fun List<Periode>.tilJson(): String = objectMapper.writeValueAsString(this)

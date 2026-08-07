@@ -4,10 +4,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.testdata.SubscriptionService
 import no.nav.helse.testdata.api.Oppdatering
+import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
 
 internal class TrengerOpplysningerFraArbeidsgiverRiver(
@@ -21,15 +23,20 @@ internal class TrengerOpplysningerFraArbeidsgiverRiver(
             validate {
                 it.requireKey("fødselsnummer", "vedtaksperiodeId", "organisasjonsnummer")
                 it.requireArray("sykmeldingsperioder") {
-                    it.requireKey("fom")
-                    it.requireKey("tom")
+                    requireKey("fom")
+                    requireKey("tom")
                 }
             }
         }.register(this)
     }
 
+    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
+        log.warn("Feil i TrengerOpplysningerFraArbeidsgiverRiver: ${problems.toExtendedReport()}")
+    }
+
     override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val fødselsnummer = packet["fødselsnummer"].asText()
+        log.info("Gjenkjente behovet TrengerOpplysningerFraArbeidsgiver for $fødselsnummer\n\t${packet.toJson()}")
 
         subscriptionService.update(fødselsnummer, Oppdatering.forespørsel(objectMapper.createObjectNode().apply {
             put("vedtaksperiodeId", packet["vedtaksperiodeId"].asText())

@@ -157,18 +157,6 @@ describe("OpprettDokumenter", () => {
               harBrukerOppgittForsikring: null,
               meldingTilNavDagerFraSykmelding: null,
             },
-            inntektsmelding: {
-              inntekt: "54321",
-              refusjon: {
-                opphørRefusjon: "2021-08-01",
-                refusjonsbeløp: "20000",
-              },
-              arbeidsgiverperiode: [{ fom: "2021-07-01", tom: "2021-07-16" }],
-              endringRefusjon: [{ endringsdato: "2021-07-17", beløp: "19000" }],
-              førsteFraværsdag: "2021-07-01",
-              begrunnelseForReduksjonEllerIkkeUtbetalt: "",
-              harOpphørAvNaturalytelser: false,
-            },
           })}`,
           headers: { "Content-Type": "application/json" },
           method: "post",

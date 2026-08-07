@@ -1,5 +1,6 @@
 package no.nav.helse.testdata.api
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.response.*
@@ -15,10 +16,11 @@ import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
 import java.util.*
 
-internal class Oppdatering private constructor(val type: String, val verdi: String) {
+internal class Oppdatering private constructor(val type: String, val verdi: Any) {
     companion object {
         fun endring(tilstand: String) = Oppdatering("endring", tilstand)
         fun sletting(app: String) = Oppdatering("sletting", app)
+        fun forespørsel(forespørsel: JsonNode) = Oppdatering("forespørsel", forespørsel)
     }
 }
 

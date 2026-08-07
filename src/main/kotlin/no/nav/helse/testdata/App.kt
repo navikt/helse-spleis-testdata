@@ -46,6 +46,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Paths
+import no.nav.helse.testdata.rivers.TrengerOpplysningerFraArbeidsgiverRiver
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
@@ -157,6 +158,7 @@ internal class ApplicationBuilder(
         rapidsConnection.register(this)
         VedtaksperiodeEndretRiver(rapidsConnection, subscriptionService)
         PersonSlettetRiver(rapidsConnection, subscriptionService)
+        TrengerOpplysningerFraArbeidsgiverRiver(rapidsConnection, subscriptionService)
         TokenRefreshRiver(rapidsConnection, azureAd)
     }
 

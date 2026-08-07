@@ -169,7 +169,9 @@ export const OpprettDokumenter = React.memo(() => {
         text: "Dokumenter er sendt.",
         timeToLiveMs: 4000,
       });
-      subscribe(data.fnr);
+      subscribe(data.fnr, () => {
+          console.log("Jeg er en forespørselcallback :)")
+      });
     }
   };
 

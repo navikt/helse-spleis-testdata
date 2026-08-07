@@ -5,10 +5,11 @@ import { nanoid } from "nanoid";
 enum MessageType {
   Endring = "endring",
   Sletting = "sletting",
+  Forespørsel = "forespørsel",
 }
 
 type UseSubscribeResult = [
-  subscribeFunction: (fødselsnummer: string) => void,
+  subscribeFunction: (fødselsnummer: string, forespørselCallback: () => void) => void,
   tilstand: string,
 ];
 
@@ -18,7 +19,7 @@ type Message = {
 };
 
 export const useSubscribe = (): UseSubscribeResult => {
-  const [data, setData] = useState<{ fødselsnummer: string; key: string }>();
+  const [data, setData] = useState<{ fødselsnummer: string; key: string, forespørselCallback: () => void}>();
   const [tilstand, setTilstand] = useState<string>();
   const [eventSource, setEventSource] = useState<EventSource>();
   const addMessage = useAddSystemMessage();
@@ -66,6 +67,16 @@ export const useSubscribe = (): UseSubscribeResult => {
           });
           break;
         }
+        case MessageType.Forespørsel: {
+          addMessage({
+              id: nanoid(),
+              text: `Mottok forespørsel om arbeidsgiveropplysninger`,
+              dismissable: true,
+              timeToLiveMs: 5000,
+          });
+          data?.forespørselCallback()
+          break;
+        }
         default: {
           console.error("Received unknown message:", message);
         }
@@ -74,7 +85,7 @@ export const useSubscribe = (): UseSubscribeResult => {
   }, [eventSource?.url]);
 
   return [
-    (fødselsnummer: string) => setData({ fødselsnummer, key: nanoid() }),
+    (fødselsnummer: string, forespørselCallback: () => void) => setData({ fødselsnummer, key: nanoid(), forespørselCallback }),
     tilstand ?? "",
   ];
 };

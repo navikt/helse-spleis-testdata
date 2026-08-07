@@ -9,7 +9,7 @@ enum MessageType {
 }
 
 type UseSubscribeResult = [
-  subscribeFunction: (fødselsnummer: string, forespørselCallback: () => void) => void,
+  subscribeFunction: (fødselsnummer: string, forespørselCallback: (vedtaksperiodeId: string) => void) => void,
   tilstand: string,
 ];
 
@@ -19,7 +19,7 @@ type Message = {
 };
 
 export const useSubscribe = (): UseSubscribeResult => {
-  const [data, setData] = useState<{ fødselsnummer: string; key: string, forespørselCallback: () => void}>();
+  const [data, setData] = useState<{ fødselsnummer: string; key: string, forespørselCallback: (vedtaksperiodeId: string) => void}>();
   const [tilstand, setTilstand] = useState<string>();
   const [eventSource, setEventSource] = useState<EventSource>();
   const addMessage = useAddSystemMessage();
@@ -74,7 +74,7 @@ export const useSubscribe = (): UseSubscribeResult => {
               dismissable: true,
               timeToLiveMs: 5000,
           });
-          data?.forespørselCallback()
+          data?.forespørselCallback(JSON.parse(event.data).verdi.vedtaksperiodeId)
           break;
         }
         default: {
@@ -85,7 +85,7 @@ export const useSubscribe = (): UseSubscribeResult => {
   }, [eventSource?.url]);
 
   return [
-    (fødselsnummer: string, forespørselCallback: () => void) => setData({ fødselsnummer, key: nanoid(), forespørselCallback }),
+    (fødselsnummer: string, forespørselCallback: (vedtaksperiodeId: string) => void) => setData({ fødselsnummer, key: nanoid(), forespørselCallback }),
     tilstand ?? "",
   ];
 };

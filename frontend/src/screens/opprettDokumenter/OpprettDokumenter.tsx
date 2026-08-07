@@ -105,6 +105,7 @@ const createOpprettVedtaksperiodePayload = (
 
 const createArbeidsgiverSvarerPayload = (
     values: Record<string, any>,
+    vedtaksperiodeId: string
 ): ArbeidsgiverSvarerPayload | undefined  => {
     const inntektsmelding = (): InntektsmeldingDTO => ({
         inntekt: values.inntektsmelding.inntekt,
@@ -128,6 +129,7 @@ const createArbeidsgiverSvarerPayload = (
         values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
         harOpphørAvNaturalytelser:
             values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
+        vedtaksperiodeId: vedtaksperiodeId
     });
 
     if (values.arbeidssituasjon !== "ARBEIDSTAKER" || !values.skalSendeInntektsmelding) return undefined
@@ -189,9 +191,9 @@ export const OpprettDokumenter = React.memo(() => {
         text: "Dokumenter er sendt.",
         timeToLiveMs: 4000,
       });
-      subscribe(data.fnr, async () => {
-          console.log("Jeg er en forespørselcallback :)")
-          const payload = createArbeidsgiverSvarerPayload(data)
+      subscribe(data.fnr, async (vedtaksperiodeId: string) => {
+          console.log(`Jeg er en forespørselcallback for vedtaksperiodeId ${vedtaksperiodeId}`);
+          const payload = createArbeidsgiverSvarerPayload(data, vedtaksperiodeId)
           if (payload == undefined) return
           setIsFetching(true);
           const response = await postArbeidsgiverSvarer(payload);

@@ -45,6 +45,7 @@ export interface InntektsmeldingDTO {
   refusjon: RefusjonDto;
   begrunnelseForReduksjonEllerIkkeUtbetalt: string;
   harOpphørAvNaturalytelser: boolean;
+  vedtaksperiodeId: string;
 }
 
 export interface RefusjonDto {

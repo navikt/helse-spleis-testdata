@@ -32,11 +32,15 @@ type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
     sykmelding?: SykmeldingDTO;
     søknad?: SøknadDTO;
-    inntektsmelding?: InntektsmeldingDTO;
     medlemskapVerdi: String;
   };
 
-const createPayload = (
+type ArbeidsgiverSvarerPayload = PersonDTO &
+    FellesDTO & {
+    inntektsmelding?: InntektsmeldingDTO;
+};
+
+const createOpprettVedtaksperiodePayload = (
   values: Record<string, any>,
 ): OpprettVedtaksperiodePayload => {
   const sykmelding = (): SykmeldingDTO => ({
@@ -84,30 +88,6 @@ const createPayload = (
     };
   };
 
-  const inntektsmelding = (): InntektsmeldingDTO => ({
-    inntekt: values.inntektsmelding.inntekt,
-    refusjon: {
-      opphørRefusjon: values.inntektsmelding.opphørRefusjon || null,
-      refusjonsbeløp: values.inntektsmelding.refusjonsbeløp || null,
-    },
-    arbeidsgiverperiode:
-      values.inntektsmelding.arbeidsgiverperiode?.map(
-        (it: { fom: string; tom: string }) => ({ fom: it.fom, tom: it.tom }),
-      ) ?? [],
-    endringRefusjon:
-      values.inntektsmelding.endringIRefusjon?.map(
-        (it: { endringsdato: string; endringsbeløp: number }) => ({
-          endringsdato: it.endringsdato,
-          beløp: it.endringsbeløp as number,
-        }),
-      ) ?? [],
-    førsteFraværsdag: values.inntektsmelding.førsteFraværsdag,
-    begrunnelseForReduksjonEllerIkkeUtbetalt:
-      values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
-    harOpphørAvNaturalytelser:
-      values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
-  });
-
   return {
     fnr: values.fnr,
     orgnummer: values.orgnummer || null,
@@ -120,12 +100,46 @@ const createPayload = (
     sykmelding: values.skalSendeSykmelding ? sykmelding() : undefined,
     søknad: values.skalSendeSøknad ? søknad() : undefined,
     medlemskapVerdi: values.medlemskapVerdi,
-    inntektsmelding:
-      values.skalSendeInntektsmelding &&
-      values.arbeidssituasjon === "ARBEIDSTAKER"
-        ? inntektsmelding()
-        : undefined,
   };
+};
+
+const createArbeidsgiverSvarerPayload = (
+    values: Record<string, any>,
+): ArbeidsgiverSvarerPayload | undefined  => {
+    const inntektsmelding = (): InntektsmeldingDTO => ({
+        inntekt: values.inntektsmelding.inntekt,
+        refusjon: {
+            opphørRefusjon: values.inntektsmelding.opphørRefusjon || null,
+            refusjonsbeløp: values.inntektsmelding.refusjonsbeløp || null,
+        },
+        arbeidsgiverperiode:
+            values.inntektsmelding.arbeidsgiverperiode?.map(
+                (it: { fom: string; tom: string }) => ({ fom: it.fom, tom: it.tom }),
+            ) ?? [],
+        endringRefusjon:
+            values.inntektsmelding.endringIRefusjon?.map(
+                (it: { endringsdato: string; endringsbeløp: number }) => ({
+                    endringsdato: it.endringsdato,
+                    beløp: it.endringsbeløp as number,
+                }),
+            ) ?? [],
+        førsteFraværsdag: values.inntektsmelding.førsteFraværsdag,
+        begrunnelseForReduksjonEllerIkkeUtbetalt:
+        values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
+        harOpphørAvNaturalytelser:
+            values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
+    });
+
+    if (values.arbeidssituasjon !== "ARBEIDSTAKER" || !values.skalSendeInntektsmelding) return undefined
+
+    return {
+        fnr: values.fnr,
+        orgnummer: values.orgnummer || null,
+        sykdomFom: values.sykdomFom,
+        sykdomTom: values.sykdomTom,
+        arbeidssituasjon: values.arbeidssituasjon,
+        inntektsmelding: inntektsmelding()
+    };
 };
 
 export const OpprettDokumenter = React.memo(() => {
@@ -149,15 +163,21 @@ export const OpprettDokumenter = React.memo(() => {
   const [subscribe] = useSubscribe();
   const addMessage = useAddSystemMessage();
 
-  const postPayload = async (data: Record<string, any>): Promise<Response> => {
-    return post("/vedtaksperiode", createPayload(data)).finally(() =>
+  const postOpprettVedtaksperiode = async (data: Record<string, any>): Promise<Response> => {
+    return post("/vedtaksperiode", createOpprettVedtaksperiodePayload(data)).finally(() =>
       setIsFetching(false),
     );
   };
 
+    const postArbeidsgiverSvarer = async (payload: ArbeidsgiverSvarerPayload): Promise<Response> => {
+        return post("/vedtaksperiode", payload).finally(() =>
+            setIsFetching(false),
+        );
+    };
+
   const onSubmit = async (data: Record<string, any>) => {
     setIsFetching(true);
-    const response = await postPayload(data);
+    const response = await postOpprettVedtaksperiode(data);
     const { status } = response;
     setStatus(status);
     const errorBody = await response.text();
@@ -169,8 +189,23 @@ export const OpprettDokumenter = React.memo(() => {
         text: "Dokumenter er sendt.",
         timeToLiveMs: 4000,
       });
-      subscribe(data.fnr, () => {
+      subscribe(data.fnr, async () => {
           console.log("Jeg er en forespørselcallback :)")
+          const payload = createArbeidsgiverSvarerPayload(data)
+          if (payload == undefined) return
+          setIsFetching(true);
+          const response = await postArbeidsgiverSvarer(payload);
+          const { status } = response;
+          setStatus(status);
+          const errorBody = await response.text();
+          setErrorBody(errorBody);
+          if (status < 400) {
+              addMessage({
+                  id: nanoid(),
+                  text: "Arbeidsgiveropplysninger er sendt.",
+                  timeToLiveMs: 4000,
+              });
+          }
       });
     }
   };

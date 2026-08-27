@@ -12,6 +12,7 @@ fun sykmelding(
 ): String? = vedtak.sykmelding?.let { sykmelding ->
     """
     {
+        "@event_name":"sendt_sykmelding_fra_testdata",
         "id":"${UUID.randomUUID()}",
         "type":"${vedtak.arbeidssituasjon.somSøknadstype()}",
         "fnr":"${vedtak.fnr}",

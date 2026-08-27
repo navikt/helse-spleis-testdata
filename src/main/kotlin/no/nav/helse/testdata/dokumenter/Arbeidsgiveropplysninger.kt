@@ -1,11 +1,11 @@
 package no.nav.helse.testdata.dokumenter
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 import no.nav.helse.testdata.dokumenter.EndringIRefusjon.Companion.tilJson
 import no.nav.helse.testdata.objectMapper
 import org.intellij.lang.annotations.Language
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 data class Arbeidsgiveropplysninger(
     val inntekt: Double,
@@ -44,7 +44,6 @@ fun arbeidsgiveropplysninger(
         @Language("JSON")
         return """
             {
-                "@event_name":"arbeidsgiveropplysninger_fra_testdata",
                 "inntektsmeldingId":"${UUID.randomUUID()}",
                 "arbeidstakerFnr":"${vedtak.fnr}",
                 "virksomhetsnummer":"${vedtak.orgnummer}",

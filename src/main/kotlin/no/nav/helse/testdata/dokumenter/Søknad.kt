@@ -34,7 +34,6 @@ fun søknad(
     return vedtak.søknad?.let { søknad ->
         """
         {
-            "@event_name":"sendt_søknad_selvstendig_fra_testdata",
             "id":"${UUID.randomUUID()}",
             "fnr":"${vedtak.fnr}",
             "type":"${vedtak.arbeidssituasjon.somSøknadstype()}",

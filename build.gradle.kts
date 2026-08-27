@@ -6,6 +6,8 @@ val tbdLibsVersion = "2026.01.22-09.16-1d3f6039"
 val rapidsAndRiversVersion = "2026011411051768385145.e8ebad1177b4"
 val junitJupiterVersion = "5.12.1"
 val ktorVersion = "3.2.3"
+val flywayVersion = "13.3.0"
+val testcontainersVersion = "2.0.5"
 group = "no.nav.helse"
 
 // Sett opp repositories basert på om vi kjører i CI eller ikke
@@ -41,9 +43,16 @@ dependencies {
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-websockets:$ktorVersion")
 
+    implementation("com.zaxxer:HikariCP:7.1.0")
+    implementation("org.postgresql:postgresql:42.7.13")
+    implementation("com.github.seratch:kotliquery:1.9.1")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
+
     testImplementation("com.github.navikt.tbd-libs:rapids-and-rivers-test:$tbdLibsVersion")
     testImplementation("com.github.navikt.tbd-libs:naisful-test-app:$tbdLibsVersion")
     testImplementation("io.mockk:mockk:1.13.9")
+    testImplementation("org.testcontainers:testcontainers-postgresql:$testcontainersVersion")
 
     testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion") {
         exclude("junit")

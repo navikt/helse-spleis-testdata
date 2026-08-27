@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.zaxxer.hikari.HikariDataSource
 import com.github.navikt.tbd_libs.azure.AzureToken
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
@@ -39,6 +40,8 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.prometheus.metrics.model.registry.PrometheusRegistry
 import no.nav.helse.rapids_rivers.*
 import no.nav.helse.testdata.api.*
+import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
+import no.nav.helse.testdata.db.ForsikringReplikaTestdataDataSource
 import no.nav.helse.testdata.rivers.PersonSlettetRiver
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -82,6 +85,10 @@ fun main() {
         tokenProvider = azureAd
     )
 
+    val forsikringReplikaTestdataDataSource = ForsikringReplikaTestdataDataSource.createDataSource(env)
+    ForsikringReplikaTestdataDataSource.migrate(forsikringReplikaTestdataDataSource)
+    val forsikringReplikaTestdataDao = ForsikringReplikaTestdataDao(forsikringReplikaTestdataDataSource)
+
     ApplicationBuilder(
         env = System.getenv(),
         subscriptionService = ConcreteSubscriptionService,
@@ -89,7 +96,9 @@ fun main() {
         aaregClient = aaregClient,
         eregClient = eregClient,
         speedClient = speedClient,
-        azureAd = azureAd
+        azureAd = azureAd,
+        forsikringReplikaTestdataDataSource = forsikringReplikaTestdataDataSource,
+        forsikringReplikaTestdataDao = forsikringReplikaTestdataDao
     ).start()
 }
 
@@ -100,7 +109,9 @@ internal class ApplicationBuilder(
     private val aaregClient: AaregClient,
     private val eregClient: EregClient,
     private val speedClient: SpeedClient,
-    azureAd: RefreshTokens
+    azureAd: RefreshTokens,
+    private val forsikringReplikaTestdataDataSource: HikariDataSource,
+    private val forsikringReplikaTestdataDao: ForsikringReplikaTestdataDao
 ) : RapidsConnection.StatusListener {
     private val factory = ConsumerProducerFactory(AivenConfig.default)
     private val rapidsMediator = RapidsMediator(object : RapidProducer {
@@ -163,6 +174,10 @@ internal class ApplicationBuilder(
     }
 
     fun start() = rapidsConnection.start()
+
+    override fun onShutdown(rapidsConnection: RapidsConnection) {
+        forsikringReplikaTestdataDataSource.close()
+    }
 }
 
 internal fun Application.installKtorModule(

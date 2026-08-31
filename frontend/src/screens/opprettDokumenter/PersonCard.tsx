@@ -59,14 +59,22 @@ function lagreSøk(fnr: string, navn: string) {
 
 export const PersonCard = ({
   setErArbeidstaker,
+  setPersonIkkeFunnet,
 }: {
   setErArbeidstaker: (value: boolean) => void;
+  setPersonIkkeFunnet: (value: boolean) => void;
 }) => {
   const { register, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<
     string | undefined
   >(undefined);
   const [isChecked, setIsChecked] = useState(true);
+  const [personIkkeFunnet, setLocalPersonIkkeFunnet] = useState(false);
+
+  const oppdaterPersonIkkeFunnet = (verdi: boolean) => {
+    setLocalPersonIkkeFunnet(verdi);
+    setPersonIkkeFunnet(verdi);
+  };
 
   const validateSendsDocuments = useDocumentsValidator();
   const fnr = watch("fnr");
@@ -79,11 +87,17 @@ export const PersonCard = ({
   useEffect(() => {
     if (!fnr || fnr.length < 11) {
       setNavn(null);
+      oppdaterPersonIkkeFunnet(false);
       return setArbeidsgivere([]);
     }
     get(`/person/${fnr}`)
       .then((result) => result.json())
       .then((json) => {
+        if (json.type === "urn:error:not_found") {
+          oppdaterPersonIkkeFunnet(true);
+          return;
+        }
+        oppdaterPersonIkkeFunnet(false);
         if (typeof json.fornavn === "undefined") return;
         const navn = `${json.fornavn}${json.mellomnavn ? ` ${json.mellomnavn}` : ""} ${json.etternavn}`;
         lagreSøk(fnr, navn);
@@ -148,6 +162,9 @@ export const PersonCard = ({
           />
           <DeleteButton errorCallback={deleteFailed} />
         </span>
+        {personIkkeFunnet && (
+          <ErrorMessage>Person ikke funnet i PDL</ErrorMessage>
+        )}
         {navn && <small>{navn}</small>}
         {skalKreveOrgnummer ? (
           <>

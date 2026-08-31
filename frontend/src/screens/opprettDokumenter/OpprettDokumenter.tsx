@@ -156,6 +156,7 @@ export const OpprettDokumenter = React.memo(() => {
   });
 
   const [erArbeidstaker, setErArbeidstaker] = useState<boolean>(true);
+  const [personIkkeFunnet, setPersonIkkeFunnet] = useState<boolean>(false);
 
   const skalSendeSøknad = form.watch("skalSendeSøknad");
 
@@ -218,7 +219,7 @@ export const OpprettDokumenter = React.memo(() => {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className={styles.OpprettDokumenter}>
           <div className={styles.DocumentContainer}>
-            <PersonCard setErArbeidstaker={setErArbeidstaker} />
+            <PersonCard setErArbeidstaker={setErArbeidstaker} setPersonIkkeFunnet={setPersonIkkeFunnet} />
             {skalSendeSøknad && <SøknadCard />}
             {erArbeidstaker && <InntektsmeldingCard />}
             <DiverseCard />
@@ -233,7 +234,7 @@ export const OpprettDokumenter = React.memo(() => {
           {skalSendeSøknad && <Egenmeldingsdager />}
           {skalSendeSøknad && <InntektFraNyttArbeidsforhold />}
           <div className={styles.Flex}>
-            <FetchButton status={status} isFetching={isFetching} type="submit">
+            <FetchButton status={status} isFetching={isFetching} type="submit" disabled={personIkkeFunnet}>
               Opprett dokumenter
             </FetchButton>
             {typeof status === "number" && status >= 400 && (

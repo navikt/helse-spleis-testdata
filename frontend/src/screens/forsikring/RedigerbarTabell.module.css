@@ -1,0 +1,104 @@
+.Tabellseksjon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--block-small);
+  min-width: 0;
+}
+
+.Overskrift {
+  display: flex;
+  align-items: center;
+  gap: var(--block-small);
+}
+
+.Tittel {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.TabellContainer {
+  overflow-x: auto;
+  background-color: var(--background-color-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--block-small);
+}
+
+.Tabell {
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.Kolonnetittel {
+  text-align: left;
+  font-weight: 600;
+  padding: var(--block-extra-small) 0.5rem;
+  border-bottom: 1px solid var(--text-color-secondary);
+}
+
+.Celle {
+  padding: var(--block-extra-small) 0.5rem;
+  border-bottom: 1px solid var(--background-color-primary);
+}
+
+.Verdi {
+  display: inline-block;
+  min-height: 1.5rem;
+  line-height: 1.5rem;
+}
+
+.Rad.erValgt {
+  background-color: var(--active-color-secondary);
+}
+
+.NyRad {
+  background-color: var(--active-color-secondary);
+}
+
+.Input {
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: var(--text-color-primary);
+  background-color: var(--background-color-primary);
+  border: 1px solid var(--text-color-secondary);
+  border-radius: var(--border-radius);
+  padding: 0.125rem 0.25rem;
+  width: 9rem;
+}
+
+.Input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-shadow);
+}
+
+.Handlinger {
+  display: table-cell;
+  white-space: nowrap;
+}
+
+.Ikonknapp {
+  border: none;
+  background: none;
+  color: var(--text-color-primary);
+  padding: 0.125rem;
+  border-radius: 50%;
+  outline: none;
+}
+
+.Ikonknapp:focus-visible {
+  box-shadow: var(--focus-shadow);
+}
+
+.Ikonknapp:disabled {
+  color: var(--color-disabled);
+  cursor: default;
+}
+
+.Slett {
+  color: var(--text-color-error);
+}
+
+.TomTabell {
+  padding: var(--block-small);
+  color: var(--text-color-secondary);
+}

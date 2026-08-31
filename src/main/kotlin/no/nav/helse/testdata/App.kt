@@ -158,7 +158,8 @@ internal class ApplicationBuilder(
                             aaregClient,
                             eregClient,
                             speedClient,
-                            rapidsMediator
+                            rapidsMediator,
+                            forsikringReplikaTestdataDao
                         )
                     }
                 }
@@ -187,6 +188,7 @@ internal fun Application.installKtorModule(
     eregClient: EregClient,
     speedClient: SpeedClient,
     rapidsMediator: RapidsMediator,
+    forsikringReplikaTestdataDao: ForsikringReplikaTestdataDao,
 ) {
     install(WebSockets)
     errorTracing(no.nav.helse.testdata.log)
@@ -199,6 +201,7 @@ internal fun Application.installKtorModule(
         registerInntektApi(inntektRestClient)
         registerBehovApi(rapidsMediator)
         registerSubscriptionApi(subscriptionService)
+        registerForsikringReplikaApi(forsikringReplikaTestdataDao)
 
         val path = Paths.get("").toAbsolutePath().toString()
         val dir = File("public")

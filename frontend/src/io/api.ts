@@ -17,6 +17,18 @@ export const post = (
   });
 };
 
+export const put = (
+  path: string,
+  body?: any,
+  headers?: Headers,
+): Promise<Response> => {
+  return fetch(`${baseUrl}${path}`, {
+    method: "put",
+    body: JSON.stringify(body),
+    headers: { "Content-Type": "application/json", ...headers },
+  });
+};
+
 export const get = (path: string, headers?: Headers): Promise<Response> => {
   return fetch(`${baseUrl}${path}`, {
     method: "get",

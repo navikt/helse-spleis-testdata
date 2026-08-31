@@ -1,178 +1,88 @@
 package no.nav.helse.testdata.db
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import java.math.BigDecimal
-import java.time.Instant
-import kotliquery.queryOf
-import kotliquery.sessionOf
-import org.flywaydb.core.Flyway
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.PostgreSQLContainer
 
 class ForsikringReplikaTestdataDaoTest {
-    companion object {
-        private val postgres = PostgreSQLContainer("postgres:17").apply { start() }
-        private lateinit var dataSource: HikariDataSource
-        private lateinit var dao: ForsikringReplikaTestdataDao
+    private val dao = TestDatabase.dao
 
-        @BeforeAll
-        @JvmStatic
-        fun setup() {
-            dataSource = HikariDataSource(
-                HikariConfig().apply {
-                    jdbcUrl = postgres.jdbcUrl
-                    username = postgres.username
-                    password = postgres.password
-                }
-            )
-            Flyway
-                .configure()
-                .dataSource(dataSource)
-                .locations("classpath:forsikring-replika-testdata/db/migrations")
-                .load()
-                .migrate()
-            dao = ForsikringReplikaTestdataDao(dataSource)
-        }
+    @Test
+    fun `lagrer og henter IF_VEDFRIVT_10`() {
+        val rad = ifVedfrivt10(IF01_AGNR_FNR = 12345678901, ID_VED = dao.nesteIdVed())
+        dao.lagreIfVedfrivt10(rad)
 
-        @AfterAll
-        @JvmStatic
-        fun tearDown() {
-            dataSource.close()
-            postgres.stop()
-        }
+        assertEquals(rad, dao.hentIfVedfrivt10(rad.ID_VED))
     }
 
     @Test
-    fun `lagrer IF_VEDFRIVT_10`() {
-        lagreIfVedfrivt10(
+    fun `lister IF_VEDFRIVT_10 på IF01_AGNR_FNR`() {
+        val agnrFnr = 22222222222
+        val første = ifVedfrivt10(IF01_AGNR_FNR = agnrFnr, ID_VED = dao.nesteIdVed())
+        val andre = ifVedfrivt10(IF01_AGNR_FNR = agnrFnr, ID_VED = dao.nesteIdVed())
+        val annenPerson = ifVedfrivt10(IF01_AGNR_FNR = 33333333333, ID_VED = dao.nesteIdVed())
+        listOf(første, andre, annenPerson).forEach(dao::lagreIfVedfrivt10)
+
+        assertEquals(listOf(første, andre), dao.finnIfVedfrivt10(agnrFnr))
+    }
+
+    @Test
+    fun `oppdaterer og sletter IF_VEDFRIVT_10`() {
+        val rad = ifVedfrivt10(IF01_AGNR_FNR = 44444444444, ID_VED = dao.nesteIdVed())
+        dao.lagreIfVedfrivt10(rad)
+
+        val endret = rad.copy(IF10_PREMIE = 1234, KILDE_IF = "ENDRET")
+        assertTrue(dao.oppdaterIfVedfrivt10(endret))
+        assertEquals(endret, dao.hentIfVedfrivt10(rad.ID_VED))
+
+        assertTrue(dao.slettIfVedfrivt10(rad.ID_VED))
+        assertNull(dao.hentIfVedfrivt10(rad.ID_VED))
+        assertFalse(dao.slettIfVedfrivt10(rad.ID_VED))
+    }
+
+    @Test
+    fun `oppdaterer ikke ukjent IF_VEDFRIVT_10`() {
+        val ukjent = ifVedfrivt10(IF01_AGNR_FNR = 55555555555, ID_VED = BigDecimal("-1"))
+        assertFalse(dao.oppdaterIfVedfrivt10(ukjent))
+    }
+
+    @Test
+    fun `lagrer og henter IF_FKONTO_12`() {
+        val rad = ifFkonto12(
             IF01_AGNR_FNR = 12345678901,
-            IF10_VIRKDATO = 20260101,
-            ID_VED = BigDecimal.ONE,
+            IF12_BELOEP = BigDecimal("1234.56"),
+            ID_KONT = dao.nesteIdKont(),
         )
+        dao.lagreIfFkonto12(rad)
 
-        val antall = sessionOf(dataSource).use { session ->
-            session.run(queryOf("SELECT COUNT(*) AS antall FROM IF_VEDFRIVT_10").map { it.int("antall") }.asSingle)
-        }
-        assertEquals(1, antall)
+        assertEquals(rad, dao.hentIfFkonto12(rad.ID_KONT))
     }
 
     @Test
-    fun `lagrer IF_FKONTO_12`() {
-        lagreIfFkonto12(
-            ID_KONT = BigDecimal.ONE,
-        )
+    fun `lister IF_FKONTO_12 på IF01_AGNR_FNR`() {
+        val agnrFnr = 66666666666
+        val rad = ifFkonto12(IF01_AGNR_FNR = agnrFnr, ID_KONT = dao.nesteIdKont())
+        dao.lagreIfFkonto12(rad)
+        dao.lagreIfFkonto12(ifFkonto12(IF01_AGNR_FNR = 77777777777, ID_KONT = dao.nesteIdKont()))
 
-        val antall = sessionOf(dataSource).use { session ->
-            session.run(queryOf("SELECT COUNT(*) AS antall FROM IF_FKONTO_12").map { it.int("antall") }.asSingle)
-        }
-        assertEquals(1, antall)
+        assertEquals(listOf(rad), dao.finnIfFkonto12(agnrFnr))
+        assertTrue(dao.finnIfFkonto12(null).contains(rad))
     }
 
-    fun lagreIfVedfrivt10(
-        IF01_KODE: Char = '1',
-        IF01_AGNR_FNR: Long,
-        IF10_FORSFOM_SEQ: Int = 0,
-        IF10_GODKJ: Char = 'J',
-        IF10_FORSFOM: Int = 0,
-        IF10_VIRKDATO: Int,
-        IF10_TYPE: Char = '1',
-        IF10_SELVFOM: String = " ",
-        IF10_KOMBI: Char = ' ',
-        IF10_PREMGRL: Int = 0,
-        IF10_FOM: Int = 0,
-        IF10_PREMIE: Int = 0,
-        IF10_GML_PREMGRL: Int = 0,
-        IF10_GML_FOM: Int = 0,
-        IF10_GML_PREMIE: Int = 0,
-        IF10_FRIFOM: Int = 0,
-        IF10_FORSTOM: Int = 0,
-        IF10_OPPHGR: String = " ",
-        IF10_VARSEL: Int = 0,
-        IF10_TERM_KV: Char = ' ',
-        IF10_TERM_AAR: String = " ",
-        IF10_VARSEL_BELOEP: Int = 0,
-        IF10_BETALT_BELOEP: Int = 0,
-        IF10_PURR: Int = 0,
-        IF10_TKNR_BOST: Int = 0,
-        IF10_TKNR_BEH: Int = 0,
-        OPPRETTET: Instant = Instant.now(),
-        ENDRET_I_KILDE: Instant = Instant.now(),
-        KILDE_IF: String = " ",
-        ID_VED: BigDecimal,
-        OPPDATERT: Instant? = null,
-    ) {
-        dao.lagreIfVedfrivt10(
-            IF01_KODE = IF01_KODE,
-            IF01_AGNR_FNR = IF01_AGNR_FNR,
-            IF10_FORSFOM_SEQ = IF10_FORSFOM_SEQ,
-            IF10_GODKJ = IF10_GODKJ,
-            IF10_FORSFOM = IF10_FORSFOM,
-            IF10_VIRKDATO = IF10_VIRKDATO,
-            IF10_TYPE = IF10_TYPE,
-            IF10_SELVFOM = IF10_SELVFOM,
-            IF10_KOMBI = IF10_KOMBI,
-            IF10_PREMGRL = IF10_PREMGRL,
-            IF10_FOM = IF10_FOM,
-            IF10_PREMIE = IF10_PREMIE,
-            IF10_GML_PREMGRL = IF10_GML_PREMGRL,
-            IF10_GML_FOM = IF10_GML_FOM,
-            IF10_GML_PREMIE = IF10_GML_PREMIE,
-            IF10_FRIFOM = IF10_FRIFOM,
-            IF10_FORSTOM = IF10_FORSTOM,
-            IF10_OPPHGR = IF10_OPPHGR,
-            IF10_VARSEL = IF10_VARSEL,
-            IF10_TERM_KV = IF10_TERM_KV,
-            IF10_TERM_AAR = IF10_TERM_AAR,
-            IF10_VARSEL_BELOEP = IF10_VARSEL_BELOEP,
-            IF10_BETALT_BELOEP = IF10_BETALT_BELOEP,
-            IF10_PURR = IF10_PURR,
-            IF10_TKNR_BOST = IF10_TKNR_BOST,
-            IF10_TKNR_BEH = IF10_TKNR_BEH,
-            OPPRETTET = OPPRETTET,
-            ENDRET_I_KILDE = ENDRET_I_KILDE,
-            KILDE_IF = KILDE_IF,
-            ID_VED = ID_VED,
-            OPPDATERT = OPPDATERT,
-        )
-    }
+    @Test
+    fun `oppdaterer og sletter IF_FKONTO_12`() {
+        val rad = ifFkonto12(IF01_AGNR_FNR = 88888888888, ID_KONT = dao.nesteIdKont())
+        dao.lagreIfFkonto12(rad)
 
-    fun lagreIfFkonto12(
-        IF01_KODE: Char = '1',
-        IF01_AGNR_FNR: Long? = null,
-        IF10_FORSFOM_SEQ: Int? = null,
-        IF12_BETDATO_SEQ: Int? = null,
-        IF12_FOM: Int? = null,
-        IF12_TOM: Int? = null,
-        IF12_BET_KODE: Char? = null,
-        IF12_FRIUKER: String? = null,
-        IF12_BELOEP: BigDecimal? = null,
-        IF12_BETDATO: Int? = null,
-        OPPRETTET: Instant = Instant.now(),
-        ENDRET_I_KILDE: Instant = Instant.now(),
-        KILDE_IF: String = " ",
-        ID_KONT: BigDecimal,
-        OPPDATERT: Instant? = null,
-    ) {
-        dao.lagreIfFkonto12(
-            IF01_KODE = IF01_KODE,
-            IF01_AGNR_FNR = IF01_AGNR_FNR,
-            IF10_FORSFOM_SEQ = IF10_FORSFOM_SEQ,
-            IF12_BETDATO_SEQ = IF12_BETDATO_SEQ,
-            IF12_FOM = IF12_FOM,
-            IF12_TOM = IF12_TOM,
-            IF12_BET_KODE = IF12_BET_KODE,
-            IF12_FRIUKER = IF12_FRIUKER,
-            IF12_BELOEP = IF12_BELOEP,
-            IF12_BETDATO = IF12_BETDATO,
-            OPPRETTET = OPPRETTET,
-            ENDRET_I_KILDE = ENDRET_I_KILDE,
-            KILDE_IF = KILDE_IF,
-            ID_KONT = ID_KONT,
-            OPPDATERT = OPPDATERT,
-        )
+        val endret = rad.copy(IF12_FOM = 20260101, IF12_TOM = 20260131)
+        assertTrue(dao.oppdaterIfFkonto12(endret))
+        assertEquals(endret, dao.hentIfFkonto12(rad.ID_KONT))
+
+        assertTrue(dao.slettIfFkonto12(rad.ID_KONT))
+        assertNull(dao.hentIfFkonto12(rad.ID_KONT))
+        assertFalse(dao.slettIfFkonto12(rad.ID_KONT))
     }
 }

@@ -36,6 +36,10 @@ export const Nav = React.memo(() => {
           <i className="material-icons accessibility" />
           Hent testgruppe
         </NavLink>
+        <NavLink to="/forsikring" isExpanded={isExpanded}>
+          <i className="material-icons verified_user" />
+          Forsikring
+        </NavLink>
       </ul>
       <ExpandButton
         expanded={isExpanded}

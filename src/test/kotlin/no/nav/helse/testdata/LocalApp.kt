@@ -6,16 +6,22 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.result_object.ok
 import com.github.navikt.tbd_libs.speed.SpeedClient
-import io.ktor.serialization.jackson.*
-import io.ktor.server.application.*
-import io.ktor.server.cio.*
-import io.ktor.server.engine.*
-import io.ktor.server.plugins.contentnegotiation.*
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.cio.CIO
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.mockk.every
 import io.mockk.mockk
 import java.time.LocalDate
 import java.time.YearMonth
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
+import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
+import org.flywaydb.core.Flyway
+import org.testcontainers.postgresql.PostgreSQLContainer
 
 fun main() {
     val rapidsConnection = TestRapid()
@@ -78,6 +84,23 @@ fun main() {
         }
     })
 
+    val postgres = PostgreSQLContainer("postgres:17").apply { start() }
+    val forsikringReplikaTestdataDataSource = HikariDataSource(
+        HikariConfig().apply {
+            jdbcUrl = postgres.jdbcUrl
+            username = postgres.username
+            password = postgres.password
+            maximumPoolSize = 5
+            poolName = "forsikring-replika-testdata-lokalt"
+        }
+    )
+    Flyway
+        .configure()
+        .dataSource(forsikringReplikaTestdataDataSource)
+        .locations("classpath:forsikring-replika-testdata/db/migrations")
+        .load()
+        .migrate()
+
     LocalApplicationBuilder(
         subscriptionService = LocalSubscriptionService,
         inntektRestClient = inntektRestClientMock,
@@ -85,6 +108,7 @@ fun main() {
         eregClient = eregClient,
         speedClient = speedClient,
         rapidsMediator = rapidsMediator,
+        forsikringReplikaTestdataDao = ForsikringReplikaTestdataDao(forsikringReplikaTestdataDataSource),
     ).start()
 }
 
@@ -95,6 +119,7 @@ internal class LocalApplicationBuilder(
     private val eregClient: EregClient,
     private val speedClient: SpeedClient,
     private val rapidsMediator: RapidsMediator,
+    private val forsikringReplikaTestdataDao: ForsikringReplikaTestdataDao,
 ) : RapidsConnection.StatusListener {
 
     fun start() = runLocalServer {
@@ -111,6 +136,7 @@ internal class LocalApplicationBuilder(
             eregClient = eregClient,
             speedClient = speedClient,
             rapidsMediator = rapidsMediator,
+            forsikringReplikaTestdataDao = forsikringReplikaTestdataDao,
         )
     }
 }

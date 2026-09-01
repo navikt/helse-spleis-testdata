@@ -51,6 +51,15 @@
   background-color: var(--active-color-secondary);
 }
 
+.Velgbar {
+  cursor: pointer;
+}
+
+.Velgbar:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-shadow);
+}
+
 .NyRad {
   background-color: var(--active-color-secondary);
 }

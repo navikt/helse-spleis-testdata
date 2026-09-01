@@ -6,7 +6,6 @@ import { useTheme, useUpdateBodyBackgroundColor } from "./state/useTheme";
 import { HentInntekt } from "./screens/HentInntekt";
 import { HentTestgruppe } from "./screens/HentTestgruppe";
 import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
-import { Forsikring } from "./screens/forsikring/Forsikring";
 
 import { Nav } from "./components/nav/Nav";
 import { ThemeButton } from "./components/ThemeButton";
@@ -35,7 +34,6 @@ export const App = () => {
         />
         <Route path="/inntekt/hent" element={<HentInntekt />} />
         <Route path="/testgruppe" element={<HentTestgruppe />} />
-        <Route path="/forsikring" element={<Forsikring />} />
       </Routes>
       <ThemeButton />
       <SystemMessages />

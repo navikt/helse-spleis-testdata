@@ -126,6 +126,7 @@ internal class LocalApplicationBuilder(
         install(ContentNegotiation) {
             jackson {
                 enable(SerializationFeature.INDENT_OUTPUT)
+                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 registerModule(JavaTimeModule())
             }
         }

@@ -174,8 +174,50 @@ class ForsikringReplikaTestdataDao(private val dataSource: DataSource) {
             session.run(queryOf(statement, parametere(rad)).asUpdate) > 0
         }
 
-    fun slettIfVedfrivt10(ID_VED: BigDecimal): Boolean =
+    /**
+     * Som [oppdaterIfVedfrivt10], men rører ikke OPPRETTET. Da beholder raden opprettelsestidspunktet
+     * sitt uten at kallstedet må slå det opp først. OPPRETTET på [rad] blir derfor ignorert.
+     */
+    fun oppdaterIfVedfrivt10UtenOpprettet(rad: IfVedfrivt10): Boolean =
         sessionOf(dataSource).use { session ->
+            @Language("PostgreSQL")
+            val statement = """
+                UPDATE IF_VEDFRIVT_10 SET
+                    IF01_KODE = :IF01_KODE,
+                    IF01_AGNR_FNR = :IF01_AGNR_FNR,
+                    IF10_FORSFOM_SEQ = :IF10_FORSFOM_SEQ,
+                    IF10_GODKJ = :IF10_GODKJ,
+                    IF10_FORSFOM = :IF10_FORSFOM,
+                    IF10_VIRKDATO = :IF10_VIRKDATO,
+                    IF10_TYPE = :IF10_TYPE,
+                    IF10_SELVFOM = :IF10_SELVFOM,
+                    IF10_KOMBI = :IF10_KOMBI,
+                    IF10_PREMGRL = :IF10_PREMGRL,
+                    IF10_FOM = :IF10_FOM,
+                    IF10_PREMIE = :IF10_PREMIE,
+                    IF10_GML_PREMGRL = :IF10_GML_PREMGRL,
+                    IF10_GML_FOM = :IF10_GML_FOM,
+                    IF10_GML_PREMIE = :IF10_GML_PREMIE,
+                    IF10_FRIFOM = :IF10_FRIFOM,
+                    IF10_FORSTOM = :IF10_FORSTOM,
+                    IF10_OPPHGR = :IF10_OPPHGR,
+                    IF10_VARSEL = :IF10_VARSEL,
+                    IF10_TERM_KV = :IF10_TERM_KV,
+                    IF10_TERM_AAR = :IF10_TERM_AAR,
+                    IF10_VARSEL_BELOEP = :IF10_VARSEL_BELOEP,
+                    IF10_BETALT_BELOEP = :IF10_BETALT_BELOEP,
+                    IF10_PURR = :IF10_PURR,
+                    IF10_TKNR_BOST = :IF10_TKNR_BOST,
+                    IF10_TKNR_BEH = :IF10_TKNR_BEH,
+                    ENDRET_I_KILDE = :ENDRET_I_KILDE,
+                    KILDE_IF = :KILDE_IF,
+                    OPPDATERT = :OPPDATERT
+                WHERE ID_VED = :ID_VED
+            """
+            session.run(queryOf(statement, parametere(rad)).asUpdate) > 0
+        }
+
+    fun slettIfVedfrivt10(ID_VED: BigDecimal): Boolean =        sessionOf(dataSource).use { session ->
             @Language("PostgreSQL")
             val statement = "DELETE FROM IF_VEDFRIVT_10 WHERE ID_VED = :ID_VED"
             session.run(queryOf(statement, mapOf("ID_VED" to ID_VED)).asUpdate) > 0
@@ -223,6 +265,28 @@ class ForsikringReplikaTestdataDao(private val dataSource: DataSource) {
             }
         }
 
+    fun finnIfFkonto12(IF01_KODE: Char, IF01_AGNR_FNR: Long, IF10_FORSFOM_SEQ: Int): List<IfFkonto12> =
+        sessionOf(dataSource).use { session ->
+            @Language("PostgreSQL")
+            val statement = """
+                SELECT * FROM IF_FKONTO_12
+                WHERE IF01_KODE = :IF01_KODE
+                  AND IF01_AGNR_FNR = :IF01_AGNR_FNR
+                  AND IF10_FORSFOM_SEQ = :IF10_FORSFOM_SEQ
+                ORDER BY IF12_FOM NULLS LAST, ID_KONT
+            """
+            session.run(
+                queryOf(
+                    statement,
+                    mapOf(
+                        "IF01_KODE" to IF01_KODE.toString(),
+                        "IF01_AGNR_FNR" to IF01_AGNR_FNR,
+                        "IF10_FORSFOM_SEQ" to IF10_FORSFOM_SEQ,
+                    ),
+                ).map(::ifFkonto12).asList,
+            )
+        }
+
     fun oppdaterIfFkonto12(rad: IfFkonto12): Boolean =
         sessionOf(dataSource).use { session ->
             @Language("PostgreSQL")
@@ -239,6 +303,33 @@ class ForsikringReplikaTestdataDao(private val dataSource: DataSource) {
                     IF12_BELOEP = :IF12_BELOEP,
                     IF12_BETDATO = :IF12_BETDATO,
                     OPPRETTET = :OPPRETTET,
+                    ENDRET_I_KILDE = :ENDRET_I_KILDE,
+                    KILDE_IF = :KILDE_IF,
+                    OPPDATERT = :OPPDATERT
+                WHERE ID_KONT = :ID_KONT
+            """
+            session.run(queryOf(statement, parametere(rad)).asUpdate) > 0
+        }
+
+    /**
+     * Som [oppdaterIfFkonto12], men rører ikke OPPRETTET. Da beholder raden opprettelsestidspunktet
+     * sitt uten at kallstedet må slå det opp først. OPPRETTET på [rad] blir derfor ignorert.
+     */
+    fun oppdaterIfFkonto12UtenOpprettet(rad: IfFkonto12): Boolean =
+        sessionOf(dataSource).use { session ->
+            @Language("PostgreSQL")
+            val statement = """
+                UPDATE IF_FKONTO_12 SET
+                    IF01_KODE = :IF01_KODE,
+                    IF01_AGNR_FNR = :IF01_AGNR_FNR,
+                    IF10_FORSFOM_SEQ = :IF10_FORSFOM_SEQ,
+                    IF12_BETDATO_SEQ = :IF12_BETDATO_SEQ,
+                    IF12_FOM = :IF12_FOM,
+                    IF12_TOM = :IF12_TOM,
+                    IF12_BET_KODE = :IF12_BET_KODE,
+                    IF12_FRIUKER = :IF12_FRIUKER,
+                    IF12_BELOEP = :IF12_BELOEP,
+                    IF12_BETDATO = :IF12_BETDATO,
                     ENDRET_I_KILDE = :ENDRET_I_KILDE,
                     KILDE_IF = :KILDE_IF,
                     OPPDATERT = :OPPDATERT

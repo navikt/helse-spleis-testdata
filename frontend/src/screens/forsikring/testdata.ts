@@ -1,57 +1,25 @@
-import type { IfFkonto12, IfVedfrivt10 } from "./typer";
+import type { Forsikringsfaktura, IndividuellForsikring } from "./typer";
 
-export const ifVedfrivt10 = (
-  overstyringer: Partial<IfVedfrivt10> & Pick<IfVedfrivt10, "ID_VED">,
-): IfVedfrivt10 => ({
-  IF01_KODE: "1",
-  IF01_AGNR_FNR: 11111111111,
-  IF10_FORSFOM_SEQ: 0,
-  IF10_GODKJ: "J",
-  IF10_FORSFOM: 0,
-  IF10_VIRKDATO: 20260101,
-  IF10_TYPE: "1",
-  IF10_SELVFOM: " ",
-  IF10_KOMBI: " ",
-  IF10_PREMGRL: 0,
-  IF10_FOM: 0,
-  IF10_PREMIE: 0,
-  IF10_GML_PREMGRL: 0,
-  IF10_GML_FOM: 0,
-  IF10_GML_PREMIE: 0,
-  IF10_FRIFOM: 0,
-  IF10_FORSTOM: 0,
-  IF10_OPPHGR: " ",
-  IF10_VARSEL: 0,
-  IF10_TERM_KV: " ",
-  IF10_TERM_AAR: " ",
-  IF10_VARSEL_BELOEP: 0,
-  IF10_BETALT_BELOEP: 0,
-  IF10_PURR: 0,
-  IF10_TKNR_BOST: 0,
-  IF10_TKNR_BEH: 0,
-  OPPRETTET: "2026-01-01T00:00:00Z",
-  ENDRET_I_KILDE: "2026-01-01T00:00:00Z",
-  KILDE_IF: " ",
-  OPPDATERT: null,
+export const individuellForsikring = (
+  overstyringer: Partial<IndividuellForsikring> &
+    Pick<IndividuellForsikring, "id">,
+): IndividuellForsikring => ({
+  identitetsnummer: "31128512345",
+  godkjent: true,
+  fom: "2026-01-01",
+  virkningsdato: "2026-01-01",
+  type: "SELVSTENDIG_80_PROSENT_FRA_DAG_1",
+  premiegrunnlag: 0,
+  opphørsdato: null,
+  opphørsgrunn: null,
   ...overstyringer,
 });
 
-export const ifFkonto12 = (
-  overstyringer: Partial<IfFkonto12> & Pick<IfFkonto12, "ID_KONT">,
-): IfFkonto12 => ({
-  IF01_KODE: "1",
-  IF01_AGNR_FNR: 11111111111,
-  IF10_FORSFOM_SEQ: 0,
-  IF12_BETDATO_SEQ: 0,
-  IF12_FOM: 0,
-  IF12_TOM: 0,
-  IF12_BET_KODE: " ",
-  IF12_FRIUKER: " ",
-  IF12_BELOEP: 0,
-  IF12_BETDATO: 0,
-  OPPRETTET: "2026-01-01T00:00:00Z",
-  ENDRET_I_KILDE: "2026-01-01T00:00:00Z",
-  KILDE_IF: " ",
-  OPPDATERT: null,
+export const forsikringsfaktura = (
+  overstyringer: Partial<Forsikringsfaktura> & Pick<Forsikringsfaktura, "id">,
+): Forsikringsfaktura => ({
+  år: 2026,
+  halvdel: 1,
+  betalingsdato: null,
   ...overstyringer,
 });

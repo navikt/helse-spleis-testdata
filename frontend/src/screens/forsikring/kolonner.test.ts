@@ -1,81 +1,135 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  faktiskFødselsnummer,
-  sorterIfFkonto12,
-  sorterIfVedfrivt10,
+  fakturaKolonner,
+  forsikringKolonner,
+  manglerPåkrevdeFelter,
+  nyForsikring,
+  tilPayload,
+  tilUtkast,
+  visVerdi,
 } from "./kolonner";
-import { ifFkonto12, ifVedfrivt10 } from "./testdata";
+import { forsikringsfaktura, individuellForsikring } from "./testdata";
 
-describe("faktiskFødselsnummer", () => {
-  it("bytter om dag og år", () => {
-    expect(faktiskFødselsnummer(85_12_31_12345)).toBe("31128512345");
-  });
+describe("tilUtkast", () => {
+  it("gjør om raden til tekstverdier og tomme strenger for null", () => {
+    const utkast = tilUtkast(
+      forsikringKolonner,
+      individuellForsikring({ id: 1, godkjent: false, opphørsdato: null }),
+    );
 
-  it("beholder ledende nuller", () => {
-    expect(faktiskFødselsnummer(1_02_03_00123)).toBe("03020100123");
-  });
-
-  it("håndterer manglende verdi", () => {
-    expect(faktiskFødselsnummer(null)).toBe("");
-  });
-});
-
-describe("sorterIfVedfrivt10", () => {
-  it("sorterer på fødselsnummer, så godkjenning, så virkdato, så forstom", () => {
-    const rader = [
-      ifVedfrivt10({
-        ID_VED: 1,
-        IF01_AGNR_FNR: 85_12_31_12345,
-        IF10_GODKJ: "N",
-      }),
-      ifVedfrivt10({
-        ID_VED: 2,
-        IF01_AGNR_FNR: 85_12_31_12345,
-        IF10_GODKJ: "J",
-      }),
-      ifVedfrivt10({ ID_VED: 3, IF01_AGNR_FNR: 85_01_01_12345 }),
-      ifVedfrivt10({
-        ID_VED: 4,
-        IF01_AGNR_FNR: 85_12_31_12345,
-        IF10_GODKJ: "J",
-        IF10_VIRKDATO: 20250101,
-      }),
-      ifVedfrivt10({
-        ID_VED: 5,
-        IF01_AGNR_FNR: 85_12_31_12345,
-        IF10_GODKJ: "J",
-        IF10_FORSTOM: -1,
-      }),
-    ];
-
-    expect(sorterIfVedfrivt10(rader).map((rad) => rad.ID_VED)).toEqual([
-      3, 4, 5, 2, 1,
-    ]);
-  });
-
-  it("endrer ikke lista som sendes inn", () => {
-    const rader = [
-      ifVedfrivt10({ ID_VED: 1, IF10_GODKJ: "N" }),
-      ifVedfrivt10({ ID_VED: 2, IF10_GODKJ: "J" }),
-    ];
-
-    sorterIfVedfrivt10(rader);
-
-    expect(rader.map((rad) => rad.ID_VED)).toEqual([1, 2]);
+    expect(utkast).toEqual({
+      godkjent: "false",
+      fom: "2026-01-01",
+      virkningsdato: "2026-01-01",
+      type: "SELVSTENDIG_80_PROSENT_FRA_DAG_1",
+      premiegrunnlag: "0",
+      opphørsdato: "",
+      opphørsgrunn: "",
+    });
+    expect(utkast).not.toHaveProperty("id");
+    expect(utkast).not.toHaveProperty("identitetsnummer");
   });
 });
 
-describe("sorterIfFkonto12", () => {
-  it("sorterer på IF12_FOM med tomme verdier sist", () => {
-    const rader = [
-      ifFkonto12({ ID_KONT: 1, IF12_FOM: null }),
-      ifFkonto12({ ID_KONT: 2, IF12_FOM: 20260201 }),
-      ifFkonto12({ ID_KONT: 3, IF12_FOM: 20260101 }),
-    ];
+describe("tilPayload", () => {
+  it("sender riktige typer og utelater id og identitetsnummer", () => {
+    const payload = tilPayload(
+      forsikringKolonner,
+      tilUtkast(
+        forsikringKolonner,
+        individuellForsikring({
+          id: 1,
+          godkjent: false,
+          premiegrunnlag: 500000,
+          opphørsdato: "2026-12-31",
+        }),
+      ),
+    );
 
-    expect(sorterIfFkonto12(rader).map((rad) => rad.ID_KONT)).toEqual([
-      3, 2, 1,
-    ]);
+    expect(payload).toEqual({
+      godkjent: false,
+      fom: "2026-01-01",
+      virkningsdato: "2026-01-01",
+      type: "SELVSTENDIG_80_PROSENT_FRA_DAG_1",
+      premiegrunnlag: 500000,
+      opphørsdato: "2026-12-31",
+      opphørsgrunn: null,
+    });
+  });
+
+  it("sender halvdel som tall og manglende betalingsdato som null", () => {
+    const payload = tilPayload(
+      fakturaKolonner,
+      tilUtkast(fakturaKolonner, forsikringsfaktura({ id: 2, halvdel: 2 })),
+    );
+
+    expect(payload).toEqual({ år: 2026, halvdel: 2, betalingsdato: null });
+  });
+
+  it("tolker manglende avkrysning som usann", () => {
+    expect(tilPayload(forsikringKolonner, {})).toMatchObject({
+      godkjent: false,
+    });
+  });
+});
+
+describe("manglerPåkrevdeFelter", () => {
+  it("krever år og halvdel på fakturaer", () => {
+    expect(
+      manglerPåkrevdeFelter(fakturaKolonner, {
+        år: "2026",
+        halvdel: "1",
+        betalingsdato: "",
+      }),
+    ).toBe(false);
+    expect(
+      manglerPåkrevdeFelter(fakturaKolonner, { år: "", halvdel: "1" }),
+    ).toBe(true);
+    expect(
+      manglerPåkrevdeFelter(fakturaKolonner, { år: "2026", halvdel: "" }),
+    ).toBe(true);
+  });
+
+  it("krever ingen felter på forsikringer", () => {
+    expect(manglerPåkrevdeFelter(forsikringKolonner, {})).toBe(false);
+  });
+});
+
+describe("visVerdi", () => {
+  const kolonne = (nøkkel: string) =>
+    forsikringKolonner.find((it) => it.key === nøkkel)!;
+
+  it("viser avkrysning for godkjent", () => {
+    const rad = individuellForsikring({ id: 1 });
+    expect(visVerdi(kolonne("godkjent"), rad)).toBe("✔️");
+    expect(visVerdi(kolonne("godkjent"), { ...rad, godkjent: false })).toBe(
+      "❌",
+    );
+  });
+
+  it("viser lesbart navn for forsikringstypen", () => {
+    expect(visVerdi(kolonne("type"), individuellForsikring({ id: 1 }))).toBe(
+      "Selvstendig næringsdrivende 80 % fra 1. dag",
+    );
+  });
+
+  it("viser tom tekst for manglende verdier", () => {
+    expect(
+      visVerdi(
+        kolonne("opphørsdato"),
+        individuellForsikring({ id: 1, opphørsdato: null }),
+      ),
+    ).toBe("");
+  });
+});
+
+describe("nyForsikring", () => {
+  it("foreslår en godkjent forsikring med en gyldig type", () => {
+    const utkast = nyForsikring();
+
+    expect(utkast.godkjent).toBe("true");
+    expect(utkast.type).toBe("SELVSTENDIG_80_PROSENT_FRA_DAG_1");
+    expect(utkast.fom).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

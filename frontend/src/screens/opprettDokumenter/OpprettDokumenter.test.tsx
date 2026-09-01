@@ -17,8 +17,13 @@ vi.mock("../../io/environment", () => ({
 
 global.fetch = vi.fn();
 
-const mockFetchResponse = (body: object) =>
-  (fetch as Mock).mockImplementationOnce(() => Promise.resolve(body));
+const køetteSvar: object[] = [];
+
+// Køer opp neste svar. Kall til de individuelle forsikringene besvares utenom køen,
+// slik at rekkefølgen i de øvrige testene ikke påvirkes av forsikringsseksjonen.
+const mockFetchResponse = (body: object) => {
+  køetteSvar.push(body);
+};
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <AppProvider>{children}</AppProvider>
@@ -26,6 +31,14 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 describe("OpprettDokumenter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    køetteSvar.length = 0;
+    (fetch as Mock).mockImplementation((url: string) => {
+      if (url.includes("individuelle-forsikringer"))
+        return Promise.resolve({ ok: true, status: 200, json: () => [] });
+      return Promise.resolve(
+        køetteSvar.shift() ?? { status: 200, json: () => ({}), text: () => "" },
+      );
+    });
   });
 
   it("oppretter dokumenter", async () => {
@@ -179,8 +192,7 @@ describe("OpprettDokumenter", () => {
     await userEvent.type(screen.getByTestId("fnr"), fnr);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenNthCalledWith(
-        4,
+      expect(fetch).toHaveBeenCalledWith(
         `http://0.0.0.0:8080/organisasjon/${orgnr}`,
         { headers: { Accept: "application/json" }, method: "get" },
       );
@@ -189,7 +201,7 @@ describe("OpprettDokumenter", () => {
     await userEvent.click(screen.getByText("❌"));
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenNthCalledWith(5, "http://0.0.0.0:8080/person", {
+      expect(fetch).toHaveBeenCalledWith("http://0.0.0.0:8080/person", {
         headers: { ident: fnr },
         method: "delete",
       });
@@ -209,8 +221,7 @@ describe("OpprettDokumenter", () => {
 
     await userEvent.type(screen.getByTestId("fnr"), "12345678900");
     await waitFor(() => {
-      expect(fetch).toHaveBeenNthCalledWith(
-        4,
+      expect(fetch).toHaveBeenCalledWith(
         `http://0.0.0.0:8080/organisasjon/${orgnr}`,
         { headers: { Accept: "application/json" }, method: "get" },
       );
@@ -259,10 +270,9 @@ describe("OpprettDokumenter", () => {
     ).not.toBeInTheDocument();
 
     // Bytt til SELVSTENDIG_NARINGSDRIVENDE
-    fireEvent.change(
-      screen.getAllByRole("combobox")[0],
-      { target: { value: "SELVSTENDIG_NARINGSDRIVENDE" } },
-    );
+    fireEvent.change(screen.getAllByRole("combobox")[0], {
+      target: { value: "SELVSTENDIG_NARINGSDRIVENDE" },
+    });
 
     await waitFor(() => {
       expect(
@@ -292,9 +302,14 @@ describe("OpprettDokumenter", () => {
 
     // Fyll inn inntektFraSigrun (påkrevd for SELVSTENDIG)
     await waitFor(() =>
-      expect(screen.getByLabelText(/Årsinntekt fra Sigrun/)).toBeInTheDocument(),
+      expect(
+        screen.getByLabelText(/Årsinntekt fra Sigrun/),
+      ).toBeInTheDocument(),
     );
-    await userEvent.type(screen.getByLabelText(/Årsinntekt fra Sigrun/), "600000");
+    await userEvent.type(
+      screen.getByLabelText(/Årsinntekt fra Sigrun/),
+      "600000",
+    );
 
     // Fyll inn periodefelter
     fireEvent.change(screen.getByTestId("meldingTilNavDagerFraSykmeldingFom"), {
@@ -346,7 +361,7 @@ describe("OpprettDokumenter", () => {
 
     await waitFor(() => {
       const vedtaksperiodeCall = (fetch as Mock).mock.calls.find(
-          ([url]) => url === "http://0.0.0.0:8080/vedtaksperiode",
+        ([url]) => url === "http://0.0.0.0:8080/vedtaksperiode",
       );
       const body = JSON.parse(vedtaksperiodeCall?.[1]?.body ?? "{}");
       expect(body.søknad?.meldingTilNavDagerFraSykmelding).toBeNull();

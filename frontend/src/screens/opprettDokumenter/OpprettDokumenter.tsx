@@ -12,6 +12,7 @@ import { Ferieperioder } from "./Ferieperioder";
 import { EndringRefusjon } from "./EndringRefusjon";
 import { InntektsmeldingCard } from "./InntektsmeldingCard";
 import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
+import { Forsikring } from "../forsikring/Forsikring";
 
 import { FetchButton } from "../../components/FetchButton";
 import { ErrorMessage } from "../../components/ErrorMessage";
@@ -224,6 +225,7 @@ export const OpprettDokumenter = React.memo(() => {
             {erArbeidstaker && <InntektsmeldingCard />}
             <DiverseCard />
           </div>
+          <Forsikring />
           {erArbeidstaker && (
             <>
               <Arbeidsgiverperioder />

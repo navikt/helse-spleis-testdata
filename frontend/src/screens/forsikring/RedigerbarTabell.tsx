@@ -1,40 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 
 import styles from "./RedigerbarTabell.module.css";
-import type { Kolonne } from "./kolonner";
-
-type Utkast = Record<string, string>;
+import {
+  manglerPåkrevdeFelter,
+  tilPayload,
+  tilUtkast,
+  visVerdi,
+  type Kolonne,
+  type Utkast,
+} from "./kolonner";
 
 const NY_RAD = "ny-rad";
-
-const tilUtkast = <T,>(kolonner: Kolonne<T>[], rad: T): Utkast =>
-  Object.fromEntries(
-    kolonner.map((kolonne) => {
-      const verdi = rad[kolonne.key];
-      return [
-        kolonne.key,
-        verdi === null || verdi === undefined ? "" : String(verdi),
-      ];
-    }),
-  );
-
-const tilPayload = <T,>(
-  kolonner: Kolonne<T>[],
-  utkast: Utkast,
-): Record<string, unknown> => {
-  const payload: Record<string, unknown> = {};
-  kolonner.forEach((kolonne) => {
-    if (kolonne.readOnly) return;
-    const verdi = utkast[kolonne.key] ?? "";
-    if (verdi === "") {
-      payload[kolonne.key] = null;
-    } else {
-      payload[kolonne.key] = kolonne.type === "number" ? Number(verdi) : verdi;
-    }
-  });
-  return payload;
-};
 
 interface RedigerbarTabellProps<T> {
   tittel: string;
@@ -47,6 +24,9 @@ interface RedigerbarTabellProps<T> {
   onOppdater: (rad: T, verdier: Record<string, unknown>) => Promise<void>;
   onSlett: (rad: T) => Promise<void>;
   nyRadVerdier: () => Utkast;
+  /** Settes når «legg til»-modus styres utenfra. Da vises ikke tabellens egen knapp. */
+  nyRadÅpen?: boolean;
+  onNyRadÅpenEndret?: (åpen: boolean) => void;
 }
 
 export const RedigerbarTabell = <T,>({
@@ -60,10 +40,31 @@ export const RedigerbarTabell = <T,>({
   onOppdater,
   onSlett,
   nyRadVerdier,
+  nyRadÅpen,
+  onNyRadÅpenEndret,
 }: RedigerbarTabellProps<T>) => {
   const [utkast, setUtkast] = useState<Record<string, Utkast>>({});
   const [nyRad, setNyRad] = useState<Utkast | null>(null);
   const [lagrer, setLagrer] = useState<string | null>(null);
+
+  const styresUtenfra = onNyRadÅpenEndret !== undefined;
+
+  useEffect(() => {
+    if (!styresUtenfra) return;
+    if (nyRadÅpen === true && nyRad === null) setNyRad(nyRadVerdier());
+    if (nyRadÅpen !== true && nyRad !== null) setNyRad(null);
+    // holder den interne kladden i takt med den eksterne av/på-bryteren
+  }, [styresUtenfra, nyRadÅpen]);
+
+  const åpneNyRad = () => {
+    setNyRad(nyRadVerdier());
+    onNyRadÅpenEndret?.(true);
+  };
+
+  const lukkNyRad = () => {
+    setNyRad(null);
+    onNyRadÅpenEndret?.(false);
+  };
 
   const oppdaterFelt = (nøkkel: string, felt: string, verdi: string) => {
     if (nøkkel === NY_RAD) {
@@ -104,7 +105,7 @@ export const RedigerbarTabell = <T,>({
     setLagrer(NY_RAD);
     try {
       await onOpprett(tilPayload(kolonner, nyRad));
-      setNyRad(null);
+      lukkNyRad();
     } catch {
       // feilmeldingen vises av forelderen, raden blir stående i redigeringsmodus
     } finally {
@@ -129,15 +130,39 @@ export const RedigerbarTabell = <T,>({
     const radnavn = erNyRad ? "ny rad" : `rad ${nøkkel}`;
     return kolonner.map((kolonne) => (
       <td key={kolonne.key} className={styles.Celle}>
-        {kolonne.readOnly ? (
-          <span className={styles.Verdi}>
-            {erNyRad ? "–" : (verdier[kolonne.key] ?? "")}
-          </span>
+        {kolonne.type === "boolean" ? (
+          <input
+            className={styles.Input}
+            type="checkbox"
+            aria-label={`${kolonne.tittel} ${radnavn}`}
+            checked={verdier[kolonne.key] === "true"}
+            onChange={(event) =>
+              oppdaterFelt(nøkkel, kolonne.key, String(event.target.checked))
+            }
+          />
+        ) : kolonne.type === "select" ? (
+          <select
+            className={styles.Input}
+            aria-label={`${kolonne.tittel} ${radnavn}`}
+            required={kolonne.påkrevd}
+            value={verdier[kolonne.key] ?? ""}
+            onChange={(event) =>
+              oppdaterFelt(nøkkel, kolonne.key, event.target.value)
+            }
+          >
+            {!kolonne.påkrevd && <option value="" />}
+            {kolonne.valg?.map((valg) => (
+              <option key={valg.verdi} value={valg.verdi}>
+                {valg.tekst}
+              </option>
+            ))}
+          </select>
         ) : (
           <input
             className={styles.Input}
-            type={kolonne.type === "number" ? "number" : "text"}
-            aria-label={`${kolonne.key} ${radnavn}`}
+            type={kolonne.type === "text" ? "text" : kolonne.type}
+            aria-label={`${kolonne.tittel} ${radnavn}`}
+            required={kolonne.påkrevd}
             value={verdier[kolonne.key] ?? ""}
             onChange={(event) =>
               oppdaterFelt(nøkkel, kolonne.key, event.target.value)
@@ -151,35 +176,34 @@ export const RedigerbarTabell = <T,>({
   return (
     <section className={styles.Tabellseksjon}>
       <div className={styles.Overskrift}>
+        {!styresUtenfra && (
+          <button
+            type="button"
+            className={styles.Ikonknapp}
+            aria-label={`Legg til rad i ${tittel}`}
+            title="Legg til rad"
+            disabled={nyRad !== null}
+            onClick={åpneNyRad}
+          >
+            <i className="material-icons add_circle_outline" />
+          </button>
+        )}
         <h2 className={styles.Tittel}>{tittel}</h2>
-        <button
-          type="button"
-          className={styles.Ikonknapp}
-          aria-label={`Legg til rad i ${tittel}`}
-          title="Legg til rad"
-          disabled={nyRad !== null}
-          onClick={() => setNyRad(nyRadVerdier())}
-        >
-          <i className="material-icons add_circle_outline" />
-        </button>
       </div>
       <div className={styles.TabellContainer}>
         <table className={styles.Tabell} aria-label={tittel}>
           <thead>
             <tr>
-              {onVelg && <th scope="col" className={styles.Handlinger} />}
+              <th scope="col" className={styles.Handlinger} />
               {kolonner.map((kolonne) => (
                 <th
                   scope="col"
                   key={kolonne.key}
                   className={styles.Kolonnetittel}
                 >
-                  {kolonne.key}
+                  {kolonne.tittel}
                 </th>
               ))}
-              <th scope="col" className={styles.Handlinger}>
-                Handlinger
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -188,37 +212,25 @@ export const RedigerbarTabell = <T,>({
               const verdier = utkast[nøkkel];
               const redigeres = verdier !== undefined;
               const erValgt = valgtId !== undefined && valgtId === radId(rad);
+              const velg = onVelg ? () => onVelg(rad) : undefined;
               return (
                 <tr
                   key={nøkkel}
-                  className={classNames(styles.Rad, erValgt && styles.erValgt)}
-                  onClick={onVelg ? () => onVelg(rad) : undefined}
-                >
-                  {onVelg && (
-                    <td className={styles.Celle}>
-                      <input
-                        type="radio"
-                        name={`valgtRad-${tittel}`}
-                        aria-label={`Velg rad ${nøkkel}`}
-                        checked={erValgt}
-                        onChange={() => onVelg(rad)}
-                      />
-                    </td>
+                  className={classNames(
+                    styles.Rad,
+                    onVelg && styles.Velgbar,
+                    erValgt && styles.erValgt,
                   )}
-                  {redigeres
-                    ? cellerForUtkast(nøkkel, verdier, false)
-                    : kolonner.map((kolonne) => {
-                        const verdi = rad[kolonne.key];
-                        return (
-                          <td key={kolonne.key} className={styles.Celle}>
-                            <span className={styles.Verdi}>
-                              {verdi === null || verdi === undefined
-                                ? ""
-                                : String(verdi)}
-                            </span>
-                          </td>
-                        );
-                      })}
+                  aria-current={erValgt ? "true" : undefined}
+                  tabIndex={onVelg ? 0 : undefined}
+                  onClick={velg}
+                  onKeyDown={(event) => {
+                    if (velg === undefined) return;
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    velg();
+                  }}
+                >
                   <td className={classNames(styles.Celle, styles.Handlinger)}>
                     {redigeres ? (
                       <>
@@ -227,7 +239,10 @@ export const RedigerbarTabell = <T,>({
                           className={styles.Ikonknapp}
                           aria-label={`Lagre rad ${nøkkel}`}
                           title="Lagre"
-                          disabled={lagrer === nøkkel}
+                          disabled={
+                            lagrer === nøkkel ||
+                            manglerPåkrevdeFelter(kolonner, verdier)
+                          }
                           onClick={() => void lagreEndring(rad)}
                         >
                           <i className="material-icons save" />
@@ -268,20 +283,30 @@ export const RedigerbarTabell = <T,>({
                       <i className="material-icons delete_forever" />
                     </button>
                   </td>
+                  {redigeres
+                    ? cellerForUtkast(nøkkel, verdier, false)
+                    : kolonner.map((kolonne) => (
+                        <td key={kolonne.key} className={styles.Celle}>
+                          <span className={styles.Verdi}>
+                            {visVerdi(kolonne, rad)}
+                          </span>
+                        </td>
+                      ))}
                 </tr>
               );
             })}
             {nyRad !== null && (
               <tr className={classNames(styles.Rad, styles.NyRad)}>
-                {onVelg && <td className={styles.Celle} />}
-                {cellerForUtkast(NY_RAD, nyRad, true)}
                 <td className={classNames(styles.Celle, styles.Handlinger)}>
                   <button
                     type="button"
                     className={styles.Ikonknapp}
                     aria-label={`Lagre ny rad i ${tittel}`}
                     title="Lagre"
-                    disabled={lagrer === NY_RAD}
+                    disabled={
+                      lagrer === NY_RAD ||
+                      manglerPåkrevdeFelter(kolonner, nyRad)
+                    }
                     onClick={() => void lagreNyRad()}
                   >
                     <i className="material-icons save" />
@@ -291,19 +316,17 @@ export const RedigerbarTabell = <T,>({
                     className={styles.Ikonknapp}
                     aria-label={`Avbryt ny rad i ${tittel}`}
                     title="Avbryt"
-                    onClick={() => setNyRad(null)}
+                    onClick={lukkNyRad}
                   >
                     <i className="material-icons close" />
                   </button>
                 </td>
+                {cellerForUtkast(NY_RAD, nyRad, true)}
               </tr>
             )}
             {rader.length === 0 && nyRad === null && (
               <tr>
-                <td
-                  className={styles.TomTabell}
-                  colSpan={kolonner.length + (onVelg ? 2 : 1)}
-                >
+                <td className={styles.TomTabell} colSpan={kolonner.length + 1}>
                   Ingen rader
                 </td>
               </tr>

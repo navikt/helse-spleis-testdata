@@ -14,6 +14,9 @@ spec:
         databases:
           - name: forsikring-replika-testdata
             envVarPrefix: DATABASE
+            users:
+              # sp-forsikring leser denne basen i dev i stedet for Infotrygd-replikaen i Q.
+              - name: sp-forsikring
   image: {{image}}
   port: 8080
   liveness:

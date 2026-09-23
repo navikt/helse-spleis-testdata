@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ErrorMessage, HStack, VStack } from "@navikt/ds-react";
+import { HStack, VStack } from "@navikt/ds-react";
 
 import { post } from "../../io/api";
 import { useSubscribe } from "../../io/subscription";
@@ -13,8 +13,6 @@ import { EndringRefusjon } from "./EndringRefusjon";
 import { InntektsmeldingCard } from "./InntektsmeldingCard";
 import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
 import { Forsikring } from "../forsikring/Forsikring";
-
-import { FetchButton } from "../../components/FetchButton";
 
 import type {
   FellesDTO,
@@ -236,6 +234,10 @@ export const OpprettDokumenter = React.memo(() => {
             <PersonCard
               setErArbeidstaker={setErArbeidstaker}
               setPersonIkkeFunnet={setPersonIkkeFunnet}
+              status={status}
+              isFetching={isFetching}
+              isPersonNotFound={personIkkeFunnet}
+              errorBody={errorBody}
             />
             {skalSendeSøknad && <SøknadCard />}
             {erArbeidstaker && <InntektsmeldingCard />}
@@ -251,22 +253,6 @@ export const OpprettDokumenter = React.memo(() => {
           {skalSendeSøknad && <Ferieperioder />}
           {skalSendeSøknad && <Egenmeldingsdager />}
           {skalSendeSøknad && <InntektFraNyttArbeidsforhold />}
-          <HStack gap="space-16" align="center">
-            <FetchButton
-              status={status}
-              isFetching={isFetching}
-              type="submit"
-              disabled={personIkkeFunnet}
-            >
-              Opprett dokumenter
-            </FetchButton>
-            {typeof status === "number" && status >= 400 && (
-              <ErrorMessage>
-                Noe gikk galt! Melding fra server: {errorBody}, statuskode{" "}
-                {status}
-              </ErrorMessage>
-            )}
-          </HStack>
         </VStack>
       </form>
     </FormProvider>

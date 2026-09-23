@@ -16,6 +16,7 @@ import { FormInput } from "../../components/FormInput";
 import { FormSelect } from "../../components/FormSelect";
 import { Checkbox } from "../../components/Checkbox";
 import { Card } from "../../components/Card";
+import { FetchButton } from "../../components/FetchButton";
 import { SykdomTom } from "./SykdomTom";
 import { SykdomFom } from "./SykdomFom";
 import { DeleteButton } from "./DeleteButton";
@@ -69,9 +70,17 @@ function lagreSøk(fnr: string, navn: string) {
 export const PersonCard = ({
   setErArbeidstaker,
   setPersonIkkeFunnet,
+  status,
+  isFetching,
+  isPersonNotFound,
+  errorBody,
 }: {
   setErArbeidstaker: (value: boolean) => void;
   setPersonIkkeFunnet: (value: boolean) => void;
+  status?: number;
+  isFetching: boolean;
+  isPersonNotFound: boolean;
+  errorBody?: string;
 }) => {
   const { register, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<
@@ -241,6 +250,21 @@ export const PersonCard = ({
           })}
           aria-invalid={!!validateSendsDocuments()}
         />
+        <VStack gap="space-16">
+          <FetchButton
+            status={status}
+            isFetching={isFetching}
+            type="submit"
+            disabled={isPersonNotFound}
+          >
+            Opprett dokumenter
+          </FetchButton>
+          {typeof status === "number" && status >= 400 && (
+            <ErrorMessage>
+              Noe gikk galt! Melding fra server: {errorBody}
+            </ErrorMessage>
+          )}
+        </VStack>
         {typeof validateSendsDocuments() === "string" && (
           <ErrorMessage size="small">{validateSendsDocuments()}</ErrorMessage>
         )}

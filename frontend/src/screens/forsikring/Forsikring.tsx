@@ -8,14 +8,14 @@ import { useAddSystemMessage } from "../../state/useSystemMessages";
 import { AddButton } from "../../components/AddButton";
 import { Spinner } from "../../components/Spinner";
 
-import { RedigerbarTabell } from "./RedigerbarTabell";
-import {
-  fakturaKolonner,
-  forsikringKolonner,
-  nyFaktura,
-  nyForsikring,
-} from "./kolonner";
-import type { Forsikringsfaktura, IndividuellForsikring } from "./typer";
+import { ForsikringTabell } from "./ForsikringTabell";
+import { FakturaTabell } from "./FakturaTabell";
+import type {
+  Forsikringsfaktura,
+  ForsikringsfakturaPayload,
+  IndividuellForsikring,
+  IndividuellForsikringPayload,
+} from "./typer";
 
 const forsikringerUrl = (identitetsnummer: string) =>
   `/personer/${identitetsnummer}/individuelle-forsikringer`;
@@ -144,34 +144,31 @@ export const Forsikring = React.memo(() => {
       {feil !== null && <ErrorMessage>{feil}</ErrorMessage>}
       {laster && <Spinner />}
       {visForsikringstabell && (
-        <RedigerbarTabell<IndividuellForsikring>
-          tittel={`Individuelle forsikringer for ${person}`}
-          kolonner={forsikringKolonner}
-          rader={forsikringer}
-          radId={(rad) => rad.id}
+        <ForsikringTabell
+          identitetsnummer={person}
+          forsikringer={forsikringer}
           valgtId={valgtId}
-          onVelg={(rad) => setValgtId(rad.id)}
-          nyRadVerdier={nyForsikring}
+          onVelg={(forsikring) => setValgtId(forsikring.id)}
           nyRadÅpen={nyForsikringÅpen}
-          onNyRadÅpenEndret={setNyForsikringÅpen}
-          onOpprett={(verdier) =>
+          onLukkNyRad={() => setNyForsikringÅpen(false)}
+          onOpprett={(payload: IndividuellForsikringPayload) =>
             utfør(
-              post(forsikringerUrl(person), verdier),
+              post(forsikringerUrl(person), payload),
               "Ny individuell forsikring er lagret.",
               oppfriskForsikringer,
             )
           }
-          onOppdater={(rad, verdier) =>
+          onOppdater={(forsikring, payload) =>
             utfør(
-              put(forsikringUrl(rad.id), verdier),
-              `Individuell forsikring ${rad.id} er oppdatert.`,
+              put(forsikringUrl(forsikring.id), payload),
+              `Individuell forsikring ${forsikring.id} er oppdatert.`,
               oppfriskForsikringer,
             )
           }
-          onSlett={(rad) =>
+          onSlett={(forsikring) =>
             utfør(
-              del(forsikringUrl(rad.id)),
-              `Individuell forsikring ${rad.id} er slettet.`,
+              del(forsikringUrl(forsikring.id)),
+              `Individuell forsikring ${forsikring.id} er slettet.`,
               oppfriskForsikringer,
             )
           }
@@ -179,30 +176,26 @@ export const Forsikring = React.memo(() => {
       )}
       {valgtId !== null && (
         <VStack minWidth="0" width="100%">
-          <RedigerbarTabell<Forsikringsfaktura>
-            tittel="Fakturaer"
-            kolonner={fakturaKolonner}
-            rader={fakturaer}
-            radId={(rad) => rad.id}
-            nyRadVerdier={nyFaktura}
-            onOpprett={(verdier) =>
+          <FakturaTabell
+            fakturaer={fakturaer}
+            onOpprett={(payload: ForsikringsfakturaPayload) =>
               utfør(
-                post(fakturaerUrl(valgtId), verdier),
+                post(fakturaerUrl(valgtId), payload),
                 "Ny forsikringsfaktura er lagret.",
                 oppfriskFakturaer,
               )
             }
-            onOppdater={(rad, verdier) =>
+            onOppdater={(faktura, payload) =>
               utfør(
-                put(fakturaUrl(rad.id), verdier),
-                `Forsikringsfaktura ${rad.id} er oppdatert.`,
+                put(fakturaUrl(faktura.id), payload),
+                `Forsikringsfaktura ${faktura.id} er oppdatert.`,
                 oppfriskFakturaer,
               )
             }
-            onSlett={(rad) =>
+            onSlett={(faktura) =>
               utfør(
-                del(fakturaUrl(rad.id)),
-                `Forsikringsfaktura ${rad.id} er slettet.`,
+                del(fakturaUrl(faktura.id)),
+                `Forsikringsfaktura ${faktura.id} er slettet.`,
                 oppfriskFakturaer,
               )
             }

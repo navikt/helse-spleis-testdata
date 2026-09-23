@@ -48,3 +48,20 @@ export interface Forsikringsfaktura {
   halvdel: number | null;
   betalingsdato: string | null;
 }
+
+/** Feltene API-et tar imot ved opprettelse og oppdatering. Id og person kommer fra URL-en. */
+export interface IndividuellForsikringPayload {
+  godkjent: boolean;
+  fom: string | null;
+  virkningsdato: string | null;
+  type: IndividuellForsikringstype | null;
+  premiegrunnlag: number | null;
+  opphørsdato: string | null;
+  opphørsgrunn: string | null;
+}
+
+export interface ForsikringsfakturaPayload {
+  år: number | null;
+  halvdel: number | null;
+  betalingsdato: string | null;
+}

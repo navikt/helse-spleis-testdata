@@ -1,19 +1,17 @@
-import styles from "./OpprettDokumenter.module.css";
+import React, { useState } from "react";
 import { nanoid } from "nanoid";
+import { useFormContext } from "react-hook-form";
+import { HStack } from "@navikt/ds-react";
+
 import { Card } from "../../components/Card";
-import { FormInput } from "../../components/FormInput";
+import { FormDatePicker } from "../../components/FormDatePicker";
 import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
 
 type PeriodeId = string;
 
-const formattedDateString = (date: Date): string =>
-  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
-
 export const Arbeidsgiverperioder = React.memo(() => {
-  const { register, unregister, formState } = useFormContext();
+  const { unregister } = useFormContext();
   const [perioder, setPerioder] = useState<PeriodeId[]>([]);
 
   const addArbeidsgiverperiode = () => {
@@ -35,29 +33,26 @@ export const Arbeidsgiverperioder = React.memo(() => {
       </AddButton>
       {perioder.map((id, i) => (
         <Card key={id}>
-          <div className={styles.PeriodContainer}>
-            <FormInput
+          <HStack gap="space-16" align="end" wrap={false}>
+            <FormDatePicker
               data-testid={`arbeidsgiverFom${i}`}
-              type="date"
               label="Arbeidsgiverperiode f.o.m."
-              errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2021-07-01"))}
-              {...register(`inntektsmelding.arbeidsgiverperiode.${i}.fom`, {
-                required: "Start av arbeidsgiverperioden må angis",
-              })}
+              name={`inntektsmelding.arbeidsgiverperiode.${i}.fom`}
+              defaultValue="2021-07-01"
+              rules={{ required: "Start av arbeidsgiverperioden må angis" }}
             />
-            <FormInput
+            <FormDatePicker
               data-testid={`arbeidsgiverTom${i}`}
-              type="date"
               label="Arbeidsgiverperiode t.o.m."
-              errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2021-07-16"))}
-              {...register(`inntektsmelding.arbeidsgiverperiode.${i}.tom`, {
-                required: "Slutt av arbeidsgiverperioden må angis",
-              })}
+              name={`inntektsmelding.arbeidsgiverperiode.${i}.tom`}
+              defaultValue="2021-07-16"
+              rules={{ required: "Slutt av arbeidsgiverperioden må angis" }}
             />
-            <DeleteButton onClick={() => removeArbeidsgiverperiode(i)} />
-          </div>
+            <DeleteButton
+              aria-label="Fjern arbeidsgiverperiode"
+              onClick={() => removeArbeidsgiverperiode(i)}
+            />
+          </HStack>
         </Card>
       ))}
     </>

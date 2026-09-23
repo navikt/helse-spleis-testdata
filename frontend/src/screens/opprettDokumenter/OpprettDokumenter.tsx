@@ -1,6 +1,6 @@
-import styles from "./OpprettDokumenter.module.css";
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { ErrorMessage, HStack, VStack } from "@navikt/ds-react";
 
 import { post } from "../../io/api";
 import { useSubscribe } from "../../io/subscription";
@@ -15,7 +15,6 @@ import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
 import { Forsikring } from "../forsikring/Forsikring";
 
 import { FetchButton } from "../../components/FetchButton";
-import { ErrorMessage } from "../../components/ErrorMessage";
 
 import type {
   FellesDTO,
@@ -37,9 +36,9 @@ type OpprettVedtaksperiodePayload = PersonDTO &
   };
 
 type ArbeidsgiverSvarerPayload = PersonDTO &
-    FellesDTO & {
+  FellesDTO & {
     arbeidsgiveropplysninger: ArbeidsgiveropplysningerDTO;
-};
+  };
 
 const createOpprettVedtaksperiodePayload = (
   values: Record<string, any>,
@@ -105,45 +104,51 @@ const createOpprettVedtaksperiodePayload = (
 };
 
 const createArbeidsgiverSvarerPayload = (
-    values: Record<string, any>,
-    vedtaksperiodeId: string,
-    forespurt: boolean,
-    aarsakTilEndring: string
-): ArbeidsgiverSvarerPayload | undefined  => {
-    const arbeidsgiveropplysninger = (): ArbeidsgiveropplysningerDTO => ({
-        inntekt: values.inntektsmelding.inntekt,
-        refusjon: {
-            opphørRefusjon: values.inntektsmelding.opphørRefusjon || null,
-            refusjonsbeløp: values.inntektsmelding.refusjonsbeløp || null,
-        },
-        arbeidsgiverperiode:
-            values.inntektsmelding.arbeidsgiverperiode?.map(
-                (it: { fom: string; tom: string }) => ({ fom: it.fom, tom: it.tom }),
-            ) ?? [],
-        endringRefusjon:
-            values.inntektsmelding.endringIRefusjon?.map(
-                (it: { endringsdato: string; endringsbeløp: number }) => ({
-                    endringsdato: it.endringsdato,
-                    beløp: it.endringsbeløp as number,
-                }),
-            ) ?? [],
-        begrunnelseForReduksjonEllerIkkeUtbetalt: values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
-        harOpphørAvNaturalytelser: values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
-        vedtaksperiodeId: vedtaksperiodeId,
-        forespurt: forespurt,
-        arsakTilInnsending: aarsakTilEndring,
-    });
+  values: Record<string, any>,
+  vedtaksperiodeId: string,
+  forespurt: boolean,
+  aarsakTilEndring: string,
+): ArbeidsgiverSvarerPayload | undefined => {
+  const arbeidsgiveropplysninger = (): ArbeidsgiveropplysningerDTO => ({
+    inntekt: values.inntektsmelding.inntekt,
+    refusjon: {
+      opphørRefusjon: values.inntektsmelding.opphørRefusjon || null,
+      refusjonsbeløp: values.inntektsmelding.refusjonsbeløp || null,
+    },
+    arbeidsgiverperiode:
+      values.inntektsmelding.arbeidsgiverperiode?.map(
+        (it: { fom: string; tom: string }) => ({ fom: it.fom, tom: it.tom }),
+      ) ?? [],
+    endringRefusjon:
+      values.inntektsmelding.endringIRefusjon?.map(
+        (it: { endringsdato: string; endringsbeløp: number }) => ({
+          endringsdato: it.endringsdato,
+          beløp: it.endringsbeløp as number,
+        }),
+      ) ?? [],
+    begrunnelseForReduksjonEllerIkkeUtbetalt:
+      values.inntektsmelding.begrunnelseForReduksjonEllerIkkeUtbetalt,
+    harOpphørAvNaturalytelser:
+      values.inntektsmelding.harOpphørAvNaturalytelser ?? false,
+    vedtaksperiodeId: vedtaksperiodeId,
+    forespurt: forespurt,
+    arsakTilInnsending: aarsakTilEndring,
+  });
 
-    if (values.arbeidssituasjon !== "ARBEIDSTAKER" || !values.skalSendeInntektsmelding) return undefined
+  if (
+    values.arbeidssituasjon !== "ARBEIDSTAKER" ||
+    !values.skalSendeInntektsmelding
+  )
+    return undefined;
 
-    return {
-        fnr: values.fnr,
-        orgnummer: values.orgnummer || null,
-        sykdomFom: values.sykdomFom,
-        sykdomTom: values.sykdomTom,
-        arbeidssituasjon: values.arbeidssituasjon,
-        arbeidsgiveropplysninger: arbeidsgiveropplysninger()
-    };
+  return {
+    fnr: values.fnr,
+    orgnummer: values.orgnummer || null,
+    sykdomFom: values.sykdomFom,
+    sykdomTom: values.sykdomTom,
+    arbeidssituasjon: values.arbeidssituasjon,
+    arbeidsgiveropplysninger: arbeidsgiveropplysninger(),
+  };
 };
 
 export const OpprettDokumenter = React.memo(() => {
@@ -168,17 +173,20 @@ export const OpprettDokumenter = React.memo(() => {
   const [subscribe] = useSubscribe();
   const addMessage = useAddSystemMessage();
 
-  const postOpprettVedtaksperiode = async (data: Record<string, any>): Promise<Response> => {
-    return post("/vedtaksperiode", createOpprettVedtaksperiodePayload(data)).finally(() =>
-      setIsFetching(false),
-    );
+  const postOpprettVedtaksperiode = async (
+    data: Record<string, any>,
+  ): Promise<Response> => {
+    return post(
+      "/vedtaksperiode",
+      createOpprettVedtaksperiodePayload(data),
+    ).finally(() => setIsFetching(false));
   };
 
-    const postArbeidsgiverSvarer = async (payload: ArbeidsgiverSvarerPayload): Promise<Response> => {
-        return post("/vedtaksperiode", payload).finally(() =>
-            setIsFetching(false),
-        );
-    };
+  const postArbeidsgiverSvarer = async (
+    payload: ArbeidsgiverSvarerPayload,
+  ): Promise<Response> => {
+    return post("/vedtaksperiode", payload).finally(() => setIsFetching(false));
+  };
 
   const onSubmit = async (data: Record<string, any>) => {
     setIsFetching(true);
@@ -195,22 +203,27 @@ export const OpprettDokumenter = React.memo(() => {
         timeToLiveMs: 4000,
       });
       subscribe(data.fnr, async (vedtaksperiodeId: string) => {
-          // Når det er svar på forespørsel er det alltid forespurt true og årsakTilEndring er "Ny"
-          const payload = createArbeidsgiverSvarerPayload(data, vedtaksperiodeId, true, "Ny")
-          if (payload == undefined) return
-          setIsFetching(true);
-          const response = await postArbeidsgiverSvarer(payload);
-          const { status } = response;
-          setStatus(status);
-          const errorBody = await response.text();
-          setErrorBody(errorBody);
-          if (status < 400) {
-              addMessage({
-                  id: nanoid(),
-                  text: "Arbeidsgiveropplysninger er sendt.",
-                  timeToLiveMs: 4000,
-              });
-          }
+        // Når det er svar på forespørsel er det alltid forespurt true og årsakTilEndring er "Ny"
+        const payload = createArbeidsgiverSvarerPayload(
+          data,
+          vedtaksperiodeId,
+          true,
+          "Ny",
+        );
+        if (payload == undefined) return;
+        setIsFetching(true);
+        const response = await postArbeidsgiverSvarer(payload);
+        const { status } = response;
+        setStatus(status);
+        const errorBody = await response.text();
+        setErrorBody(errorBody);
+        if (status < 400) {
+          addMessage({
+            id: nanoid(),
+            text: "Arbeidsgiveropplysninger er sendt.",
+            timeToLiveMs: 4000,
+          });
+        }
       });
     }
   };
@@ -218,13 +231,16 @@ export const OpprettDokumenter = React.memo(() => {
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className={styles.OpprettDokumenter}>
-          <div className={styles.DocumentContainer}>
-            <PersonCard setErArbeidstaker={setErArbeidstaker} setPersonIkkeFunnet={setPersonIkkeFunnet} />
+        <VStack gap="space-32" padding="space-32" align="start">
+          <HStack gap="space-16" align="start">
+            <PersonCard
+              setErArbeidstaker={setErArbeidstaker}
+              setPersonIkkeFunnet={setPersonIkkeFunnet}
+            />
             {skalSendeSøknad && <SøknadCard />}
             {erArbeidstaker && <InntektsmeldingCard />}
             <DiverseCard />
-          </div>
+          </HStack>
           <Forsikring />
           {erArbeidstaker && (
             <>
@@ -235,8 +251,13 @@ export const OpprettDokumenter = React.memo(() => {
           {skalSendeSøknad && <Ferieperioder />}
           {skalSendeSøknad && <Egenmeldingsdager />}
           {skalSendeSøknad && <InntektFraNyttArbeidsforhold />}
-          <div className={styles.Flex}>
-            <FetchButton status={status} isFetching={isFetching} type="submit" disabled={personIkkeFunnet}>
+          <HStack gap="space-16" align="center">
+            <FetchButton
+              status={status}
+              isFetching={isFetching}
+              type="submit"
+              disabled={personIkkeFunnet}
+            >
               Opprett dokumenter
             </FetchButton>
             {typeof status === "number" && status >= 400 && (
@@ -245,8 +266,8 @@ export const OpprettDokumenter = React.memo(() => {
                 {status}
               </ErrorMessage>
             )}
-          </div>
-        </div>
+          </HStack>
+        </VStack>
       </form>
     </FormProvider>
   );

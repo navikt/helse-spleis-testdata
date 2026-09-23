@@ -1,7 +1,26 @@
 import React, { useEffect, useState } from "react";
-import classNames from "classnames";
+import {
+  BodyShort,
+  Button,
+  Checkbox,
+  Heading,
+  HStack,
+  Select,
+  Table,
+  TextField,
+  VStack,
+} from "@navikt/ds-react";
+import { Box } from "@navikt/ds-react/Box";
+import {
+  FloppydiskIcon,
+  PencilIcon,
+  PlusCircleIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@navikt/aksel-icons";
 
 import styles from "./RedigerbarTabell.module.css";
+import { DatoFelt } from "../../components/DatoFelt";
 import {
   manglerPåkrevdeFelter,
   tilPayload,
@@ -129,22 +148,24 @@ export const RedigerbarTabell = <T,>({
   ) => {
     const radnavn = erNyRad ? "ny rad" : `rad ${nøkkel}`;
     return kolonner.map((kolonne) => (
-      <td key={kolonne.key} className={styles.Celle}>
+      <Table.DataCell key={kolonne.key}>
         {kolonne.type === "boolean" ? (
-          <input
-            className={styles.Input}
-            type="checkbox"
-            aria-label={`${kolonne.tittel} ${radnavn}`}
+          <Checkbox
+            size="small"
+            hideLabel
             checked={verdier[kolonne.key] === "true"}
             onChange={(event) =>
               oppdaterFelt(nøkkel, kolonne.key, String(event.target.checked))
             }
-          />
+          >
+            {`${kolonne.tittel} ${radnavn}`}
+          </Checkbox>
         ) : kolonne.type === "select" ? (
-          <select
-            className={styles.Input}
-            aria-label={`${kolonne.tittel} ${radnavn}`}
-            required={kolonne.påkrevd}
+          <Select
+            size="small"
+            hideLabel
+            label={`${kolonne.tittel} ${radnavn}`}
+            className={styles.Felt}
             value={verdier[kolonne.key] ?? ""}
             onChange={(event) =>
               oppdaterFelt(nøkkel, kolonne.key, event.target.value)
@@ -156,184 +177,197 @@ export const RedigerbarTabell = <T,>({
                 {valg.tekst}
               </option>
             ))}
-          </select>
+          </Select>
+        ) : kolonne.type === "date" ? (
+          <DatoFelt
+            hideLabel
+            label={`${kolonne.tittel} ${radnavn}`}
+            className={styles.Felt}
+            verdi={verdier[kolonne.key] ?? ""}
+            onEndret={(isoDato) => oppdaterFelt(nøkkel, kolonne.key, isoDato)}
+          />
         ) : (
-          <input
-            className={styles.Input}
-            type={kolonne.type === "text" ? "text" : kolonne.type}
-            aria-label={`${kolonne.tittel} ${radnavn}`}
-            required={kolonne.påkrevd}
+          <TextField
+            size="small"
+            hideLabel
+            label={`${kolonne.tittel} ${radnavn}`}
+            className={styles.Felt}
+            type={kolonne.type === "number" ? "number" : "text"}
             value={verdier[kolonne.key] ?? ""}
             onChange={(event) =>
               oppdaterFelt(nøkkel, kolonne.key, event.target.value)
             }
           />
         )}
-      </td>
+      </Table.DataCell>
     ));
   };
 
   return (
-    <section className={styles.Tabellseksjon}>
-      <div className={styles.Overskrift}>
-        {!styresUtenfra && (
-          <button
-            type="button"
-            className={styles.Ikonknapp}
-            aria-label={`Legg til rad i ${tittel}`}
-            title="Legg til rad"
-            disabled={nyRad !== null}
-            onClick={åpneNyRad}
-          >
-            <i className="material-icons add_circle_outline" />
-          </button>
-        )}
-        <h2 className={styles.Tittel}>{tittel}</h2>
-      </div>
-      <div className={styles.TabellContainer}>
-        <table className={styles.Tabell} aria-label={tittel}>
-          <thead>
-            <tr>
-              <th scope="col" className={styles.Handlinger} />
-              {kolonner.map((kolonne) => (
-                <th
-                  scope="col"
-                  key={kolonne.key}
-                  className={styles.Kolonnetittel}
-                >
-                  {kolonne.tittel}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rader.map((rad) => {
-              const nøkkel = String(radId(rad));
-              const verdier = utkast[nøkkel];
-              const redigeres = verdier !== undefined;
-              const erValgt = valgtId !== undefined && valgtId === radId(rad);
-              const velg = onVelg ? () => onVelg(rad) : undefined;
-              return (
-                <tr
-                  key={nøkkel}
-                  className={classNames(
-                    styles.Rad,
-                    onVelg && styles.Velgbar,
-                    erValgt && styles.erValgt,
-                  )}
-                  aria-current={erValgt ? "true" : undefined}
-                  tabIndex={onVelg ? 0 : undefined}
-                  onClick={velg}
-                  onKeyDown={(event) => {
-                    if (velg === undefined) return;
-                    if (event.key !== "Enter" && event.key !== " ") return;
-                    event.preventDefault();
-                    velg();
-                  }}
-                >
-                  <td className={classNames(styles.Celle, styles.Handlinger)}>
-                    {redigeres ? (
-                      <>
-                        <button
+    <VStack gap="space-16" minWidth="0" asChild>
+      <section>
+        <HStack gap="space-16" align="center">
+          {!styresUtenfra && (
+            <Button
+              type="button"
+              variant="tertiary"
+              size="small"
+              icon={<PlusCircleIcon aria-hidden />}
+              aria-label={`Legg til rad i ${tittel}`}
+              title="Legg til rad"
+              disabled={nyRad !== null}
+              onClick={åpneNyRad}
+            />
+          )}
+          <Heading level="2" size="small">
+            {tittel}
+          </Heading>
+        </HStack>
+        <Box
+          background="raised"
+          borderRadius="8"
+          padding="space-16"
+          overflow="auto"
+          minWidth="0"
+        >
+          <Table size="small" aria-label={tittel}>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader scope="col" />
+                {kolonner.map((kolonne) => (
+                  <Table.ColumnHeader scope="col" key={kolonne.key}>
+                    {kolonne.tittel}
+                  </Table.ColumnHeader>
+                ))}
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {rader.map((rad) => {
+                const nøkkel = String(radId(rad));
+                const verdier = utkast[nøkkel];
+                const redigeres = verdier !== undefined;
+                const erValgt = valgtId !== undefined && valgtId === radId(rad);
+                const velg = onVelg ? () => onVelg(rad) : undefined;
+                return (
+                  <Table.Row
+                    key={nøkkel}
+                    selected={erValgt}
+                    className={onVelg ? styles.Velgbar : undefined}
+                    aria-current={erValgt ? "true" : undefined}
+                    tabIndex={onVelg ? 0 : undefined}
+                    onClick={velg}
+                    onKeyDown={(event) => {
+                      if (velg === undefined) return;
+                      if (event.key !== "Enter" && event.key !== " ") return;
+                      event.preventDefault();
+                      velg();
+                    }}
+                  >
+                    <Table.DataCell className={styles.Handlinger}>
+                      {redigeres ? (
+                        <>
+                          <Button
+                            type="button"
+                            variant="tertiary"
+                            size="small"
+                            icon={<FloppydiskIcon aria-hidden />}
+                            aria-label={`Lagre rad ${nøkkel}`}
+                            title="Lagre"
+                            disabled={
+                              lagrer === nøkkel ||
+                              manglerPåkrevdeFelter(kolonner, verdier)
+                            }
+                            onClick={() => void lagreEndring(rad)}
+                          />
+                          <Button
+                            type="button"
+                            variant="tertiary"
+                            size="small"
+                            icon={<XMarkIcon aria-hidden />}
+                            aria-label={`Avbryt redigering av rad ${nøkkel}`}
+                            title="Avbryt"
+                            onClick={() => avbrytRedigering(nøkkel)}
+                          />
+                        </>
+                      ) : (
+                        <Button
                           type="button"
-                          className={styles.Ikonknapp}
-                          aria-label={`Lagre rad ${nøkkel}`}
-                          title="Lagre"
-                          disabled={
-                            lagrer === nøkkel ||
-                            manglerPåkrevdeFelter(kolonner, verdier)
+                          variant="tertiary"
+                          size="small"
+                          icon={<PencilIcon aria-hidden />}
+                          aria-label={`Rediger rad ${nøkkel}`}
+                          title="Rediger"
+                          onClick={() =>
+                            setUtkast((forrige) => ({
+                              ...forrige,
+                              [nøkkel]: tilUtkast(kolonner, rad),
+                            }))
                           }
-                          onClick={() => void lagreEndring(rad)}
-                        >
-                          <i className="material-icons save" />
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.Ikonknapp}
-                          aria-label={`Avbryt redigering av rad ${nøkkel}`}
-                          title="Avbryt"
-                          onClick={() => avbrytRedigering(nøkkel)}
-                        >
-                          <i className="material-icons close" />
-                        </button>
-                      </>
-                    ) : (
-                      <button
+                        />
+                      )}
+                      <Button
                         type="button"
-                        className={styles.Ikonknapp}
-                        aria-label={`Rediger rad ${nøkkel}`}
-                        title="Rediger"
-                        onClick={() =>
-                          setUtkast((forrige) => ({
-                            ...forrige,
-                            [nøkkel]: tilUtkast(kolonner, rad),
-                          }))
-                        }
-                      >
-                        <i className="material-icons edit" />
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className={classNames(styles.Ikonknapp, styles.Slett)}
-                      aria-label={`Slett rad ${nøkkel}`}
-                      title="Slett"
-                      onClick={() => void slettRad(rad)}
-                    >
-                      <i className="material-icons delete_forever" />
-                    </button>
-                  </td>
-                  {redigeres
-                    ? cellerForUtkast(nøkkel, verdier, false)
-                    : kolonner.map((kolonne) => (
-                        <td key={kolonne.key} className={styles.Celle}>
-                          <span className={styles.Verdi}>
+                        variant="tertiary"
+                        data-color="danger"
+                        size="small"
+                        icon={<TrashIcon aria-hidden />}
+                        aria-label={`Slett rad ${nøkkel}`}
+                        title="Slett"
+                        onClick={() => void slettRad(rad)}
+                      />
+                    </Table.DataCell>
+                    {redigeres
+                      ? cellerForUtkast(nøkkel, verdier, false)
+                      : kolonner.map((kolonne) => (
+                          <Table.DataCell key={kolonne.key}>
                             {visVerdi(kolonne, rad)}
-                          </span>
-                        </td>
-                      ))}
-                </tr>
-              );
-            })}
-            {nyRad !== null && (
-              <tr className={classNames(styles.Rad, styles.NyRad)}>
-                <td className={classNames(styles.Celle, styles.Handlinger)}>
-                  <button
-                    type="button"
-                    className={styles.Ikonknapp}
-                    aria-label={`Lagre ny rad i ${tittel}`}
-                    title="Lagre"
-                    disabled={
-                      lagrer === NY_RAD ||
-                      manglerPåkrevdeFelter(kolonner, nyRad)
-                    }
-                    onClick={() => void lagreNyRad()}
-                  >
-                    <i className="material-icons save" />
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.Ikonknapp}
-                    aria-label={`Avbryt ny rad i ${tittel}`}
-                    title="Avbryt"
-                    onClick={lukkNyRad}
-                  >
-                    <i className="material-icons close" />
-                  </button>
-                </td>
-                {cellerForUtkast(NY_RAD, nyRad, true)}
-              </tr>
-            )}
-            {rader.length === 0 && nyRad === null && (
-              <tr>
-                <td className={styles.TomTabell} colSpan={kolonner.length + 1}>
-                  Ingen rader
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </section>
+                          </Table.DataCell>
+                        ))}
+                  </Table.Row>
+                );
+              })}
+              {nyRad !== null && (
+                <Table.Row selected>
+                  <Table.DataCell className={styles.Handlinger}>
+                    <Button
+                      type="button"
+                      variant="tertiary"
+                      size="small"
+                      icon={<FloppydiskIcon aria-hidden />}
+                      aria-label={`Lagre ny rad i ${tittel}`}
+                      title="Lagre"
+                      disabled={
+                        lagrer === NY_RAD ||
+                        manglerPåkrevdeFelter(kolonner, nyRad)
+                      }
+                      onClick={() => void lagreNyRad()}
+                    />
+                    <Button
+                      type="button"
+                      variant="tertiary"
+                      size="small"
+                      icon={<XMarkIcon aria-hidden />}
+                      aria-label={`Avbryt ny rad i ${tittel}`}
+                      title="Avbryt"
+                      onClick={lukkNyRad}
+                    />
+                  </Table.DataCell>
+                  {cellerForUtkast(NY_RAD, nyRad, true)}
+                </Table.Row>
+              )}
+              {rader.length === 0 && nyRad === null && (
+                <Table.Row>
+                  <Table.DataCell colSpan={kolonner.length + 1}>
+                    <BodyShort size="small" textColor="subtle">
+                      Ingen rader
+                    </BodyShort>
+                  </Table.DataCell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+        </Box>
+      </section>
+    </VStack>
   );
 };

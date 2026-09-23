@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import styles from "./CopyField.module.css";
-import classNames from "classnames";
-import { Input } from "./Input";
-import { Button } from "./Button";
-import { ErrorMessage } from "./ErrorMessage";
+import { Button, ErrorMessage, HStack, TextField } from "@navikt/ds-react";
+import {
+  CheckmarkCircleIcon,
+  FilesIcon,
+  XMarkOctagonIcon,
+} from "@navikt/aksel-icons";
 
 interface CopyFieldProps {
   label: string;
@@ -30,28 +31,37 @@ export const CopyField: React.FC<CopyFieldProps> = (props) => {
     props.value && setCopied(false);
   }, [props.value]);
 
+  const ikon = () => {
+    if (copied) return <CheckmarkCircleIcon aria-hidden />;
+    if (error) return <XMarkOctagonIcon aria-hidden />;
+    return <FilesIcon aria-hidden />;
+  };
+
   return (
-    <label className={styles.Label}>
-      {props.label}
-      <span className={styles.Flex}>
-        <Input type="text" value={props.value} disabled />
+    <div>
+      <HStack gap="space-8" align="end" wrap={false}>
+        <TextField
+          label={props.label}
+          size="small"
+          type="text"
+          value={props.value}
+          readOnly
+        />
         <Button
           type="button"
-          className={classNames(
-            styles.Button,
-            copied && styles.copied,
-            error && styles.error,
-          )}
+          variant="secondary"
+          size="small"
+          data-color={copied ? "success" : error ? "danger" : "neutral"}
+          icon={ikon()}
+          aria-label={`Kopier ${props.label}`}
           onClick={copyValueToClipboard}
-        >
-          {copied && <i className="material-icons check_circle" />}
-          {error && <i className="material-icons error" />}
-          {!copied && !error && <i className="material-icons content_copy" />}
-        </Button>
-      </span>
+        />
+      </HStack>
       {error && (
-        <ErrorMessage>Kunne ikke kopiere til utklippstavle</ErrorMessage>
+        <ErrorMessage size="small">
+          Kunne ikke kopiere til utklippstavle
+        </ErrorMessage>
       )}
-    </label>
+    </div>
   );
 };

@@ -1,9 +1,12 @@
+import React from "react";
+import classNames from "classnames";
+import { FileTextIcon, PersonGroupIcon, WalletIcon } from "@navikt/aksel-icons";
+import { Heading } from "@navikt/ds-react";
+
 import styles from "./Nav.module.css";
 import { NavLink } from "./NavLink";
-import classNames from "classnames";
 import { ExpandButton } from "./ExpandButton";
 import { useLocalStorageState } from "../../state/persistance";
-import React from "react";
 
 import logo from "../../assets/logo.png";
 
@@ -20,20 +23,20 @@ export const Nav = React.memo(() => {
       aria-expanded={isExpanded}
     >
       <ul className={styles.Links}>
-        <h1 className={styles.Title}>
+        <Heading level="1" size="medium" className={styles.Title}>
           <img className={styles.Logo} src={logo} alt="" />
           <span>Spleis testdata</span>
-        </h1>
+        </Heading>
         <NavLink to="/" isExpanded={isExpanded}>
-          <i className={classNames("material-icons", "description")} />
+          <FileTextIcon aria-hidden fontSize="1.5rem" />
           Opprett dokumenter
         </NavLink>
         <NavLink to="/inntekt/hent" isExpanded={isExpanded}>
-          <i className="material-icons attach_money" />
+          <WalletIcon aria-hidden fontSize="1.5rem" />
           Hent inntekt
         </NavLink>
         <NavLink to="/testgruppe" isExpanded={isExpanded}>
-          <i className="material-icons accessibility" />
+          <PersonGroupIcon aria-hidden fontSize="1.5rem" />
           Hent testgruppe
         </NavLink>
       </ul>

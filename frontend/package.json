@@ -35,9 +35,11 @@
     "vitest": "^4.0.14"
   },
   "dependencies": {
+    "@navikt/aksel-icons": "^8.16.2",
+    "@navikt/ds-css": "^8.16.2",
+    "@navikt/ds-react": "^8.16.2",
     "@react-spring/web": "^10.0.3",
     "date-fns": "^4.1.0",
-    "material-design-icons-iconfont": "^6.7.0",
     "nanoid": "^5.1.6",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",

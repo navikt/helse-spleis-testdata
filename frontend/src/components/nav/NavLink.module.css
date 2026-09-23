@@ -2,62 +2,45 @@
   position: relative;
   display: flex;
   align-items: center;
-  font-weight: 400;
-  margin: 0 0 var(--block-extra-small);
-  border-radius: 0.25rem;
+  gap: var(--ax-space-8);
+  margin: 0 0 var(--ax-space-4);
+  padding: var(--ax-space-16);
+  border-radius: var(--ax-radius-4);
   white-space: nowrap;
   text-decoration: none;
   overflow: hidden;
-  color: var(--text-color-primary);
-  padding: 1rem;
-  outline: none;
-  transition: all 0.2s ease;
+  color: var(--ax-text-neutral);
 }
 
 .Link > a:focus-visible {
-  box-shadow: var(--focus-shadow);
-}
-
-.Link > a > i:first-child {
-  margin-right: 0.5rem;
-}
-
-.Link > a > i {
-  transition: filter 0.2s ease;
+  outline: 3px solid var(--ax-border-focus);
+  outline-offset: 2px;
 }
 
 .Link > a:before {
   content: "";
   position: absolute;
   top: 0;
-  left: -0.5rem;
-  width: 0.5rem;
+  left: calc(-1 * var(--ax-space-8));
+  width: var(--ax-space-8);
   height: 100%;
-  transition: left 0.2s ease;
 }
 
 .Link > a:hover,
 .Link > :global(a.active) {
-  background: var(--active-color-secondary);
+  background: var(--ax-bg-accent-soft);
 }
 
 .isExpanded > :global(a.active) {
-  padding-left: 1.5rem;
-}
-
-.isExpanded > :global(a.active) {
-  padding-left: 1.5rem;
+  padding-left: var(--ax-space-24);
 }
 
 .Link > :global(a.active:before) {
-  background: var(--active-color-primary);
+  background: var(--ax-bg-accent-strong);
   left: 0;
-  border-radius: var(--border-radius) 0 0 var(--border-radius);
-}
-
-.isExpanded > a {
+  border-radius: var(--ax-radius-4) 0 0 var(--ax-radius-4);
 }
 
 .isMinified > a {
-  padding: 1rem 0.5rem;
+  padding: var(--ax-space-16) var(--ax-space-8);
 }

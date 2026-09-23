@@ -1,8 +1,8 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import classNames from "classnames";
+import { Theme } from "@navikt/ds-react";
 
-import { useTheme, useUpdateBodyBackgroundColor } from "./state/useTheme";
+import { useTheme } from "./state/useTheme";
 import { HentInntekt } from "./screens/HentInntekt";
 import { HentTestgruppe } from "./screens/HentTestgruppe";
 import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
@@ -17,10 +17,8 @@ import { AppStatus } from "./components/AppStatus";
 export const App = () => {
   const theme = useTheme();
 
-  useUpdateBodyBackgroundColor(theme);
-
   return (
-    <div className={classNames(styles.App, styles[theme])}>
+    <Theme theme={theme} hasBackground className={styles.App}>
       <Nav />
       <Routes>
         <Route
@@ -37,6 +35,6 @@ export const App = () => {
       </Routes>
       <ThemeButton />
       <SystemMessages />
-    </div>
+    </Theme>
   );
 };

@@ -1,8 +1,9 @@
 .SystemMessages {
   position: fixed;
-  bottom: 5rem;
-  right: 2rem;
+  bottom: var(--ax-space-80);
+  right: var(--ax-space-32);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  z-index: 1;
 }

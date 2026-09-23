@@ -1,11 +1,13 @@
-import styles from "./OpprettDokumenter.module.css";
+import React, { useState } from "react";
 import { nanoid } from "nanoid";
+import { useFormContext } from "react-hook-form";
+import { HStack, VStack } from "@navikt/ds-react";
+
 import { Card } from "../../components/Card";
 import { FormInput } from "../../components/FormInput";
+import { FormDatePicker } from "../../components/FormDatePicker";
 import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
 import {
   validateOptionalInntekt,
   validateOrganisasjonsnummer,
@@ -14,11 +16,10 @@ import {
 type InntektFraNyttArbeidsforholdId = string;
 
 export const InntektFraNyttArbeidsforhold = React.memo(() => {
-  const { register, unregister, formState } = useFormContext();
+  const { register, unregister, formState, watch } = useFormContext();
 
   const [inntektFraNyttArbeidsforhold, setInntektFraNyttArbeidsforhold] =
     useState<InntektFraNyttArbeidsforholdId[]>([]);
-  const { watch } = useFormContext();
 
   const inntekterFraNyeArbeidsforhold = watch(
     "søknad.inntektFraNyttArbeidsforhold",
@@ -48,47 +49,38 @@ export const InntektFraNyttArbeidsforhold = React.memo(() => {
       </AddButton>
       {inntektFraNyttArbeidsforhold.map((id, i) => (
         <Card key={id}>
-          <div className={styles.CardContainer}>
-            <div className={styles.PeriodContainer}>
-              <FormInput
+          <VStack gap="space-16">
+            <HStack gap="space-16" align="end" wrap={false}>
+              <FormDatePicker
                 data-testid={`startdato${i}`}
-                type="date"
                 label="Startdato for inntekt"
-                errors={formState.errors}
+                name={`søknad.inntektFraNyttArbeidsforhold.${i}.datoFom`}
                 defaultValue={defaultFom}
-                {...register(
-                  `søknad.inntektFraNyttArbeidsforhold.${i}.datoFom`,
-                  {
-                    required: "Startdato for inntekt må angis",
-                  },
-                )}
+                rules={{ required: "Startdato for inntekt må angis" }}
               />
-              <FormInput
+              <FormDatePicker
                 data-testid={`sluttdato${i}`}
-                type="date"
                 label="Sluttdato for inntekt"
-                errors={formState.errors}
+                name={`søknad.inntektFraNyttArbeidsforhold.${i}.datoTom`}
                 defaultValue={defaultTom}
-                {...register(
-                  `søknad.inntektFraNyttArbeidsforhold.${i}.datoTom`,
-                  {
-                    validate: (value?: string): boolean | string => {
-                      const startDato =
-                        inntekterFraNyeArbeidsforhold[i]["datoFom"] ??
-                        "2021-07-01";
-                      return value
-                        ? new Date(startDato) <= new Date(value) ||
-                            "Sluttdato må være senere eller lik startdato"
-                        : true;
-                    },
-                    required: "Startdato for inntekt må angis",
+                rules={{
+                  validate: (value?: string): boolean | string => {
+                    const startDato =
+                      inntekterFraNyeArbeidsforhold[i]["datoFom"] ??
+                      "2021-07-01";
+                    return value
+                      ? new Date(startDato) <= new Date(value) ||
+                          "Sluttdato må være senere eller lik startdato"
+                      : true;
                   },
-                )}
+                  required: "Startdato for inntekt må angis",
+                }}
               />
               <DeleteButton
+                aria-label="Fjern inntekt fra nytt arbeidsforhold"
                 onClick={() => removeInntektFraNyttArbeidsforhold(i)}
               />
-            </div>
+            </HStack>
             <FormInput
               data-testid={`beløp${i}`}
               label="Beløp"
@@ -110,7 +102,7 @@ export const InntektFraNyttArbeidsforhold = React.memo(() => {
                 },
               )}
             />
-          </div>
+          </VStack>
         </Card>
       ))}
     </>

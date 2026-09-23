@@ -1,11 +1,16 @@
 import React from "react";
-import styles from "./Card.module.css";
-import classNames from "classnames";
+import { Box } from "@navikt/ds-react/Box";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export const Card: React.FC<CardProps> = ({ className, children, ...rest }) => (
-  <div className={classNames(styles.Card, className)} {...rest}>
+export const Card: React.FC<CardProps> = ({ children, ...rest }) => (
+  <Box
+    background="raised"
+    borderRadius="8"
+    padding="space-24"
+    width="max-content"
+    {...rest}
+  >
     {children}
-  </div>
+  </Box>
 );

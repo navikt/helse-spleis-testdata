@@ -1,25 +1,31 @@
 import React from "react";
-import { InputLabel } from "./InputLabel";
-import { nanoid } from "nanoid";
-import { Select } from "./Select";
+import { Select } from "@navikt/ds-react";
 
 interface Option {
   value: string;
   label: string;
 }
-interface FormSelectProps extends React.InputHTMLAttributes<HTMLSelectElement> {
+
+interface FormSelectProps extends Omit<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  "size"
+> {
   label: string;
   options: (string | Option)[];
 }
 
 export const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
-  ({ name, label, options, ...rest }, ref) => {
-    const id = nanoid();
-    return (
-      <InputLabel>
-        {label}
-        <Select id={id} name={name} options={options} ref={ref} {...rest} />
-      </InputLabel>
-    );
-  },
+  ({ name, label, options, ...rest }, ref) => (
+    <Select label={label} size="small" name={name} ref={ref} {...rest}>
+      {options.map((option, index) => {
+        const label = typeof option === "object" ? option.label : option;
+        const value = typeof option === "object" ? option.value : option;
+        return (
+          <option value={value} key={index}>
+            {label}
+          </option>
+        );
+      })}
+    </Select>
+  ),
 );

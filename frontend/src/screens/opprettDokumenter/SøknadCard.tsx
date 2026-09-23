@@ -1,10 +1,13 @@
-import styles from "./OpprettDokumenter.module.css";
+import React from "react";
+import { useFormContext } from "react-hook-form";
 import { addDays, endOfMonth, format, subMonths } from "date-fns";
+import { Heading, VStack } from "@navikt/ds-react";
+
 import { Card } from "../../components/Card";
 import { Checkbox } from "../../components/Checkbox";
 import { FormInput } from "../../components/FormInput";
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import { FormDatePicker } from "../../components/FormDatePicker";
+import { FormSelect } from "../../components/FormSelect";
 import {
   validateArbeidsgrad,
   validateInntekt,
@@ -12,7 +15,6 @@ import {
   validateSykdomsgrad,
 } from "../formValidation";
 import { ArbeidssituasjonDTO } from "../../utils/types";
-import { FormSelect } from "../../components/FormSelect";
 
 const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 
@@ -41,8 +43,10 @@ export const SøknadCard = React.memo(() => {
 
   return (
     <Card>
-      <h2 className={styles.Title}>Søknad</h2>
-      <div className={styles.CardContainer}>
+      <VStack gap="space-16">
+        <Heading level="2" size="small">
+          Søknad
+        </Heading>
         {skalViseTidligereArbeidsgiverOrgnummer && (
           <FormInput
             data-testid="tidligereArbeidsgiverOrgnummer"
@@ -54,29 +58,24 @@ export const SøknadCard = React.memo(() => {
             })}
           />
         )}
-        <FormInput
+        <FormDatePicker
           data-testid="sendtNav"
           label="Søknad sendt Nav"
-          type="date"
-          errors={formState.errors}
+          name="søknad.sendtNav"
           defaultValue={
             sykdomTom
               ? formatDateString(nextDay(new Date(sykdomTom)))
               : defaultDate
           }
-          {...register("søknad.sendtNav")}
         />
-        <FormInput
+        <FormDatePicker
           label="Søknad sendt arbeidsgiver"
-          type="date"
-          errors={formState.errors}
-          {...register("søknad.sendtArbeidsgiver")}
+          name="søknad.sendtArbeidsgiver"
         />
-        <FormInput
+        <FormDatePicker
           label="Arbeid gjenopptatt"
-          type="date"
-          errors={formState.errors}
-          {...register("søknad.arbeidGjenopptatt", {
+          name="søknad.arbeidGjenopptatt"
+          rules={{
             required: false,
             validate: (value?: string): boolean | string =>
               value
@@ -84,7 +83,7 @@ export const SøknadCard = React.memo(() => {
                     new Date(sykdomTom) >= new Date(value)) ||
                   "Arbeid gjenopptatt kan ikke være eldre enn sykdomFom, eller nyere enn sykdomTom"
                 : true,
-          })}
+          }}
         />
         <FormInput
           data-testid="faktiskgrad"
@@ -123,24 +122,16 @@ export const SøknadCard = React.memo(() => {
               errors={formState.errors}
               {...register("søknad.harBrukerOppgittForsikring")}
             />
-            {skalViseSelvstendigInputs && (
-              <>
-                <FormInput
-                  data-testid="meldingTilNavDagerFraSykmeldingFom"
-                  label="Melding til Nav dager fom"
-                  type="date"
-                  errors={formState.errors}
-                  {...register("søknad.meldingTilNavDagerFraSykmeldingFom")}
-                />
-                <FormInput
-                  data-testid="meldingTilNavDagerFraSykmeldingTom"
-                  label="Melding til Nav dager tom"
-                  type="date"
-                  errors={formState.errors}
-                  {...register("søknad.meldingTilNavDagerFraSykmeldingTom")}
-                />
-              </>
-            )}
+            <FormDatePicker
+              data-testid="meldingTilNavDagerFraSykmeldingFom"
+              label="Melding til Nav dager fom"
+              name="søknad.meldingTilNavDagerFraSykmeldingFom"
+            />
+            <FormDatePicker
+              data-testid="meldingTilNavDagerFraSykmeldingTom"
+              label="Melding til Nav dager tom"
+              name="søknad.meldingTilNavDagerFraSykmeldingTom"
+            />
           </>
         )}
         <Checkbox
@@ -161,7 +152,7 @@ export const SøknadCard = React.memo(() => {
             })}
           />
         )}
-      </div>
+      </VStack>
     </Card>
   );
 });

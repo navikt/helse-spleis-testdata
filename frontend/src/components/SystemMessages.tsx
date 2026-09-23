@@ -40,9 +40,7 @@ export const SystemMessages: React.FC = React.memo(() => {
       {messages.length > 0 && <ClearMessagesButton />}
       <div className={styles.SystemMessages}>
         {transitions((style, it) => (
-          <animated.div
-            style={{ ...style, marginBottom: "var(--block-extra-small)" }}
-          >
+          <animated.div style={{ ...style, marginBottom: "var(--ax-space-4)" }}>
             <SystemMessage
               ref={(ref) => {
                 if (ref) refs.set(it, ref);

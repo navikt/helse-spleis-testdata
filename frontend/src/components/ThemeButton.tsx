@@ -1,14 +1,15 @@
-import styles from "./ThemeButton.module.css";
-import classNames from "classnames";
-import { useThemeState } from "../state/useTheme";
 import React from "react";
+import { Button } from "@navikt/ds-react";
+import { MoonIcon, SunIcon } from "@navikt/aksel-icons";
+import { useThemeState } from "../state/useTheme";
+import styles from "./ThemeButton.module.css";
 
-interface ThemeButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ThemeButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "color"
+> {}
 
-export const ThemeButton: React.FC<ThemeButtonProps> = ({
-  className,
-  ...rest
-}) => {
+export const ThemeButton: React.FC<ThemeButtonProps> = ({ ...rest }) => {
   const [theme, setTheme] = useThemeState();
 
   const toggleTheme = () => {
@@ -16,13 +17,19 @@ export const ThemeButton: React.FC<ThemeButtonProps> = ({
   };
 
   return (
-    <button
-      className={classNames(styles.ThemeButton, styles[theme], className)}
+    <Button
+      type="button"
+      variant="tertiary"
+      data-color="neutral"
+      className={styles.ThemeButton}
+      icon={
+        theme === "light" ? <SunIcon aria-hidden /> : <MoonIcon aria-hidden />
+      }
+      aria-label={
+        theme === "light" ? "Bytt til mørk modus" : "Bytt til lys modus"
+      }
       onClick={toggleTheme}
       {...rest}
-    >
-      {theme === "light" && <i className="material-icons wb_sunny" />}
-      {theme === "dark" && <i className="material-icons brightness_2" />}
-    </button>
+    />
   );
 };

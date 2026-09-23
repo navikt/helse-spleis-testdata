@@ -1,21 +1,31 @@
+import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import {
+  BodyShort,
+  Button,
+  Detail,
+  ErrorMessage,
+  Heading,
+  HStack,
+  Label,
+  List,
+  VStack,
+} from "@navikt/ds-react";
+
 import styles from "./OpprettDokumenter.module.css";
 import { FormInput } from "../../components/FormInput";
+import { FormSelect } from "../../components/FormSelect";
 import { Checkbox } from "../../components/Checkbox";
 import { Card } from "../../components/Card";
-import { ErrorMessage } from "../../components/ErrorMessage";
-import { useFormContext } from "react-hook-form";
-import React, { useEffect, useState } from "react";
-import {
-  validateFødselsnummer,
-  validateOrganisasjonsnummer,
-} from "../formValidation";
 import { SykdomTom } from "./SykdomTom";
 import { SykdomFom } from "./SykdomFom";
 import { DeleteButton } from "./DeleteButton";
 import { ArbeidssituasjonDTO } from "../../utils/types";
 import { get } from "../../io/api";
-import { Button } from "../../components/Button";
-import { FormSelect } from "../../components/FormSelect";
+import {
+  validateFødselsnummer,
+  validateOrganisasjonsnummer,
+} from "../formValidation";
 
 const useDocumentsValidator = () => {
   const { watch } = useFormContext();
@@ -148,9 +158,16 @@ export const PersonCard = ({
 
   return (
     <Card>
-      <h2 className={styles.Title}>Person</h2>
-      <div className={styles.CardContainer}>
-        <span className={styles.Fødselsnummer}>
+      <VStack gap="space-16">
+        <Heading level="2" size="small">
+          Person
+        </Heading>
+        <HStack
+          gap="space-8"
+          align="end"
+          justify="space-between"
+          className={styles.Fødselsnummer}
+        >
           <FormInput
             data-testid="fnr"
             label="Fødselsnummer"
@@ -161,11 +178,11 @@ export const PersonCard = ({
             })}
           />
           <DeleteButton errorCallback={deleteFailed} />
-        </span>
+        </HStack>
         {personIkkeFunnet && (
           <ErrorMessage>Person ikke funnet i PDL</ErrorMessage>
         )}
-        {navn && <small>{navn}</small>}
+        {navn && <Detail>{navn}</Detail>}
         {skalKreveOrgnummer ? (
           <>
             <FormInput
@@ -183,12 +200,10 @@ export const PersonCard = ({
             )}
           </>
         ) : (
-          <>
-            <label className={styles.Infotekst}>Organisasjonsnummer</label>
-            <span className={styles.Infotekst}>
-              Kun aktuelt ved IM/arb.tak.søknad
-            </span>
-          </>
+          <div>
+            <Label size="small">Organisasjonsnummer</Label>
+            <Detail>Kun aktuelt ved IM/arb.tak.søknad</Detail>
+          </div>
         )}
         <SykdomFom />
         <SykdomTom />
@@ -204,7 +219,7 @@ export const PersonCard = ({
             "BARNEPASSER",
           ]}
           {...register("arbeidssituasjon")}
-        ></FormSelect>
+        />
         <Checkbox
           label="Send sykmelding"
           {...register("skalSendeSykmelding", {
@@ -230,16 +245,16 @@ export const PersonCard = ({
           aria-invalid={!!validateSendsDocuments()}
         />
         {typeof validateSendsDocuments() === "string" && (
-          <ErrorMessage className={styles.DocumentError}>
+          <ErrorMessage size="small" className={styles.DocumentError}>
             {validateSendsDocuments()}
           </ErrorMessage>
         )}
         {/* Rendres alltid for å unngå resizing av card-et, som har width: max-content */}
-        <ErrorMessage className={styles.DocumentError}>
+        <ErrorMessage size="small" className={styles.DocumentError}>
           {deleteErrorMessage}
         </ErrorMessage>
         <TidligereSøk />
-      </div>
+      </VStack>
     </Card>
   );
 };
@@ -258,17 +273,21 @@ function TidligereSøk() {
   if (historikk == null) return null;
 
   return (
-    <>
-      <h4>Tidligere søk</h4>
-      <ul>
+    <VStack gap="space-8" align="start">
+      <Heading level="3" size="xsmall">
+        Tidligere søk
+      </Heading>
+      <List size="small">
         {historikk.historikk.map((it, i) => (
-          <li key={i}>
+          <List.Item key={i}>
             {it.fnr}: {it.navn}
-          </li>
+          </List.Item>
         ))}
-      </ul>
+      </List>
       <Button
         type="button"
+        variant="secondary"
+        size="small"
         onClick={() => {
           localStorage.removeItem("historikk");
           setHistorikk(null);
@@ -276,7 +295,7 @@ function TidligereSøk() {
       >
         Tøm historikk
       </Button>
-    </>
+    </VStack>
   );
 }
 
@@ -313,19 +332,19 @@ function Arbeidsgivere({ arbeidsgivere }: { arbeidsgivere: Arbeidsgiver[] }) {
   }, [arbeidsgivere]);
 
   return (
-    <small>
-      Registrerte arbeidsforhold:{" "}
-      <ul>
-        {arbeidsgivere.map((it, i) => {
-          return (
-            <li key={i}>
-              {arbeidsgivernavn[i].navn}:<br />
+    <div>
+      <Detail>Registrerte arbeidsforhold:</Detail>
+      <List size="small">
+        {arbeidsgivere.map((it, i) => (
+          <List.Item key={i}>
+            <BodyShort size="small">{arbeidsgivernavn[i].navn}</BodyShort>
+            <Detail>
               {it.arbeidsgiver.identifikator} ({it.detaljer[0].yrke}, fom.{" "}
               {it.ansattFom})
-            </li>
-          );
-        })}
-      </ul>
-    </small>
+            </Detail>
+          </List.Item>
+        ))}
+      </List>
+    </div>
   );
 }

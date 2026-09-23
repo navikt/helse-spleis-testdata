@@ -28,6 +28,20 @@ const mockFetchResponse = (body: object) => {
 const wrapper = ({ children }: { children: ReactNode }) => (
   <AppProvider>{children}</AppProvider>
 );
+
+// Datofeltene viser dd.mm.yyyy, mens skjemaet og API-et bruker ISO.
+const skrivDato = (testId: string, isoDato: string) => {
+  const [år, måned, dag] = isoDato.split("-");
+  fireEvent.change(screen.getByTestId(testId), {
+    target: { value: `${dag}.${måned}.${år}` },
+  });
+};
+
+const visDato = (isoDato: string): string => {
+  const [år, måned, dag] = isoDato.split("-");
+  return `${dag}.${måned}.${år}`;
+};
+
 describe("OpprettDokumenter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -108,39 +122,23 @@ describe("OpprettDokumenter", () => {
     await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
     await userEvent.type(screen.getByTestId("faktiskgrad"), "80");
-    fireEvent.change(screen.getByTestId("sykdomFom"), {
-      target: { value: "2021-07-01" },
-    });
-    fireEvent.change(screen.getByTestId("sykdomTom"), {
-      target: { value: "2021-07-31" },
-    });
+    skrivDato("sykdomFom", "2021-07-01");
+    skrivDato("sykdomTom", "2021-07-31");
 
     await userEvent.clear(screen.getByTestId("refusjonsbeløp"));
     await userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000");
-    fireEvent.change(screen.getByTestId("opphørRefusjon"), {
-      target: { value: "2021-08-01" },
-    });
+    skrivDato("opphørRefusjon", "2021-08-01");
 
     await userEvent.click(screen.getByTestId("arbeidsgiverperioderButton"));
-    fireEvent.change(screen.getByTestId("arbeidsgiverFom0"), {
-      target: { value: "2021-07-01" },
-    });
-    fireEvent.change(screen.getByTestId("arbeidsgiverTom0"), {
-      target: { value: "2021-07-16" },
-    });
+    skrivDato("arbeidsgiverFom0", "2021-07-01");
+    skrivDato("arbeidsgiverTom0", "2021-07-16");
 
     await userEvent.click(screen.getByTestId("ferieButton"));
-    fireEvent.change(screen.getByTestId("ferieFom0"), {
-      target: { value: "2021-07-02" },
-    });
-    fireEvent.change(screen.getByTestId("ferieTom0"), {
-      target: { value: "2021-07-04" },
-    });
+    skrivDato("ferieFom0", "2021-07-02");
+    skrivDato("ferieTom0", "2021-07-04");
 
     await userEvent.click(screen.getByTestId("endringButton"));
-    fireEvent.change(screen.getByTestId("endringsdato0"), {
-      target: { value: "2021-07-17" },
-    });
+    skrivDato("endringsdato0", "2021-07-17");
     await userEvent.type(screen.getByTestId("endringsbeløp0"), "19000");
     mockFetchResponse({ status: 200, text: () => vi.fn() });
     await userEvent.click(screen.getByText("Opprett dokumenter"));
@@ -237,24 +235,22 @@ describe("OpprettDokumenter", () => {
   it("endring av sykdomTom endrer automatisk søknadSendt til sykdomTom + 1", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    fireEvent.change(screen.getByTestId("sykdomTom"), {
-      target: { value: "2021-08-31" },
-    });
+    skrivDato("sykdomTom", "2021-08-31");
 
     await waitFor(() => {
-      expect(screen.getByTestId("sendtNav")).toHaveValue("2021-09-01");
+      expect(screen.getByTestId("sendtNav")).toHaveValue(visDato("2021-09-01"));
     });
   });
 
   it("endring av sykdomFom endrer automatisk førsteFraværsdag til sykdomFom", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
-    fireEvent.change(screen.getByTestId("sykdomFom"), {
-      target: { value: "2021-07-31" },
-    });
+    skrivDato("sykdomFom", "2021-07-31");
 
     await waitFor(() => {
-      expect(screen.getByTestId("førsteFraværsdag")).toHaveValue("2021-07-31");
+      expect(screen.getByTestId("førsteFraværsdag")).toHaveValue(
+        visDato("2021-07-31"),
+      );
     });
   });
 
@@ -312,12 +308,8 @@ describe("OpprettDokumenter", () => {
     );
 
     // Fyll inn periodefelter
-    fireEvent.change(screen.getByTestId("meldingTilNavDagerFraSykmeldingFom"), {
-      target: { value: "2021-07-01" },
-    });
-    fireEvent.change(screen.getByTestId("meldingTilNavDagerFraSykmeldingTom"), {
-      target: { value: "2021-07-31" },
-    });
+    skrivDato("meldingTilNavDagerFraSykmeldingFom", "2021-07-01");
+    skrivDato("meldingTilNavDagerFraSykmeldingTom", "2021-07-31");
 
     mockFetchResponse({ status: 200, text: () => vi.fn() });
     await userEvent.click(screen.getByText("Opprett dokumenter"));

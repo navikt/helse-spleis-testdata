@@ -1,8 +1,12 @@
-import styles from "./ExpandButton.module.css";
-import classNames from "classnames";
 import React from "react";
+import { Button } from "@navikt/ds-react";
+import { SidebarLeftIcon, SidebarRightIcon } from "@navikt/aksel-icons";
+import styles from "./ExpandButton.module.css";
 
-interface ExpandButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface ExpandButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "color"
+> {
   expanded: boolean;
   onExpand: () => void;
 }
@@ -10,18 +14,23 @@ interface ExpandButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 export const ExpandButton: React.FC<ExpandButtonProps> = ({
   expanded,
   onExpand,
-  className,
   ...rest
-}) => {
-  return (
-    <button
-      className={classNames(
-        styles.ExpandButton,
-        expanded ? styles.expanded : styles.minified,
-        className,
-      )}
-      onClick={onExpand}
-      {...rest}
-    />
-  );
-};
+}) => (
+  <Button
+    type="button"
+    variant="tertiary"
+    data-color="neutral"
+    size="small"
+    className={styles.ExpandButton}
+    icon={
+      expanded ? (
+        <SidebarLeftIcon aria-hidden />
+      ) : (
+        <SidebarRightIcon aria-hidden />
+      )
+    }
+    aria-label={expanded ? "Gjør menyen smalere" : "Gjør menyen bredere"}
+    onClick={onExpand}
+    {...rest}
+  />
+);

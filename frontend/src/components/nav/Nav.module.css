@@ -1,11 +1,8 @@
 .Navigation {
-  --padding-expanded: 2rem 2rem 0.5rem;
-  --padding-minified: 2rem 0.5rem 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: var(--background-color-secondary);
-  transition: all 0.2s ease;
+  background-color: var(--ax-bg-raised);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -15,24 +12,16 @@
 }
 
 .Title {
-  margin: 0 0 2rem;
-  font-weight: 600;
-  font-size: 28px;
-  color: var(--text-color-primary);
-  white-space: nowrap;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-}
-
-.Title > span:not(:last-child) {
-  margin-right: 1rem;
+  margin: 0 0 var(--ax-space-32);
+  white-space: nowrap;
 }
 
 .Logo {
   width: 1.75rem;
   height: 1.75rem;
-  margin-right: 1rem;
+  margin-right: var(--ax-space-16);
 }
 
 .Links {
@@ -42,14 +31,14 @@
 
 .isExpanded {
   width: 350px;
-  padding: var(--padding-expanded);
+  padding: var(--ax-space-32) var(--ax-space-32) var(--ax-space-8);
 }
 
 .isMinified {
   width: 55px;
-  padding: var(--padding-minified);
+  padding: var(--ax-space-32) var(--ax-space-8) var(--ax-space-8);
 }
 
 .isMinified .Title {
-  margin-left: 0.5rem;
+  margin-left: var(--ax-space-8);
 }

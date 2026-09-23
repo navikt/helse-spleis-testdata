@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 import { useFormContext } from "react-hook-form";
+import { ErrorMessage, VStack } from "@navikt/ds-react";
 
 import { del, get, post, put } from "../../io/api";
 import { useAddSystemMessage } from "../../state/useSystemMessages";
 import { AddButton } from "../../components/AddButton";
-import { ErrorMessage } from "../../components/ErrorMessage";
 import { Spinner } from "../../components/Spinner";
 
 import { RedigerbarTabell } from "./RedigerbarTabell";
@@ -16,8 +16,6 @@ import {
   nyForsikring,
 } from "./kolonner";
 import type { Forsikringsfaktura, IndividuellForsikring } from "./typer";
-
-import styles from "./Forsikring.module.css";
 
 const forsikringerUrl = (identitetsnummer: string) =>
   `/personer/${identitetsnummer}/individuelle-forsikringer`;
@@ -135,7 +133,7 @@ export const Forsikring = React.memo(() => {
     person !== null && (forsikringer.length > 0 || nyForsikringÅpen);
 
   return (
-    <div className={styles.Forsikring}>
+    <VStack gap="space-16" align="start" minWidth="0" width="100%">
       <AddButton
         data-testid="forsikringButton"
         disabled={person === null || nyForsikringÅpen}
@@ -180,7 +178,7 @@ export const Forsikring = React.memo(() => {
         />
       )}
       {valgtId !== null && (
-        <div className={styles.Fakturaer}>
+        <VStack minWidth="0" width="100%">
           <RedigerbarTabell<Forsikringsfaktura>
             tittel="Fakturaer"
             kolonner={fakturaKolonner}
@@ -209,8 +207,8 @@ export const Forsikring = React.memo(() => {
               )
             }
           />
-        </div>
+        </VStack>
       )}
-    </div>
+    </VStack>
   );
 });

@@ -1,7 +1,8 @@
-import styles from "./OpprettDokumenter.module.css";
-import { Card } from "../../components/Card";
-import { useFormContext } from "react-hook-form";
 import React from "react";
+import { useFormContext } from "react-hook-form";
+import { Heading, VStack } from "@navikt/ds-react";
+
+import { Card } from "../../components/Card";
 import { Sykmelding } from "./Sykmelding";
 import { FormSelect } from "../../components/FormSelect";
 
@@ -12,9 +13,11 @@ export const DiverseCard = React.memo(() => {
 
   return (
     <Card>
-      <h2 className={styles.Title}>Diverse</h2>
-      {lovmeMockFinnes && (
-        <div className={styles.CardContainer}>
+      <VStack gap="space-16">
+        <Heading level="2" size="small">
+          Diverse
+        </Heading>
+        {lovmeMockFinnes && (
           <FormSelect
             label="Medlemskapsvurdering"
             options={["JA", "NEI", "UAVKLART", "UAVKLART_MED_BRUKERSPORSMAAL"]}
@@ -25,9 +28,9 @@ export const DiverseCard = React.memo(() => {
               setValue("medlemskapVerdi", verdi);
             }}
           />
-        </div>
-      )}
-      {skalSendeSykmelding && <Sykmelding />}
+        )}
+        {skalSendeSykmelding && <Sykmelding />}
+      </VStack>
     </Card>
   );
 });

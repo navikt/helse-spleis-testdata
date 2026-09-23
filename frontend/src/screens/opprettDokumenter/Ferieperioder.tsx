@@ -1,19 +1,17 @@
-import styles from "./OpprettDokumenter.module.css";
+import React, { useState } from "react";
 import { nanoid } from "nanoid";
+import { useFormContext } from "react-hook-form";
+import { HStack } from "@navikt/ds-react";
+
 import { Card } from "../../components/Card";
-import { FormInput } from "../../components/FormInput";
+import { FormDatePicker } from "../../components/FormDatePicker";
 import { DeleteButton } from "../../components/DeleteButton";
 import { AddButton } from "../../components/AddButton";
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
 
 type PeriodeId = string;
 
-const formattedDateString = (date: Date): string =>
-  date.toLocaleDateString("nb-NO", { dateStyle: "short" });
-
 export const Ferieperioder = React.memo(() => {
-  const { register, unregister, formState } = useFormContext();
+  const { unregister } = useFormContext();
 
   const [perioder, setPerioder] = useState<PeriodeId[]>([]);
 
@@ -32,30 +30,27 @@ export const Ferieperioder = React.memo(() => {
         Legg inn ferieperioder
       </AddButton>
       {perioder.map((id, i) => (
-        <Card>
-          <div className={styles.PeriodContainer}>
-            <FormInput
+        <Card key={id}>
+          <HStack gap="space-16" align="end" wrap={false}>
+            <FormDatePicker
               data-testid={`ferieFom${i}`}
-              type="date"
               label="Ferieperiode f.o.m."
-              errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2021-07-01"))}
-              {...register(`søknad.ferieperioder.${i}.fom`, {
-                required: "Start av ferieperioden må angis",
-              })}
+              name={`søknad.ferieperioder.${i}.fom`}
+              defaultValue="2021-07-01"
+              rules={{ required: "Start av ferieperioden må angis" }}
             />
-            <FormInput
+            <FormDatePicker
               data-testid={`ferieTom${i}`}
-              type="date"
               label="Ferieperiode t.o.m."
-              errors={formState.errors}
-              defaultValue={formattedDateString(new Date("2021-07-10"))}
-              {...register(`søknad.ferieperioder.${i}.tom`, {
-                required: "Slutt av ferieperioden må angis",
-              })}
+              name={`søknad.ferieperioder.${i}.tom`}
+              defaultValue="2021-07-10"
+              rules={{ required: "Slutt av ferieperioden må angis" }}
             />
-            <DeleteButton onClick={() => removeFerieperiode(i)} />
-          </div>
+            <DeleteButton
+              aria-label="Fjern ferieperiode"
+              onClick={() => removeFerieperiode(i)}
+            />
+          </HStack>
         </Card>
       ))}
     </>

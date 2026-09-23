@@ -1,17 +1,18 @@
-import styles from "./OpprettDokumenter.module.css";
-import { nanoid } from "nanoid";
-import { Card } from "../../components/Card";
-import { FormInput } from "../../components/FormInput";
-import { DeleteButton } from "../../components/DeleteButton";
-import { AddButton } from "../../components/AddButton";
 import React, { useState } from "react";
+import { nanoid } from "nanoid";
 import { useFormContext } from "react-hook-form";
 import { format, subDays } from "date-fns";
+import { HStack } from "@navikt/ds-react";
+
+import { Card } from "../../components/Card";
+import { FormDatePicker } from "../../components/FormDatePicker";
+import { DeleteButton } from "../../components/DeleteButton";
+import { AddButton } from "../../components/AddButton";
 
 type DagId = string;
 
 export const Egenmeldingsdager = React.memo(() => {
-  const { watch, register, unregister, formState } = useFormContext();
+  const { watch, unregister } = useFormContext();
 
   const [dager, setDager] = useState<DagId[]>([]);
 
@@ -36,22 +37,22 @@ export const Egenmeldingsdager = React.memo(() => {
       </AddButton>
       {dager.map((id, i) => (
         <Card key={id}>
-          <div className={styles.PeriodContainer}>
-            <FormInput
+          <HStack gap="space-16" align="end" wrap={false}>
+            <FormDatePicker
               data-testid={`egenmeldingsdag${i}`}
-              type="date"
               label="Egenmeldingsdag"
-              errors={formState.errors}
+              name={`søknad.egenmeldingsdager.${i}`}
               defaultValue={format(
                 subDays(new Date(sykdomFom), i + 1),
                 "yyyy-MM-dd",
               )}
-              {...register(`søknad.egenmeldingsdager.${i}`, {
-                required: "Dato for egenmelding må angis",
-              })}
+              rules={{ required: "Dato for egenmelding må angis" }}
             />
-            <DeleteButton onClick={() => removeEgenmeldingsdager(i)} />
-          </div>
+            <DeleteButton
+              aria-label="Fjern egenmeldingsdag"
+              onClick={() => removeEgenmeldingsdager(i)}
+            />
+          </HStack>
         </Card>
       ))}
     </>

@@ -1,19 +1,14 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { ErrorMessage, Heading, VStack } from "@navikt/ds-react";
 
 import { Card } from "../components/Card";
 import { FormInput } from "../components/FormInput";
-
-import { validateGruppeId } from "./formValidation";
-
-import styles from "./HentTestgruppe.module.css";
 import { FetchButton } from "../components/FetchButton";
 import { get } from "../io/api";
-import { ErrorMessage } from "../components/ErrorMessage";
+import { validateGruppeId } from "./formValidation";
 
-interface DollyTestProps {}
-
-export const HentTestgruppe: React.FC<DollyTestProps> = () => {
+export const HentTestgruppe: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -34,10 +29,12 @@ export const HentTestgruppe: React.FC<DollyTestProps> = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.HentTestgruppe}>
+      <VStack gap="space-32" padding="space-32" align="start">
         <Card>
-          <h2 className={styles.Title}>Hent testgruppe</h2>
-          <div className={styles.CardContainer}>
+          <VStack gap="space-16" minWidth="300px" align="start">
+            <Heading level="2" size="small">
+              Hent testgruppe
+            </Heading>
             <FormInput
               id="gruppeId"
               label="Gruppe-ID"
@@ -55,9 +52,9 @@ export const HentTestgruppe: React.FC<DollyTestProps> = () => {
                 Det skjedde en feil. Prøv igjen senere.
               </ErrorMessage>
             )}
-          </div>
+          </VStack>
         </Card>
-      </div>
+      </VStack>
     </form>
   );
 };

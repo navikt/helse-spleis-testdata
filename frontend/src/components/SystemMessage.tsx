@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
-import styles from "./SystemMessage.module.css";
-import classNames from "classnames";
+import { LocalAlert } from "@navikt/ds-react";
 import { useRemoveSystemMessage } from "../state/useSystemMessages";
-import { Text } from "./Text";
 
 export const SystemMessageInitializationError = () =>
   Error(
@@ -12,7 +10,7 @@ export const SystemMessageInitializationError = () =>
 interface SystemMessageProps
   extends
     SystemMessageObject,
-    Omit<React.HTMLAttributes<HTMLDivElement>, "id"> {}
+    Omit<React.HTMLAttributes<HTMLDivElement>, "id" | "data-color"> {}
 
 export const SystemMessage = React.forwardRef<
   HTMLDivElement,
@@ -32,16 +30,13 @@ export const SystemMessage = React.forwardRef<
   }, [id, timeToLiveMs]);
 
   return (
-    <div className={classNames(styles.SystemMessage)} ref={ref} {...rest}>
-      <Text className={styles.MessageText}>{text}</Text>
-      {dismissable && (
-        <button
-          className={styles.DismissButton}
-          onClick={() => removeMessage(id)}
-        >
-          <i className="material-icons close" />
-        </button>
-      )}
-    </div>
+    <LocalAlert status="announcement" as="div" size="small" ref={ref} {...rest}>
+      <LocalAlert.Header>
+        <LocalAlert.Title as="div">{text}</LocalAlert.Title>
+        {dismissable && (
+          <LocalAlert.CloseButton onClick={() => removeMessage(id)} />
+        )}
+      </LocalAlert.Header>
+    </LocalAlert>
   );
 });

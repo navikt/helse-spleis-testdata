@@ -1,10 +1,10 @@
-import styles from "./OpprettDokumenter.module.css";
-import { useFormContext } from "react-hook-form";
 import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { nanoid } from "nanoid";
+import { Button } from "@navikt/ds-react";
+
 import { del } from "../../io/api";
 import { Spinner } from "../../components/Spinner";
-import classNames from "classnames";
-import { nanoid } from "nanoid";
 import { useAddSystemMessage } from "../../state/useSystemMessages";
 
 const error = (status?: number): boolean =>
@@ -27,14 +27,8 @@ export const DeleteButton = ({
     if (status !== undefined) setTimeout(() => setStatus(undefined), 3000);
   }, [status]);
 
-  const ignorer = (event: React.SyntheticEvent) =>
-    (event as React.KeyboardEvent).key !== "Enter" &&
-    (event as React.KeyboardEvent).key !== " " &&
-    (event as React.MouseEvent).button !== 0;
-
-  const slettPerson = async (event: React.SyntheticEvent) => {
-    let fnr = getValues("fnr");
-    if (ignorer(event)) return;
+  const slettPerson = async () => {
+    const fnr = getValues("fnr");
     if (fnr.length !== 11) {
       errorCallback(
         `Kan ikke slette! ${fnr} er ikke nøyaktig elleve tegn langt!`,
@@ -42,7 +36,6 @@ export const DeleteButton = ({
       return;
     }
 
-    event.preventDefault();
     setIsFetching(true);
     await del("/person", { ident: fnr })
       .then((res) => {
@@ -67,26 +60,23 @@ export const DeleteButton = ({
     else errorCallback(null);
   }, [status]);
 
+  const innhold = () => {
+    if (isFetching) return <Spinner />;
+    if (error(status)) return "☠️";
+    if (success(status)) return "✔️️";
+    return "❌";
+  };
+
   return (
-    <span
-      tabIndex={0}
-      role={"button"}
-      className={classNames(
-        styles.SlettPersonButton,
-        error(status) && styles.error,
-      )}
+    <Button
+      type="button"
+      variant="secondary"
+      data-color="neutral"
+      size="small"
+      aria-label="Slett person"
       onClick={slettPerson}
-      onKeyDown={slettPerson}
     >
-      {isFetching ? (
-        <Spinner />
-      ) : error(status) ? (
-        "☠️"
-      ) : success(status) ? (
-        "✔️️"
-      ) : (
-        "❌"
-      )}
-    </span>
+      {innhold()}
+    </Button>
   );
 };

@@ -1,37 +1,34 @@
 import React from "react";
-import { InputLabel } from "./InputLabel";
-import { Input } from "./Input";
-import { ErrorMessage } from "./ErrorMessage";
+import { TextField } from "@navikt/ds-react";
 import type { FieldErrors } from "react-hook-form";
-import classNames from "classnames";
-import { nanoid } from "nanoid";
 
-interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+type TextFieldType = React.ComponentProps<typeof TextField>["type"];
+
+interface FormInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size" | "type" | "value" | "defaultValue"
+> {
   label: string;
+  type?: TextFieldType;
+  value?: string | number;
+  defaultValue?: string | number;
   errors?: FieldErrors;
 }
 
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   ({ name, label, type, errors, ...rest }, ref) => {
-    const id = nanoid();
     const errorMessage = getErrorMessage(name, errors);
 
     return (
-      <InputLabel>
-        {label}
-        <Input
-          id={id}
-          name={name}
-          type={type ?? "text"}
-          className={classNames(errorMessage != undefined && "error")}
-          aria-invalid={errorMessage != undefined ? "true" : "false"}
-          {...rest}
-          ref={ref}
-        />
-        {errorMessage && (
-          <ErrorMessage label-for={id}>{errorMessage}</ErrorMessage>
-        )}
-      </InputLabel>
+      <TextField
+        label={label}
+        size="small"
+        name={name}
+        type={type ?? "text"}
+        error={errorMessage}
+        {...rest}
+        ref={ref}
+      />
     );
   },
 );

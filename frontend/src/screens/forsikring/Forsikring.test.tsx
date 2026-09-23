@@ -76,7 +76,8 @@ const forsikringstabell = () =>
 
 const fakturatabell = () => screen.getByRole("table", { name: "Fakturaer" });
 
-const leggTilForsikring = () => screen.getByText("Legg til forsikring");
+const leggTilForsikring = () =>
+  screen.getByRole("button", { name: "Legg til forsikring" });
 
 const velgForsikring = async (radnummer: number) =>
   userEvent.click(within(forsikringstabell()).getAllByRole("row")[radnummer]);
@@ -290,7 +291,7 @@ describe("Forsikring", () => {
 
     await userEvent.click(screen.getByLabelText("Rediger rad 10"));
     const betalingsdato = screen.getByLabelText("Betalingsdato rad 10");
-    await userEvent.type(betalingsdato, "2026-08-15");
+    await userEvent.type(betalingsdato, "15.08.2026");
     await userEvent.click(screen.getByLabelText("Lagre rad 10"));
 
     await waitFor(() => {

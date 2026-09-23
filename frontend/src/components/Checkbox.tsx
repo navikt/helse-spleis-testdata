@@ -1,39 +1,36 @@
-import styles from "./Checkbox.module.css";
-import { InputLabel } from "./InputLabel";
-import { ErrorMessage } from "./ErrorMessage";
-import classNames from "classnames";
 import React from "react";
+import { Checkbox as AkselCheckbox, ErrorMessage } from "@navikt/ds-react";
 import type { FieldErrors } from "react-hook-form";
 
-interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface CheckboxProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size" | "type"
+> {
   label: string;
   errors?: FieldErrors;
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ id, name, label, errors, className, disabled, ...rest }, ref) => {
+  ({ id, name, label, errors, className, ...rest }, ref) => {
+    const feilmelding =
+      name && errors?.[name]
+        ? (errors[name]!.message as string | undefined)
+        : undefined;
+
     return (
-      <InputLabel className={classNames(styles.Label, className)}>
-        <input
-          type="checkbox"
+      <div className={className}>
+        <AkselCheckbox
           id={id}
           name={name}
-          className={classNames(
-            styles.Checkbox,
-            disabled ? styles.disabled : "",
-          )}
+          size="small"
+          error={feilmelding !== undefined}
           ref={ref}
           {...rest}
-        />
-        <div>
+        >
           {label}
-          {name && errors?.[name] && (
-            <ErrorMessage label-for={id}>
-              {errors[name].message as string}
-            </ErrorMessage>
-          )}
-        </div>
-      </InputLabel>
+        </AkselCheckbox>
+        {feilmelding && <ErrorMessage size="small">{feilmelding}</ErrorMessage>}
+      </div>
     );
   },
 );

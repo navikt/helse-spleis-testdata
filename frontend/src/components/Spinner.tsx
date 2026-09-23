@@ -1,6 +1,6 @@
-import styles from "./Spinner.module.css";
 import React from "react";
+import { Loader } from "@navikt/ds-react";
 
 export const Spinner = () => (
-  <div className={styles.Spinner} data-testid="spinner" />
+  <Loader size="small" data-testid="spinner" title="Laster" />
 );

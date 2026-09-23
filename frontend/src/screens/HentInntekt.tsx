@@ -1,12 +1,12 @@
-import styles from "./HentInntekt.module.css";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { ErrorMessage, Heading, VStack } from "@navikt/ds-react";
+
 import { get } from "../io/api";
 import { Card } from "../components/Card";
 import { FormInput } from "../components/FormInput";
 import { CopyField } from "../components/CopyField";
 import { FetchButton } from "../components/FetchButton";
-import { ErrorMessage } from "../components/ErrorMessage";
 import { validateFødselsnummer } from "./formValidation";
 
 export const HentInntekt = React.memo(() => {
@@ -34,10 +34,12 @@ export const HentInntekt = React.memo(() => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.HentInntekt}>
+      <VStack gap="space-32" padding="space-32" align="start">
         <Card>
-          <h2 className={styles.Title}>Hent inntekt</h2>
-          <div className={styles.CardContainer}>
+          <VStack gap="space-16" minWidth="300px" align="start">
+            <Heading level="2" size="small">
+              Hent inntekt
+            </Heading>
             <FormInput
               id="fnr"
               label="Fødselsnummer"
@@ -53,12 +55,12 @@ export const HentInntekt = React.memo(() => {
             {typeof status === "number" && status >= 400 && (
               <ErrorMessage>Kunne ikke hente inntekt</ErrorMessage>
             )}
-          </div>
+          </VStack>
         </Card>
         <Card>
           <CopyField value={String(inntekt ?? "")} label="Inntekt" />
         </Card>
-      </div>
+      </VStack>
     </form>
   );
 });

@@ -1,18 +1,20 @@
-import styles from "./OpprettDokumenter.module.css";
-import { Card } from "../../components/Card";
-import { FormInput } from "../../components/FormInput";
-import { get } from "../../io/api";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { format, startOfMonth, subMonths } from "date-fns";
+import { Heading, VStack } from "@navikt/ds-react";
+
+import { Card } from "../../components/Card";
+import { FormInput } from "../../components/FormInput";
+import { FormDatePicker } from "../../components/FormDatePicker";
+import { FormSelect } from "../../components/FormSelect";
+import { Checkbox } from "../../components/Checkbox";
+import { get } from "../../io/api";
 import {
   validateFødselsnummer,
   validateInntekt,
   validateOrganisasjonsnummer,
   validateRefusjonsbeløp,
 } from "../formValidation";
-import { format, startOfMonth, subMonths } from "date-fns";
-import { FormSelect } from "../../components/FormSelect";
-import { Checkbox } from "../../components/Checkbox";
 
 const useUnregisterInntektsmeldingCard = () => {
   const { unregister } = useFormContext();
@@ -89,26 +91,24 @@ export const InntektsmeldingCard = React.memo(() => {
     startOfMonth(subMonths(new Date(), 3)),
     "yyyy-MM-dd",
   );
+
   return (
     <Card>
-      <h2 className={styles.Title}>Inntektsmelding</h2>
-      <div className={styles.CardContainer}>
-        <FormInput
+      <VStack gap="space-16">
+        <Heading level="2" size="small">
+          Inntektsmelding
+        </Heading>
+        <FormDatePicker
           data-testid="førsteFraværsdag"
-          type="date"
           label="Første fraværsdag"
-          errors={formState.errors}
+          name="inntektsmelding.førsteFraværsdag"
           defaultValue={defaultDate}
-          {...register("inntektsmelding.førsteFraværsdag", {
-            required: "Første fraværsdag må angis",
-          })}
+          rules={{ required: "Første fraværsdag må angis" }}
         />
-        <FormInput
+        <FormDatePicker
           data-testid="opphørRefusjon"
-          type="date"
           label="Siste dag med refusjon"
-          errors={formState.errors}
-          {...register("inntektsmelding.opphørRefusjon")}
+          name="inntektsmelding.opphørRefusjon"
         />
         <FormInput
           data-testid="inntekt"
@@ -165,7 +165,7 @@ export const InntektsmeldingCard = React.memo(() => {
           errors={formState.errors}
           {...register("inntektsmelding.harOpphørAvNaturalytelser")}
         />
-      </div>
+      </VStack>
     </Card>
   );
 });

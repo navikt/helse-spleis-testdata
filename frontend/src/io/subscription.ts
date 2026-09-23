@@ -9,7 +9,10 @@ enum MessageType {
 }
 
 type UseSubscribeResult = [
-  subscribeFunction: (fødselsnummer: string, forespørselCallback: (vedtaksperiodeId: string) => void) => void,
+  subscribeFunction: (
+    fødselsnummer: string,
+    forespørselCallback: (vedtaksperiodeId: string) => void,
+  ) => void,
   tilstand: string,
 ];
 
@@ -19,7 +22,11 @@ type Message = {
 };
 
 export const useSubscribe = (): UseSubscribeResult => {
-  const [data, setData] = useState<{ fødselsnummer: string; key: string, forespørselCallback: (vedtaksperiodeId: string) => void}>();
+  const [data, setData] = useState<{
+    fødselsnummer: string;
+    key: string;
+    forespørselCallback: (vedtaksperiodeId: string) => void;
+  }>();
   const [tilstand, setTilstand] = useState<string>();
   const [eventSource, setEventSource] = useState<EventSource>();
   const addMessage = useAddSystemMessage();
@@ -69,12 +76,14 @@ export const useSubscribe = (): UseSubscribeResult => {
         }
         case MessageType.Forespørsel: {
           addMessage({
-              id: nanoid(),
-              text: `Mottok forespørsel om arbeidsgiveropplysninger`,
-              dismissable: true,
-              timeToLiveMs: 5000,
+            id: nanoid(),
+            text: `Mottok forespørsel om arbeidsgiveropplysninger`,
+            dismissable: true,
+            timeToLiveMs: 5000,
           });
-          data?.forespørselCallback(JSON.parse(event.data).verdi.vedtaksperiodeId)
+          data?.forespørselCallback(
+            JSON.parse(event.data).verdi.vedtaksperiodeId,
+          );
           break;
         }
         default: {
@@ -85,7 +94,10 @@ export const useSubscribe = (): UseSubscribeResult => {
   }, [eventSource?.url]);
 
   return [
-    (fødselsnummer: string, forespørselCallback: (vedtaksperiodeId: string) => void) => setData({ fødselsnummer, key: nanoid(), forespørselCallback }),
+    (
+      fødselsnummer: string,
+      forespørselCallback: (vedtaksperiodeId: string) => void,
+    ) => setData({ fødselsnummer, key: nanoid(), forespørselCallback }),
     tilstand ?? "",
   ];
 };

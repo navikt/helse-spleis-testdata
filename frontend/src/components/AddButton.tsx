@@ -1,22 +1,20 @@
 import React from "react";
-import classNames from "classnames";
-import styles from "./AddButton.module.css";
+import { Button } from "@navikt/ds-react";
+import { PlusCircleIcon } from "@navikt/aksel-icons";
 
 interface AddCardButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 export const AddButton: React.FC<AddCardButtonProps> = ({
-  className,
   children,
   ...rest
 }) => (
-  <button
-    className={classNames(styles.AddButton, className)}
+  <Button
+    variant="tertiary"
+    size="small"
     type="button"
+    icon={<PlusCircleIcon aria-hidden />}
     {...rest}
   >
-    <i
-      className={classNames(styles.Icon, "material-icons add_circle_outline")}
-    />
     {children}
-  </button>
+  </Button>
 );

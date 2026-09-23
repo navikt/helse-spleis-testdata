@@ -1,11 +1,18 @@
 .App {
   display: flex;
-  width: 100vw;
+  flex-direction: column;
   min-height: 100vh;
+}
+
+.Main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .OpprettDokumenterContainer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  flex: 1;
 }

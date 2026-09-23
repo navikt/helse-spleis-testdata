@@ -7,8 +7,7 @@ import { HentInntekt } from "./screens/HentInntekt";
 import { HentTestgruppe } from "./screens/HentTestgruppe";
 import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter";
 
-import { Nav } from "./components/nav/Nav";
-import { ThemeButton } from "./components/ThemeButton";
+import { Header } from "./components/nav/Header";
 import { SystemMessages } from "./components/SystemMessages";
 
 import styles from "./App.module.css";
@@ -19,21 +18,22 @@ export const App = () => {
 
   return (
     <Theme theme={theme} hasBackground className={styles.App}>
-      <Nav />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div className={styles.OpprettDokumenterContainer}>
-              <OpprettDokumenter />
-              <AppStatus />
-            </div>
-          }
-        />
-        <Route path="/inntekt/hent" element={<HentInntekt />} />
-        <Route path="/testgruppe" element={<HentTestgruppe />} />
-      </Routes>
-      <ThemeButton />
+      <Header />
+      <main className={styles.Main}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <div className={styles.OpprettDokumenterContainer}>
+                <OpprettDokumenter />
+                <AppStatus />
+              </div>
+            }
+          />
+          <Route path="/inntekt/hent" element={<HentInntekt />} />
+          <Route path="/testgruppe" element={<HentTestgruppe />} />
+        </Routes>
+      </main>
       <SystemMessages />
     </Theme>
   );

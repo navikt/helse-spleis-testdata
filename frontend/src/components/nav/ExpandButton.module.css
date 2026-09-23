@@ -1,6 +1,0 @@
-.ExpandButton {
-  position: fixed;
-  bottom: var(--ax-space-16);
-  left: var(--ax-space-16);
-  z-index: 1;
-}

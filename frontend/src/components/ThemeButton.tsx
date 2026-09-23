@@ -1,8 +1,7 @@
 import React from "react";
-import { Button } from "@navikt/ds-react";
+import { InternalHeader } from "@navikt/ds-react";
 import { MoonIcon, SunIcon } from "@navikt/aksel-icons";
 import { useThemeState } from "../state/useTheme";
-import styles from "./ThemeButton.module.css";
 
 interface ThemeButtonProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -17,19 +16,19 @@ export const ThemeButton: React.FC<ThemeButtonProps> = ({ ...rest }) => {
   };
 
   return (
-    <Button
+    <InternalHeader.Button
       type="button"
-      variant="tertiary"
-      data-color="neutral"
-      className={styles.ThemeButton}
-      icon={
-        theme === "light" ? <SunIcon aria-hidden /> : <MoonIcon aria-hidden />
-      }
       aria-label={
         theme === "light" ? "Bytt til mørk modus" : "Bytt til lys modus"
       }
       onClick={toggleTheme}
       {...rest}
-    />
+    >
+      {theme === "light" ? (
+        <SunIcon aria-hidden fontSize="1.5rem" />
+      ) : (
+        <MoonIcon aria-hidden fontSize="1.5rem" />
+      )}
+    </InternalHeader.Button>
   );
 };

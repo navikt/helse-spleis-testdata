@@ -1,8 +1,0 @@
-.ThemeButton {
-  position: fixed;
-  top: var(--ax-space-16);
-  right: var(--ax-space-16);
-  z-index: 1;
-  background-color: var(--ax-bg-raised);
-  box-shadow: var(--ax-shadow-dialog);
-}

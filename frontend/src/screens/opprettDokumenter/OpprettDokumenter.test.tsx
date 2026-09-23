@@ -196,14 +196,13 @@ describe("OpprettDokumenter", () => {
       );
     });
 
-    await userEvent.click(screen.getByText("❌"));
+    await userEvent.click(screen.getByText("Slett"));
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith("http://0.0.0.0:8080/person", {
         headers: { ident: fnr },
         method: "delete",
       });
-      expect(screen.getByText("✔️️")).toBeVisible();
     });
   });
 
@@ -224,11 +223,10 @@ describe("OpprettDokumenter", () => {
         { headers: { Accept: "application/json" }, method: "get" },
       );
     });
-    await userEvent.click(screen.getByText("❌"));
-
+    await userEvent.click(screen.getByText("Slett"));
+3
     await waitFor(() => {
-      expect(screen.getByText("☠️")).toBeVisible();
-      expect(screen.getByText("Sletting av person feilet")).toBeVisible();
+      expect(screen.getByText("Sletting av person feilet mot backend")).toBeVisible();
     });
   });
 

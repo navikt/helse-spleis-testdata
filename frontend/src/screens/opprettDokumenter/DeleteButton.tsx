@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { nanoid } from "nanoid";
 import { Button } from "@navikt/ds-react";
 
 import { del } from "../../io/api";
-import { Spinner } from "../../components/Spinner";
 import { useAddSystemMessage } from "../../state/useSystemMessages";
-
-const error = (status?: number): boolean =>
-  status !== undefined && status !== null && status >= 400;
-
-const success = (status?: number): boolean =>
-  status !== undefined && status !== null && status < 400;
 
 export const DeleteButton = ({
   errorCallback,
@@ -20,26 +13,22 @@ export const DeleteButton = ({
 }) => {
   const { getValues } = useFormContext();
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [status, setStatus] = useState<number>();
   const addMessage = useAddSystemMessage();
-
-  useEffect(() => {
-    if (status !== undefined) setTimeout(() => setStatus(undefined), 3000);
-  }, [status]);
 
   const slettPerson = async () => {
     const fnr = getValues("fnr");
     if (fnr.length !== 11) {
-      errorCallback(
-        `Kan ikke slette! ${fnr} er ikke nøyaktig elleve tegn langt!`,
-      );
+      oppdaterFeilmeldingstekst(`Må være elleve tegn for å kunne slette`);
       return;
     }
 
     setIsFetching(true);
     await del("/person", { ident: fnr })
       .then((res) => {
-        setStatus(res.status);
+        if (res.status !== 200) {
+          oppdaterFeilmeldingstekst("Sletting av person feilet mot backend");
+        } else errorCallback(null);
+
         if (res.ok)
           addMessage({
             id: nanoid(),
@@ -48,24 +37,17 @@ export const DeleteButton = ({
           });
       })
       .catch((error) => {
-        setStatus(error.status ?? 404);
+        oppdaterFeilmeldingstekst("Sletting av person feilet");
         return error;
       })
       .finally(() => setIsFetching(false));
   };
 
-  useEffect(() => {
-    if (status != null && status !== 200)
-      errorCallback("Sletting av person feilet");
-    else errorCallback(null);
-  }, [status]);
+  function oppdaterFeilmeldingstekst(melding: string) {
+    errorCallback(melding);
+    setTimeout(() => errorCallback(null), 3000);
+  }
 
-  const innhold = () => {
-    if (isFetching) return <Spinner />;
-    if (error(status)) return "☠️";
-    if (success(status)) return "✔️️";
-    return "❌";
-  };
 
   return (
     <Button
@@ -73,10 +55,9 @@ export const DeleteButton = ({
       variant="secondary"
       data-color="neutral"
       size="small"
-      aria-label="Slett person"
       onClick={slettPerson}
     >
-      {innhold()}
+      {isFetching ? "Sletter" : "Slett"}
     </Button>
   );
 };

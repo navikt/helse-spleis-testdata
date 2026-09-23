@@ -12,7 +12,6 @@ import {
   VStack,
 } from "@navikt/ds-react";
 
-import styles from "./OpprettDokumenter.module.css";
 import { FormInput } from "../../components/FormInput";
 import { FormSelect } from "../../components/FormSelect";
 import { Checkbox } from "../../components/Checkbox";
@@ -162,23 +161,21 @@ export const PersonCard = ({
         <Heading level="2" size="small">
           Person
         </Heading>
-        <HStack
-          gap="space-8"
-          align="end"
-          justify="space-between"
-          className={styles.Fødselsnummer}
-        >
-          <FormInput
-            data-testid="fnr"
-            label="Fødselsnummer"
-            errors={formState.errors}
-            {...register("fnr", {
-              required: "Fødselsnummer må fylles ut",
-              validate: validateFødselsnummer,
-            })}
-          />
-          <DeleteButton errorCallback={deleteFailed} />
-        </HStack>
+        <VStack gap="space-16">
+          <HStack gap="space-8" align="end" justify="space-between">
+            <FormInput
+              data-testid="fnr"
+              label="Fødselsnummer"
+              errors={formState.errors}
+              {...register("fnr", {
+                required: "Fødselsnummer må fylles ut",
+                validate: validateFødselsnummer,
+              })}
+            />
+            <DeleteButton errorCallback={deleteFailed} />
+          </HStack>
+          <ErrorMessage size="small">{deleteErrorMessage}</ErrorMessage>
+        </VStack>
         {personIkkeFunnet && (
           <ErrorMessage>Person ikke funnet i PDL</ErrorMessage>
         )}
@@ -245,14 +242,8 @@ export const PersonCard = ({
           aria-invalid={!!validateSendsDocuments()}
         />
         {typeof validateSendsDocuments() === "string" && (
-          <ErrorMessage size="small" className={styles.DocumentError}>
-            {validateSendsDocuments()}
-          </ErrorMessage>
+          <ErrorMessage size="small">{validateSendsDocuments()}</ErrorMessage>
         )}
-        {/* Rendres alltid for å unngå resizing av card-et, som har width: max-content */}
-        <ErrorMessage size="small" className={styles.DocumentError}>
-          {deleteErrorMessage}
-        </ErrorMessage>
         <TidligereSøk />
       </VStack>
     </Card>

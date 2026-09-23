@@ -1,8 +1,0 @@
-.Fødselsnummer input {
-  width: 100%;
-}
-
-.DocumentError {
-  /* Fast bredde for å unngå at PersonCard utvider seg når feilmelding vises */
-  width: 220px;
-}

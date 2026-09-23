@@ -16,12 +16,6 @@ vi.mock("../../io/environment", () => ({
 
 global.fetch = vi.fn();
 
-const mockFetchSuccess = () => {
-  (fetch as Mock).mockImplementationOnce(() =>
-    Promise.resolve({ status: 200 } as Response),
-  );
-};
-
 const mockFetchError = () => {
   (fetch as Mock).mockImplementationOnce(() =>
     Promise.resolve({ status: 500 } as Response),
@@ -54,24 +48,13 @@ describe("DeleteButton", () => {
     vi.clearAllMocks();
   });
 
-  it("sletter person", async () => {
-    mockFetchSuccess();
-    render(<DeleteButton errorCallback={vi.fn()} />, { wrapper: FormWrapper });
-    await userEvent.type(screen.getByRole("textbox"), "12345678900");
-    await userEvent.click(screen.getByRole("button"));
-    await waitFor(() => {
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(screen.getByRole("button")).toHaveTextContent("✔️️");
-    });
-  });
-
   it("viser feilmelding om sletting feiler", async () => {
     mockFetchError();
     let errorCallbackWasCalled = false;
     const errorCallback = (value: string | null) => {
       if (value == null) return;
-      errorCallbackWasCalled = true;
       expect(value).toBe("Sletting av person feilet");
+      errorCallbackWasCalled = true;
     };
     render(<DeleteButton errorCallback={errorCallback} />, {
       wrapper: FormWrapper,
@@ -80,7 +63,6 @@ describe("DeleteButton", () => {
     await userEvent.click(screen.getByRole("button"));
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(screen.getByRole("button")).toHaveTextContent("☠️");
     });
     expect(errorCallbackWasCalled).toBeTruthy();
   });
@@ -94,6 +76,6 @@ describe("DeleteButton", () => {
     await new Promise((r) => setTimeout(r, 500));
 
     expect(fetch).toHaveBeenCalledTimes(0);
-    expect(screen.getByRole("button")).toHaveTextContent("❌");
+    expect(screen.getByText("Slett")).to.exist;
   });
 });

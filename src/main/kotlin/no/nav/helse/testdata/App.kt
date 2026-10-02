@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.zaxxer.hikari.HikariDataSource
 import com.github.navikt.tbd_libs.azure.AzureToken
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
@@ -22,6 +21,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.result_object.Result
 import com.github.navikt.tbd_libs.speed.SpeedClient
+import com.zaxxer.hikari.HikariDataSource
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -43,47 +43,52 @@ import no.nav.helse.testdata.api.*
 import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
 import no.nav.helse.testdata.db.ForsikringReplikaTestdataDataSource
 import no.nav.helse.testdata.rivers.PersonSlettetRiver
+import no.nav.helse.testdata.rivers.TrengerOpplysningerFraArbeidsgiverRiver
 import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Paths
-import no.nav.helse.testdata.rivers.TrengerOpplysningerFraArbeidsgiverRiver
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
-val objectMapper: ObjectMapper = jacksonObjectMapper()
-    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    .registerKotlinModule()
-    .registerModule(JavaTimeModule())
-    .setDefaultPrettyPrinter(
-        DefaultPrettyPrinter().apply {
-            indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
-            indentObjectsWith(DefaultIndenter("  ", "\n"))
-        }
-    )
+val objectMapper: ObjectMapper =
+    jacksonObjectMapper()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .registerKotlinModule()
+        .registerModule(JavaTimeModule())
+        .setDefaultPrettyPrinter(
+            DefaultPrettyPrinter().apply {
+                indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
+                indentObjectsWith(DefaultIndenter("  ", "\n"))
+            },
+        )
 
 fun main() {
     val env = setUpEnvironment()
 
-    val httpClient = HttpClient(CIO) {
-        expectSuccess = false
-        install(ContentNegotiation) {
-            register(ContentType.Application.Json, JacksonConverter(objectMapper))
+    val httpClient =
+        HttpClient(CIO) {
+            expectSuccess = false
+            install(ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter(objectMapper))
+            }
         }
-    }
 
     val azureAd = RefreshTokens(createJwkAzureTokenClientFromEnvironment())
     val inntektRestClient = InntektRestClient(env.inntektRestUrl, env.inntektScope, azureAd, httpClient)
     val aaregClient = AaregClient(env.aaregUrl, env.aaregScope, azureAd, httpClient)
     val eregClient = EregClient(env.eregUrl, httpClient)
-    val speedClient = SpeedClient(
-        httpClient = java.net.http.HttpClient.newHttpClient(),
-        objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()),
-        tokenProvider = azureAd
-    )
+    val speedClient =
+        SpeedClient(
+            httpClient =
+                java.net.http.HttpClient
+                    .newHttpClient(),
+            objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()),
+            tokenProvider = azureAd,
+        )
 
     val forsikringReplikaTestdataDataSource = ForsikringReplikaTestdataDataSource.createDataSource(env)
     ForsikringReplikaTestdataDataSource.migrate(forsikringReplikaTestdataDataSource)
@@ -98,7 +103,7 @@ fun main() {
         speedClient = speedClient,
         azureAd = azureAd,
         forsikringReplikaTestdataDataSource = forsikringReplikaTestdataDataSource,
-        forsikringReplikaTestdataDao = forsikringReplikaTestdataDao
+        forsikringReplikaTestdataDao = forsikringReplikaTestdataDao,
     ).start()
 }
 
@@ -111,19 +116,26 @@ internal class ApplicationBuilder(
     private val speedClient: SpeedClient,
     azureAd: RefreshTokens,
     private val forsikringReplikaTestdataDataSource: HikariDataSource,
-    private val forsikringReplikaTestdataDao: ForsikringReplikaTestdataDao
+    private val forsikringReplikaTestdataDao: ForsikringReplikaTestdataDao,
 ) : RapidsConnection.StatusListener {
     private val factory = ConsumerProducerFactory(AivenConfig.default)
-    private val rapidsMediator = RapidsMediator(object : RapidProducer {
-        private val producer = factory.createProducer()
-        override fun publish(message: String) {
-            producer.send(ProducerRecord(env.getValue("KAFKA_RAPID_TOPIC"), message))
-        }
+    private val rapidsMediator =
+        RapidsMediator(
+            object : RapidProducer {
+                private val producer = factory.createProducer()
 
-        override fun publish(key: String, message: String) {
-            producer.send(ProducerRecord(env.getValue("KAFKA_RAPID_TOPIC"), key, message))
-        }
-    })
+                override fun publish(message: String) {
+                    producer.send(ProducerRecord(env.getValue("KAFKA_RAPID_TOPIC"), message))
+                }
+
+                override fun publish(
+                    key: String,
+                    message: String,
+                ) {
+                    producer.send(ProducerRecord(env.getValue("KAFKA_RAPID_TOPIC"), key, message))
+                }
+            },
+        )
 
     private val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT, PrometheusRegistry.defaultRegistry, Clock.SYSTEM)
     private val rapidsConnection =
@@ -145,12 +157,13 @@ internal class ApplicationBuilder(
                                 // eksempel: <APP>.<NAMESPACE>.serviceaccount.identity.linkerd.cluster.local
                                 .tag("konsument", call.request.header("L5d-Client-Id") ?: "n/a")
                         },
-                        mdcEntries = mapOf(
-                            "konsument" to { call: ApplicationCall -> call.request.header("L5d-Client-Id") }
-                        ),
+                        mdcEntries =
+                            mapOf(
+                                "konsument" to { call: ApplicationCall -> call.request.header("L5d-Client-Id") },
+                            ),
                         aliveCheck = rapid::isReady,
                         readyCheck = rapid::isReady,
-                        preStopHook = preStopHook::handlePreStopRequest
+                        preStopHook = preStopHook::handlePreStopRequest,
                     ) {
                         installKtorModule(
                             subscriptionService,
@@ -159,11 +172,11 @@ internal class ApplicationBuilder(
                             eregClient,
                             speedClient,
                             rapidsMediator,
-                            forsikringReplikaTestdataDao
+                            forsikringReplikaTestdataDao,
                         )
                     }
                 }
-            }
+            },
         )
 
     init {
@@ -222,21 +235,32 @@ private fun Application.errorTracing(logger: Logger) {
     }
 }
 
-private class TokenRefreshRiver(rapidsConnection: RapidsConnection, private val azureAd: RefreshTokens) : River.PacketListener {
+private class TokenRefreshRiver(
+    rapidsConnection: RapidsConnection,
+    private val azureAd: RefreshTokens,
+) : River.PacketListener {
     init {
         River(rapidsConnection)
             .precondition { it.requireValue("@event_name", "halv_time") }
             .register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         log.info("refresher tokens som har gått ut")
         azureAd.refreshTokens()
     }
 }
 
-class RefreshTokens(private val client: AzureTokenProvider) : AzureTokenProvider by (client) {
+class RefreshTokens(
+    private val client: AzureTokenProvider,
+) : AzureTokenProvider by (client) {
     private val scopes = mutableSetOf<String>()
+
     fun refreshTokens() {
         scopes.forEach { scope ->
             log.info("refresher $scope")
@@ -247,6 +271,7 @@ class RefreshTokens(private val client: AzureTokenProvider) : AzureTokenProvider
             }
         }
     }
+
     override fun bearerToken(scope: String): Result<AzureToken> {
         scopes.add(scope)
         return client.bearerToken(scope)

@@ -9,55 +9,68 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 
-internal fun Routing.registerArbeidsforholdApi(aaregClient: AaregClient) = get("/person/arbeidsforhold") {
-    val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
+internal fun Routing.registerArbeidsforholdApi(aaregClient: AaregClient) =
+    get("/person/arbeidsforhold") {
+        val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
 
-    try {
-        val response = ArbeidsforholdResponse(
-            arbeidsforhold = aaregClient.hentArbeidsforhold(fnr, UUID.randomUUID())
-                .map { aaregArbeidsforhold ->
-                    ArbeidsforholdDto(
-                        type = when (aaregArbeidsforhold.type) {
-                            Arbeidsforholdkode.ORDINÆRT -> ArbeidsforholdtypeDto.ORDINÆRT
-                            Arbeidsforholdkode.MARITIMT -> ArbeidsforholdtypeDto.MARITIMT
-                            Arbeidsforholdkode.FRILANSER -> ArbeidsforholdtypeDto.FRILANSER
-                            Arbeidsforholdkode.FORENKLET_OPPGJØRSORDNING -> ArbeidsforholdtypeDto.FORENKLET_OPPGJØRSORDNING
-                        },
-                        arbeidsgiver = aaregArbeidsforhold.arbeidssted.let { arbeidssted ->
-                            ArbeidsgiverDto(
-                                type = when (arbeidssted.type) {
-                                    Arbeidsstedtype.Underenhet -> ArbeidsgivertypeDto.Organisasjon
-                                    Arbeidsstedtype.Person -> ArbeidsgivertypeDto.Person
-                                },
-                                identifikator = arbeidssted.identer.first {
-                                    it.type in setOf(
-                                        Identtype.ORGANISASJONSNUMMER,
-                                        Identtype.FOLKEREGISTERIDENT
-                                    )
-                                }.ident,
-                            )
-                        },
-                        ansettelseperiodeFom = aaregArbeidsforhold.ansettelsesperiode.startdato,
-                        ansettelseperiodeTom = aaregArbeidsforhold.ansettelsesperiode.sluttdato,
-                        detaljer = aaregArbeidsforhold.ansettelsesdetaljer.map { ansettelsesdetaljer ->
-                            AnsettelsedetaljeDto(
-                                yrke = ansettelsesdetaljer.yrke.beskrivelse,
-                                ansettelseform = ansettelsesdetaljer.ansettelsesform?.kode,
-                                rapporteringsmaanederFom = ansettelsesdetaljer.rapporteringsmaaneder.fra,
-                                rapporteringsmaanederTom = ansettelsesdetaljer.rapporteringsmaaneder.til
-                            )
-                        }
-                    )
-                }
-        )
-        call.respond(response)
-    } catch (err: Exception) {
-        log.error("feil ved oppslag i aareg: ${err.message}", err)
-        call.respond(HttpStatusCode.InternalServerError, ErrorResponse(err))
+        try {
+            val response =
+                ArbeidsforholdResponse(
+                    arbeidsforhold =
+                        aaregClient
+                            .hentArbeidsforhold(fnr, UUID.randomUUID())
+                            .map { aaregArbeidsforhold ->
+                                ArbeidsforholdDto(
+                                    type =
+                                        when (aaregArbeidsforhold.type) {
+                                            Arbeidsforholdkode.ORDINÆRT -> ArbeidsforholdtypeDto.ORDINÆRT
+                                            Arbeidsforholdkode.MARITIMT -> ArbeidsforholdtypeDto.MARITIMT
+                                            Arbeidsforholdkode.FRILANSER -> ArbeidsforholdtypeDto.FRILANSER
+                                            Arbeidsforholdkode.FORENKLET_OPPGJØRSORDNING -> ArbeidsforholdtypeDto.FORENKLET_OPPGJØRSORDNING
+                                        },
+                                    arbeidsgiver =
+                                        aaregArbeidsforhold.arbeidssted.let { arbeidssted ->
+                                            ArbeidsgiverDto(
+                                                type =
+                                                    when (arbeidssted.type) {
+                                                        Arbeidsstedtype.Underenhet -> ArbeidsgivertypeDto.Organisasjon
+                                                        Arbeidsstedtype.Person -> ArbeidsgivertypeDto.Person
+                                                    },
+                                                identifikator =
+                                                    arbeidssted.identer
+                                                        .first {
+                                                            it.type in
+                                                                setOf(
+                                                                    Identtype.ORGANISASJONSNUMMER,
+                                                                    Identtype.FOLKEREGISTERIDENT,
+                                                                )
+                                                        }.ident,
+                                            )
+                                        },
+                                    ansettelseperiodeFom = aaregArbeidsforhold.ansettelsesperiode.startdato,
+                                    ansettelseperiodeTom = aaregArbeidsforhold.ansettelsesperiode.sluttdato,
+                                    detaljer =
+                                        aaregArbeidsforhold.ansettelsesdetaljer.map { ansettelsesdetaljer ->
+                                            AnsettelsedetaljeDto(
+                                                yrke = ansettelsesdetaljer.yrke.beskrivelse,
+                                                ansettelseform = ansettelsesdetaljer.ansettelsesform?.kode,
+                                                rapporteringsmaanederFom = ansettelsesdetaljer.rapporteringsmaaneder.fra,
+                                                rapporteringsmaanederTom = ansettelsesdetaljer.rapporteringsmaaneder.til,
+                                            )
+                                        },
+                                )
+                            },
+                )
+            call.respond(response)
+        } catch (err: Exception) {
+            log.error("feil ved oppslag i aareg: ${err.message}", err)
+            call.respond(HttpStatusCode.InternalServerError, ErrorResponse(err))
+        }
     }
-}
 
-class ErrorResponse(err: Exception) {
+class ErrorResponse(
+    err: Exception,
+) {
     val feilmelding = err.message ?: "ukjent feil"
 }
 
@@ -70,24 +83,29 @@ data class ArbeidsforholdDto(
     val arbeidsgiver: ArbeidsgiverDto,
     val ansettelseperiodeFom: LocalDate,
     val ansettelseperiodeTom: LocalDate?,
-    val detaljer: List<AnsettelsedetaljeDto>
+    val detaljer: List<AnsettelsedetaljeDto>,
 )
+
 data class ArbeidsgiverDto(
     val type: ArbeidsgivertypeDto,
-    val identifikator: String
+    val identifikator: String,
 )
+
 enum class ArbeidsforholdtypeDto {
     FORENKLET_OPPGJØRSORDNING,
     FRILANSER,
     MARITIMT,
-    ORDINÆRT
+    ORDINÆRT,
 }
+
 enum class ArbeidsgivertypeDto {
-    Organisasjon, Person
+    Organisasjon,
+    Person,
 }
+
 data class AnsettelsedetaljeDto(
     val yrke: String,
     val ansettelseform: String?,
     val rapporteringsmaanederFom: YearMonth,
-    val rapporteringsmaanederTom: YearMonth?
+    val rapporteringsmaanederTom: YearMonth?,
 )

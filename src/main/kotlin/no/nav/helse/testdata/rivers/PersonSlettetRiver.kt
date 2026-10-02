@@ -13,18 +13,23 @@ internal class PersonSlettetRiver(
     rapidsConnection: RapidsConnection,
     private val subscriptionService: SubscriptionService,
 ) : River.PacketListener {
-
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "person_slettet") }
-            validate {
-                it.requireKey("fødselsnummer")
-                it.requireKey("system_participating_services")
-            }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "person_slettet") }
+                validate {
+                    it.requireKey("fødselsnummer")
+                    it.requireKey("system_participating_services")
+                }
+            }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val fødselsnummer = packet["fødselsnummer"].asText()
         val app = packet["system_participating_services"][0].let { it["service"].asText() }
 

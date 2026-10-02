@@ -14,7 +14,7 @@ internal object ForsikringReplikaTestdataDataSource {
                 password = env.databasePassword
                 maximumPoolSize = 5
                 poolName = "forsikring-replika-testdata"
-            }
+            },
         )
 
     fun migrate(dataSource: HikariDataSource) {

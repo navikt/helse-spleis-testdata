@@ -21,64 +21,69 @@ internal class InntektRestClient(
         fom: YearMonth,
         tom: YearMonth,
         filter: String,
-        callId: String
+        callId: String,
     ): Result<List<Måned>, ResponseFailure> =
-        httpClient.post("$baseUrl/api/v1/hentinntektliste") {
-            bearerAuth(tokenSupplier.bearerToken(inntektClientId).getOrThrow().token)
-            header("Nav-Consumer-Id", "spleis-testdata")
-            header("Nav-Call-Id", callId)
-            contentType(ContentType.Application.Json)
-            accept(ContentType.Application.Json)
-            setBody(
-                mapOf(
-                    "ident" to mapOf(
-                        "identifikator" to fnr,
-                        "aktoerType" to "NATURLIG_IDENT"
+        httpClient
+            .post("$baseUrl/api/v1/hentinntektliste") {
+                bearerAuth(tokenSupplier.bearerToken(inntektClientId).getOrThrow().token)
+                header("Nav-Consumer-Id", "spleis-testdata")
+                header("Nav-Call-Id", callId)
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(
+                    mapOf(
+                        "ident" to
+                            mapOf(
+                                "identifikator" to fnr,
+                                "aktoerType" to "NATURLIG_IDENT",
+                            ),
+                        "ainntektsfilter" to filter,
+                        "formaal" to "Sykepenger",
+                        "maanedFom" to fom,
+                        "maanedTom" to tom,
                     ),
-                    "ainntektsfilter" to filter,
-                    "formaal" to "Sykepenger",
-                    "maanedFom" to fom,
-                    "maanedTom" to tom,
                 )
-            )
-        }.let {
-            Result.Ok(toMånedListe(objectMapper.readValue(it.body<String>())))
-        }
+            }.let {
+                Result.Ok(toMånedListe(objectMapper.readValue(it.body<String>())))
+            }
 }
 
 private fun toMånedListe(node: JsonNode) = node.path("arbeidsInntektMaaned").map(::tilMåned)
 
-private fun toInntekt(node: JsonNode) = Inntekt(
-    beløp = node["beloep"].asDouble(),
-    inntektstype = Inntektstype.valueOf(node["inntektType"].textValue()),
-    orgnummer = node["virksomhet"].let {
-        if (it["aktoerType"].asText() == "ORGANISASJON") {
-            it["identifikator"].asText()
-        } else {
-            null
-        }
-    }
-)
+private fun toInntekt(node: JsonNode) =
+    Inntekt(
+        beløp = node["beloep"].asDouble(),
+        inntektstype = Inntektstype.valueOf(node["inntektType"].textValue()),
+        orgnummer =
+            node["virksomhet"].let {
+                if (it["aktoerType"].asText() == "ORGANISASJON") {
+                    it["identifikator"].asText()
+                } else {
+                    null
+                }
+            },
+    )
 
-private fun tilMåned(node: JsonNode) = Måned(
-    YearMonth.parse(node["aarMaaned"].asText()),
-    node["arbeidsInntektInformasjon"]["inntektListe"].map(::toInntekt)
-)
+private fun tilMåned(node: JsonNode) =
+    Måned(
+        YearMonth.parse(node["aarMaaned"].asText()),
+        node["arbeidsInntektInformasjon"]["inntektListe"].map(::toInntekt),
+    )
 
 data class Måned(
     val årMåned: YearMonth,
-    val inntektsliste: List<Inntekt>
+    val inntektsliste: List<Inntekt>,
 )
 
 data class Inntekt(
     val beløp: Double,
     val inntektstype: Inntektstype,
-    val orgnummer: String?
+    val orgnummer: String?,
 )
 
 enum class Inntektstype {
     LOENNSINNTEKT,
     NAERINGSINNTEKT,
     PENSJON_ELLER_TRYGD,
-    YTELSE_FRA_OFFENTLIGE
+    YTELSE_FRA_OFFENTLIGE,
 }

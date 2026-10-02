@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test
 import java.time.YearMonth
 
 class InntektRestClientTest {
-
     @Test
     fun `person uten inntektshistorikk`() {
         val inntektRestClient = inntektRestClient(tomRespons())
-        val inntektsliste = runBlocking {
-            inntektRestClient.hentInntektsliste("fnr", YearMonth.of(2019, 1), YearMonth.of(2019, 10), "8-30", "callId")
-        }
+        val inntektsliste =
+            runBlocking {
+                inntektRestClient.hentInntektsliste("fnr", YearMonth.of(2019, 1), YearMonth.of(2019, 10), "8-30", "callId")
+            }
 
         when (inntektsliste) {
             is Ok -> {
@@ -34,9 +34,10 @@ class InntektRestClientTest {
     @Test
     fun `person med inntektshistorikk`() {
         val inntektRestClient = inntektRestClient(responsMedInntekt())
-        val inntektsliste = runBlocking {
-            inntektRestClient.hentInntektsliste("fnr", YearMonth.of(2019, 1), YearMonth.of(2019, 10), "8-30", "callId")
-        }
+        val inntektsliste =
+            runBlocking {
+                inntektRestClient.hentInntektsliste("fnr", YearMonth.of(2019, 1), YearMonth.of(2019, 10), "8-30", "callId")
+            }
         when (inntektsliste) {
             is Ok -> {
                 assertNotNull(inntektsliste.value)
@@ -46,29 +47,28 @@ class InntektRestClientTest {
         }
     }
 
-
-
-    private fun inntektRestClient(response: String) = InntektRestClient(
-        "http://localhost.no",
-        "clientId",
-        MockAzureTokenProvider(),
-        HttpClient(MockEngine) {
-            install(ContentNegotiation) {
-                jackson {
-                    registerModule(JavaTimeModule())
-                }
-            }
-            engine {
-                addHandler { request ->
-                    if (request.url.fullPath.startsWith("/api/v1/hentinntektliste")) {
-                        respond(response)
-                    } else {
-                        error("Endepunktet finnes ikke ${request.url.fullPath}")
+    private fun inntektRestClient(response: String) =
+        InntektRestClient(
+            "http://localhost.no",
+            "clientId",
+            MockAzureTokenProvider(),
+            HttpClient(MockEngine) {
+                install(ContentNegotiation) {
+                    jackson {
+                        registerModule(JavaTimeModule())
                     }
                 }
-            }
-        },
-    )
+                engine {
+                    addHandler { request ->
+                        if (request.url.fullPath.startsWith("/api/v1/hentinntektliste")) {
+                            respond(response)
+                        } else {
+                            error("Endepunktet finnes ikke ${request.url.fullPath}")
+                        }
+                    }
+                }
+            },
+        )
 }
 
 private fun tomRespons() =

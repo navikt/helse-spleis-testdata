@@ -8,9 +8,10 @@ data class Sykmelding(
 )
 
 fun sykmelding(
-    vedtak: Vedtak
-): String? = vedtak.sykmelding?.let { sykmelding ->
-    """
+    vedtak: Vedtak,
+): String? =
+    vedtak.sykmelding?.let { sykmelding ->
+        """
     {
         "id":"${UUID.randomUUID()}",
         "type":"${vedtak.arbeidssituasjon.somSøknadstype()}",
@@ -52,5 +53,4 @@ fun sykmelding(
         "hendelseId":"${UUID.randomUUID()}"
     }   
 """
-}
-
+    }

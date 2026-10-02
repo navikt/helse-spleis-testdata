@@ -1,11 +1,11 @@
 package no.nav.helse.testdata.db
 
-import java.math.BigDecimal
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class ForsikringReplikaTestdataDaoTest {
     private val dao = TestDatabase.dao
@@ -51,11 +51,12 @@ class ForsikringReplikaTestdataDaoTest {
 
     @Test
     fun `lagrer og henter IF_FKONTO_12`() {
-        val rad = ifFkonto12(
-            IF01_AGNR_FNR = 12345678901,
-            IF12_BELOEP = BigDecimal("1234.56"),
-            ID_KONT = dao.nesteIdKont(),
-        )
+        val rad =
+            ifFkonto12(
+                IF01_AGNR_FNR = 12345678901,
+                IF12_BELOEP = BigDecimal("1234.56"),
+                ID_KONT = dao.nesteIdKont(),
+            )
         dao.lagreIfFkonto12(rad)
 
         assertEquals(rad, dao.hentIfFkonto12(rad.ID_KONT))

@@ -9,7 +9,8 @@ import java.time.LocalDateTime
 class MockAzureTokenProvider : AzureTokenProvider {
     override fun bearerToken(scope: String) = AzureToken("token", LocalDateTime.MAX).ok()
 
-    override fun onBehalfOfToken(scope: String, token: String): Result<AzureToken> {
-        throw NotImplementedError("ikke implementert i mocken")
-    }
+    override fun onBehalfOfToken(
+        scope: String,
+        token: String,
+    ): Result<AzureToken> = throw NotImplementedError("ikke implementert i mocken")
 }

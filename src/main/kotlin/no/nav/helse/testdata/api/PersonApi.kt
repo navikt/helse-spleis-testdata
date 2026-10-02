@@ -12,7 +12,10 @@ import no.nav.helse.testdata.log
 import no.nav.helse.testdata.sikkerlogg
 import java.util.UUID
 
-internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, speedClient: SpeedClient) {
+internal fun Routing.registerPersonApi(
+    rapidsMediator: RapidsMediator,
+    speedClient: SpeedClient,
+) {
     delete("/person") {
         val fnr = call.request.header("ident")
         rapidsMediator.slett(fnr ?: throw IllegalArgumentException("Mangler ident"))
@@ -28,8 +31,8 @@ internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, speedClie
             PersonResponse(
                 fornavn = response.fornavn,
                 mellomnavn = response.mellomnavn,
-                etternavn = response.etternavn
-            )
+                etternavn = response.etternavn,
+            ),
         )
     }
 }
@@ -37,5 +40,5 @@ internal fun Routing.registerPersonApi(rapidsMediator: RapidsMediator, speedClie
 data class PersonResponse(
     val fornavn: String,
     val mellomnavn: String?,
-    val etternavn: String
+    val etternavn: String,
 )

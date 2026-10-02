@@ -8,7 +8,11 @@ import no.nav.helse.testdata.api.Oppdatering
 
 internal interface SubscriptionService {
     fun addSubscription(fødselsnummer: String): SharedFlow<Oppdatering>
-    fun update(fødselsnummer: String, oppdatering: Oppdatering)
+
+    fun update(
+        fødselsnummer: String,
+        oppdatering: Oppdatering,
+    )
 }
 
 internal object ConcreteSubscriptionService : SubscriptionService {
@@ -21,7 +25,10 @@ internal object ConcreteSubscriptionService : SubscriptionService {
         return flow.asSharedFlow()
     }
 
-    override fun update(fødselsnummer: String, oppdatering: Oppdatering) {
+    override fun update(
+        fødselsnummer: String,
+        oppdatering: Oppdatering,
+    ) {
         subscriptions[fødselsnummer]?.let { flow ->
             CoroutineScope(Dispatchers.IO).launch {
                 flow.emit(oppdatering)

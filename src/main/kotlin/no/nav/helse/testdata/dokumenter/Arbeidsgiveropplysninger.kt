@@ -16,7 +16,7 @@ data class Arbeidsgiveropplysninger(
     val harOpphørAvNaturalytelser: Boolean = false,
     val vedtaksperiodeId: UUID,
     val forespurt: Boolean,
-    val arsakTilInnsending: String? = null
+    val arsakTilInnsending: String? = null,
 )
 
 data class Refusjon(
@@ -26,17 +26,18 @@ data class Refusjon(
 
 data class EndringIRefusjon(
     val endringsdato: LocalDate,
-    val beløp: Double
+    val beløp: Double,
 ) {
     @Language("JSON")
     internal fun tilJson() = """{"endringsdato":"$endringsdato", "beloep": "$beløp"}"""
+
     internal companion object {
         internal fun List<EndringIRefusjon>.tilJson() = joinToString(",", prefix = "[", postfix = "]", transform = EndringIRefusjon::tilJson)
     }
 }
 
 fun arbeidsgiveropplysninger(
-    vedtak: Vedtak
+    vedtak: Vedtak,
 ): String? {
     return vedtak.arbeidsgiveropplysninger?.let { arbeidsgiveropplysninger ->
         val arbeidsgiverperioder = arbeidsgiveropplysninger.arbeidsgiverperiode
@@ -76,7 +77,7 @@ fun arbeidsgiveropplysninger(
                 ${if (vedtak.arbeidsgiveropplysninger.arsakTilInnsending in setOf("Ny", "Endring")) """, "arsakTilInnsending": "${vedtak.arbeidsgiveropplysninger.arsakTilInnsending}"""" else ""}
             }
             """
-            }
     }
+}
 
 fun List<Periode>.tilJson(): String = objectMapper.writeValueAsString(this)

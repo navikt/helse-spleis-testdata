@@ -9,7 +9,6 @@ import io.ktor.server.routing.post
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.log
 
-
 internal fun Routing.registerBehovApi(mediator: RapidsMediator) {
     post("/behov") {
         val behov = call.receive<ObjectNode>()
@@ -19,7 +18,8 @@ internal fun Routing.registerBehovApi(mediator: RapidsMediator) {
         if (!behov.path("organisasjonsnummer").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         if (!behov.path("vedtaksperiodeId").isTextual) return@post call.respond(HttpStatusCode.BadRequest)
         mediator.publiser(behov.path("fødselsnummer").asText(), behov.toString())
-        call.respond(HttpStatusCode.OK)
+        call
+            .respond(HttpStatusCode.OK)
             .also { log.info("produsert data for behov: $behov") }
     }
 }

@@ -9,7 +9,7 @@ internal fun setUpEnvironment() =
         eregUrl = System.getenv("EREG_BASE_URL"),
         databaseJdbcUrl = System.getenv("DATABASE_JDBC_URL"),
         databaseUsername = System.getenv("DATABASE_USERNAME"),
-        databasePassword = System.getenv("DATABASE_PASSWORD")
+        databasePassword = System.getenv("DATABASE_PASSWORD"),
     )
 
 data class Environment(
@@ -20,5 +20,5 @@ data class Environment(
     val eregUrl: String,
     val databaseJdbcUrl: String,
     val databaseUsername: String,
-    val databasePassword: String
+    val databasePassword: String,
 )

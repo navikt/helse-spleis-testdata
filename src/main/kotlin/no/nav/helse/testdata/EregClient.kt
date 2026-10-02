@@ -10,7 +10,7 @@ import java.util.*
 
 class EregClient(
     private val baseUrl: String,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) {
     suspend fun hentOrganisasjon(
         organisasjonsnummer: String,
@@ -28,27 +28,34 @@ class EregClient(
                 accept(ContentType.Application.Json)
             }
 
-        sikkerlogg.info("EregResponse status: " + response.status )
+        sikkerlogg.info("EregResponse status: " + response.status)
         if (response.status.isSuccess()) {
             val bodyAsText = response.bodyAsText()
             sikkerlogg.info("EregResponse response: $bodyAsText")
             val json = objectMapper.readTree(bodyAsText)
             return EregResponse(
-                    navn = trekkUtNavn(json),
-                    næringer = json.path("organisasjonDetaljer").path("naeringer").takeIf { !it.isMissingNode }
-                        ?.map { it["naeringskode"].asText() } ?: emptyList()
-                )
-        } else throw FeilVedHenting("ereg svarte med ${response.status.value}")
+                navn = trekkUtNavn(json),
+                næringer =
+                    json
+                        .path("organisasjonDetaljer")
+                        .path("naeringer")
+                        .takeIf { !it.isMissingNode }
+                        ?.map { it["naeringskode"].asText() } ?: emptyList(),
+            )
+        } else {
+            throw FeilVedHenting("ereg svarte med ${response.status.value}")
+        }
     }
 
     private fun trekkUtNavn(organisasjon: JsonNode) =
-        organisasjon["navn"].let { navn ->
-            (1..5).mapNotNull { index -> navn["navnelinje$index"] }
-                .filterNot(JsonNode::isMissingOrNull)
-                .map(JsonNode::asText)
-                .filterNot(String::isBlank)
-        }.joinToString()
-
+        organisasjon["navn"]
+            .let { navn ->
+                (1..5)
+                    .mapNotNull { index -> navn["navnelinje$index"] }
+                    .filterNot(JsonNode::isMissingOrNull)
+                    .map(JsonNode::asText)
+                    .filterNot(String::isBlank)
+            }.joinToString()
 }
 
 data class EregResponse(
@@ -56,4 +63,6 @@ data class EregResponse(
     val næringer: List<String>,
 )
 
-class FeilVedHenting(msg: String): RuntimeException(msg)
+class FeilVedHenting(
+    msg: String,
+) : RuntimeException(msg)

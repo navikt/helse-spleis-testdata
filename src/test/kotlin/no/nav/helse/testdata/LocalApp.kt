@@ -16,84 +16,100 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.mockk.every
 import io.mockk.mockk
-import java.time.LocalDate
-import java.time.YearMonth
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
 import org.flywaydb.core.Flyway
 import org.testcontainers.postgresql.PostgreSQLContainer
+import java.time.LocalDate
+import java.time.YearMonth
 
 fun main() {
     val rapidsConnection = TestRapid()
 
-    val inntektRestClientMock = mockk<InntektRestClient> {
-        every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
-            Result.Ok(
-                (1..12).map {
-                    Måned(
-                        YearMonth.of(2019, it), listOf(
-                        Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "123456789"),
-                        Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "987654321")
-                    )
-                    )
-                }
+    val inntektRestClientMock =
+        mockk<InntektRestClient> {
+            every { runBlocking { hentInntektsliste(any(), any(), any(), any(), any()) } }.returns(
+                Result.Ok(
+                    (1..12).map {
+                        Måned(
+                            YearMonth.of(2019, it),
+                            listOf(
+                                Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "123456789"),
+                                Inntekt(30000.0, Inntektstype.LOENNSINNTEKT, "987654321"),
+                            ),
+                        )
+                    },
+                ),
             )
-        )
-    }
+        }
 
-    val aaregClient = mockk<AaregClient> {
-        every {
-            runBlocking { hentArbeidsforhold(any(), any()) }
-        } returns listOf(
-            AaregArbeidsforhold(
-                type = Arbeidsforholdkode.ORDINÆRT,
-                arbeidssted = Arbeidssted(Arbeidsstedtype.Underenhet, listOf(Ident(Identtype.ORGANISASJONSNUMMER, "111111111"))),
-                ansettelsesperiode = Ansettelsesperiode(LocalDate.EPOCH, null),
-                ansettelsesdetaljer = listOf(
-                    Ansettelsesdetaljer(100, Yrke("10000", "UTVIKLER"), Ansettelseform("fast", "Fast stilling"), Rapporteringsmåneder(YearMonth.of(1970, 1), null))
+    val aaregClient =
+        mockk<AaregClient> {
+            every {
+                runBlocking { hentArbeidsforhold(any(), any()) }
+            } returns
+                listOf(
+                    AaregArbeidsforhold(
+                        type = Arbeidsforholdkode.ORDINÆRT,
+                        arbeidssted = Arbeidssted(Arbeidsstedtype.Underenhet, listOf(Ident(Identtype.ORGANISASJONSNUMMER, "111111111"))),
+                        ansettelsesperiode = Ansettelsesperiode(LocalDate.EPOCH, null),
+                        ansettelsesdetaljer =
+                            listOf(
+                                Ansettelsesdetaljer(100, Yrke("10000", "UTVIKLER"), Ansettelseform("fast", "Fast stilling"), Rapporteringsmåneder(YearMonth.of(1970, 1), null)),
+                            ),
+                    ),
                 )
-            )
+        }
+
+    val eregClient =
+        mockk<EregClient> {
+            every {
+                runBlocking { hentOrganisasjon(any(), any()) }
+            } returns EregResponse("Testnavn", emptyList())
+        }
+
+    val speedClient =
+        mockk<SpeedClient> {
+            every { hentPersoninfo(any(), any()) } returns
+                com.github.navikt.tbd_libs.speed
+                    .PersonResponse(
+                        fornavn = "NORMAL",
+                        mellomnavn = null,
+                        etternavn = "MUFFINS",
+                        fødselsdato = LocalDate.EPOCH,
+                        dødsdato = null,
+                        adressebeskyttelse = com.github.navikt.tbd_libs.speed.PersonResponse.Adressebeskyttelse.UGRADERT,
+                        kjønn = com.github.navikt.tbd_libs.speed.PersonResponse.Kjønn.UKJENT,
+                    ).ok()
+        }
+
+    val rapidsMediator =
+        RapidsMediator(
+            object : RapidProducer {
+                override fun publish(message: String) {
+                    rapidsConnection.publish(message)
+                }
+
+                override fun publish(
+                    key: String,
+                    message: String,
+                ) {
+                    rapidsConnection.publish(key, message)
+                }
+            },
         )
-    }
-
-    val eregClient = mockk<EregClient>() {
-        every {
-            runBlocking { hentOrganisasjon(any(), any()) }
-        } returns EregResponse("Testnavn", emptyList())
-    }
-
-    val speedClient = mockk<SpeedClient>() {
-        every { hentPersoninfo(any(), any()) } returns com.github.navikt.tbd_libs.speed.PersonResponse(
-            fornavn = "NORMAL",
-            mellomnavn = null,
-            etternavn = "MUFFINS",
-            fødselsdato = LocalDate.EPOCH,
-            dødsdato = null,
-            adressebeskyttelse = com.github.navikt.tbd_libs.speed.PersonResponse.Adressebeskyttelse.UGRADERT,
-            kjønn = com.github.navikt.tbd_libs.speed.PersonResponse.Kjønn.UKJENT
-        ).ok()
-    }
-
-    val rapidsMediator = RapidsMediator(object : RapidProducer {
-        override fun publish(message: String) {
-            rapidsConnection.publish(message)
-        }
-
-        override fun publish(key: String, message: String) {
-            rapidsConnection.publish(key, message)
-        }
-    })
 
     val postgres = PostgreSQLContainer("postgres:17").apply { start() }
-    val forsikringReplikaTestdataDataSource = HikariDataSource(
-        HikariConfig().apply {
-            jdbcUrl = postgres.jdbcUrl
-            username = postgres.username
-            password = postgres.password
-            maximumPoolSize = 5
-            poolName = "forsikring-replika-testdata-lokalt"
-        }
-    )
+    val forsikringReplikaTestdataDataSource =
+        HikariDataSource(
+            HikariConfig().apply {
+                jdbcUrl = postgres.jdbcUrl
+                username = postgres.username
+                password = postgres.password
+                maximumPoolSize = 5
+                poolName = "forsikring-replika-testdata-lokalt"
+            },
+        )
     Flyway
         .configure()
         .dataSource(forsikringReplikaTestdataDataSource)
@@ -121,25 +137,25 @@ internal class LocalApplicationBuilder(
     private val rapidsMediator: RapidsMediator,
     private val forsikringReplikaTestdataDao: ForsikringReplikaTestdataDao,
 ) : RapidsConnection.StatusListener {
-
-    fun start() = runLocalServer {
-        install(ContentNegotiation) {
-            jackson {
-                enable(SerializationFeature.INDENT_OUTPUT)
-                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                registerModule(JavaTimeModule())
+    fun start() =
+        runLocalServer {
+            install(ContentNegotiation) {
+                jackson {
+                    enable(SerializationFeature.INDENT_OUTPUT)
+                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    registerModule(JavaTimeModule())
+                }
             }
+            installKtorModule(
+                subscriptionService = subscriptionService,
+                inntektRestClient = inntektRestClient,
+                aaregClient = aaregClient,
+                eregClient = eregClient,
+                speedClient = speedClient,
+                rapidsMediator = rapidsMediator,
+                forsikringReplikaTestdataDao = forsikringReplikaTestdataDao,
+            )
         }
-        installKtorModule(
-            subscriptionService = subscriptionService,
-            inntektRestClient = inntektRestClient,
-            aaregClient = aaregClient,
-            eregClient = eregClient,
-            speedClient = speedClient,
-            rapidsMediator = rapidsMediator,
-            forsikringReplikaTestdataDao = forsikringReplikaTestdataDao,
-        )
-    }
 }
 
 internal fun runLocalServer(applicationBlock: Application.() -> Unit) {

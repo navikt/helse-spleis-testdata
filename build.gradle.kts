@@ -1,97 +1,109 @@
-plugins {
-    kotlin("jvm") version "2.3.0"
-}
+import com.github.gradle.node.pnpm.task.PnpmTask
 
-val tbdLibsVersion = "2026.01.22-09.16-1d3f6039"
-val rapidsAndRiversVersion = "2026011411051768385145.e8ebad1177b4"
-val junitJupiterVersion = "5.12.1"
-val ktorVersion = "3.2.3"
-val flywayVersion = "13.3.0"
-val testcontainersVersion = "2.0.5"
 group = "no.nav.helse"
 
-// Sett opp repositories basert på om vi kjører i CI eller ikke
-// Jf. https://github.com/navikt/utvikling/blob/main/docs/teknisk/Konsumere%20biblioteker%20fra%20Github%20Package%20Registry.md
-repositories {
-    mavenCentral()
-    if (providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") {
-        maven {
-            url = uri("https://maven.pkg.github.com/navikt/maven-release")
-            credentials {
-                username = "token"
-                password = providers.environmentVariable("GITHUB_TOKEN").orNull!!
-            }
-        }
-    } else {
-        maven("https://repo.adeo.no/repository/github-package-registry-navikt/")
-    }
+plugins {
+    alias(libs.plugins.sykepenger.deployable)
+    alias(libs.plugins.nodeGradle)
 }
 
-apply(plugin = "org.jetbrains.kotlin.jvm")
+sykepengerDeployable {
+    mainClass = "no.nav.helse.testdata.AppKt"
+}
 
 dependencies {
-    implementation("com.github.navikt.tbd-libs:naisful-app:$tbdLibsVersion")
-    implementation("com.github.navikt.tbd-libs:azure-token-client-default:$tbdLibsVersion")
-    implementation("com.github.navikt.tbd-libs:speed-client:$tbdLibsVersion")
-    implementation("com.github.navikt:rapids-and-rivers:$rapidsAndRiversVersion")
-    implementation("io.ktor:ktor-server-websockets:$ktorVersion")
+    implementation(libs.tbdLibs.naisfulApp)
+    implementation(libs.tbdLibs.azureTokenClientDefault)
+    implementation(libs.tbdLibs.speedClient)
+    implementation(libs.rapidsAndRivers)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.bundles.ktor.client)
 
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-auth-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-json-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-websockets:$ktorVersion")
+    implementation(libs.hikaricp)
+    implementation(libs.postgresql)
+    implementation(libs.kotliquery)
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.databasePostgresql)
 
-    implementation("com.zaxxer:HikariCP:7.1.0")
-    implementation("org.postgresql:postgresql:42.7.13")
-    implementation("com.github.seratch:kotliquery:1.9.1")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
-
-    testImplementation("com.github.navikt.tbd-libs:rapids-and-rivers-test:$tbdLibsVersion")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:$tbdLibsVersion")
-    testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("org.testcontainers:testcontainers-postgresql:$testcontainersVersion")
-
-    testImplementation("io.ktor:ktor-client-mock-jvm:$ktorVersion") {
+    testImplementation(libs.tbdLibs.rapidsAndRiversTest)
+    testImplementation(libs.tbdLibs.naisfulTestApp)
+    testImplementation(libs.mockk)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.ktor.client.mock) {
         exclude("junit")
     }
-
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of("21"))
+// Frontenden bygges med Node og pnpm som Gradle laster ned selv, slik at standard-workflowene
+// (som bare kjører Gradle) både tester frontenden og får den med i imaget.
+node {
+    download = true
+    version = "24.21.0"
+    pnpmVersion = "10.28.0"
+    // Repositoryet for Node-distribusjonen er satt opp i settings.gradle.kts (FAIL_ON_PROJECT_REPOS)
+    distBaseUrl.set(null as String?)
+    nodeProjectDir = layout.projectDirectory.dir("frontend")
+}
+
+tasks.pnpmInstall {
+    // Ikke-interaktiv installasjon med låst lockfile, også lokalt
+    environment = mapOf("CI" to "true")
+}
+
+val frontendKilder =
+    files(
+        "frontend/src",
+        "frontend/index.html",
+        "frontend/package.json",
+        "frontend/pnpm-lock.yaml",
+        "frontend/pnpm-workspace.yaml",
+        "frontend/tsconfig.json",
+        "frontend/vite.config.ts",
+    )
+
+val frontendTypesjekk by tasks.registering(PnpmTask::class) {
+    group = "frontend"
+    dependsOn(tasks.pnpmInstall)
+    pnpmCommand = listOf("run", "tsc")
+    inputs.files(frontendKilder)
+    outputs.upToDateWhen { true }
+}
+
+val frontendTest by tasks.registering(PnpmTask::class) {
+    group = "frontend"
+    dependsOn(tasks.pnpmInstall)
+    pnpmCommand = listOf("run", "test")
+    environment = mapOf("TZ" to "UTC")
+    inputs.files(frontendKilder)
+    outputs.upToDateWhen { true }
+}
+
+val frontendBygg by tasks.registering(PnpmTask::class) {
+    group = "frontend"
+    dependsOn(tasks.pnpmInstall)
+    pnpmCommand = listOf("run", "build")
+    inputs.files(frontendKilder)
+    outputs.dir(layout.projectDirectory.dir("public"))
+}
+
+tasks.named("check") {
+    dependsOn(frontendTypesjekk, frontendTest)
+}
+
+jib {
+    container {
+        workingDirectory = "/app"
+    }
+    extraDirectories {
+        paths {
+            path {
+                setFrom(layout.projectDirectory.dir("public"))
+                into = "/app/public"
+            }
+        }
     }
 }
 
-tasks {
-    named<Jar>("jar") {
-        archiveBaseName.set("app")
-
-        manifest {
-            attributes["Main-Class"] = "no.nav.helse.testdata.AppKt"
-            attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-                it.name
-            }
-        }
-
-        doLast {
-            configurations.runtimeClasspath.get().forEach {
-                val file = File("${layout.buildDirectory.get()}/libs/${it.name}")
-                if (!file.exists())
-                    it.copyTo(file)
-            }
-        }
-    }
-
-    withType<Test> {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
+tasks.matching { it.name in setOf("jib", "jibDockerBuild", "jibBuildTar") }.configureEach {
+    dependsOn(frontendBygg)
 }

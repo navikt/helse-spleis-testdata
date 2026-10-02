@@ -16,39 +16,55 @@ internal class TrengerOpplysningerFraArbeidsgiverRiver(
     rapidsConnection: RapidsConnection,
     private val subscriptionService: SubscriptionService,
 ) : River.PacketListener {
-
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "trenger_opplysninger_fra_arbeidsgiver") }
-            validate {
-                it.requireKey("fødselsnummer", "vedtaksperiodeId", "organisasjonsnummer")
-                it.requireArray("sykmeldingsperioder") {
-                    requireKey("fom")
-                    requireKey("tom")
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "trenger_opplysninger_fra_arbeidsgiver") }
+                validate {
+                    it.requireKey("fødselsnummer", "vedtaksperiodeId", "organisasjonsnummer")
+                    it.requireArray("sykmeldingsperioder") {
+                        requireKey("fom")
+                        requireKey("tom")
+                    }
                 }
-            }
-        }.register(this)
+            }.register(this)
     }
 
-    override fun onError(problems: MessageProblems, context: MessageContext, metadata: MessageMetadata) {
+    override fun onError(
+        problems: MessageProblems,
+        context: MessageContext,
+        metadata: MessageMetadata,
+    ) {
         log.warn("Feil i TrengerOpplysningerFraArbeidsgiverRiver: ${problems.toExtendedReport()}")
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val fødselsnummer = packet["fødselsnummer"].asText()
         log.info("Gjenkjente behovet TrengerOpplysningerFraArbeidsgiver for $fødselsnummer\n\t${packet.toJson()}")
 
-        subscriptionService.update(fødselsnummer, Oppdatering.forespørsel(objectMapper.createObjectNode().apply {
-            put("vedtaksperiodeId", packet["vedtaksperiodeId"].asText())
-            put("organisasjonsnummer", packet["organisasjonsnummer"].asText())
-            putArray("sykmeldingsperioder").apply {
-                packet["sykmeldingsperioder"].forEach { sykmeldingsperiode ->
-                    add(objectMapper.createObjectNode().apply {
-                        put("fom", sykmeldingsperiode.path("fom").asText())
-                        put("tom", sykmeldingsperiode.path("tom").asText())
-                    })
-                }
-            }
-        }))
+        subscriptionService.update(
+            fødselsnummer,
+            Oppdatering.forespørsel(
+                objectMapper.createObjectNode().apply {
+                    put("vedtaksperiodeId", packet["vedtaksperiodeId"].asText())
+                    put("organisasjonsnummer", packet["organisasjonsnummer"].asText())
+                    putArray("sykmeldingsperioder").apply {
+                        packet["sykmeldingsperioder"].forEach { sykmeldingsperiode ->
+                            add(
+                                objectMapper.createObjectNode().apply {
+                                    put("fom", sykmeldingsperiode.path("fom").asText())
+                                    put("tom", sykmeldingsperiode.path("tom").asText())
+                                },
+                            )
+                        }
+                    }
+                },
+            ),
+        )
     }
 }

@@ -18,20 +18,20 @@ data class Søknad(
     val inntektFraSigrun: Int? = null,
     val fraværFørSykmeldingen: Boolean? = null,
     val harBrukerOppgittForsikring: Boolean? = null,
-    val meldingTilNavDagerFraSykmelding: Periode? = null
+    val meldingTilNavDagerFraSykmelding: Periode? = null,
 ) {
     data class InntektFraNyttArbeidsforholdDto(
         val datoFom: LocalDate,
         val datoTom: LocalDate,
         val belop: Int?,
-        val arbeidsstedOrgnummer: String
+        val arbeidsstedOrgnummer: String,
     )
 }
 
 fun søknad(
-    vedtak: Vedtak
-): String? {
-    return vedtak.søknad?.let { søknad ->
+    vedtak: Vedtak,
+): String? =
+    vedtak.søknad?.let { søknad ->
         """
         {
             "id":"${UUID.randomUUID()}",
@@ -61,12 +61,12 @@ fun søknad(
             "papirsykmeldinger":[],
             "fravar":${søknad.ferieperioder.somSøknadsferie()},
             "andreInntektskilder":[${
-                if (søknad.harAndreInntektskilder) {
-                    "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
-                } else {
-                    ""
-                }
-            }],
+            if (søknad.harAndreInntektskilder) {
+                "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
+            } else {
+                ""
+            }
+        }],
             "soknadsperioder":[
                 {
                   "fom":"${vedtak.sykdomFom}",
@@ -85,23 +85,23 @@ fun søknad(
         }
     """
     }
-}
 
 private fun Vedtak.somSelvstendigNæringsdrivende() =
-    if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE", "JORDBRUKER"))
-    {
+    if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE", "JORDBRUKER")) {
         """{
             "hovedSporsmalSvar": {
              ${if (søknad?.fraværFørSykmeldingen != null) {
-                "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen
-             } else { "" }
+            "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen
+        } else {
+            ""
+        }
         }
             },
             "harBrukerOppgittForsikring": ${søknad?.harBrukerOppgittForsikring},
             "inntekt": {
-                "norskPersonidentifikator": "${fnr}",
+                "norskPersonidentifikator": "$fnr",
                 "inntektsAar": ${(1..3).map {
-                    """
+            """
                     { 
                         "aar": "${sykdomFom.year - it}",
                         "pensjonsgivendeInntekt": { 
@@ -111,7 +111,7 @@ private fun Vedtak.somSelvstendigNæringsdrivende() =
                             "pensjonsgivendeInntektAvNaeringsinntektFraFiskeFangstEllerFamiliebarnehage": 0
                         }
                     }"""
-                }}
+        }}
             }
         }
         """
@@ -131,7 +131,6 @@ private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbei
             }"""
     }
 
-
 private fun List<Periode>.somSøknadsferie() =
     map {
         """
@@ -141,5 +140,3 @@ private fun List<Periode>.somSøknadsferie() =
                 "tom": "${it.tom}"
             }"""
     }
-
-

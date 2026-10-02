@@ -11,23 +11,24 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
+import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
+import no.nav.helse.testdata.db.IfFkonto12
+import no.nav.helse.testdata.db.IfVedfrivt10
+import no.nav.helse.testdata.log
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
-import no.nav.helse.testdata.db.IfFkonto12
-import no.nav.helse.testdata.db.IfVedfrivt10
-import no.nav.helse.testdata.log
 
 internal fun Routing.registerForsikringReplikaApi(dao: ForsikringReplikaTestdataDao) {
     route("/replikabase/if-vedfrivt-10") {
         get {
             call.respond(
-                call.request.queryParameters["IF01_AGNR_FNR"]?.toLong()
+                call.request.queryParameters["IF01_AGNR_FNR"]
+                    ?.toLong()
                     ?.let { dao.finnIfVedfrivt10(it) }
-                    ?: dao.finnIfVedfrivt10()
+                    ?: dao.finnIfVedfrivt10(),
             )
         }
         post {
@@ -62,7 +63,7 @@ internal fun Routing.registerForsikringReplikaApi(dao: ForsikringReplikaTestdata
         get {
             val IF01_AGNR_FNR = call.identitetsnummerParameter() ?: return@get
             call.respond(
-                dao.finnIfVedfrivt10(IF01_AGNR_FNR).map(IndividuellForsikringResponse::fraRad).sortedWith(sortering)
+                dao.finnIfVedfrivt10(IF01_AGNR_FNR).map(IndividuellForsikringResponse::fraRad).sortedWith(sortering),
             )
         }
         post {
@@ -84,8 +85,9 @@ internal fun Routing.registerForsikringReplikaApi(dao: ForsikringReplikaTestdata
             val ID_VED = call.idParameter("ID_VED") ?: return@put
             val request = call.receiveEllerNull<IndividuellForsikringRequest>() ?: return@put
             // Forsikringen kan ikke flyttes til en annen person, så eieren hentes fra raden som ligger der
-            val eksisterende = dao.hentIfVedfrivt10(ID_VED)
-                ?: return@put call.respondIkkeFunnet("IF_VEDFRIVT_10", ID_VED)
+            val eksisterende =
+                dao.hentIfVedfrivt10(ID_VED)
+                    ?: return@put call.respondIkkeFunnet("IF_VEDFRIVT_10", ID_VED)
             // OPPRETTET blir ikke rørt av oppdateringen, så verdien vi setter her er uten betydning
             val rad = request.tilRad(ID_VED, eksisterende.IF01_AGNR_FNR)
             if (!dao.oppdaterIfVedfrivt10UtenOpprettet(rad)) {
@@ -101,23 +103,27 @@ internal fun Routing.registerForsikringReplikaApi(dao: ForsikringReplikaTestdata
         route("/forsikringsfakturaer") {
             get {
                 val ID_VED = call.idParameter("ID_VED") ?: return@get
-                val forsikring = dao.hentIfVedfrivt10(ID_VED)
-                    ?: return@get call.respondIkkeFunnet("IF_VEDFRIVT_10", ID_VED)
+                val forsikring =
+                    dao.hentIfVedfrivt10(ID_VED)
+                        ?: return@get call.respondIkkeFunnet("IF_VEDFRIVT_10", ID_VED)
                 call.respond(
-                    dao.finnIfFkonto12(
-                        forsikring.IF01_KODE,
-                        forsikring.IF01_AGNR_FNR,
-                        forsikring.IF10_FORSFOM_SEQ,
-                    ).map(ForsikringsfakturaResponse::fraRad)
+                    dao
+                        .finnIfFkonto12(
+                            forsikring.IF01_KODE,
+                            forsikring.IF01_AGNR_FNR,
+                            forsikring.IF10_FORSFOM_SEQ,
+                        ).map(ForsikringsfakturaResponse::fraRad),
                 )
             }
             post {
                 val ID_VED = call.idParameter("ID_VED") ?: return@post
                 val request = call.receiveEllerNull<ForsikringsfakturaRequest>() ?: return@post
-                val forsikring = dao.hentIfVedfrivt10(ID_VED)
-                    ?: return@post call.respondIkkeFunnet("IF_VEDFRIVT_10", ID_VED)
-                val rad = request.tilRad(dao.nesteIdKont(), forsikring)
-                    ?: return@post call.respondFeil(request.periodefeil())
+                val forsikring =
+                    dao.hentIfVedfrivt10(ID_VED)
+                        ?: return@post call.respondIkkeFunnet("IF_VEDFRIVT_10", ID_VED)
+                val rad =
+                    request.tilRad(dao.nesteIdKont(), forsikring)
+                        ?: return@post call.respondFeil(request.periodefeil())
                 dao.lagreIfFkonto12(rad)
                 call.respond(HttpStatusCode.Created, ForsikringsfakturaResponse.fraRad(rad))
             }
@@ -134,11 +140,13 @@ internal fun Routing.registerForsikringReplikaApi(dao: ForsikringReplikaTestdata
             val ID_KONT = call.idParameter("ID_KONT") ?: return@put
             val request = call.receiveEllerNull<ForsikringsfakturaRequest>() ?: return@put
             // Fakturaen kan ikke flyttes til en annen forsikring, så nøklene hentes fra raden som ligger der
-            val eksisterende = dao.hentIfFkonto12(ID_KONT)
-                ?: return@put call.respondIkkeFunnet("IF_FKONTO_12", ID_KONT)
+            val eksisterende =
+                dao.hentIfFkonto12(ID_KONT)
+                    ?: return@put call.respondIkkeFunnet("IF_FKONTO_12", ID_KONT)
             // OPPRETTET blir ikke rørt av oppdateringen, så verdien vi setter her er uten betydning
-            val rad = request.tilRad(ID_KONT, eksisterende)
-                ?: return@put call.respondFeil(request.periodefeil())
+            val rad =
+                request.tilRad(ID_KONT, eksisterende)
+                    ?: return@put call.respondFeil(request.periodefeil())
             if (!dao.oppdaterIfFkonto12UtenOpprettet(rad)) {
                 return@put call.respondIkkeFunnet("IF_FKONTO_12", ID_KONT)
             }
@@ -154,8 +162,13 @@ internal fun Routing.registerForsikringReplikaApi(dao: ForsikringReplikaTestdata
     route("/replikabase/if-fkonto-12") {
         get {
             val IF01_AGNR_FNR = call.request.queryParameters["IF01_AGNR_FNR"]
-            val agnrFnr = if (IF01_AGNR_FNR == null) null else IF01_AGNR_FNR.toLongOrNull()
-                ?: return@get call.respondFeil("IF01_AGNR_FNR må være et heltall, var '$IF01_AGNR_FNR'")
+            val agnrFnr =
+                if (IF01_AGNR_FNR == null) {
+                    null
+                } else {
+                    IF01_AGNR_FNR.toLongOrNull()
+                        ?: return@get call.respondFeil("IF01_AGNR_FNR må være et heltall, var '$IF01_AGNR_FNR'")
+                }
             call.respond(dao.finnIfFkonto12(agnrFnr))
         }
         post {
@@ -226,39 +239,40 @@ data class IfVedfrivt10Request(
     val OPPDATERT: Instant?,
     val ID_VED: BigDecimal?,
 ) {
-    fun tilRad(ID_VED: BigDecimal) = IfVedfrivt10(
-        IF01_KODE = IF01_KODE,
-        IF01_AGNR_FNR = IF01_AGNR_FNR,
-        IF10_FORSFOM_SEQ = IF10_FORSFOM_SEQ,
-        IF10_GODKJ = IF10_GODKJ,
-        IF10_FORSFOM = IF10_FORSFOM,
-        IF10_VIRKDATO = IF10_VIRKDATO,
-        IF10_TYPE = IF10_TYPE,
-        IF10_SELVFOM = IF10_SELVFOM,
-        IF10_KOMBI = IF10_KOMBI,
-        IF10_PREMGRL = IF10_PREMGRL,
-        IF10_FOM = IF10_FOM,
-        IF10_PREMIE = IF10_PREMIE,
-        IF10_GML_PREMGRL = IF10_GML_PREMGRL,
-        IF10_GML_FOM = IF10_GML_FOM,
-        IF10_GML_PREMIE = IF10_GML_PREMIE,
-        IF10_FRIFOM = IF10_FRIFOM,
-        IF10_FORSTOM = IF10_FORSTOM,
-        IF10_OPPHGR = IF10_OPPHGR,
-        IF10_VARSEL = IF10_VARSEL,
-        IF10_TERM_KV = IF10_TERM_KV,
-        IF10_TERM_AAR = IF10_TERM_AAR,
-        IF10_VARSEL_BELOEP = IF10_VARSEL_BELOEP,
-        IF10_BETALT_BELOEP = IF10_BETALT_BELOEP,
-        IF10_PURR = IF10_PURR,
-        IF10_TKNR_BOST = IF10_TKNR_BOST,
-        IF10_TKNR_BEH = IF10_TKNR_BEH,
-        OPPRETTET = OPPRETTET,
-        ENDRET_I_KILDE = ENDRET_I_KILDE,
-        KILDE_IF = KILDE_IF,
-        ID_VED = ID_VED,
-        OPPDATERT = OPPDATERT,
-    )
+    fun tilRad(ID_VED: BigDecimal) =
+        IfVedfrivt10(
+            IF01_KODE = IF01_KODE,
+            IF01_AGNR_FNR = IF01_AGNR_FNR,
+            IF10_FORSFOM_SEQ = IF10_FORSFOM_SEQ,
+            IF10_GODKJ = IF10_GODKJ,
+            IF10_FORSFOM = IF10_FORSFOM,
+            IF10_VIRKDATO = IF10_VIRKDATO,
+            IF10_TYPE = IF10_TYPE,
+            IF10_SELVFOM = IF10_SELVFOM,
+            IF10_KOMBI = IF10_KOMBI,
+            IF10_PREMGRL = IF10_PREMGRL,
+            IF10_FOM = IF10_FOM,
+            IF10_PREMIE = IF10_PREMIE,
+            IF10_GML_PREMGRL = IF10_GML_PREMGRL,
+            IF10_GML_FOM = IF10_GML_FOM,
+            IF10_GML_PREMIE = IF10_GML_PREMIE,
+            IF10_FRIFOM = IF10_FRIFOM,
+            IF10_FORSTOM = IF10_FORSTOM,
+            IF10_OPPHGR = IF10_OPPHGR,
+            IF10_VARSEL = IF10_VARSEL,
+            IF10_TERM_KV = IF10_TERM_KV,
+            IF10_TERM_AAR = IF10_TERM_AAR,
+            IF10_VARSEL_BELOEP = IF10_VARSEL_BELOEP,
+            IF10_BETALT_BELOEP = IF10_BETALT_BELOEP,
+            IF10_PURR = IF10_PURR,
+            IF10_TKNR_BOST = IF10_TKNR_BOST,
+            IF10_TKNR_BEH = IF10_TKNR_BEH,
+            OPPRETTET = OPPRETTET,
+            ENDRET_I_KILDE = ENDRET_I_KILDE,
+            KILDE_IF = KILDE_IF,
+            ID_VED = ID_VED,
+            OPPDATERT = OPPDATERT,
+        )
 }
 
 /** Jackson må bruke feltnavnene direkte, jf. kommentaren på [IfVedfrivt10]. */
@@ -284,23 +298,24 @@ data class IfFkonto12Request(
     val OPPDATERT: Instant?,
     val ID_KONT: BigDecimal?,
 ) {
-    fun tilRad(ID_KONT: BigDecimal) = IfFkonto12(
-        IF01_KODE = IF01_KODE,
-        IF01_AGNR_FNR = IF01_AGNR_FNR,
-        IF10_FORSFOM_SEQ = IF10_FORSFOM_SEQ,
-        IF12_BETDATO_SEQ = IF12_BETDATO_SEQ,
-        IF12_FOM = IF12_FOM,
-        IF12_TOM = IF12_TOM,
-        IF12_BET_KODE = IF12_BET_KODE,
-        IF12_FRIUKER = IF12_FRIUKER,
-        IF12_BELOEP = IF12_BELOEP,
-        IF12_BETDATO = IF12_BETDATO,
-        OPPRETTET = OPPRETTET,
-        ENDRET_I_KILDE = ENDRET_I_KILDE,
-        KILDE_IF = KILDE_IF,
-        ID_KONT = ID_KONT,
-        OPPDATERT = OPPDATERT,
-    )
+    fun tilRad(ID_KONT: BigDecimal) =
+        IfFkonto12(
+            IF01_KODE = IF01_KODE,
+            IF01_AGNR_FNR = IF01_AGNR_FNR,
+            IF10_FORSFOM_SEQ = IF10_FORSFOM_SEQ,
+            IF12_BETDATO_SEQ = IF12_BETDATO_SEQ,
+            IF12_FOM = IF12_FOM,
+            IF12_TOM = IF12_TOM,
+            IF12_BET_KODE = IF12_BET_KODE,
+            IF12_FRIUKER = IF12_FRIUKER,
+            IF12_BELOEP = IF12_BELOEP,
+            IF12_BETDATO = IF12_BETDATO,
+            OPPRETTET = OPPRETTET,
+            ENDRET_I_KILDE = ENDRET_I_KILDE,
+            KILDE_IF = KILDE_IF,
+            ID_KONT = ID_KONT,
+            OPPDATERT = OPPDATERT,
+        )
 }
 
 /**
@@ -317,7 +332,10 @@ data class IndividuellForsikringRequest(
     val opphørsdato: LocalDate?,
     val opphørsgrunn: String?,
 ) {
-    fun tilRad(ID_VED: BigDecimal, IF01_AGNR_FNR: Long): IfVedfrivt10 {
+    fun tilRad(
+        ID_VED: BigDecimal,
+        IF01_AGNR_FNR: Long,
+    ): IfVedfrivt10 {
         val nå = Instant.now()
         return IfVedfrivt10(
             IF01_KODE = '1',
@@ -364,22 +382,27 @@ data class ForsikringsfakturaRequest(
     val halvdel: Int,
     val betalingsdato: LocalDate?,
 ) {
-    fun tilRad(ID_KONT: BigDecimal, forsikring: IfVedfrivt10) = tilRad(
+    fun tilRad(
+        ID_KONT: BigDecimal,
+        forsikring: IfVedfrivt10,
+    ) = tilRad(
         ID_KONT = ID_KONT,
         IF01_KODE = forsikring.IF01_KODE,
         IF01_AGNR_FNR = forsikring.IF01_AGNR_FNR,
         IF10_FORSFOM_SEQ = forsikring.IF10_FORSFOM_SEQ,
     )
 
-    fun tilRad(ID_KONT: BigDecimal, eksisterende: IfFkonto12) = tilRad(
+    fun tilRad(
+        ID_KONT: BigDecimal,
+        eksisterende: IfFkonto12,
+    ) = tilRad(
         ID_KONT = ID_KONT,
         IF01_KODE = eksisterende.IF01_KODE,
         IF01_AGNR_FNR = eksisterende.IF01_AGNR_FNR,
         IF10_FORSFOM_SEQ = eksisterende.IF10_FORSFOM_SEQ,
     )
 
-    fun periodefeil() =
-        "år må være mellom 1000 og 9999 og halvdel må være 1 eller 2, var år=$år og halvdel=$halvdel"
+    fun periodefeil() = "år må være mellom 1000 og 9999 og halvdel må være 1 eller 2, var år=$år og halvdel=$halvdel"
 
     /** Returnerer null om halvåret ikke lar seg regne ut, jf. [periodefeil]. */
     private fun tilRad(
@@ -409,15 +432,18 @@ data class ForsikringsfakturaRequest(
         )
     }
 
-    private fun halvår(): Pair<LocalDate, LocalDate>? = when {
-        år !in 1000..9999 -> null
-        halvdel == 1 -> LocalDate.of(år, 1, 1) to LocalDate.of(år, 6, 30)
-        halvdel == 2 -> LocalDate.of(år, 7, 1) to LocalDate.of(år, 12, 31)
-        else -> null
-    }
+    private fun halvår(): Pair<LocalDate, LocalDate>? =
+        when {
+            år !in 1000..9999 -> null
+            halvdel == 1 -> LocalDate.of(år, 1, 1) to LocalDate.of(år, 6, 30)
+            halvdel == 2 -> LocalDate.of(år, 7, 1) to LocalDate.of(år, 12, 31)
+            else -> null
+        }
 }
 
-data class Feilmelding(val melding: String)
+data class Feilmelding(
+    val melding: String,
+)
 
 /**
  * Den forenklede visningen av en rad i IF_VEDFRIVT_10. Felter som ikke lar seg tolke — for eksempel
@@ -435,17 +461,18 @@ data class IndividuellForsikringResponse(
     val opphørsgrunn: String?,
 ) {
     companion object {
-        fun fraRad(rad: IfVedfrivt10) = IndividuellForsikringResponse(
-            id = rad.ID_VED,
-            identitetsnummer = rad.IF01_AGNR_FNR.tilIdentitetsnummer(),
-            godkjent = rad.IF10_GODKJ == 'J',
-            fom = rad.IF10_FORSFOM.tilLocalDate(),
-            virkningsdato = rad.IF10_VIRKDATO.tilLocalDate(),
-            type = IndividuellForsikringType.fraKode(rad.IF10_TYPE),
-            premiegrunnlag = rad.IF10_PREMGRL,
-            opphørsdato = rad.IF10_FORSTOM.tilLocalDate(),
-            opphørsgrunn = rad.IF10_OPPHGR.takeIf { it.isNotBlank() },
-        )
+        fun fraRad(rad: IfVedfrivt10) =
+            IndividuellForsikringResponse(
+                id = rad.ID_VED,
+                identitetsnummer = rad.IF01_AGNR_FNR.tilIdentitetsnummer(),
+                godkjent = rad.IF10_GODKJ == 'J',
+                fom = rad.IF10_FORSFOM.tilLocalDate(),
+                virkningsdato = rad.IF10_VIRKDATO.tilLocalDate(),
+                type = IndividuellForsikringType.fraKode(rad.IF10_TYPE),
+                premiegrunnlag = rad.IF10_PREMGRL,
+                opphørsdato = rad.IF10_FORSTOM.tilLocalDate(),
+                opphørsgrunn = rad.IF10_OPPHGR.takeIf { it.isNotBlank() },
+            )
     }
 }
 
@@ -473,19 +500,23 @@ data class ForsikringsfakturaResponse(
 }
 
 /** Sorterer på virkningsdato, deretter opphørsdato. Forsikringer uten dato kommer sist. */
-private val sortering = compareBy<IndividuellForsikringResponse, LocalDate?>(nullsLast()) { it.virkningsdato }
-    .thenBy(nullsLast()) { it.opphørsdato }
+private val sortering =
+    compareBy<IndividuellForsikringResponse, LocalDate?>(nullsLast()) { it.virkningsdato }
+        .thenBy(nullsLast()) { it.opphørsdato }
 
 /** Infotrygd lagrer datoer som heltall på formen yyyyMMdd, og bruker 0 for «ingen dato». */
 private fun LocalDate.tilInfotrygddato(): Int = format(DateTimeFormatter.BASIC_ISO_DATE).toInt()
 
 private fun Int.tilLocalDate(): LocalDate? =
-    if (this == 0) null
-    else try {
-        LocalDate.parse(toString().padStart(8, '0'), DateTimeFormatter.BASIC_ISO_DATE)
-    } catch (err: DateTimeParseException) {
-        log.info("klarte ikke tolke infotrygddatoen $this: ${err.message}", err)
+    if (this == 0) {
         null
+    } else {
+        try {
+            LocalDate.parse(toString().padStart(8, '0'), DateTimeFormatter.BASIC_ISO_DATE)
+        } catch (err: DateTimeParseException) {
+            log.info("klarte ikke tolke infotrygddatoen $this: ${err.message}", err)
+            null
+        }
     }
 
 /** Infotrygd lagrer identitetsnummer med snudd fødselsdato: ddMMyy blir yyMMdd. */
@@ -530,8 +561,9 @@ private suspend inline fun <reified T : Any> ApplicationCall.receiveEllerNull():
         null
     }
 
-private suspend fun ApplicationCall.respondFeil(melding: String) =
-    respond(HttpStatusCode.BadRequest, Feilmelding(melding))
+private suspend fun ApplicationCall.respondFeil(melding: String) = respond(HttpStatusCode.BadRequest, Feilmelding(melding))
 
-private suspend fun ApplicationCall.respondIkkeFunnet(tabell: String, id: BigDecimal) =
-    respond(HttpStatusCode.NotFound, Feilmelding("Fant ingen rad i $tabell med id $id"))
+private suspend fun ApplicationCall.respondIkkeFunnet(
+    tabell: String,
+    id: BigDecimal,
+) = respond(HttpStatusCode.NotFound, Feilmelding("Fant ingen rad i $tabell med id $id"))

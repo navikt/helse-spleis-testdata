@@ -16,10 +16,15 @@ import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
 import java.util.*
 
-internal class Oppdatering private constructor(val type: String, val verdi: Any) {
+internal class Oppdatering private constructor(
+    val type: String,
+    val verdi: Any,
+) {
     companion object {
         fun endring(tilstand: String) = Oppdatering("endring", tilstand)
+
         fun sletting(app: String) = Oppdatering("sletting", app)
+
         fun forespørsel(forespørsel: JsonNode) = Oppdatering("forespørsel", forespørsel)
     }
 }
@@ -40,7 +45,10 @@ internal fun Routing.registerSubscriptionApi(sseService: SubscriptionService) {
     }
 }
 
-private suspend fun ByteWriteChannel.sendEndring(oppdatering: Oppdatering, coroutineScope: CoroutineScope) {
+private suspend fun ByteWriteChannel.sendEndring(
+    oppdatering: Oppdatering,
+    coroutineScope: CoroutineScope,
+) {
     if (isClosedForWrite) {
         log.info("Avbryter coroutine for lukket ByteWriteChannel")
         coroutineScope.cancel()

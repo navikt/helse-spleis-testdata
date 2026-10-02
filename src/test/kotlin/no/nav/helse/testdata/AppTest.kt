@@ -22,21 +22,24 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppTest {
-
     companion object {
         private const val fnr1 = "123"
     }
 
     private val testRapid: TestRapid = TestRapid()
-    private val rapidProducer = object : RapidProducer {
-        override fun publish(message: String) {
-            testRapid.publish(message)
-        }
+    private val rapidProducer =
+        object : RapidProducer {
+            override fun publish(message: String) {
+                testRapid.publish(message)
+            }
 
-        override fun publish(key: String, message: String) {
-            testRapid.publish(key, message)
+            override fun publish(
+                key: String,
+                message: String,
+            ) {
+                testRapid.publish(key, message)
+            }
         }
-    }
 
     @BeforeEach
     fun beforeEach() {
@@ -46,9 +49,10 @@ class AppTest {
     @Test
     fun `slett person`() {
         e2e {
-            val response = client.delete("/person") {
-                header("ident", fnr1)
-            }
+            val response =
+                client.delete("/person") {
+                    header("ident", fnr1)
+                }
 
             assertTrue(response.status.isSuccess())
             assertEquals(1, testRapid.inspektør.size)
@@ -59,10 +63,11 @@ class AppTest {
     @Test
     fun `opprett vedtak`() {
         e2e {
-            val response = client.post("/vedtaksperiode") {
-                header("Content-Type", "application/json")
-                setBody(data())
-            }
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(data())
+                }
             assertTrue(response.status.isSuccess())
         }
     }
@@ -70,10 +75,11 @@ class AppTest {
     @Test
     fun `slå opp inntekt`() {
         e2e {
-            val response = client.get("/person/inntekt") {
-                header(Accept, ContentType.Application.Json)
-                header("ident", "fnr")
-            }
+            val response =
+                client.get("/person/inntekt") {
+                    header(Accept, ContentType.Application.Json)
+                    header("ident", "fnr")
+                }
             assertTrue(response.status.isSuccess())
         }
     }
@@ -89,12 +95,13 @@ class AppTest {
             },
             objectMapper = objectMapper,
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            testblokk = testblokk
+            testblokk = testblokk,
         )
     }
 
     @Language("json")
-    private fun data() = """
+    private fun data() =
+        """
         {
             "fnr": "fnr",
             "orgnummer": "orgnummer",
@@ -107,7 +114,8 @@ class AppTest {
     """
 
     @Language("json")
-    private fun inntektsmelding() = """
+    private fun inntektsmelding() =
+        """
         {
             "inntekt": 0.0,
             "arbeidsgiverperiode": [
@@ -120,5 +128,4 @@ class AppTest {
             "begrunnelseForReduksjonEllerIkkeUtbetalt": ""
         }
     """
-
 }

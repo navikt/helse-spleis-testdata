@@ -1,11 +1,12 @@
-.idea/
-*.iml
-build/
-.DS_Store
 .gradle/
-public/
+.idea/
+.kotlin/
+build/
 out/
+.DS_Store
 
+# Frontend
+public/
 frontend/node_modules
 frontend/dist
 frontend/.cache

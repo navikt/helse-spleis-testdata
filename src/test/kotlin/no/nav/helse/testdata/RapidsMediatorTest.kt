@@ -12,15 +12,21 @@ internal class RapidsMediatorTest {
     @BeforeEach
     fun beforeEach() {
         testRapid = TestRapid()
-        rapidsMediator = RapidsMediator(object : RapidProducer {
-            override fun publish(message: String) {
-                testRapid.publish(message)
-            }
+        rapidsMediator =
+            RapidsMediator(
+                object : RapidProducer {
+                    override fun publish(message: String) {
+                        testRapid.publish(message)
+                    }
 
-            override fun publish(key: String, message: String) {
-                testRapid.publish(key, message)
-            }
-        })
+                    override fun publish(
+                        key: String,
+                        message: String,
+                    ) {
+                        testRapid.publish(key, message)
+                    }
+                },
+            )
         testRapid.reset()
     }
 

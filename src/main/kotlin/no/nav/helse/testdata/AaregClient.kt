@@ -17,18 +17,19 @@ class AaregClient(
     private val baseUrl: String,
     private val aaregScope: String,
     private val tokenSupplier: AzureTokenProvider,
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) {
     suspend fun hentArbeidsforhold(
         fnr: String,
-        callId: UUID
+        callId: UUID,
     ): List<AaregArbeidsforhold> {
-        val response = hent(
-            tokenSupplier.bearerToken(aaregScope).getOrThrow().token,
-            fnr,
-            callId,
-            "$baseUrl/api/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET"
-        )
+        val response =
+            hent(
+                tokenSupplier.bearerToken(aaregScope).getOrThrow().token,
+                fnr,
+                callId,
+                "$baseUrl/api/v2/arbeidstaker/arbeidsforhold?sporingsinformasjon=false&arbeidsforholdstatus=AKTIV,FREMTIDIG,AVSLUTTET",
+            )
 
         if (response.status.value > 299) throw RuntimeException("feilkode fra aareg: ${response.status}")
 
@@ -41,16 +42,19 @@ class AaregClient(
         }
     }
 
-    private suspend fun hent(token: String, fnr: String, callId: UUID, url: String) =
-        httpClient.get(url) {
-            header("Authorization", "Bearer $token")
-            System.getenv("NAIS_APP_NAME")?.also { header("Nav-Consumer-Id", it) }
-            header("Nav-Call-Id", callId)
-            accept(ContentType.Application.Json)
-            header("Nav-Personident", fnr)
-        }
+    private suspend fun hent(
+        token: String,
+        fnr: String,
+        callId: UUID,
+        url: String,
+    ) = httpClient.get(url) {
+        header("Authorization", "Bearer $token")
+        System.getenv("NAIS_APP_NAME")?.also { header("Nav-Consumer-Id", it) }
+        header("Nav-Call-Id", callId)
+        accept(ContentType.Application.Json)
+        header("Nav-Personident", fnr)
+    }
 }
-
 
 data class AaregArbeidsforhold(
     val type: Arbeidsforholdkode,
@@ -59,18 +63,22 @@ data class AaregArbeidsforhold(
     val ansettelsesdetaljer: List<Ansettelsesdetaljer>,
 )
 
-enum class Arbeidsforholdkode(private val kodeHosAAreg: String) {
+enum class Arbeidsforholdkode(
+    private val kodeHosAAreg: String,
+) {
     FORENKLET_OPPGJØRSORDNING("forenkletOppgjoersordning"),
     FRILANSER("frilanserOppdragstakerHonorarPersonerMm"),
     MARITIMT("maritimtArbeidsforhold"),
-    ORDINÆRT("ordinaertArbeidsforhold");
+    ORDINÆRT("ordinaertArbeidsforhold"),
+    ;
 
     companion object {
         @JsonCreator
         @JvmStatic
-        fun forValues(@JsonProperty("kode") kode: String, @JsonProperty("beskrivelse") beskrivelse: String): Arbeidsforholdkode {
-            return values().first { it.kodeHosAAreg == kode }
-        }
+        fun forValues(
+            @JsonProperty("kode") kode: String,
+            @JsonProperty("beskrivelse") beskrivelse: String,
+        ): Arbeidsforholdkode = values().first { it.kodeHosAAreg == kode }
     }
 }
 
@@ -83,37 +91,41 @@ data class Ansettelsesdetaljer(
     val avtaltStillingsprosent: Int,
     val yrke: Yrke,
     val ansettelsesform: Ansettelseform?,
-    val rapporteringsmaaneder: Rapporteringsmåneder
+    val rapporteringsmaaneder: Rapporteringsmåneder,
 )
 
 data class Rapporteringsmåneder(
     val fra: YearMonth,
-    val til: YearMonth?
+    val til: YearMonth?,
 )
 
 data class Yrke(
     val kode: String,
     val beskrivelse: String,
 )
+
 data class Ansettelseform(
     val kode: String,
     val beskrivelse: String,
 )
 
-data class Arbeidssted(val type: Arbeidsstedtype, val identer: List<Ident>)
+data class Arbeidssted(
+    val type: Arbeidsstedtype,
+    val identer: List<Ident>,
+)
 
 enum class Arbeidsstedtype {
     Underenhet,
-    Person
+    Person,
 }
 
 data class Ident(
     val type: Identtype,
-    val ident: String
+    val ident: String,
 )
 
 enum class Identtype {
     AKTORID,
     FOLKEREGISTERIDENT,
-    ORGANISASJONSNUMMER
+    ORGANISASJONSNUMMER,
 }

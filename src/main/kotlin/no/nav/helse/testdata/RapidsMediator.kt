@@ -8,13 +8,24 @@ import java.util.*
 
 interface RapidProducer {
     fun publish(message: String)
-    fun publish(key: String, message: String)
+
+    fun publish(
+        key: String,
+        message: String,
+    )
 }
-internal class RapidsMediator(private val producer: RapidProducer) {
+
+internal class RapidsMediator(
+    private val producer: RapidProducer,
+) {
     private companion object {
         private val logg: Logger = LoggerFactory.getLogger(RapidsMediator::class.java)
     }
-    internal fun publiser(nøkkel: String, melding: String) {
+
+    internal fun publiser(
+        nøkkel: String,
+        melding: String,
+    ) {
         logg.info("publiserer syntetisk testdatamelding key=$nøkkel record:\n$melding")
         producer.publish(nøkkel, melding)
     }
@@ -24,8 +35,8 @@ internal class RapidsMediator(private val producer: RapidProducer) {
     }
 
     @Language("JSON")
-    private fun slettPerson(fødselsnummer: String): String {
-        return """
+    private fun slettPerson(fødselsnummer: String): String =
+        """
             {
               "@event_name": "slett_person",
               "@id": "${UUID.randomUUID()}",
@@ -33,5 +44,4 @@ internal class RapidsMediator(private val producer: RapidProducer) {
               "fødselsnummer": "$fødselsnummer"
             }
         """
-    }
 }

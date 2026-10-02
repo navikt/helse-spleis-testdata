@@ -17,14 +17,15 @@ import org.intellij.lang.annotations.Language
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
-        val vedtak: Vedtak = try {
-            call.receive<Vedtak>().also {
-                validate(it)
+        val vedtak: Vedtak =
+            try {
+                call.receive<Vedtak>().also {
+                    validate(it)
+                }
+            } catch (e: Exception) {
+                log.warn("Feil i input, lar seg ikke deserialisere", e)
+                throw e
             }
-        } catch (e: Exception) {
-            log.warn("Feil i input, lar seg ikke deserialisere", e)
-            throw e
-        }
 
         val fnr = vedtak.fnr
 
@@ -55,7 +56,8 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
             mediator.publiser(fnr, it)
         }
 
-        call.respond(HttpStatusCode.OK)
+        call
+            .respond(HttpStatusCode.OK)
             .also {
                 log.info("produsert dokumenter, se sikkerlogg/tjenestekall for fnr")
                 sikkerlogg.info("produsert dokumenter for fnr=$fnr")

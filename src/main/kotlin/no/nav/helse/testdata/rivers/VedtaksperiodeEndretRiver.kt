@@ -13,24 +13,28 @@ internal class VedtaksperiodeEndretRiver(
     rapidsConnection: RapidsConnection,
     private val subscriptionService: SubscriptionService,
 ) : River.PacketListener {
-
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "vedtaksperiode_endret") }
-            validate {
-                it.requireKey("vedtaksperiodeId")
-                it.requireKey("fødselsnummer")
-                it.requireKey("@id")
-                it.requireKey("gjeldendeTilstand")
-            }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "vedtaksperiode_endret") }
+                validate {
+                    it.requireKey("vedtaksperiodeId")
+                    it.requireKey("fødselsnummer")
+                    it.requireKey("@id")
+                    it.requireKey("gjeldendeTilstand")
+                }
+            }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val fødselsnummer = packet["fødselsnummer"].asText()
         val tilstand = packet["gjeldendeTilstand"].asText()
 
         subscriptionService.update(fødselsnummer, Oppdatering.endring(tilstand))
     }
-
 }

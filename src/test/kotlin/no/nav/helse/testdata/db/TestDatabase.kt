@@ -2,10 +2,10 @@ package no.nav.helse.testdata.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import java.math.BigDecimal
-import java.time.Instant
 import org.flywaydb.core.Flyway
 import org.testcontainers.postgresql.PostgreSQLContainer
+import java.math.BigDecimal
+import java.time.Instant
 
 object TestDatabase {
     private val postgres by lazy { PostgreSQLContainer("postgres:17").apply { start() } }
@@ -16,7 +16,7 @@ object TestDatabase {
                 jdbcUrl = postgres.jdbcUrl
                 username = postgres.username
                 password = postgres.password
-            }
+            },
         ).also { dataSource ->
             Flyway
                 .configure()

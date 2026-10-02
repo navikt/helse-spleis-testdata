@@ -13,10 +13,13 @@ data class Vedtak(
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
     val arbeidsgiveropplysninger: Arbeidsgiveropplysninger? = null,
-    val medlemskapVerdi: String = "JA"
+    val medlemskapVerdi: String = "JA",
 )
 
-data class Periode(val fom: LocalDate, val tom: LocalDate)
+data class Periode(
+    val fom: LocalDate,
+    val tom: LocalDate,
+)
 
 internal fun Vedtak.somArbeidsgiver(): String? {
     if (arbeidssituasjon == "ARBEIDSTAKER") {
@@ -33,13 +36,16 @@ internal fun String?.somTidligereArbeidsgiverOrgnummer(): String? {
     }
     return null
 }
-internal fun String?.somSøknadstype() = when (this) {
-    null -> "ARBEIDSTAKERE"
-    "FRILANSER",
-    "JORDBRUKER",
-    "FISKER",
-    "SELVSTENDIG_NARINGSDRIVENDE",
-    "BARNEPASSER" -> "SELVSTENDIGE_OG_FRILANSERE"
-    "ARBEIDSTAKER" -> "ARBEIDSTAKERE"
-    else -> this
-}
+
+internal fun String?.somSøknadstype() =
+    when (this) {
+        null -> "ARBEIDSTAKERE"
+        "FRILANSER",
+        "JORDBRUKER",
+        "FISKER",
+        "SELVSTENDIG_NARINGSDRIVENDE",
+        "BARNEPASSER",
+        -> "SELVSTENDIGE_OG_FRILANSERE"
+        "ARBEIDSTAKER" -> "ARBEIDSTAKERE"
+        else -> this
+    }

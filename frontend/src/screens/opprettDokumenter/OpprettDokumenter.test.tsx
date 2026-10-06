@@ -1,12 +1,24 @@
-import React, { ReactNode } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { OpprettDokumenter } from "./OpprettDokumenter";
-import { AppProvider } from "../../state/AppContext";
+import React, {ReactNode} from "react";
+import {act, fireEvent, render, screen, waitFor,} from "@testing-library/react";
+import {OpprettDokumenter} from "./OpprettDokumenter";
+import {AppProvider} from "../../state/AppContext";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
+import {beforeEach, describe, expect, it, Mock, vi} from "vitest";
+
+const { subscribeMock } = vi.hoisted(() => ({
+  subscribeMock: vi.fn(
+    (
+      _fødselsnummer: string,
+      _callback: (
+        vedtaksperiodeId: string,
+        organisasjonsnummer: string,
+      ) => void,
+    ) => {},
+  ),
+}));
 
 vi.mock("../../io/subscription", () => ({
-  useSubscribe: () => [() => {}],
+  useSubscribe: () => [subscribeMock],
 }));
 
 vi.mock("../../io/environment", () => ({
@@ -83,6 +95,70 @@ describe("OpprettDokumenter", () => {
     await waitFor(() => {
       expect(screen.getByTestId("success")).toBeVisible();
     });
+  });
+
+  it("bruker organisasjonsnummeret fra forespørselen i arbeidsgiversvaret", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    const orgnr = "987654321";
+    const forespurtOrgnummer = "123456789";
+    mockPersonNavn();
+    mockArbeidsforhold(orgnr);
+    mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr);
+
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+        "54321",
+      ),
+    );
+
+    mockFetchResponse({ status: 200, text: () => "" });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+    await waitFor(() => expect(subscribeMock).toHaveBeenCalled());
+
+    const callback = subscribeMock.mock.calls.at(-1)?.[1];
+    expect(callback).toBeDefined();
+    await act(async () => callback?.("vedtaksperiode-id", forespurtOrgnummer));
+
+    await waitFor(() => {
+      const innsendtKall = (fetch as Mock).mock.calls
+        .filter(([url]) => url === "http://0.0.0.0:8080/vedtaksperiode")
+        .at(-1);
+      const payload = JSON.parse(innsendtKall?.[1]?.body ?? "{}");
+      expect(payload.orgnummer).toBe(forespurtOrgnummer);
+    });
+  });
+
+  it("sender ikke arbeidsgiversvar dersom forespørselen mangler organisasjonsnummer", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    const orgnr = "987654321";
+    mockPersonNavn();
+    mockArbeidsforhold(orgnr);
+    mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr);
+
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+        "54321",
+      ),
+    );
+
+    mockFetchResponse({ status: 200, text: () => "" });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+    await waitFor(() => expect(subscribeMock).toHaveBeenCalled());
+
+    const antallKallFørCallback = (fetch as Mock).mock.calls.length;
+    const callback = subscribeMock.mock.calls.at(-1)?.[1];
+    expect(callback).toBeDefined();
+    await act(async () => callback?.("vedtaksperiode-id", ""));
+
+    expect((fetch as Mock).mock.calls.length).toBe(antallKallFørCallback);
   });
 
   it("krever fødselsnummer, organisasjonsnummer og inntekt", async () => {

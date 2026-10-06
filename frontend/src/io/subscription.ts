@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useAddSystemMessage } from "../state/useSystemMessages";
-import { nanoid } from "nanoid";
+import {useEffect, useState} from "react";
+import {useAddSystemMessage} from "../state/useSystemMessages";
+import {nanoid} from "nanoid";
 
 enum MessageType {
   Endring = "endring",
@@ -11,21 +11,33 @@ enum MessageType {
 type UseSubscribeResult = [
   subscribeFunction: (
     fødselsnummer: string,
-    forespørselCallback: (vedtaksperiodeId: string) => void,
+    forespørselCallback: (
+      vedtaksperiodeId: string,
+      organisasjonsnummer: string,
+    ) => void,
   ) => void,
   tilstand: string,
 ];
 
 type Message = {
-  type: MessageType;
+  type: MessageType.Endring | MessageType.Sletting;
   verdi: string;
+} | {
+  type: MessageType.Forespørsel;
+  verdi: {
+    vedtaksperiodeId: string;
+    organisasjonsnummer: string;
+  };
 };
 
 export const useSubscribe = (): UseSubscribeResult => {
   const [data, setData] = useState<{
     fødselsnummer: string;
     key: string;
-    forespørselCallback: (vedtaksperiodeId: string) => void;
+    forespørselCallback: (
+      vedtaksperiodeId: string,
+      organisasjonsnummer: string,
+    ) => void;
   }>();
   const [tilstand, setTilstand] = useState<string>();
   const [eventSource, setEventSource] = useState<EventSource>();
@@ -82,7 +94,8 @@ export const useSubscribe = (): UseSubscribeResult => {
             timeToLiveMs: 5000,
           });
           data?.forespørselCallback(
-            JSON.parse(event.data).verdi.vedtaksperiodeId,
+            message.verdi.vedtaksperiodeId,
+            message.verdi.organisasjonsnummer,
           );
           break;
         }
@@ -96,7 +109,10 @@ export const useSubscribe = (): UseSubscribeResult => {
   return [
     (
       fødselsnummer: string,
-      forespørselCallback: (vedtaksperiodeId: string) => void,
+      forespørselCallback: (
+        vedtaksperiodeId: string,
+        organisasjonsnummer: string,
+      ) => void,
     ) => setData({ fødselsnummer, key: nanoid(), forespørselCallback }),
     tilstand ?? "",
   ];

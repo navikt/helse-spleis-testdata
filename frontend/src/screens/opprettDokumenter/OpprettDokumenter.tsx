@@ -1,30 +1,24 @@
-import React, { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { HStack, VStack } from "@navikt/ds-react";
+import React, {useState} from "react";
+import {FormProvider, useForm} from "react-hook-form";
+import {HStack, VStack} from "@navikt/ds-react";
 
-import { post } from "../../io/api";
-import { useSubscribe } from "../../io/subscription";
+import {post} from "../../io/api";
+import {useSubscribe} from "../../io/subscription";
 
-import { DiverseCard } from "./DiverseCard";
-import { PersonCard } from "./PersonCard";
-import { SøknadCard } from "./SøknadCard";
-import { Ferieperioder } from "./Ferieperioder";
-import { EndringRefusjon } from "./EndringRefusjon";
-import { InntektsmeldingCard } from "./InntektsmeldingCard";
-import { Arbeidsgiverperioder } from "./Arbeidsgiverperioder";
-import { Forsikring } from "../forsikring/Forsikring";
+import {DiverseCard} from "./DiverseCard";
+import {PersonCard} from "./PersonCard";
+import {SøknadCard} from "./SøknadCard";
+import {Ferieperioder} from "./Ferieperioder";
+import {EndringRefusjon} from "./EndringRefusjon";
+import {InntektsmeldingCard} from "./InntektsmeldingCard";
+import {Arbeidsgiverperioder} from "./Arbeidsgiverperioder";
+import {Forsikring} from "../forsikring/Forsikring";
 
-import type {
-  FellesDTO,
-  ArbeidsgiveropplysningerDTO,
-  PersonDTO,
-  SykmeldingDTO,
-  SøknadDTO,
-} from "../../io/api.d";
-import { Egenmeldingsdager } from "./Egenmeldingsdager";
-import { InntektFraNyttArbeidsforhold } from "./InntektFraNyttArbeidsforhold";
-import { nanoid } from "nanoid";
-import { useAddSystemMessage } from "../../state/useSystemMessages";
+import type {ArbeidsgiveropplysningerDTO, FellesDTO, PersonDTO, SykmeldingDTO, SøknadDTO,} from "../../io/api.d";
+import {Egenmeldingsdager} from "./Egenmeldingsdager";
+import {InntektFraNyttArbeidsforhold} from "./InntektFraNyttArbeidsforhold";
+import {nanoid} from "nanoid";
+import {useAddSystemMessage} from "../../state/useSystemMessages";
 
 type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
@@ -104,6 +98,7 @@ const createOpprettVedtaksperiodePayload = (
 const createArbeidsgiverSvarerPayload = (
   values: Record<string, any>,
   vedtaksperiodeId: string,
+  organisasjonsnummer: string,
   forespurt: boolean,
   aarsakTilEndring: string,
 ): ArbeidsgiverSvarerPayload | undefined => {
@@ -141,7 +136,7 @@ const createArbeidsgiverSvarerPayload = (
 
   return {
     fnr: values.fnr,
-    orgnummer: values.orgnummer || null,
+    orgnummer: organisasjonsnummer,
     sykdomFom: values.sykdomFom,
     sykdomTom: values.sykdomTom,
     arbeidssituasjon: values.arbeidssituasjon,
@@ -200,29 +195,42 @@ export const OpprettDokumenter = React.memo(() => {
         text: "Dokumenter er sendt.",
         timeToLiveMs: 4000,
       });
-      subscribe(data.fnr, async (vedtaksperiodeId: string) => {
-        // Når det er svar på forespørsel er det alltid forespurt true og årsakTilEndring er "Ny"
-        const payload = createArbeidsgiverSvarerPayload(
-          data,
-          vedtaksperiodeId,
-          true,
-          "Ny",
-        );
-        if (payload == undefined) return;
-        setIsFetching(true);
-        const response = await postArbeidsgiverSvarer(payload);
-        const { status } = response;
-        setStatus(status);
-        const errorBody = await response.text();
-        setErrorBody(errorBody);
-        if (status < 400) {
-          addMessage({
-            id: nanoid(),
-            text: "Arbeidsgiveropplysninger er sendt.",
-            timeToLiveMs: 4000,
-          });
-        }
-      });
+      subscribe(
+        data.fnr,
+        async (vedtaksperiodeId: string, organisasjonsnummer: string) => {
+          if (!organisasjonsnummer) {
+            addMessage({
+              id: nanoid(),
+              text: "Mottok forespørsel uten organisasjonsnummer, kan ikke sende arbeidsgiveropplysninger.",
+              dismissable: true,
+              timeToLiveMs: 5000,
+            });
+            return;
+          }
+          // Når det er svar på forespørsel er det alltid forespurt true og årsakTilEndring er "Ny"
+          const payload = createArbeidsgiverSvarerPayload(
+            data,
+            vedtaksperiodeId,
+            organisasjonsnummer,
+            true,
+            "Ny",
+          );
+          if (payload == undefined) return;
+          setIsFetching(true);
+          const response = await postArbeidsgiverSvarer(payload);
+          const { status } = response;
+          setStatus(status);
+          const errorBody = await response.text();
+          setErrorBody(errorBody);
+          if (status < 400) {
+            addMessage({
+              id: nanoid(),
+              text: "Arbeidsgiveropplysninger er sendt.",
+              timeToLiveMs: 4000,
+            });
+          }
+        },
+      );
     }
   };
 

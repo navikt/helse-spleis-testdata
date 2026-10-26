@@ -1,13 +1,11 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.client.*
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.jackson3.*
 
 internal val inntektRestClient =
     InntektRestClient(
@@ -16,10 +14,7 @@ internal val inntektRestClient =
         MockAzureTokenProvider(),
         HttpClient(MockEngine) {
             install(ContentNegotiation) {
-                jackson {
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                    registerModule(JavaTimeModule())
-                }
+                jackson()
             }
             engine {
                 addHandler { request ->

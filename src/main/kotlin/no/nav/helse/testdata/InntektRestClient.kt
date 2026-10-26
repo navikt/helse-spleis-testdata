@@ -1,13 +1,13 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.result_object.getOrThrow
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.readValue
 import java.time.YearMonth
 
 internal class InntektRestClient(
@@ -48,16 +48,16 @@ internal class InntektRestClient(
             }
 }
 
-private fun toMånedListe(node: JsonNode) = node.path("arbeidsInntektMaaned").map(::tilMåned)
+private fun toMånedListe(node: JsonNode) = node.path("arbeidsInntektMaaned").values().map(::tilMåned)
 
 private fun toInntekt(node: JsonNode) =
     Inntekt(
         beløp = node["beloep"].asDouble(),
-        inntektstype = Inntektstype.valueOf(node["inntektType"].textValue()),
+        inntektstype = Inntektstype.valueOf(node["inntektType"].stringValue()),
         orgnummer =
             node["virksomhet"].let {
-                if (it["aktoerType"].asText() == "ORGANISASJON") {
-                    it["identifikator"].asText()
+                if (it["aktoerType"].asString() == "ORGANISASJON") {
+                    it["identifikator"].asString()
                 } else {
                     null
                 }
@@ -66,8 +66,8 @@ private fun toInntekt(node: JsonNode) =
 
 private fun tilMåned(node: JsonNode) =
     Måned(
-        YearMonth.parse(node["aarMaaned"].asText()),
-        node["arbeidsInntektInformasjon"]["inntektListe"].map(::toInntekt),
+        YearMonth.parse(node["aarMaaned"].asString()),
+        node["arbeidsInntektInformasjon"]["inntektListe"].values().map(::toInntekt),
     )
 
 data class Måned(

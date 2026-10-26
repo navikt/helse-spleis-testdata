@@ -35,7 +35,7 @@ internal class RapidsMediatorTest {
         rapidsMediator.publiser("partition_key", """{"key":"value"}""")
         assertEquals(1, testRapid.inspektør.size)
         assertEquals("partition_key", testRapid.inspektør.key(0))
-        assertEquals("value", testRapid.inspektør.field(0, "key").asText())
+        assertEquals("value", testRapid.inspektør.field(0, "key").asString())
     }
 
     @Test
@@ -43,7 +43,7 @@ internal class RapidsMediatorTest {
         rapidsMediator.slett("12345678910")
         assertEquals(1, testRapid.inspektør.size)
         assertEquals("12345678910", testRapid.inspektør.key(0))
-        assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asText())
-        assertEquals("12345678910", testRapid.inspektør.field(0, "fødselsnummer").asText())
+        assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asString())
+        assertEquals("12345678910", testRapid.inspektør.field(0, "fødselsnummer").asString())
     }
 }

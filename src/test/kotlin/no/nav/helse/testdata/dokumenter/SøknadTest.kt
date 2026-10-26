@@ -180,8 +180,8 @@ internal class SøknadTest {
         val meldingTilNav = tree.path("meldingTilNavDagerFraSykmelding")
         assertFalse(meldingTilNav.isNull, "meldingTilNavDagerFraSykmelding skal ikke være null")
         assertEquals(1, meldingTilNav.size())
-        assertEquals("$fom", meldingTilNav[0].path("fom").asText())
-        assertEquals("$tom", meldingTilNav[0].path("tom").asText())
+        assertEquals("$fom", meldingTilNav[0].path("fom").asString())
+        assertEquals("$tom", meldingTilNav[0].path("tom").asString())
     }
 
     @Test

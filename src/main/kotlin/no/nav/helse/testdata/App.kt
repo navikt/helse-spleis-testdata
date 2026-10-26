@@ -1,13 +1,5 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.core.util.DefaultIndenter
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.navikt.tbd_libs.azure.AzureToken
 import com.github.navikt.tbd_libs.azure.AzureTokenProvider
 import com.github.navikt.tbd_libs.azure.createJwkAzureTokenClientFromEnvironment
@@ -26,7 +18,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.*
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.jackson3.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.plugins.callid.*
@@ -48,23 +40,30 @@ import no.nav.helse.testdata.rivers.VedtaksperiodeEndretRiver
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import tools.jackson.core.util.DefaultIndenter
+import tools.jackson.core.util.DefaultPrettyPrinter
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.introspect.DefaultAccessorNamingStrategy
+import tools.jackson.module.kotlin.jacksonMapperBuilder
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.io.File
 import java.nio.file.Paths
 
 val log: Logger = LoggerFactory.getLogger("spleis-testdata")
 val sikkerlogg: Logger = LoggerFactory.getLogger("tjenestekall")
 val objectMapper: ObjectMapper =
-    jacksonObjectMapper()
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    jacksonMapperBuilder()
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .registerKotlinModule()
-        .registerModule(JavaTimeModule())
-        .setDefaultPrettyPrinter(
-            DefaultPrettyPrinter().apply {
-                indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
-                indentObjectsWith(DefaultIndenter("  ", "\n"))
-            },
-        )
+        // Jackson 3 skrur dette på som standard; frontenden kan utelate tallfelter som sykmeldingsgrad
+        .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+        // Standardvalideringen godtar ikke felter som starter med æ, ø eller å (f.eks. «år»), og dropper dem stille
+        .accessorNaming(DefaultAccessorNamingStrategy.Provider().withFirstCharAcceptance(true, true))
+        .defaultPrettyPrinter(
+            DefaultPrettyPrinter()
+                .withArrayIndenter(DefaultPrettyPrinter.FixedSpaceIndenter.instance())
+                .withObjectIndenter(DefaultIndenter("  ", "\n")),
+        ).build()
 
 fun main() {
     val env = setUpEnvironment()
@@ -86,7 +85,7 @@ fun main() {
             httpClient =
                 java.net.http.HttpClient
                     .newHttpClient(),
-            objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()),
+            objectMapper = jacksonObjectMapper(),
             tokenProvider = azureAd,
         )
 

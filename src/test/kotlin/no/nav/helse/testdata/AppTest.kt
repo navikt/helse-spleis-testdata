@@ -56,7 +56,7 @@ class AppTest {
 
             assertTrue(response.status.isSuccess())
             assertEquals(1, testRapid.inspektør.size)
-            assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asText())
+            assertEquals("slett_person", testRapid.inspektør.field(0, "@event_name").asString())
         }
     }
 

@@ -1,14 +1,12 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import com.github.navikt.tbd_libs.result_object.ok
 import com.github.navikt.tbd_libs.speed.SpeedClient
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson3.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.cio.CIO
@@ -20,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.helse.testdata.db.ForsikringReplikaTestdataDao
 import org.flywaydb.core.Flyway
 import org.testcontainers.postgresql.PostgreSQLContainer
+import tools.jackson.databind.SerializationFeature
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -142,8 +141,6 @@ internal class LocalApplicationBuilder(
             install(ContentNegotiation) {
                 jackson {
                     enable(SerializationFeature.INDENT_OUTPUT)
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                    registerModule(JavaTimeModule())
                 }
             }
             installKtorModule(

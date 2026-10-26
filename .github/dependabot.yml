@@ -38,6 +38,6 @@ updates:
     cooldown:
       default-days: 7
     ignore:
-      - dependency-name: '@type/node'
-      - dependency-name: 'eslint'
-        version: ['9.x']
+      # @types/node må følge Node-versjonen i Dockerfile og CI, så major-versjoner holdes tilbake
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]

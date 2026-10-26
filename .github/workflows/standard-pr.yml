@@ -30,6 +30,12 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
+      # Skriver .npmrc med auth mot GitHub Packages, som pnpm (via Gradle) bruker for @navikt-pakker i lockfila
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          registry-url: https://npm.pkg.github.com
+          scope: '@navikt'
+
       - name: NAIS login
         id: login
         uses: nais/login@40b72a35a18ddf2ad74b632461139ab838cc2a2f # v0
@@ -39,6 +45,7 @@ jobs:
       - name: gradlew clean build jibDockerBuild
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
         run: |
           ./gradlew clean build jibDockerBuild -Djib.console=plain --build-cache
 

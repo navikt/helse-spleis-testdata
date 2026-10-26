@@ -6,27 +6,35 @@ import type { TransitionFn } from "@react-spring/web";
 import { animated, useTransition } from "@react-spring/web";
 import { ClearMessagesButton } from "./ClearMessagesButton";
 
+type SystemMessageStyle = { opacity: number; height: number };
+
 type UseSystemMessageTransitionsResult = [
-  TransitionFn<SystemMessageObject, { opacity: number; height: number }>,
-  WeakMap<object, HTMLElement>,
+  TransitionFn<SystemMessageObject, SystemMessageStyle>,
+  WeakMap<SystemMessageObject, HTMLElement>,
 ];
 
 const useSystemMessageTransitions = (
   messages: SystemMessageObject[],
 ): UseSystemMessageTransitionsResult => {
-  const refs = useMemo(() => new WeakMap(), []);
+  const refs = useMemo(
+    () => new WeakMap<SystemMessageObject, HTMLElement>(),
+    [],
+  );
 
-  const transitions = useTransition(messages, {
-    keys: (item) => item.id,
-    from: { opacity: 0, height: 0 },
-    enter: (item) => async (start, _) => {
-      await start({ opacity: 1, height: refs.get(item).offsetHeight });
+  const transitions = useTransition<SystemMessageObject, SystemMessageStyle>(
+    messages,
+    {
+      keys: (item) => item.id,
+      from: { opacity: 0, height: 0 },
+      enter: (item) => async (start, _) => {
+        await start({ opacity: 1, height: refs.get(item)!.offsetHeight });
+      },
+      leave: [{ opacity: 0 }, { height: 0 }],
+      onRest: (result, _spring, item) => {
+        if (item && result.finished) refs.delete(item);
+      },
     },
-    leave: [{ opacity: 0 }, { height: 0 }],
-    onRest: (result, _spring, item) => {
-      if (item && result.finished) refs.delete(item);
-    },
-  });
+  );
 
   return [transitions, refs];
 };

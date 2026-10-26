@@ -52,7 +52,7 @@ class ForsikringReplikaApiTest {
 
             val listet = client.get("$VEDFRIVT_PATH?IF01_AGNR_FNR=$agnrFnr")
             assertEquals(HttpStatusCode.OK, listet.status)
-            assertEquals(listOf(idVed), listet.json().map { it["ID_VED"].decimalValue() })
+            assertEquals(listOf(idVed), listet.json().values().map { it["ID_VED"].decimalValue() })
 
             val oppdatert =
                 client.put("$VEDFRIVT_PATH/$idVed") {
@@ -111,7 +111,7 @@ class ForsikringReplikaApiTest {
             assertEquals(HttpStatusCode.OK, client.get("$FKONTO_PATH/$idKont").status)
 
             val listet = client.get("$FKONTO_PATH?IF01_AGNR_FNR=$agnrFnr")
-            assertEquals(listOf(idKont), listet.json().map { it["ID_KONT"].decimalValue() })
+            assertEquals(listOf(idKont), listet.json().values().map { it["ID_KONT"].decimalValue() })
             assertTrue(client.get(FKONTO_PATH).json().any { it["ID_KONT"].decimalValue() == idKont })
 
             val oppdatert =
@@ -166,23 +166,23 @@ class ForsikringReplikaApiTest {
             assertEquals(HttpStatusCode.Created, response.status)
 
             val rad = client.get("$VEDFRIVT_PATH/${response.json()["id"].decimalValue()}").json()
-            assertEquals("1", rad["IF01_KODE"].asText())
+            assertEquals("1", rad["IF01_KODE"].asString())
             assertEquals(90123112345, rad["IF01_AGNR_FNR"].asLong())
             assertEquals(rad["ID_VED"].asInt(), rad["IF10_FORSFOM_SEQ"].asInt())
-            assertEquals("J", rad["IF10_GODKJ"].asText())
+            assertEquals("J", rad["IF10_GODKJ"].asString())
             assertEquals(20260101, rad["IF10_FORSFOM"].asInt())
             assertEquals(20260201, rad["IF10_VIRKDATO"].asInt())
-            assertEquals("4", rad["IF10_TYPE"].asText())
-            assertEquals(" ", rad["IF10_SELVFOM"].asText())
-            assertEquals("N", rad["IF10_KOMBI"].asText())
+            assertEquals("4", rad["IF10_TYPE"].asString())
+            assertEquals(" ", rad["IF10_SELVFOM"].asString())
+            assertEquals("N", rad["IF10_KOMBI"].asString())
             assertEquals(500000, rad["IF10_PREMGRL"].asInt())
             assertEquals(20261231, rad["IF10_FORSTOM"].asInt())
-            assertEquals("5", rad["IF10_OPPHGR"].asText())
-            assertEquals(" ", rad["IF10_TERM_KV"].asText())
-            assertEquals(" ", rad["IF10_TERM_AAR"].asText())
-            assertEquals(" ", rad["KILDE_IF"].asText())
-            assertEquals(rad["OPPRETTET"].asText(), rad["ENDRET_I_KILDE"].asText())
-            assertEquals(rad["OPPRETTET"].asText(), rad["OPPDATERT"].asText())
+            assertEquals("5", rad["IF10_OPPHGR"].asString())
+            assertEquals(" ", rad["IF10_TERM_KV"].asString())
+            assertEquals(" ", rad["IF10_TERM_AAR"].asString())
+            assertEquals(" ", rad["KILDE_IF"].asString())
+            assertEquals(rad["OPPRETTET"].asString(), rad["ENDRET_I_KILDE"].asString())
+            assertEquals(rad["OPPRETTET"].asString(), rad["OPPDATERT"].asString())
         }
 
     @Test
@@ -206,10 +206,10 @@ class ForsikringReplikaApiTest {
 
             val rad = client.get("$VEDFRIVT_PATH/${opprettet["id"].decimalValue()}").json()
             assertEquals(50010112345, rad["IF01_AGNR_FNR"].asLong())
-            assertEquals("N", rad["IF10_GODKJ"].asText())
-            assertEquals("1", rad["IF10_TYPE"].asText())
+            assertEquals("N", rad["IF10_GODKJ"].asString())
+            assertEquals("1", rad["IF10_TYPE"].asString())
             assertEquals(0, rad["IF10_FORSTOM"].asInt())
-            assertEquals(" ", rad["IF10_OPPHGR"].asText())
+            assertEquals(" ", rad["IF10_OPPHGR"].asString())
         }
 
     @Test
@@ -246,16 +246,16 @@ class ForsikringReplikaApiTest {
 
             val forsikring = oppdatert.json()
             assertEquals(idVed, forsikring["id"].decimalValue())
-            assertEquals("31129012345", forsikring["identitetsnummer"].asText())
+            assertEquals("31129012345", forsikring["identitetsnummer"].asString())
             assertEquals(false, forsikring["godkjent"].asBoolean())
-            assertEquals("FRILANSER_100_PROSENT_FRA_DAG_1", forsikring["type"].asText())
+            assertEquals("FRILANSER_100_PROSENT_FRA_DAG_1", forsikring["type"].asString())
             assertEquals(123456, forsikring["premiegrunnlag"].asInt())
-            assertEquals("2026-12-31", forsikring["opphørsdato"].asText())
-            assertEquals("5", forsikring["opphørsgrunn"].asText())
+            assertEquals("2026-12-31", forsikring["opphørsdato"].asString())
+            assertEquals("5", forsikring["opphørsgrunn"].asString())
 
             val rad = client.get("$VEDFRIVT_PATH/$idVed").json()
-            assertEquals(lagret["OPPRETTET"].asText(), rad["OPPRETTET"].asText())
-            assertNotEquals(lagret["OPPDATERT"].asText(), rad["OPPDATERT"].asText())
+            assertEquals(lagret["OPPRETTET"].asString(), rad["OPPRETTET"].asString())
+            assertNotEquals(lagret["OPPDATERT"].asString(), rad["OPPDATERT"].asString())
         }
 
     @Test
@@ -290,14 +290,14 @@ class ForsikringReplikaApiTest {
 
             val forsikring = hentet.json()
             assertEquals(idVed, forsikring["id"].decimalValue())
-            assertEquals("01015012345", forsikring["identitetsnummer"].asText())
+            assertEquals("01015012345", forsikring["identitetsnummer"].asString())
             assertEquals(false, forsikring["godkjent"].asBoolean())
-            assertEquals("2026-03-01", forsikring["fom"].asText())
-            assertEquals("2026-04-01", forsikring["virkningsdato"].asText())
-            assertEquals("SELVSTENDIG_100_PROSENT_FRA_DAG_17", forsikring["type"].asText())
+            assertEquals("2026-03-01", forsikring["fom"].asString())
+            assertEquals("2026-04-01", forsikring["virkningsdato"].asString())
+            assertEquals("SELVSTENDIG_100_PROSENT_FRA_DAG_17", forsikring["type"].asString())
             assertEquals(654321, forsikring["premiegrunnlag"].asInt())
-            assertEquals("2026-12-31", forsikring["opphørsdato"].asText())
-            assertEquals("5", forsikring["opphørsgrunn"].asText())
+            assertEquals("2026-12-31", forsikring["opphørsdato"].asString())
+            assertEquals("5", forsikring["opphørsgrunn"].asString())
 
             assertEquals(HttpStatusCode.NoContent, client.delete("$FORSIKRING_PATH/$idVed").status)
             assertEquals(HttpStatusCode.NotFound, client.get("$FORSIKRING_PATH/$idVed").status)
@@ -346,7 +346,7 @@ class ForsikringReplikaApiTest {
             assertEquals(HttpStatusCode.OK, listet.status)
             assertEquals(
                 listOf(først, nestSist, utenOpphør, sist),
-                listet.json().map { it["id"].decimalValue() },
+                listet.json().values().map { it["id"].decimalValue() },
             )
         }
 
@@ -387,23 +387,23 @@ class ForsikringReplikaApiTest {
             val idKont = opprettet.json()["id"].decimalValue()
             assertEquals(2026, opprettet.json()["år"].asInt())
             assertEquals(2, opprettet.json()["halvdel"].asInt())
-            assertEquals("2026-08-15", opprettet.json()["betalingsdato"].asText())
+            assertEquals("2026-08-15", opprettet.json()["betalingsdato"].asString())
 
             val forsikring = client.get("$VEDFRIVT_PATH/$idVed").json()
             val rad = client.get("$FKONTO_PATH/$idKont").json()
-            assertEquals(forsikring["IF01_KODE"].asText(), rad["IF01_KODE"].asText())
+            assertEquals(forsikring["IF01_KODE"].asString(), rad["IF01_KODE"].asString())
             assertEquals(forsikring["IF01_AGNR_FNR"].asLong(), rad["IF01_AGNR_FNR"].asLong())
             assertEquals(forsikring["IF10_FORSFOM_SEQ"].asInt(), rad["IF10_FORSFOM_SEQ"].asInt())
             assertEquals(idKont.toInt(), rad["IF12_BETDATO_SEQ"].asInt())
             assertEquals(20260701, rad["IF12_FOM"].asInt())
             assertEquals(20261231, rad["IF12_TOM"].asInt())
-            assertEquals("B", rad["IF12_BET_KODE"].asText())
+            assertEquals("B", rad["IF12_BET_KODE"].asString())
             assertTrue(rad["IF12_FRIUKER"].isNull)
             assertTrue(rad["IF12_BELOEP"].isNull)
             assertEquals(20260815, rad["IF12_BETDATO"].asInt())
-            assertEquals(" ", rad["KILDE_IF"].asText())
-            assertEquals(rad["OPPRETTET"].asText(), rad["ENDRET_I_KILDE"].asText())
-            assertEquals(rad["OPPRETTET"].asText(), rad["OPPDATERT"].asText())
+            assertEquals(" ", rad["KILDE_IF"].asString())
+            assertEquals(rad["OPPRETTET"].asString(), rad["ENDRET_I_KILDE"].asString())
+            assertEquals(rad["OPPRETTET"].asString(), rad["OPPDATERT"].asString())
 
             val oppdatert =
                 client.put("$FAKTURA_PATH/$idKont") {
@@ -417,11 +417,11 @@ class ForsikringReplikaApiTest {
             val oppdatertRad = client.get("$FKONTO_PATH/$idKont").json()
             assertEquals(20250101, oppdatertRad["IF12_FOM"].asInt())
             assertEquals(20250630, oppdatertRad["IF12_TOM"].asInt())
-            assertEquals(" ", oppdatertRad["IF12_BET_KODE"].asText())
+            assertEquals(" ", oppdatertRad["IF12_BET_KODE"].asString())
             assertTrue(oppdatertRad["IF12_BETDATO"].isNull)
             assertEquals(forsikring["IF01_AGNR_FNR"].asLong(), oppdatertRad["IF01_AGNR_FNR"].asLong())
-            assertEquals(rad["OPPRETTET"].asText(), oppdatertRad["OPPRETTET"].asText())
-            assertNotEquals(rad["OPPDATERT"].asText(), oppdatertRad["OPPDATERT"].asText())
+            assertEquals(rad["OPPRETTET"].asString(), oppdatertRad["OPPRETTET"].asString())
+            assertNotEquals(rad["OPPDATERT"].asString(), oppdatertRad["OPPDATERT"].asString())
 
             assertEquals(HttpStatusCode.OK, client.get("$FAKTURA_PATH/$idKont").status)
             assertEquals(HttpStatusCode.NoContent, client.delete("$FAKTURA_PATH/$idKont").status)
@@ -462,8 +462,15 @@ class ForsikringReplikaApiTest {
 
             val listet = client.get(fakturaerFor(første))
             assertEquals(HttpStatusCode.OK, listet.status)
-            assertEquals(listOf(vår, høst), listet.json().map { it["id"].decimalValue() })
-            assertEquals(listOf(annenForsikring), client.get(fakturaerFor(andre)).json().map { it["id"].decimalValue() })
+            assertEquals(listOf(vår, høst), listet.json().values().map { it["id"].decimalValue() })
+            assertEquals(
+                listOf(annenForsikring),
+                client
+                    .get(fakturaerFor(andre))
+                    .json()
+                    .values()
+                    .map { it["id"].decimalValue() },
+            )
         }
 
     @Test

@@ -30,8 +30,8 @@ internal class PersonSlettetRiver(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val fødselsnummer = packet["fødselsnummer"].asText()
-        val app = packet["system_participating_services"][0].let { it["service"].asText() }
+        val fødselsnummer = packet["fødselsnummer"].asString()
+        val app = packet["system_participating_services"][0].let { it["service"].asString() }
 
         subscriptionService.update(fødselsnummer, Oppdatering.sletting(app))
     }

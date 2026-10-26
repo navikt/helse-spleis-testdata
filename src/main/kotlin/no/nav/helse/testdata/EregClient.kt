@@ -1,11 +1,11 @@
 package no.nav.helse.testdata
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import tools.jackson.databind.JsonNode
 import java.util.*
 
 class EregClient(
@@ -40,7 +40,8 @@ class EregClient(
                         .path("organisasjonDetaljer")
                         .path("naeringer")
                         .takeIf { !it.isMissingNode }
-                        ?.map { it["naeringskode"].asText() } ?: emptyList(),
+                        ?.values()
+                        ?.map { it["naeringskode"].asString() } ?: emptyList(),
             )
         } else {
             throw FeilVedHenting("ereg svarte med ${response.status.value}")
@@ -53,7 +54,7 @@ class EregClient(
                 (1..5)
                     .mapNotNull { index -> navn["navnelinje$index"] }
                     .filterNot(JsonNode::isMissingOrNull)
-                    .map(JsonNode::asText)
+                    .map(JsonNode::asString)
                     .filterNot(String::isBlank)
             }.joinToString()
 }

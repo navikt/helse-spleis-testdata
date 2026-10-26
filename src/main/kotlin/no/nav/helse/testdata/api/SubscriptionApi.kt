@@ -1,6 +1,5 @@
 package no.nav.helse.testdata.api
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.server.response.*
@@ -14,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.helse.testdata.SubscriptionService
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
+import tools.jackson.databind.JsonNode
 import java.util.*
 
 internal class Oppdatering private constructor(

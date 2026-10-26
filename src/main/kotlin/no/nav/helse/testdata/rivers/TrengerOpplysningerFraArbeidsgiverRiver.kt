@@ -44,21 +44,21 @@ internal class TrengerOpplysningerFraArbeidsgiverRiver(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val fødselsnummer = packet["fødselsnummer"].asText()
+        val fødselsnummer = packet["fødselsnummer"].asString()
         log.info("Gjenkjente behovet TrengerOpplysningerFraArbeidsgiver for $fødselsnummer\n\t${packet.toJson()}")
 
         subscriptionService.update(
             fødselsnummer,
             Oppdatering.forespørsel(
                 objectMapper.createObjectNode().apply {
-                    put("vedtaksperiodeId", packet["vedtaksperiodeId"].asText())
-                    put("organisasjonsnummer", packet["organisasjonsnummer"].asText())
+                    put("vedtaksperiodeId", packet["vedtaksperiodeId"].asString())
+                    put("organisasjonsnummer", packet["organisasjonsnummer"].asString())
                     putArray("sykmeldingsperioder").apply {
                         packet["sykmeldingsperioder"].forEach { sykmeldingsperiode ->
                             add(
                                 objectMapper.createObjectNode().apply {
-                                    put("fom", sykmeldingsperiode.path("fom").asText())
-                                    put("tom", sykmeldingsperiode.path("tom").asText())
+                                    put("fom", sykmeldingsperiode.path("fom").asString())
+                                    put("tom", sykmeldingsperiode.path("tom").asString())
                                 },
                             )
                         }

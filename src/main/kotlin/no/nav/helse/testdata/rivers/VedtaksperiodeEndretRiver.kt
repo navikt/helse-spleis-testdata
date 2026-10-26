@@ -32,8 +32,8 @@ internal class VedtaksperiodeEndretRiver(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val fødselsnummer = packet["fødselsnummer"].asText()
-        val tilstand = packet["gjeldendeTilstand"].asText()
+        val fødselsnummer = packet["fødselsnummer"].asString()
+        val tilstand = packet["gjeldendeTilstand"].asString()
 
         subscriptionService.update(fødselsnummer, Oppdatering.endring(tilstand))
     }

@@ -38,7 +38,7 @@ class AaregClient(
             response.body<List<AaregArbeidsforhold>>()
         } catch (_: Exception) {
             val responseValue = objectMapper.readTree(response.bodyAsText())
-            throw RuntimeException(responseValue.path("melding").asText("Ukjent respons fra Aareg"))
+            throw RuntimeException(responseValue.path("melding").asString("Ukjent respons fra Aareg"))
         }
     }
 

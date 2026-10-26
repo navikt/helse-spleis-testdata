@@ -16,7 +16,7 @@ postgresql = "org.postgresql:postgresql:42.7.14"
 ktor-client-auth = { module = "io.ktor:ktor-client-auth-jvm", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio-jvm", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-jackson = { module = "io.ktor:ktor-client-jackson", version.ref = "ktor" }
+ktor-serialization-jackson3 = { module = "io.ktor:ktor-serialization-jackson3", version.ref = "ktor" }
 ktor-client-json = { module = "io.ktor:ktor-client-json-jvm", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock-jvm", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
@@ -38,8 +38,8 @@ ktor-client = [
     "ktor-client-auth",
     "ktor-client-cio",
     "ktor-client-contentNegotiation",
-    "ktor-client-jackson",
     "ktor-client-json",
+    "ktor-serialization-jackson3",
     "ktor-websockets"
 ]
 

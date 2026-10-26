@@ -1,9 +1,9 @@
 [versions]
-flyway = "13.3.0"
+flyway = "13.10.3"
 ktor = "3.6.0"
 nodeGradle = "7.1.0"
-sykepengerGradlePlugins = "20261001.1830"
-tbdLibs = "2026.01.22-09.16-1d3f6039"
+sykepengerGradlePlugins = "20261026.1611"
+tbdLibs = "20261013.1613"
 testcontainers = "2.0.5"
 
 [libraries]
@@ -11,7 +11,7 @@ flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
 flyway-databasePostgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 hikaricp = "com.zaxxer:HikariCP:7.1.0"
 kotliquery = "com.github.seratch:kotliquery:1.9.1"
-postgresql = "org.postgresql:postgresql:42.7.13"
+postgresql = "org.postgresql:postgresql:42.7.14"
 
 ktor-client-auth = { module = "io.ktor:ktor-client-auth-jvm", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio-jvm", version.ref = "ktor" }
@@ -22,10 +22,10 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock-jvm", version.ref = "kto
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 
-mockk = "io.mockk:mockk:1.13.9"
+mockk = "io.mockk:mockk:1.14.11"
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
-rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026011411051768385145.e8ebad1177b4"
+rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026091610031789545782"
 
 tbdLibs-azureTokenClientDefault = { module = "com.github.navikt.tbd-libs:azure-token-client-default", version.ref = "tbdLibs" }
 tbdLibs-naisfulApp = { module = "com.github.navikt.tbd-libs:naisful-app", version.ref = "tbdLibs" }

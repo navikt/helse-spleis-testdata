@@ -14,13 +14,16 @@ type UseSystemMessageTransitionsResult = [
 const useSystemMessageTransitions = (
   messages: SystemMessageObject[],
 ): UseSystemMessageTransitionsResult => {
-  const refs = useMemo(() => new WeakMap(), []);
+  const refs = useMemo(() => new WeakMap<object, HTMLElement>(), []);
 
-  const transitions = useTransition(messages, {
+  const transitions = useTransition<
+    SystemMessageObject,
+    { opacity: number; height: number }
+  >(messages, {
     keys: (item) => item.id,
     from: { opacity: 0, height: 0 },
     enter: (item) => async (start, _) => {
-      await start({ opacity: 1, height: refs.get(item).offsetHeight });
+      await start({ opacity: 1, height: refs.get(item)?.offsetHeight ?? 0 });
     },
     leave: [{ opacity: 0 }, { height: 0 }],
     onRest: (result, _spring, item) => {

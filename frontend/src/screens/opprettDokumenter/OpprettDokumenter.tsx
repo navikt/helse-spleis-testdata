@@ -203,7 +203,7 @@ export const OpprettDokumenter = React.memo(() => {
     if (status < 400) {
       addMessage({
         id: nanoid(),
-        text: "Dokumenter er sendt.",
+        text: "🎃 Dokumenter er sendt.",
         timeToLiveMs: 4000,
       });
       subscribe(
@@ -236,7 +236,7 @@ export const OpprettDokumenter = React.memo(() => {
           if (status < 400) {
             addMessage({
               id: nanoid(),
-              text: "Arbeidsgiveropplysninger er sendt.",
+              text: "🦇 Arbeidsgiveropplysninger er sendt.",
               timeToLiveMs: 4000,
             });
           }

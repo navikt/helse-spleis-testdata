@@ -1,0 +1,580 @@
+/* ---------- Lag ---------- */
+
+.Background,
+.Foreground {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.Background {
+  z-index: -1;
+}
+
+.Foreground {
+  z-index: 1;
+}
+
+/* ---------- Måne ---------- */
+
+.Moon {
+  position: absolute;
+  top: 8rem;
+  right: 4%;
+  width: 9rem;
+  opacity: 0.85;
+  animation: moon-glow 6s ease-in-out infinite alternate;
+}
+
+@keyframes moon-glow {
+  from {
+    filter: drop-shadow(0 0 0.5rem var(--ax-bg-warning-moderate));
+  }
+  to {
+    filter: drop-shadow(0 0 2.5rem var(--ax-bg-warning-moderate));
+  }
+}
+
+/* ---------- Flaggermus ---------- */
+
+.Bat {
+  position: absolute;
+  top: var(--top);
+  left: 0;
+  width: var(--size);
+  filter: drop-shadow(0 0 0.25rem var(--ax-border-meta-purple));
+  animation:
+    bat-fly var(--duration) linear var(--delay) infinite,
+    bat-flap 0.18s ease-in-out infinite alternate;
+}
+
+@keyframes bat-fly {
+  0% {
+    translate: -10vw 0;
+  }
+  25% {
+    translate: 25vw -4rem;
+  }
+  50% {
+    translate: 55vw 2rem;
+  }
+  75% {
+    translate: 80vw -3rem;
+  }
+  100% {
+    translate: 110vw 0;
+  }
+}
+
+@keyframes bat-flap {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0.35);
+  }
+}
+
+/* ---------- Løv og godteri som faller ---------- */
+
+.Falling {
+  position: absolute;
+  top: -3rem;
+  left: var(--left);
+  font-size: 1.5rem;
+  opacity: 0.6;
+  animation: fall var(--duration) linear var(--delay) infinite;
+}
+
+@keyframes fall {
+  0% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  25% {
+    translate: 2rem 25vh;
+  }
+  50% {
+    translate: -1.5rem 50vh;
+    rotate: 180deg;
+  }
+  75% {
+    translate: 1.5rem 75vh;
+  }
+  100% {
+    translate: 0 calc(100vh + 6rem);
+    rotate: 360deg;
+  }
+}
+
+/* ---------- Tåke ---------- */
+
+.Fog {
+  position: absolute;
+  inset-inline: -10%;
+  bottom: 0;
+  height: 10rem;
+  background:
+    radial-gradient(
+      ellipse at 20% 100%,
+      var(--ax-bg-meta-purple-moderateA),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse at 70% 100%,
+      var(--ax-bg-neutral-moderateA),
+      transparent 65%
+    );
+  animation: fog-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes fog-drift {
+  from {
+    translate: -5% 0;
+  }
+  to {
+    translate: 5% 0;
+  }
+}
+
+/* ---------- Spindelvev ---------- */
+
+.Cobweb {
+  position: absolute;
+  top: 0;
+  width: 7rem;
+  opacity: 0.5;
+  animation: web-sway 8s ease-in-out infinite alternate;
+}
+
+.CobwebLeft {
+  left: 0;
+  transform-origin: top left;
+}
+
+.CobwebRight {
+  right: 0;
+  transform: scaleX(-1);
+  transform-origin: top right;
+}
+
+@keyframes web-sway {
+  from {
+    rotate: -1.5deg;
+  }
+  to {
+    rotate: 1.5deg;
+  }
+}
+
+/* ---------- Edderkopp: flykter når musa nærmer seg ---------- */
+
+.Spider {
+  position: absolute;
+  top: 0;
+  right: 10rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  animation: spider-bob 5s ease-in-out infinite;
+  transition: translate 0.8s ease-in 2s;
+}
+
+.Spider:hover {
+  translate: 0 -100%;
+  transition: translate 0.2s ease-out 0s;
+}
+
+.Thread {
+  width: 1px;
+  height: 5rem;
+  background: var(--ax-border-neutral);
+}
+
+.Spider img {
+  width: 2.25rem;
+  margin-top: -0.25rem;
+  filter: drop-shadow(0 0 0.25rem var(--ax-border-meta-purple));
+  animation: wiggle 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes spider-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2.5rem);
+  }
+}
+
+@keyframes wiggle {
+  from {
+    rotate: -8deg;
+  }
+  to {
+    rotate: 8deg;
+  }
+}
+
+/* ---------- Banner ---------- */
+
+.Swing {
+  display: inline-block;
+  transform-origin: top center;
+  animation: swing 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes swing {
+  from {
+    rotate: -15deg;
+  }
+  to {
+    rotate: 15deg;
+  }
+}
+
+.Flicker {
+  animation: flicker 3s steps(1) infinite;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 0.4;
+  }
+  43% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.6;
+  }
+  47% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+}
+
+.Float {
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -0.35rem;
+  }
+}
+
+.PumpkinWrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.PumpkinButton {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--ax-radius-full);
+}
+
+.PumpkinButton:focus-visible {
+  outline: 3px solid var(--ax-border-focus);
+  outline-offset: 2px;
+}
+
+.PumpkinButton img {
+  width: 2rem;
+  height: 2rem;
+  transition:
+    scale 0.15s,
+    rotate 0.15s;
+  animation: pumpkin-glow 2.5s ease-in-out infinite alternate;
+}
+
+.PumpkinButton:hover img {
+  scale: 1.15;
+  rotate: -8deg;
+}
+
+.PumpkinButton:active img {
+  scale: 0.9;
+}
+
+@keyframes pumpkin-glow {
+  from {
+    filter: drop-shadow(0 0 0.1rem var(--ax-bg-warning-strong));
+  }
+  to {
+    filter: drop-shadow(0 0 0.6rem var(--ax-bg-warning-strong));
+  }
+}
+
+.Candy {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  margin: -0.75rem 0 0 -0.75rem;
+  font-size: 1.25rem;
+  pointer-events: none;
+  animation: candy-burst 1.1s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+
+@keyframes candy-burst {
+  0% {
+    transform: translate(0, 0) rotate(0) scale(0.4);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), calc(var(--dy) + 2rem)) rotate(var(--rot))
+      scale(1);
+    opacity: 0;
+  }
+}
+
+/* ---------- Kikkende spøkelse ---------- */
+
+.PeekingGhost {
+  position: fixed;
+  bottom: 0;
+  z-index: 2;
+  width: 5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  animation: peek 7s ease-in-out forwards;
+}
+
+.PeekingGhost:focus-visible {
+  outline: 3px solid var(--ax-border-focus);
+}
+
+.PeekingGhost img {
+  display: block;
+  width: 100%;
+}
+
+.PeekingGhost:hover img {
+  animation: shiver 0.1s linear infinite alternate;
+}
+
+.PeekLeft {
+  left: 2rem;
+}
+
+.PeekRight {
+  right: 30%;
+}
+
+@keyframes peek {
+  0% {
+    translate: 0 100%;
+  }
+  15% {
+    translate: 0 35%;
+  }
+  20% {
+    translate: 0 45%;
+  }
+  85% {
+    translate: 0 40%;
+  }
+  100% {
+    translate: 0 100%;
+  }
+}
+
+@keyframes shiver {
+  from {
+    rotate: -4deg;
+  }
+  to {
+    rotate: 4deg;
+  }
+}
+
+/* ---------- Heks på kosteskaft ---------- */
+
+.Witch {
+  position: fixed;
+  top: 20%;
+  left: 0;
+  z-index: 2;
+  width: 9rem;
+  pointer-events: none;
+  filter: drop-shadow(0 0 0.5rem var(--ax-border-meta-purple));
+  animation: witch-fly 9s linear forwards;
+}
+
+@keyframes witch-fly {
+  0% {
+    translate: -12rem 3rem;
+    rotate: -4deg;
+  }
+  25% {
+    translate: 25vw -2rem;
+    rotate: 3deg;
+  }
+  50% {
+    translate: 50vw 2rem;
+    rotate: -5deg;
+  }
+  75% {
+    translate: 75vw -3rem;
+    rotate: 4deg;
+  }
+  100% {
+    translate: calc(100vw + 2rem) -6rem;
+    rotate: -8deg;
+  }
+}
+
+/* ---------- BØ! ---------- */
+
+.Jumpscare {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: var(--ax-bg-overlay);
+  animation: jumpscare-bg 1.6s ease-out forwards;
+}
+
+.Jumpscare img {
+  width: min(50vw, 22rem);
+  animation: jumpscare-ghost 1.6s cubic-bezier(0.2, 1.6, 0.4, 1) forwards;
+}
+
+.Jumpscare span {
+  color: var(--ax-text-neutral-contrast);
+  font-size: clamp(3rem, 12vw, 9rem);
+  font-weight: var(--ax-font-weight-bold);
+  animation: shake 0.12s linear 10;
+}
+
+@keyframes jumpscare-bg {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes jumpscare-ghost {
+  0% {
+    scale: 0.1;
+    rotate: -20deg;
+  }
+  25% {
+    scale: 1.1;
+    rotate: 5deg;
+  }
+  35% {
+    scale: 1;
+    rotate: 0deg;
+  }
+  100% {
+    scale: 1.05;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: -0.5rem 0.25rem;
+  }
+  50% {
+    translate: 0.5rem -0.25rem;
+  }
+  75% {
+    translate: -0.25rem -0.5rem;
+  }
+}
+
+/* ---------- Gresskar-spinner ---------- */
+
+.Spinner {
+  display: inline-block;
+  line-height: 1;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- Redusert bevegelse ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .Bat,
+  .Falling,
+  .Witch {
+    display: none;
+  }
+
+  .Moon,
+  .Fog,
+  .Cobweb,
+  .Spider,
+  .Spider img,
+  .Swing,
+  .Flicker,
+  .Float,
+  .PumpkinButton img,
+  .PeekingGhost,
+  .PeekingGhost:hover img,
+  .Jumpscare img,
+  .Jumpscare span {
+    animation: none;
+  }
+
+  .Spider {
+    transition: none;
+  }
+
+  .Candy {
+    animation-name: fade-out;
+  }
+
+  .Spinner {
+    animation-duration: 3s;
+  }
+}

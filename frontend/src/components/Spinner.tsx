@@ -1,6 +1,15 @@
 import React from "react";
-import { Loader } from "@navikt/ds-react";
+
+import styles from "./halloween/Halloween.module.css";
 
 export const Spinner = () => (
-  <Loader size="small" data-testid="spinner" title="Laster" />
+  <span
+    role="img"
+    aria-label="Laster"
+    title="Laster"
+    data-testid="spinner"
+    className={styles.Spinner}
+  >
+    🎃
+  </span>
 );

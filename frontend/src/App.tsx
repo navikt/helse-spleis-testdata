@@ -9,6 +9,12 @@ import { OpprettDokumenter } from "./screens/opprettDokumenter/OpprettDokumenter
 
 import { Header } from "./components/nav/Header";
 import { SystemMessages } from "./components/SystemMessages";
+import { HalloweenBanner } from "./components/halloween/HalloweenBanner";
+import {
+  HalloweenBakgrunn,
+  HalloweenForgrunn,
+} from "./components/halloween/HalloweenDekor";
+import { HalloweenOverraskelser } from "./components/halloween/HalloweenOverraskelser";
 
 import styles from "./App.module.css";
 import { AppStatus } from "./components/AppStatus";
@@ -17,8 +23,15 @@ export const App = () => {
   const theme = useTheme();
 
   return (
-    <Theme theme={theme} hasBackground className={styles.App}>
+    <Theme
+      theme={theme}
+      hasBackground
+      data-color="warning"
+      className={styles.App}
+    >
+      <HalloweenBakgrunn />
       <Header />
+      <HalloweenBanner />
       <main className={styles.Main}>
         <Routes>
           <Route
@@ -34,6 +47,8 @@ export const App = () => {
           <Route path="/testgruppe" element={<HentTestgruppe />} />
         </Routes>
       </main>
+      <HalloweenForgrunn />
+      <HalloweenOverraskelser />
       <SystemMessages />
     </Theme>
   );

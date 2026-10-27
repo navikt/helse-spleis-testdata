@@ -1,0 +1,9 @@
+.Card {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.Card:hover {
+  box-shadow:
+    0 0 0 1px var(--ax-border-warning),
+    0 0 1.25rem var(--ax-bg-warning-moderate);
+}

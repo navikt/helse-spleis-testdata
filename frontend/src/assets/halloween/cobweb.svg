@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <path id="thread" d="M120 0Q100 15 115 35Q91 45 100 70Q72 72 70 100Q45 91 35 115Q15 100 0 120" fill="none"/>
+  </defs>
+  <g stroke="#94a3b8" stroke-width="1" fill="none" stroke-linecap="round">
+    <path d="M0 0L120 0M0 0L115 35M0 0L100 70M0 0L70 100M0 0L35 115M0 0L0 120"/>
+    <use href="#thread" vector-effect="non-scaling-stroke"/>
+    <use href="#thread" transform="scale(0.78)" vector-effect="non-scaling-stroke"/>
+    <use href="#thread" transform="scale(0.56)" vector-effect="non-scaling-stroke"/>
+    <use href="#thread" transform="scale(0.36)" vector-effect="non-scaling-stroke"/>
+    <use href="#thread" transform="scale(0.18)" vector-effect="non-scaling-stroke"/>
+  </g>
+</svg>

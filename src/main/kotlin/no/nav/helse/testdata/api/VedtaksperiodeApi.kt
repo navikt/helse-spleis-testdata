@@ -29,17 +29,20 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
 
         val fnr = vedtak.fnr
 
-        val medlemskapavklaring =
-            objectMapper.writeValueAsString(
-                mapOf(
-                    "@event_name" to "mock_medlemskap_avklaring",
-                    "ident" to fnr,
-                    "medlemskapVerdi" to vedtak.medlemskapVerdi,
-                    "aarsaker" to vedtak.medlemskapAarsaker.takeUnless { vedtak.medlemskapVerdi == "JA" }.orEmpty(),
-                ),
-            )
-        sikkerlogg.info("publiserer mock_medlemskap_avklaring for $fnr: $medlemskapavklaring")
-        mediator.publiser(fnr, medlemskapavklaring)
+        // Arbeidsgiversvaret postes også hit, uten medlemskapVerdi, og skal ikke overskrive valgt vurdering
+        vedtak.medlemskapVerdi?.also { medlemskapVerdi ->
+            val medlemskapavklaring =
+                objectMapper.writeValueAsString(
+                    mapOf(
+                        "@event_name" to "mock_medlemskap_avklaring",
+                        "ident" to fnr,
+                        "medlemskapVerdi" to medlemskapVerdi,
+                        "aarsaker" to vedtak.medlemskapAarsaker.takeUnless { medlemskapVerdi == "JA" }.orEmpty(),
+                    ),
+                )
+            sikkerlogg.info("publiserer mock_medlemskap_avklaring for $fnr: $medlemskapavklaring")
+            mediator.publiser(fnr, medlemskapavklaring)
+        }
 
         sykmelding(vedtak)?.also {
             log.info("produserer sykmelding, se sikkerlogg/tjenestekall for fnr")

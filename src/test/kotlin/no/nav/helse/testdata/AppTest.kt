@@ -15,6 +15,7 @@ import no.nav.helse.testdata.api.registerPersonApi
 import no.nav.helse.testdata.api.registerVedtaksperiodeApi
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -101,7 +102,30 @@ class AppTest {
     }
 
     @Test
-    fun `sender medlemskapsavklaring JA uten årsaker som standard`() {
+    fun `sender ikke årsaker når medlemskapsavklaringen er JA`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(
+                        data(
+                            medlemskap =
+                                """
+                                "medlemskapVerdi": "JA",
+                                "medlemskapAarsaker": [{ "regelId": "REGEL_3", "forklaringPaaUavklart": "Skal ikke med" }],
+                                """,
+                        ),
+                    )
+                }
+            assertTrue(response.status.isSuccess())
+            val avklaring = testRapid.inspektør.message(0)
+            assertEquals("JA", avklaring.path("medlemskapVerdi").asText())
+            assertTrue(avklaring.path("aarsaker").isEmpty)
+        }
+    }
+
+    @Test
+    fun `sender ikke medlemskapsavklaring når medlemskapVerdi mangler`() {
         e2e {
             val response =
                 client.post("/vedtaksperiode") {
@@ -109,9 +133,14 @@ class AppTest {
                     setBody(data())
                 }
             assertTrue(response.status.isSuccess())
-            val avklaring = testRapid.inspektør.message(0)
-            assertEquals("JA", avklaring.path("medlemskapVerdi").asText())
-            assertTrue(avklaring.path("aarsaker").isEmpty)
+            val eventnavn =
+                (0 until testRapid.inspektør.size).map {
+                    testRapid.inspektør
+                        .message(it)
+                        .path("@event_name")
+                        .asText()
+                }
+            assertFalse("mock_medlemskap_avklaring" in eventnavn)
         }
     }
 

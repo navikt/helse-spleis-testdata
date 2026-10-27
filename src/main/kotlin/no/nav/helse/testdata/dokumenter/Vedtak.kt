@@ -13,7 +13,7 @@ data class Vedtak(
     val sykmelding: Sykmelding? = null,
     val søknad: Søknad? = null,
     val arbeidsgiveropplysninger: Arbeidsgiveropplysninger? = null,
-    val medlemskapVerdi: String = "JA",
+    val medlemskapVerdi: String? = null,
     val medlemskapAarsaker: List<MedlemskapAarsak> = emptyList(),
 )
 

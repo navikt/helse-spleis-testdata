@@ -12,8 +12,8 @@ import no.nav.helse.testdata.dokumenter.arbeidsgiveropplysninger
 import no.nav.helse.testdata.dokumenter.sykmelding
 import no.nav.helse.testdata.dokumenter.søknad
 import no.nav.helse.testdata.log
+import no.nav.helse.testdata.objectMapper
 import no.nav.helse.testdata.sikkerlogg
-import org.intellij.lang.annotations.Language
 
 internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
@@ -29,12 +29,15 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
 
         val fnr = vedtak.fnr
 
-        @Language("JSON")
-        val medlemskapavklaring = """{
-  "@event_name": "mock_medlemskap_avklaring",
-  "ident": "$fnr",
-  "medlemskapVerdi": "${vedtak.medlemskapVerdi}"
-}"""
+        val medlemskapavklaring =
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "@event_name" to "mock_medlemskap_avklaring",
+                    "ident" to fnr,
+                    "medlemskapVerdi" to vedtak.medlemskapVerdi,
+                    "aarsaker" to vedtak.medlemskapAarsaker.takeUnless { vedtak.medlemskapVerdi == "JA" }.orEmpty(),
+                ),
+            )
         sikkerlogg.info("publiserer mock_medlemskap_avklaring for $fnr: $medlemskapavklaring")
         mediator.publiser(fnr, medlemskapavklaring)
 

@@ -161,6 +161,72 @@ describe("OpprettDokumenter", () => {
     expect((fetch as Mock).mock.calls.length).toBe(antallKallFørCallback);
   });
 
+  const fyllUtOgSendInn = async (velgMedlemskap?: () => Promise<void>) => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    const orgnr = "987654321";
+    mockPersonNavn();
+    mockArbeidsforhold(orgnr);
+    mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr);
+
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+        "54321",
+      ),
+    );
+    await velgMedlemskap?.();
+
+    mockFetchResponse({ status: 200, text: () => "" });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+
+    let payload: Record<string, any> = {};
+    await waitFor(() => {
+      const innsendtKall = (fetch as Mock).mock.calls
+        .filter(([url]) => url === "http://0.0.0.0:8080/vedtaksperiode")
+        .at(-1);
+      expect(innsendtKall).toBeDefined();
+      payload = JSON.parse(innsendtKall?.[1]?.body ?? "{}");
+    });
+    return payload;
+  };
+
+  it("sender medlemskap JA uten årsaker som standard", async () => {
+    const payload = await fyllUtOgSendInn();
+
+    expect(screen.queryByTestId("leggTilMedlemskapAarsak")).toBeNull();
+    expect(payload.medlemskapVerdi).toBe("JA");
+    expect(payload.medlemskapAarsaker).toEqual([]);
+  });
+
+  it("sender valgt medlemskapsvurdering med årsaker", async () => {
+    const payload = await fyllUtOgSendInn(async () => {
+      await userEvent.selectOptions(
+        screen.getByTestId("medlemskapVerdi"),
+        "UAVKLART_MED_BRUKERSPORSMAAL",
+      );
+      await userEvent.click(screen.getByTestId("leggTilMedlemskapAarsak"));
+      await userEvent.type(
+        screen.getByTestId("medlemskapAarsakRegelId0"),
+        "REGEL_3",
+      );
+      await userEvent.type(
+        screen.getByTestId("medlemskapAarsakForklaring0"),
+        "Ikke registrert arbeidsforhold",
+      );
+    });
+
+    expect(payload.medlemskapVerdi).toBe("UAVKLART_MED_BRUKERSPORSMAAL");
+    expect(payload.medlemskapAarsaker).toEqual([
+      {
+        regelId: "REGEL_3",
+        forklaringPaaUavklart: "Ikke registrert arbeidsforhold",
+      },
+    ]);
+  });
+
   it("krever fødselsnummer, organisasjonsnummer og inntekt", async () => {
     render(<OpprettDokumenter />, { wrapper });
 
@@ -244,6 +310,8 @@ describe("OpprettDokumenter", () => {
               harBrukerOppgittForsikring: null,
               meldingTilNavDagerFraSykmelding: null,
             },
+            medlemskapVerdi: "JA",
+            medlemskapAarsaker: [],
           })}`,
           headers: { "Content-Type": "application/json" },
           method: "post",

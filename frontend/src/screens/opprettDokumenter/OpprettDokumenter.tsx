@@ -24,8 +24,14 @@ type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
     sykmelding?: SykmeldingDTO;
     søknad?: SøknadDTO;
-    medlemskapVerdi: String;
+    medlemskapVerdi: string;
+    medlemskapAarsaker: MedlemskapAarsakDTO[];
   };
+
+type MedlemskapAarsakDTO = {
+  regelId: string;
+  forklaringPaaUavklart: string;
+};
 
 type ArbeidsgiverSvarerPayload = PersonDTO &
   FellesDTO & {
@@ -91,7 +97,11 @@ const createOpprettVedtaksperiodePayload = (
         : undefined,
     sykmelding: values.skalSendeSykmelding ? sykmelding() : undefined,
     søknad: values.skalSendeSøknad ? søknad() : undefined,
-    medlemskapVerdi: values.medlemskapVerdi,
+    medlemskapVerdi: values.medlemskapVerdi ?? "JA",
+    medlemskapAarsaker:
+      values.medlemskapVerdi && values.medlemskapVerdi !== "JA"
+        ? (values.medlemskapAarsaker ?? [])
+        : [],
   };
 };
 
@@ -150,6 +160,7 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSykmelding: true,
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
+      medlemskapVerdi: "JA",
     },
     shouldUnregister: true,
   });

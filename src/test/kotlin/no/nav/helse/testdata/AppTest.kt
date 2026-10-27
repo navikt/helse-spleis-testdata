@@ -73,6 +73,49 @@ class AppTest {
     }
 
     @Test
+    fun `sender medlemskapsavklaring med årsaker`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(
+                        data(
+                            medlemskap =
+                                """
+                                "medlemskapVerdi": "UAVKLART_MED_BRUKERSPORSMAAL",
+                                "medlemskapAarsaker": [
+                                    { "regelId": "REGEL_3", "forklaringPaaUavklart": "Ikke registrert arbeidsforhold" },
+                                    { "regelId": "REGEL_23", "forklaringPaaUavklart": "Ikke opphold i Norge" }
+                                ],
+                                """,
+                        ),
+                    )
+                }
+            assertTrue(response.status.isSuccess())
+            val avklaring = testRapid.inspektør.message(0)
+            assertEquals("mock_medlemskap_avklaring", avklaring.path("@event_name").asText())
+            assertEquals("UAVKLART_MED_BRUKERSPORSMAAL", avklaring.path("medlemskapVerdi").asText())
+            assertEquals(listOf("REGEL_3", "REGEL_23"), avklaring.path("aarsaker").values().map { it.path("regelId").asText() })
+            assertEquals("Ikke opphold i Norge", avklaring.path("aarsaker")[1].path("forklaringPaaUavklart").asText())
+        }
+    }
+
+    @Test
+    fun `sender medlemskapsavklaring JA uten årsaker som standard`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(data())
+                }
+            assertTrue(response.status.isSuccess())
+            val avklaring = testRapid.inspektør.message(0)
+            assertEquals("JA", avklaring.path("medlemskapVerdi").asText())
+            assertTrue(avklaring.path("aarsaker").isEmpty)
+        }
+    }
+
+    @Test
     fun `slå opp inntekt`() {
         e2e {
             val response =
@@ -100,9 +143,10 @@ class AppTest {
     }
 
     @Language("json")
-    private fun data() =
+    private fun data(medlemskap: String = "") =
         """
         {
+            $medlemskap
             "fnr": "fnr",
             "orgnummer": "orgnummer",
             "sykdomFom": "2020-01-10",

@@ -14,6 +14,12 @@ data class Vedtak(
     val søknad: Søknad? = null,
     val arbeidsgiveropplysninger: Arbeidsgiveropplysninger? = null,
     val medlemskapVerdi: String = "JA",
+    val medlemskapAarsaker: List<MedlemskapAarsak> = emptyList(),
+)
+
+data class MedlemskapAarsak(
+    val regelId: String,
+    val forklaringPaaUavklart: String,
 )
 
 data class Periode(

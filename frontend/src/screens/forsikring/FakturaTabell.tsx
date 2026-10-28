@@ -169,7 +169,13 @@ export const FakturaTabell = ({
   );
 
   return (
-    <VStack gap="space-16" minWidth="0" asChild>
+    <VStack
+      gap="space-16"
+      minWidth="0"
+      width="fit-content"
+      maxWidth="100%"
+      asChild
+    >
       <section>
         <HStack gap="space-16" align="center">
           <Button
@@ -196,12 +202,12 @@ export const FakturaTabell = ({
           <Table size="small" aria-label={TITTEL}>
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeader scope="col" />
                 <Table.ColumnHeader scope="col">År</Table.ColumnHeader>
                 <Table.ColumnHeader scope="col">Halvdel</Table.ColumnHeader>
                 <Table.ColumnHeader scope="col">
                   Betalingsdato
                 </Table.ColumnHeader>
+                <Table.ColumnHeader scope="col" />
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -210,6 +216,21 @@ export const FakturaTabell = ({
                 const redigeres = verdier !== undefined;
                 return (
                   <Table.Row key={faktura.id}>
+                    {redigeres ? (
+                      redigeringsceller(
+                        `rad ${faktura.id}`,
+                        verdier,
+                        (endring) => endreUtkast(faktura.id, endring),
+                      )
+                    ) : (
+                      <>
+                        <Table.DataCell>{faktura.år ?? ""}</Table.DataCell>
+                        <Table.DataCell>{faktura.halvdel ?? ""}</Table.DataCell>
+                        <Table.DataCell>
+                          {faktura.betalingsdato ?? ""}
+                        </Table.DataCell>
+                      </>
+                    )}
                     <Table.DataCell>
                       <HStack gap="space-4" wrap={false}>
                         {redigeres ? (
@@ -265,26 +286,12 @@ export const FakturaTabell = ({
                         />
                       </HStack>
                     </Table.DataCell>
-                    {redigeres ? (
-                      redigeringsceller(
-                        `rad ${faktura.id}`,
-                        verdier,
-                        (endring) => endreUtkast(faktura.id, endring),
-                      )
-                    ) : (
-                      <>
-                        <Table.DataCell>{faktura.år ?? ""}</Table.DataCell>
-                        <Table.DataCell>{faktura.halvdel ?? ""}</Table.DataCell>
-                        <Table.DataCell>
-                          {faktura.betalingsdato ?? ""}
-                        </Table.DataCell>
-                      </>
-                    )}
                   </Table.Row>
                 );
               })}
               {nyRad !== null && (
                 <Table.Row selected>
+                  {redigeringsceller("ny rad", nyRad, endreNyRad)}
                   <Table.DataCell>
                     <HStack gap="space-4" wrap={false}>
                       <Button
@@ -310,7 +317,6 @@ export const FakturaTabell = ({
                       />
                     </HStack>
                   </Table.DataCell>
-                  {redigeringsceller("ny rad", nyRad, endreNyRad)}
                 </Table.Row>
               )}
               {fakturaer.length === 0 && nyRad === null && (

@@ -275,6 +275,14 @@ describe("Forsikring", () => {
     await waitFor(() => expect(fakturatabell()).toBeVisible());
 
     await userEvent.click(screen.getByLabelText("Legg til rad i Fakturaer"));
+    const nyRad = screen.getByLabelText("År ny rad").closest("tr")!;
+    const celler = within(nyRad).getAllByRole("cell");
+    expect(within(celler[0]).getByLabelText("År ny rad")).toBeVisible();
+    expect(
+      within(celler[3]).getByRole("button", {
+        name: "Lagre ny rad i Fakturaer",
+      }),
+    ).toBeVisible();
     await userEvent.clear(screen.getByLabelText("År ny rad"));
 
     expect(screen.getByLabelText("Lagre ny rad i Fakturaer")).toBeDisabled();
@@ -291,6 +299,21 @@ describe("Forsikring", () => {
     await waitFor(() => expect(forsikringstabell()).toBeVisible());
     await velgForsikring(1);
     await waitFor(() => expect(fakturatabell()).toBeVisible());
+
+    expect(
+      within(fakturatabell())
+        .getAllByRole("columnheader")
+        .map((celle) => celle.textContent),
+    ).toEqual(["År", "Halvdel", "Betalingsdato", ""]);
+    const fakturarad = within(fakturatabell()).getAllByRole("row")[1];
+    const celler = within(fakturarad).getAllByRole("cell");
+    expect(celler[0]).toHaveTextContent("2026");
+    expect(
+      within(celler[3]).getByRole("button", { name: "Rediger rad 10" }),
+    ).toBeVisible();
+    expect(
+      within(celler[3]).getByRole("button", { name: "Slett rad 10" }),
+    ).toBeVisible();
 
     await userEvent.click(screen.getByLabelText("Legg til rad i Fakturaer"));
     await userEvent.selectOptions(screen.getByLabelText("Halvdel ny rad"), "2");

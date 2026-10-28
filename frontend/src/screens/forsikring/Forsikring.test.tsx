@@ -103,6 +103,22 @@ describe("Forsikring", () => {
 
     const rader = within(forsikringstabell()).getAllByRole("row").slice(1);
     expect(rader).toHaveLength(2);
+    expect(
+      within(forsikringstabell()).getAllByRole("columnheader")[0],
+    ).toHaveTextContent("Godkjent");
+    for (const rad of rader) {
+      const celler = within(rad).getAllByRole("cell");
+      expect(celler).toHaveLength(8);
+      expect(
+        within(celler[7]).getByRole("button", { name: /^Vis fakturaer/ }),
+      ).toBeVisible();
+      expect(
+        within(celler[7]).getByRole("button", { name: /^Rediger/ }),
+      ).toBeVisible();
+      expect(
+        within(celler[7]).getByRole("button", { name: /^Slett/ }),
+      ).toBeVisible();
+    }
   });
 
   it("viser ikke id eller identitetsnummer, og viser lesbare verdier", async () => {
@@ -116,7 +132,6 @@ describe("Forsikring", () => {
         .getAllByRole("columnheader")
         .map((it) => it.textContent),
     ).toEqual([
-      "",
       "Godkjent",
       "Fom",
       "Virkningsdato",
@@ -124,6 +139,7 @@ describe("Forsikring", () => {
       "Premiegrunnlag",
       "Opphørsdato",
       "Opphørsgrunn",
+      "",
     ]);
     expect(within(tabell).queryByText(IDENTITETSNUMMER)).toBe(null);
     expect(

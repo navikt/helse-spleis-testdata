@@ -67,12 +67,14 @@ const MedlemskapAarsaker = () => {
           <DeleteButton aria-label="Fjern årsak" onClick={() => remove(i)} />
         </HStack>
       ))}
-      <AddButton
-        data-testid="leggTilMedlemskapAarsak"
-        onClick={() => append({ regelId: "", forklaringPaaUavklart: "" })}
-      >
-        Legg til årsak
-      </AddButton>
+      <HStack justify="start">
+        <AddButton
+          data-testid="leggTilMedlemskapAarsak"
+          onClick={() => append({ regelId: "", forklaringPaaUavklart: "" })}
+        >
+          Legg til årsak
+        </AddButton>
+      </HStack>
     </VStack>
   );
 };

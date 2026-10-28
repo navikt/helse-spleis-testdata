@@ -175,14 +175,16 @@ export const ForsikringTabell = ({
   ) => (
     <>
       <Table.DataCell>
-        <Checkbox
-          size="small"
-          hideLabel
-          checked={verdier.godkjent}
-          onChange={(event) => endre({ godkjent: event.target.checked })}
-        >
-          {`Godkjent ${radnavn}`}
-        </Checkbox>
+        <HStack justify="center">
+          <Checkbox
+            size="small"
+            hideLabel
+            checked={verdier.godkjent}
+            onChange={(event) => endre({ godkjent: event.target.checked })}
+          >
+            {`Godkjent ${radnavn}`}
+          </Checkbox>
+        </HStack>
       </Table.DataCell>
       <Table.DataCell>
         <DatoFelt
@@ -269,8 +271,9 @@ export const ForsikringTabell = ({
           <Table size="small" aria-label={tittel}>
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeader scope="col" />
-                <Table.ColumnHeader scope="col">Godkjent</Table.ColumnHeader>
+                <Table.ColumnHeader scope="col" align="center">
+                  Godkjent
+                </Table.ColumnHeader>
                 <Table.ColumnHeader scope="col">Fom</Table.ColumnHeader>
                 <Table.ColumnHeader scope="col">
                   Virkningsdato
@@ -283,6 +286,7 @@ export const ForsikringTabell = ({
                 <Table.ColumnHeader scope="col">
                   Opphørsgrunn
                 </Table.ColumnHeader>
+                <Table.ColumnHeader scope="col" />
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -297,6 +301,35 @@ export const ForsikringTabell = ({
                     aria-current={erValgt ? "true" : undefined}
                     onRowClick={() => onVelg(forsikring)}
                   >
+                    {redigeres ? (
+                      redigeringsceller(
+                        `rad ${forsikring.id}`,
+                        verdier,
+                        (endring) => endreUtkast(forsikring.id, endring),
+                      )
+                    ) : (
+                      <>
+                        <Table.DataCell align="center">
+                          {forsikring.godkjent ? "✔️" : "❌"}
+                        </Table.DataCell>
+                        <Table.DataCell>{forsikring.fom ?? ""}</Table.DataCell>
+                        <Table.DataCell>
+                          {forsikring.virkningsdato ?? ""}
+                        </Table.DataCell>
+                        <Table.DataCell>
+                          {visType(forsikring.type)}
+                        </Table.DataCell>
+                        <Table.DataCell>
+                          {forsikring.premiegrunnlag}
+                        </Table.DataCell>
+                        <Table.DataCell>
+                          {forsikring.opphørsdato ?? ""}
+                        </Table.DataCell>
+                        <Table.DataCell>
+                          {forsikring.opphørsgrunn ?? ""}
+                        </Table.DataCell>
+                      </>
+                    )}
                     <Table.DataCell>
                       <HStack gap="space-4" wrap={false}>
                         <Button
@@ -359,40 +392,12 @@ export const ForsikringTabell = ({
                         />
                       </HStack>
                     </Table.DataCell>
-                    {redigeres ? (
-                      redigeringsceller(
-                        `rad ${forsikring.id}`,
-                        verdier,
-                        (endring) => endreUtkast(forsikring.id, endring),
-                      )
-                    ) : (
-                      <>
-                        <Table.DataCell>
-                          {forsikring.godkjent ? "✔️" : "❌"}
-                        </Table.DataCell>
-                        <Table.DataCell>{forsikring.fom ?? ""}</Table.DataCell>
-                        <Table.DataCell>
-                          {forsikring.virkningsdato ?? ""}
-                        </Table.DataCell>
-                        <Table.DataCell>
-                          {visType(forsikring.type)}
-                        </Table.DataCell>
-                        <Table.DataCell>
-                          {forsikring.premiegrunnlag}
-                        </Table.DataCell>
-                        <Table.DataCell>
-                          {forsikring.opphørsdato ?? ""}
-                        </Table.DataCell>
-                        <Table.DataCell>
-                          {forsikring.opphørsgrunn ?? ""}
-                        </Table.DataCell>
-                      </>
-                    )}
                   </Table.Row>
                 );
               })}
               {nyRad !== null && (
                 <Table.Row selected>
+                  {redigeringsceller("ny rad", nyRad, endreNyRad)}
                   <Table.DataCell>
                     <HStack gap="space-4" wrap={false}>
                       <Button
@@ -416,7 +421,6 @@ export const ForsikringTabell = ({
                       />
                     </HStack>
                   </Table.DataCell>
-                  {redigeringsceller("ny rad", nyRad, endreNyRad)}
                 </Table.Row>
               )}
               {forsikringer.length === 0 && nyRad === null && (

@@ -192,7 +192,36 @@ export const OpprettDokumenter = React.memo(() => {
     return post("/vedtaksperiode", payload).finally(() => setIsFetching(false));
   };
 
+  const sendKunArbeidsgiveropplysninger = async (
+    data: Record<string, any>,
+  ) => {
+    const payload = createArbeidsgiverSvarerPayload(
+      data,
+      data.inntektsmelding.vedtaksperiodeId.trim(),
+      data.orgnummer,
+      true,
+      "Ny",
+    );
+    if (payload == undefined) return;
+    setIsFetching(true);
+    const response = await postArbeidsgiverSvarer(payload);
+    const { status } = response;
+    setStatus(status);
+    setErrorBody(await response.text());
+    if (status < 400) {
+      addMessage({
+        id: nanoid(),
+        text: "🦇 Arbeidsgiveropplysninger er sendt.",
+        timeToLiveMs: 4000,
+      });
+    }
+  };
+
   const onSubmit = async (data: Record<string, any>) => {
+    if (!data.skalSendeSykmelding && !data.skalSendeSøknad) {
+      await sendKunArbeidsgiveropplysninger(data);
+      return;
+    }
     setIsFetching(true);
     const response = await postOpprettVedtaksperiode(data);
     const { status } = response;

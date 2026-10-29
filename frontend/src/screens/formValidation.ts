@@ -65,3 +65,8 @@ export const validateArbeidsgrad = (value?: string): boolean | string =>
 
 export const validateGruppeId = (value?: string): boolean | string =>
   isInteger(value) || "Gruppe-ID må være et heltall";
+
+export const validateVedtaksperiodeId = (value?: string): boolean | string =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    value?.trim() ?? "",
+  ) || "Vedtaksperiode-ID må være en UUID";

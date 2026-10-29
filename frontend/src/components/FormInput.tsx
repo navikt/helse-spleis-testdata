@@ -8,7 +8,7 @@ interface FormInputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "size" | "type" | "value" | "defaultValue"
 > {
-  label: string;
+  label: React.ReactNode;
   type?: TextFieldType;
   value?: string | number;
   defaultValue?: string | number;

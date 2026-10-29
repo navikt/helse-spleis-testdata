@@ -5,6 +5,7 @@ import {
   validateInntekt,
   validateOrganisasjonsnummer,
   validateSykdomsgrad,
+  validateVedtaksperiodeId,
 } from "./formValidation";
 import { describe, expect, it } from "vitest";
 
@@ -129,5 +130,20 @@ describe("validateArbeidsgrad", () => {
     const feilmelding = "Arbeidsgrad må være 0 eller høyere";
     expect(validateArbeidsgrad("-1")).toEqual(feilmelding);
     expect(validateArbeidsgrad("0")).toEqual(true);
+  });
+});
+
+describe("validateVedtaksperiodeId", () => {
+  it("godtar en UUID", () => {
+    expect(
+      validateVedtaksperiodeId("f75c33dd-3c89-4305-8de8-472a7e598f82"),
+    ).toEqual(true);
+  });
+
+  it("avviser tom verdi og verdier som ikke er UUID", () => {
+    const feilmelding = "Vedtaksperiode-ID må være en UUID";
+    expect(validateVedtaksperiodeId("")).toEqual(feilmelding);
+    expect(validateVedtaksperiodeId(undefined)).toEqual(feilmelding);
+    expect(validateVedtaksperiodeId("f75c33dd-3c89")).toEqual(feilmelding);
   });
 });

@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { format, startOfMonth, subMonths } from "date-fns";
-import { Heading, VStack } from "@navikt/ds-react";
+import {
+  BodyShort,
+  HelpText,
+  HStack,
+  Heading,
+  List,
+  VStack,
+} from "@navikt/ds-react";
 
 import { Card } from "../../components/Card";
 import { FormInput } from "../../components/FormInput";
@@ -14,6 +21,7 @@ import {
   validateInntekt,
   validateOrganisasjonsnummer,
   validateRefusjonsbeløp,
+  validateVedtaksperiodeId,
 } from "../formValidation";
 
 const useUnregisterInntektsmeldingCard = () => {
@@ -81,8 +89,29 @@ const useFetchInntekt = () => {
   }, [alleInntekter, fødselsnummer, orgnummer]);
 };
 
+const VedtaksperiodeIdHjelp = () => (
+  <HelpText title="Hvor finner jeg vedtaksperiode-ID?">
+    <BodyShort size="small">Slik finner du den i Speil:</BodyShort>
+    <List as="ul" size="small">
+      <List.Item>
+        I URL-en: <code>/person/…/periode/&lt;vedtaksperiode-ID&gt;</code>
+      </List.Item>
+      <List.Item>
+        Tastatursnarvei <kbd>Alt</kbd> + <kbd>V</kbd> kopierer ID-en for den
+        aktive perioden (krever utviklerrolle).
+      </List.Item>
+      <List.Item>
+        Hold musepekeren over perioden (pølsen) i tidslinjen når
+        «Utviklersnacks» er slått på i toggle-menyen.
+      </List.Item>
+    </List>
+  </HelpText>
+);
+
 export const InntektsmeldingCard = React.memo(() => {
-  const { register, formState, setValue } = useFormContext();
+  const { register, formState, setValue, watch } = useFormContext();
+  const senderKunInntektsmelding =
+    !watch("skalSendeSykmelding") && !watch("skalSendeSøknad");
 
   useUnregisterInntektsmeldingCard();
   useFetchInntekt();
@@ -98,6 +127,23 @@ export const InntektsmeldingCard = React.memo(() => {
         <Heading level="2" size="small">
           Inntektsmelding
         </Heading>
+        {senderKunInntektsmelding && (
+          <FormInput
+            data-testid="vedtaksperiodeId"
+            label={
+              <HStack gap="space-8" align="center" as="span">
+                Vedtaksperiode-ID
+                <VedtaksperiodeIdHjelp />
+              </HStack>
+            }
+            errors={formState.errors}
+            {...register("inntektsmelding.vedtaksperiodeId", {
+              required: "Vedtaksperiode-ID må fylles ut",
+              validate: validateVedtaksperiodeId,
+              shouldUnregister: true,
+            })}
+          />
+        )}
         <FormDatePicker
           data-testid="førsteFraværsdag"
           label="Første fraværsdag"

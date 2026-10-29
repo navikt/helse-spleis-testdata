@@ -17,6 +17,7 @@ import { FormSelect } from "../../components/FormSelect";
 import { Checkbox } from "../../components/Checkbox";
 import { Card } from "../../components/Card";
 import { FetchButton } from "../../components/FetchButton";
+import { Tracelenke, Tracelenker } from "../../components/Tracelenker";
 import { SykdomTom } from "./SykdomTom";
 import { SykdomFom } from "./SykdomFom";
 import { DeleteButton } from "./DeleteButton";
@@ -74,6 +75,7 @@ export const PersonCard = ({
   isFetching,
   isPersonNotFound,
   errorBody,
+  tracelenker = [],
 }: {
   setErArbeidstaker: (value: boolean) => void;
   setPersonIkkeFunnet: (value: boolean) => void;
@@ -81,6 +83,7 @@ export const PersonCard = ({
   isFetching: boolean;
   isPersonNotFound: boolean;
   errorBody?: string;
+  tracelenker?: Tracelenke[];
 }) => {
   const { register, formState, watch } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<
@@ -264,6 +267,7 @@ export const PersonCard = ({
               Noe gikk galt! Melding fra server: {errorBody}
             </ErrorMessage>
           )}
+          <Tracelenker lenker={tracelenker} />
         </VStack>
         {typeof validateSendsDocuments() === "string" && (
           <ErrorMessage size="small">{validateSendsDocuments()}</ErrorMessage>

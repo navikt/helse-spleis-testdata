@@ -19,6 +19,7 @@ import {Egenmeldingsdager} from "./Egenmeldingsdager";
 import {InntektFraNyttArbeidsforhold} from "./InntektFraNyttArbeidsforhold";
 import {nanoid} from "nanoid";
 import {useAddSystemMessage} from "../../state/useSystemMessages";
+import {Tracelenke, traceUrlFra} from "../../components/Tracelenker";
 
 type OpprettVedtaksperiodePayload = PersonDTO &
   FellesDTO & {
@@ -173,6 +174,12 @@ export const OpprettDokumenter = React.memo(() => {
   const [status, setStatus] = useState<number>();
   const [errorBody, setErrorBody] = useState<string>();
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [tracelenker, setTracelenker] = useState<Tracelenke[]>([]);
+
+  const leggTilTracelenke = (tekst: string, body: unknown) => {
+    const url = traceUrlFra(body);
+    if (url) setTracelenker((lenker) => [...lenker, { tekst, url }]);
+  };
 
   const [subscribe] = useSubscribe();
   const addMessage = useAddSystemMessage();
@@ -203,12 +210,15 @@ export const OpprettDokumenter = React.memo(() => {
       "Ny",
     );
     if (payload == undefined) return;
+    setTracelenker([]);
     setIsFetching(true);
     const response = await postArbeidsgiverSvarer(payload);
     const { status } = response;
     setStatus(status);
-    setErrorBody(await response.text());
+    const body = await response.text();
+    setErrorBody(body);
     if (status < 400) {
+      leggTilTracelenke("Arbeidsgiveropplysninger", body);
       addMessage({
         id: nanoid(),
         text: "🦇 Arbeidsgiveropplysninger er sendt.",
@@ -222,6 +232,7 @@ export const OpprettDokumenter = React.memo(() => {
       await sendKunArbeidsgiveropplysninger(data);
       return;
     }
+    setTracelenker([]);
     setIsFetching(true);
     const response = await postOpprettVedtaksperiode(data);
     const { status } = response;
@@ -230,6 +241,7 @@ export const OpprettDokumenter = React.memo(() => {
     setErrorBody(errorBody);
 
     if (status < 400) {
+      leggTilTracelenke("Dokumenter", errorBody);
       addMessage({
         id: nanoid(),
         text: "🎃 Dokumenter er sendt.",
@@ -263,6 +275,7 @@ export const OpprettDokumenter = React.memo(() => {
           const errorBody = await response.text();
           setErrorBody(errorBody);
           if (status < 400) {
+            leggTilTracelenke("Arbeidsgiveropplysninger", errorBody);
             addMessage({
               id: nanoid(),
               text: "🦇 Arbeidsgiveropplysninger er sendt.",
@@ -286,6 +299,7 @@ export const OpprettDokumenter = React.memo(() => {
               isFetching={isFetching}
               isPersonNotFound={personIkkeFunnet}
               errorBody={errorBody}
+              tracelenker={tracelenker}
             />
             {skalSendeSøknad && <SøknadCard />}
             {erArbeidstaker && <InntektsmeldingCard />}

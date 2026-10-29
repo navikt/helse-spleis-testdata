@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.rapidsAndRivers)
     implementation(libs.ktor.server.websockets)
     implementation(libs.bundles.ktor.client)
+    implementation(libs.opentelemetry.api)
 
     implementation(libs.hikaricp)
     implementation(libs.postgresql)

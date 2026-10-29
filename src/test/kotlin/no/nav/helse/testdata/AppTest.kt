@@ -4,6 +4,7 @@ import com.github.navikt.tbd_libs.naisful.test.TestContext
 import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.server.routing.*
@@ -70,6 +71,9 @@ class AppTest {
                     setBody(data())
                 }
             assertTrue(response.status.isSuccess())
+            val body = objectMapper.readTree(response.bodyAsText())
+            assertTrue(body.has("traceUrl"))
+            assertTrue(body.path("traceUrl").isNull, "Uten aktiv span skal det ikke lages trace-lenke")
         }
     }
 

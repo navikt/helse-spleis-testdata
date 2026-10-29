@@ -23,6 +23,7 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 
 mockk = "io.mockk:mockk:1.14.11"
+opentelemetry-api = "io.opentelemetry:opentelemetry-api:1.67.0"
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
 rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026091610031789545782"

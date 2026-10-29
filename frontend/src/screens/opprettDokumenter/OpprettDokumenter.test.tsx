@@ -161,6 +161,49 @@ describe("OpprettDokumenter", () => {
     expect((fetch as Mock).mock.calls.length).toBe(antallKallFørCallback);
   });
 
+  it("viser lenke til loggene for tracen til dokumentene og arbeidsgiversvaret", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    const orgnr = "987654321";
+    mockPersonNavn();
+    mockArbeidsforhold(orgnr);
+    mockStandardInntekt(orgnr, "54321");
+    mockOrganisasjonnavn(orgnr);
+
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+        "54321",
+      ),
+    );
+
+    mockFetchResponse({
+      status: 200,
+      text: () => JSON.stringify({ traceUrl: "https://trace/dokumenter" }),
+    });
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+    await waitFor(() =>
+      expect(screen.getByRole("link", { name: /Dokumenter/ })).toHaveAttribute(
+        "href",
+        "https://trace/dokumenter",
+      ),
+    );
+
+    mockFetchResponse({
+      status: 200,
+      text: () => JSON.stringify({ traceUrl: "https://trace/arbeidsgiver" }),
+    });
+    const callback = subscribeMock.mock.calls.at(-1)?.[1];
+    await act(async () => callback?.("vedtaksperiode-id", orgnr));
+    await waitFor(() =>
+      expect(
+        screen.getByRole("link", { name: /Arbeidsgiveropplysninger/ }),
+      ).toHaveAttribute("href", "https://trace/arbeidsgiver"),
+    );
+    expect(screen.getByRole("link", { name: /Dokumenter/ })).toBeVisible();
+  });
+
   it("viser ikke vedtaksperiode-ID når søknad sendes", async () => {
     render(<OpprettDokumenter />, { wrapper });
 

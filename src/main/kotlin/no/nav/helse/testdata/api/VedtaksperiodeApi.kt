@@ -11,6 +11,7 @@ import no.nav.helse.testdata.dokumenter.Vedtak
 import no.nav.helse.testdata.dokumenter.arbeidsgiveropplysninger
 import no.nav.helse.testdata.dokumenter.sykmelding
 import no.nav.helse.testdata.dokumenter.søknad
+import no.nav.helse.testdata.gjeldendeTraceUrl
 import no.nav.helse.testdata.log
 import no.nav.helse.testdata.objectMapper
 import no.nav.helse.testdata.sikkerlogg
@@ -63,13 +64,17 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
         }
 
         call
-            .respond(HttpStatusCode.OK)
+            .respond(HttpStatusCode.OK, SendteDokumenterResponse(traceUrl = gjeldendeTraceUrl()))
             .also {
                 log.info("produsert dokumenter, se sikkerlogg/tjenestekall for fnr")
                 sikkerlogg.info("produsert dokumenter for fnr=$fnr")
             }
     }
 }
+
+internal data class SendteDokumenterResponse(
+    val traceUrl: String?,
+)
 
 private suspend fun RoutingContext.validate(
     vedtak: Vedtak,

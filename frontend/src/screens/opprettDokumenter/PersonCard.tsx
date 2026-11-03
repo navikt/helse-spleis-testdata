@@ -85,7 +85,7 @@ export const PersonCard = ({
   errorBody?: string;
   tracelenker?: Tracelenke[];
 }) => {
-  const { register, formState, watch } = useFormContext();
+  const { register, formState, watch, setValue } = useFormContext();
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<
     string | undefined
   >(undefined);
@@ -205,7 +205,15 @@ export const PersonCard = ({
               })}
             />
             {arbeidsgivere.length > 0 && (
-              <Arbeidsgivere arbeidsgivere={arbeidsgivere} />
+              <Arbeidsgivere
+                arbeidsgivere={arbeidsgivere}
+                onVelgOrganisasjonsnummer={(orgnummer) =>
+                  setValue("orgnummer", orgnummer, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+              />
             )}
           </>
         ) : (
@@ -321,7 +329,13 @@ function TidligereSøk() {
 interface OrganisasjonResponse {
   navn: string;
 }
-function Arbeidsgivere({ arbeidsgivere }: { arbeidsgivere: Arbeidsgiver[] }) {
+function Arbeidsgivere({
+  arbeidsgivere,
+  onVelgOrganisasjonsnummer,
+}: {
+  arbeidsgivere: Arbeidsgiver[];
+  onVelgOrganisasjonsnummer: (orgnummer: string) => void;
+}) {
   const [arbeidsgivernavn, setArbeidsgivernavn] = useState(
     arbeidsgivere.map(() => ({ navn: "ukjent" })) as OrganisasjonResponse[],
   );
@@ -357,10 +371,23 @@ function Arbeidsgivere({ arbeidsgivere }: { arbeidsgivere: Arbeidsgiver[] }) {
         {arbeidsgivere.map((it, i) => (
           <List.Item key={i}>
             <BodyShort size="small">{arbeidsgivernavn[i].navn}</BodyShort>
-            <Detail>
-              {it.arbeidsgiver.identifikator} ({it.detaljer[0].yrke}, fom.{" "}
-              {it.ansattFom})
-            </Detail>
+            <HStack gap="space-8" align="center">
+              <Detail>
+                {it.arbeidsgiver.identifikator} ({it.detaljer[0].yrke}, fom.{" "}
+                {it.ansattFom})
+              </Detail>
+              <Button
+                type="button"
+                variant="tertiary"
+                size="xsmall"
+                aria-label={`Bruk organisasjonsnummer ${it.arbeidsgiver.identifikator}`}
+                onClick={() =>
+                  onVelgOrganisasjonsnummer(it.arbeidsgiver.identifikator)
+                }
+              >
+                Bruk
+              </Button>
+            </HStack>
           </List.Item>
         ))}
       </List>

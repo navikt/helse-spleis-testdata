@@ -97,6 +97,24 @@ describe("OpprettDokumenter", () => {
     });
   });
 
+  it("fyller inn organisasjonsnummer fra registrert arbeidsforhold", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    const orgnr = "987654321";
+    mockPersonNavn();
+    mockArbeidsforhold(orgnr);
+    mockOrganisasjonnavn(orgnr);
+
+    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+    const brukKnapp = await screen.findByRole("button", {
+      name: `Bruk organisasjonsnummer ${orgnr}`,
+    });
+
+    await userEvent.click(brukKnapp);
+
+    expect(screen.getByTestId("orgnummer")).toHaveValue(orgnr);
+  });
+
   it("bruker organisasjonsnummeret fra forespørselen i arbeidsgiversvaret", async () => {
     render(<OpprettDokumenter />, { wrapper });
 

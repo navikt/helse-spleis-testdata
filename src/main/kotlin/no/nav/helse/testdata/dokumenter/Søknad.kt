@@ -30,11 +30,12 @@ data class Søknad(
 
 fun søknad(
     vedtak: Vedtak,
+    søknadId: UUID = UUID.randomUUID(),
 ): String? =
     vedtak.søknad?.let { søknad ->
         """
         {
-            "id":"${UUID.randomUUID()}",
+            "id":"$søknadId",
             "fnr":"${vedtak.fnr}",
             "type":"${vedtak.arbeidssituasjon.somSøknadstype()}",
             "status":"SENDT",

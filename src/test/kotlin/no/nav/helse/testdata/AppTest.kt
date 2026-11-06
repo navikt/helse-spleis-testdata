@@ -149,6 +149,72 @@ class AppTest {
     }
 
     @Test
+    fun `sender beskjed om at medlemskap ikke skal mockes`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(data(medlemskap = """"medlemskapVerdi": "IKKE_MOCK","""))
+                }
+            assertTrue(response.status.isSuccess())
+            val avklaring = testRapid.inspektør.message(0)
+            assertEquals("mock_medlemskap_avklaring", avklaring.path("@event_name").asText())
+            assertFalse(avklaring.path("skalMockes").asBoolean())
+            assertFalse(avklaring.has("medlemskapVerdi"))
+        }
+    }
+
+    @Test
+    fun `sender forhåndsvurdering før søknaden`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(
+                        data(
+                            medlemskap =
+                                """
+                                "forhåndsvurdering": {
+                                    "svar": "UAVKLART_MED_BRUKERSPORSMAAL",
+                                    "aarsaker": [{ "regelId": "REGEL_3", "forklaringPaaUavklart": "Ikke registrert arbeidsforhold" }]
+                                },
+                                """,
+                        ),
+                    )
+                }
+            assertTrue(response.status.isSuccess())
+            val meldinger = (0 until testRapid.inspektør.size).map { testRapid.inspektør.message(it) }
+            val forhåndsvurderingIndeks = meldinger.indexOfFirst { it.has("speilSvar") }
+            val søknadIndeks = meldinger.indexOfFirst { it.path("status").asText() == "SENDT" }
+            assertTrue(forhåndsvurderingIndeks in 0 until søknadIndeks)
+
+            val forhåndsvurdering = meldinger[forhåndsvurderingIndeks]
+            assertFalse(forhåndsvurdering.has("@event_name"))
+            assertEquals(meldinger[søknadIndeks].path("id").asText(), forhåndsvurdering.path("soknadId").asText())
+            assertEquals("fnr", forhåndsvurdering.path("fnr").asText())
+            assertEquals("UAVKLART_MED_BRUKERSPORSMAAL", forhåndsvurdering.path("speilSvar").asText())
+            assertEquals("REGEL_3", forhåndsvurdering.path("aarsaker")[0].path("regelId").asText())
+            assertEquals("2019-12-25", forhåndsvurdering.path("gyldigForSkjaeringstidspunktFom").asText())
+            assertEquals("2020-01-26", forhåndsvurdering.path("gyldigForSkjaeringstidspunktTom").asText())
+        }
+    }
+
+    @Test
+    fun `sender ikke forhåndsvurdering uten søknad eller når den ikke er valgt`() {
+        e2e {
+            client.post("/vedtaksperiode") {
+                header("Content-Type", "application/json")
+                setBody(data(medlemskap = """"forhåndsvurdering": { "svar": "JA" },""", søknad = "null"))
+            }
+            client.post("/vedtaksperiode") {
+                header("Content-Type", "application/json")
+                setBody(data())
+            }
+            assertTrue((0 until testRapid.inspektør.size).none { testRapid.inspektør.message(it).has("speilSvar") })
+        }
+    }
+
+    @Test
     fun `slå opp inntekt`() {
         e2e {
             val response =
@@ -176,7 +242,10 @@ class AppTest {
     }
 
     @Language("json")
-    private fun data(medlemskap: String = "") =
+    private fun data(
+        medlemskap: String = "",
+        søknad: String = """{ "harAndreInntektskilder": true }""",
+    ) =
         """
         {
             $medlemskap
@@ -185,7 +254,7 @@ class AppTest {
             "sykdomFom": "2020-01-10",
             "sykdomTom": "2020-01-30",
             "arbeidssituasjon": "ARBEIDSTAKER",
-            "søknad": { "harAndreInntektskilder": true },
+            "søknad": $søknad,
             "inntektsmelding": ${inntektsmelding()}
         }
     """

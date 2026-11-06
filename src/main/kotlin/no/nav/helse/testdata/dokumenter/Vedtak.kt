@@ -15,6 +15,12 @@ data class Vedtak(
     val arbeidsgiveropplysninger: Arbeidsgiveropplysninger? = null,
     val medlemskapVerdi: String? = null,
     val medlemskapAarsaker: List<MedlemskapAarsak> = emptyList(),
+    val forhåndsvurdering: Forhåndsvurdering? = null,
+)
+
+data class Forhåndsvurdering(
+    val svar: String,
+    val aarsaker: List<MedlemskapAarsak> = emptyList(),
 )
 
 data class MedlemskapAarsak(

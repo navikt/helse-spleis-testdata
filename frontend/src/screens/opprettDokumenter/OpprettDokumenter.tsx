@@ -5,7 +5,7 @@ import {HStack, VStack} from "@navikt/ds-react";
 import {post} from "../../io/api";
 import {useSubscribe} from "../../io/subscription";
 
-import {DiverseCard} from "./DiverseCard";
+import {DiverseCard, IKKE_SEND} from "./DiverseCard";
 import {PersonCard} from "./PersonCard";
 import {SøknadCard} from "./SøknadCard";
 import {Ferieperioder} from "./Ferieperioder";
@@ -27,7 +27,13 @@ type OpprettVedtaksperiodePayload = PersonDTO &
     søknad?: SøknadDTO;
     medlemskapVerdi: string;
     medlemskapAarsaker: MedlemskapAarsakDTO[];
+    forhåndsvurdering?: ForhåndsvurderingDTO;
   };
+
+type ForhåndsvurderingDTO = {
+  svar: string;
+  aarsaker: MedlemskapAarsakDTO[];
+};
 
 type MedlemskapAarsakDTO = {
   regelId: string;
@@ -103,6 +109,17 @@ const createOpprettVedtaksperiodePayload = (
       values.medlemskapVerdi && values.medlemskapVerdi !== "JA"
         ? (values.medlemskapAarsaker ?? [])
         : [],
+    forhåndsvurdering:
+      values.skalSendeSøknad && values.forhandsvurderingSvar !== IKKE_SEND
+        ? {
+            svar: values.forhandsvurderingSvar ?? "JA",
+            aarsaker:
+              values.forhandsvurderingSvar &&
+              values.forhandsvurderingSvar !== "JA"
+                ? (values.forhandsvurderingAarsaker ?? [])
+                : [],
+          }
+        : undefined,
   };
 };
 
@@ -162,6 +179,7 @@ export const OpprettDokumenter = React.memo(() => {
       skalSendeSøknad: true,
       skalSendeInntektsmelding: true,
       medlemskapVerdi: "JA",
+      forhandsvurderingSvar: "JA",
     },
     shouldUnregister: true,
   });

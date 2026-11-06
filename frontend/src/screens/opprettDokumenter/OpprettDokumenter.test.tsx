@@ -280,6 +280,7 @@ describe("OpprettDokumenter", () => {
     expect(payload.sykmelding).toBeUndefined();
     expect(payload.søknad).toBeUndefined();
     expect(payload.medlemskapVerdi).toBeUndefined();
+    expect(payload.forhåndsvurdering).toBeUndefined();
     expect(payload.arbeidsgiveropplysninger).toMatchObject({
       inntekt: "54321",
       vedtaksperiodeId,
@@ -324,7 +325,7 @@ describe("OpprettDokumenter", () => {
   it("sender medlemskap JA uten årsaker som standard", async () => {
     const payload = await fyllUtOgSendInn();
 
-    expect(screen.queryByTestId("leggTilMedlemskapAarsak")).toBeNull();
+    expect(screen.queryByTestId("medlemskapLeggTilAarsak")).toBeNull();
     expect(payload.medlemskapVerdi).toBe("JA");
     expect(payload.medlemskapAarsaker).toEqual([]);
   });
@@ -335,7 +336,7 @@ describe("OpprettDokumenter", () => {
         screen.getByTestId("medlemskapVerdi"),
         "UAVKLART_MED_BRUKERSPORSMAAL",
       );
-      await userEvent.click(screen.getByTestId("leggTilMedlemskapAarsak"));
+      await userEvent.click(screen.getByTestId("medlemskapLeggTilAarsak"));
       await userEvent.type(
         screen.getByTestId("medlemskapAarsakRegelId0"),
         "REGEL_3",
@@ -353,6 +354,67 @@ describe("OpprettDokumenter", () => {
         forklaringPaaUavklart: "Ikke registrert arbeidsforhold",
       },
     ]);
+  });
+
+  it("sender ikke mock av medlemskap når det er valgt", async () => {
+    const payload = await fyllUtOgSendInn(async () => {
+      await userEvent.selectOptions(
+        screen.getByTestId("medlemskapVerdi"),
+        "IKKE_MOCK",
+      );
+    });
+
+    expect(screen.queryByTestId("medlemskapLeggTilAarsak")).toBeNull();
+    expect(payload.medlemskapVerdi).toBe("IKKE_MOCK");
+    expect(payload.medlemskapAarsaker).toEqual([]);
+  });
+
+  it("sender forhåndsvurdering JA som standard", async () => {
+    const payload = await fyllUtOgSendInn();
+
+    expect(screen.queryByTestId("forhandsvurderingLeggTilAarsak")).toBeNull();
+    expect(payload.forhåndsvurdering).toEqual({ svar: "JA", aarsaker: [] });
+  });
+
+  it("sender valgt forhåndsvurdering med årsaker", async () => {
+    const payload = await fyllUtOgSendInn(async () => {
+      await userEvent.selectOptions(
+        screen.getByTestId("forhandsvurderingSvar"),
+        "UAVKLART_MED_BRUKERSPORSMAAL",
+      );
+      await userEvent.click(
+        screen.getByTestId("forhandsvurderingLeggTilAarsak"),
+      );
+      await userEvent.type(
+        screen.getByTestId("forhandsvurderingAarsakRegelId0"),
+        "REGEL_3",
+      );
+      await userEvent.type(
+        screen.getByTestId("forhandsvurderingAarsakForklaring0"),
+        "Ikke registrert arbeidsforhold",
+      );
+    });
+
+    expect(payload.forhåndsvurdering).toEqual({
+      svar: "UAVKLART_MED_BRUKERSPORSMAAL",
+      aarsaker: [
+        {
+          regelId: "REGEL_3",
+          forklaringPaaUavklart: "Ikke registrert arbeidsforhold",
+        },
+      ],
+    });
+  });
+
+  it("sender ikke forhåndsvurdering når det er valgt", async () => {
+    const payload = await fyllUtOgSendInn(async () => {
+      await userEvent.selectOptions(
+        screen.getByTestId("forhandsvurderingSvar"),
+        "IKKE_SEND",
+      );
+    });
+
+    expect(payload.forhåndsvurdering).toBeUndefined();
   });
 
   it("krever fødselsnummer, organisasjonsnummer og inntekt", async () => {
@@ -440,6 +502,7 @@ describe("OpprettDokumenter", () => {
             },
             medlemskapVerdi: "JA",
             medlemskapAarsaker: [],
+            forhåndsvurdering: { svar: "JA", aarsaker: [] },
           })}`,
           headers: { "Content-Type": "application/json" },
           method: "post",

@@ -1,5 +1,6 @@
 package no.nav.helse.testdata.api
 
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.header
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
@@ -7,7 +8,9 @@ import io.ktor.server.routing.get
 import no.nav.helse.testdata.InntektRestClient
 import no.nav.helse.testdata.Result
 import no.nav.helse.testdata.log
+import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeParseException
 import java.util.*
 
 private const val InntekterForSykepengegrunnlag = "8-28"
@@ -18,7 +21,15 @@ private const val InntekterForSammenligningsgrunnlag = "8-30"
 internal fun Routing.registerInntektApi(inntektRestClient: InntektRestClient) =
     get("/person/inntekt") {
         val fnr = requireNotNull(call.request.header("ident")) { "Mangler header: [ident: fnr]" }
-        val end = YearMonth.now().minusMonths(1)
+        val førsteFraværsdag =
+            call.request.queryParameters["foersteFravaersdag"]?.let {
+                try {
+                    LocalDate.parse(it)
+                } catch (err: DateTimeParseException) {
+                    throw BadRequestException("Første fraværsdag må være en gyldig dato på formatet yyyy-MM-dd", err)
+                }
+            } ?: LocalDate.now()
+        val end = YearMonth.from(førsteFraværsdag).minusMonths(1)
         val start = end.minusMonths(11)
         val inntekterResult =
             inntektRestClient.hentInntektsliste(

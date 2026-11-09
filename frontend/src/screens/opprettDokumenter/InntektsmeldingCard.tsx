@@ -34,20 +34,34 @@ const useUnregisterInntektsmeldingCard = () => {
 };
 
 const useFetchInntekt = () => {
-  const { watch, setValue, clearErrors } = useFormContext();
+  const { watch, setValue, clearErrors, setError } = useFormContext();
   const fødselsnummer = watch("fnr");
   const orgnummer = watch("orgnummer");
+  const førsteFraværsdag = watch("inntektsmelding.førsteFraværsdag");
+  const oppslagsnøkkel = `${fødselsnummer}:${førsteFraværsdag}`;
   const [alleInntekter, setAlleInntekter] = useState<
     Record<string, Record<string, number>>
   >({});
+  const inntekterForOppslag = alleInntekter[oppslagsnøkkel];
 
   useEffect(() => {
+    let aktiv = true;
     if (
       validateFødselsnummer(fødselsnummer) === true &&
-      alleInntekter[fødselsnummer] === undefined
+      førsteFraværsdag &&
+      inntekterForOppslag === undefined
     ) {
-      get("/person/inntekt", { ident: fødselsnummer })
+      setValue("inntektsmelding.inntekt", "");
+      setValue("inntektsmelding.refusjonsbeløp", "");
+      get(`/person/inntekt?foersteFravaersdag=${førsteFraværsdag}`, {
+        ident: fødselsnummer,
+      })
         .then(async (result) => {
+          if (!result.ok) {
+            throw new Error(
+              `Inntektsoppslag feilet med status ${result.status}`,
+            );
+          }
           const response = await result.json();
           const inntekterForFnr = response.arbeidsgivere.reduce(
             (
@@ -63,30 +77,44 @@ const useFetchInntekt = () => {
             {} as Record<string, number>,
           );
 
+          if (!aktiv) return;
           setAlleInntekter((previous) => ({
             ...previous,
-            [fødselsnummer]: inntekterForFnr,
+            [oppslagsnøkkel]: inntekterForFnr,
           }));
         })
-        .catch((error) => console.log(error));
+        .catch(() => {
+          if (!aktiv) return;
+          setError("inntektsmelding.inntekt", {
+            type: "server",
+            message:
+              "Kunne ikke hente inntekt for valgt dato. Fyll inn inntekt og refusjonsbeløp manuelt.",
+          });
+        });
     }
-  }, [fødselsnummer]);
+    return () => {
+      aktiv = false;
+    };
+  }, [fødselsnummer, førsteFraværsdag]);
 
   useEffect(() => {
     if (
-      !validateFødselsnummer(fødselsnummer) ||
-      !validateOrganisasjonsnummer(orgnummer)
+      validateFødselsnummer(fødselsnummer) !== true ||
+      validateOrganisasjonsnummer(orgnummer) !== true ||
+      inntekterForOppslag === undefined
     )
       return;
 
-    const beregnetMånedsinntekt = alleInntekter[fødselsnummer]?.[orgnummer];
-    if (beregnetMånedsinntekt === undefined) return;
+    const beregnetMånedsinntekt = inntekterForOppslag[orgnummer];
 
     clearErrors("inntektsmelding.inntekt");
     clearErrors("inntektsmelding.refusjonsbeløp");
-    setValue("inntektsmelding.inntekt", String(beregnetMånedsinntekt));
-    setValue("inntektsmelding.refusjonsbeløp", String(beregnetMånedsinntekt));
-  }, [alleInntekter, fødselsnummer, orgnummer]);
+    setValue("inntektsmelding.inntekt", String(beregnetMånedsinntekt ?? ""));
+    setValue(
+      "inntektsmelding.refusjonsbeløp",
+      String(beregnetMånedsinntekt ?? ""),
+    );
+  }, [inntekterForOppslag, fødselsnummer, orgnummer]);
 };
 
 const VedtaksperiodeIdHjelp = () => (

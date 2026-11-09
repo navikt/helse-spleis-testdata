@@ -443,7 +443,9 @@ describe("OpprettDokumenter", () => {
 
     await waitFor(() => {
       expect(fetch as Mock).toHaveBeenCalledWith(
-        "http://0.0.0.0:8080/person/inntekt",
+        expect.stringMatching(
+          /^http:\/\/0\.0\.0\.0:8080\/person\/inntekt\?foersteFravaersdag=\d{4}-\d{2}-\d{2}$/,
+        ),
         {
           headers: { Accept: "application/json", ident: "01234567890" },
           method: "get",
@@ -454,9 +456,16 @@ describe("OpprettDokumenter", () => {
     await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
 
     await userEvent.type(screen.getByTestId("faktiskgrad"), "80");
+    mockStandardInntekt(orgnr, "54321");
     skrivDato("sykdomFom", "2021-07-01");
     skrivDato("sykdomTom", "2021-07-31");
 
+    await waitFor(() =>
+      expect(fetch as Mock).toHaveBeenCalledWith(
+        "http://0.0.0.0:8080/person/inntekt?foersteFravaersdag=2021-07-01",
+        expect.anything(),
+      ),
+    );
     await userEvent.clear(screen.getByTestId("refusjonsbeløp"));
     await userEvent.type(screen.getByTestId("refusjonsbeløp"), "20000");
     skrivDato("opphørRefusjon", "2021-08-01");
@@ -703,6 +712,8 @@ describe("OpprettDokumenter", () => {
 
   const mockStandardInntekt = (orgnr: string, månedsinntekt: string) =>
     mockFetchResponse({
+      ok: true,
+      status: 200,
       json: () => ({
         beregnetMånedsinntekt: månedsinntekt,
         arbeidsgivere: [

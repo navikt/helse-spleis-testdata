@@ -31,7 +31,6 @@ export interface SøknadDTO extends SykmeldingDTO {
   arbeidGjenopptatt?: string;
   tidligereArbeidsgiverOrgnummer?: string | null;
   inntektFraSigrun?: number | null;
-  fraværFørSykmeldingen?: boolean | null;
   harBrukerOppgittForsikring?: boolean | null;
   meldingTilNavDagerFraSykmelding?: PeriodeDTO | null;
 }

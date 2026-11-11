@@ -53,15 +53,6 @@ const createOpprettVedtaksperiodePayload = (
   });
 
   const søknad = (): SøknadDTO => {
-    let fraværFørSykmeldingen: boolean | null = null;
-    switch (values.søknad.fraværFørSykmeldingen) {
-      case "Ja":
-        fraværFørSykmeldingen = true;
-        break;
-      case "Nei":
-        fraværFørSykmeldingen = false;
-        break;
-    }
     return {
       sykmeldingsgrad: values.sykmeldingsgrad ?? values.søknad.sykmeldingsgrad,
       harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
@@ -79,7 +70,6 @@ const createOpprettVedtaksperiodePayload = (
       tidligereArbeidsgiverOrgnummer:
         values.søknad.tidligereArbeidsgiverOrgnummer || null,
       inntektFraSigrun: values.søknad.inntektFraSigrun || null,
-      fraværFørSykmeldingen: fraværFørSykmeldingen,
       harBrukerOppgittForsikring:
         values.søknad.harBrukerOppgittForsikring || null,
       meldingTilNavDagerFraSykmelding:

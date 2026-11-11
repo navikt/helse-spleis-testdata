@@ -16,7 +16,6 @@ data class Søknad(
     val arbeidGjenopptatt: LocalDate? = null,
     val tidligereArbeidsgiverOrgnummer: String? = null,
     val inntektFraSigrun: Int? = null,
-    val fraværFørSykmeldingen: Boolean? = null,
     val harBrukerOppgittForsikring: Boolean? = null,
     val meldingTilNavDagerFraSykmelding: Periode? = null,
 ) {
@@ -90,14 +89,7 @@ fun søknad(
 private fun Vedtak.somSelvstendigNæringsdrivende() =
     if (arbeidssituasjon in setOf("BARNEPASSER", "SELVSTENDIG_NARINGSDRIVENDE", "JORDBRUKER")) {
         """{
-            "hovedSporsmalSvar": {
-             ${if (søknad?.fraværFørSykmeldingen != null) {
-            "\"FRAVAR_FOR_SYKMELDINGEN_V2\": " + søknad.fraværFørSykmeldingen
-        } else {
-            ""
-        }
-        }
-            },
+            "hovedSporsmalSvar": {},
             "harBrukerOppgittForsikring": ${søknad?.harBrukerOppgittForsikring},
             "inntekt": {
                 "norskPersonidentifikator": "$fnr",

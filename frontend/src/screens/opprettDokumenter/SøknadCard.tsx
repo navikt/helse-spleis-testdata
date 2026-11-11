@@ -7,7 +7,6 @@ import { Card } from "../../components/Card";
 import { Checkbox } from "../../components/Checkbox";
 import { FormInput } from "../../components/FormInput";
 import { FormDatePicker } from "../../components/FormDatePicker";
-import { FormSelect } from "../../components/FormSelect";
 import {
   validateArbeidsgrad,
   validateInntekt,
@@ -21,7 +20,7 @@ const formatDateString = (date: Date): string => format(date, "yyyy-MM-dd");
 const nextDay = (date: Date): Date => addDays(date, 1);
 
 export const SøknadCard = React.memo(() => {
-  const { watch, register, formState, setValue } = useFormContext();
+  const { watch, register, formState } = useFormContext();
 
   const sykdomFom = watch("sykdomFom");
   const sykdomTom = watch("sykdomTom");
@@ -103,17 +102,6 @@ export const SøknadCard = React.memo(() => {
                 required: "Inntekt fra Sigrun må fylles ut",
                 validate: validateInntekt,
               })}
-            />
-            <FormSelect
-              label="Fravær før sykmeldingen"
-              options={[{ value: "", label: "Ikke spurt om" }, "Ja", "Nei"]}
-              defaultValue="Nei"
-              {...register("søknad.fraværFørSykmeldingen")}
-              onChange={(val) => {
-                const verdi =
-                  val.target.options[val.target.options.selectedIndex].value;
-                setValue("søknad.fraværFørSykmeldingen", verdi);
-              }}
             />
             <Checkbox
               data-testid="harBrukerOppgittForsikring"

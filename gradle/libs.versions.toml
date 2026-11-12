@@ -1,6 +1,6 @@
 [versions]
-flyway = "13.11.1"
-ktor = "3.6.0"
+flyway = "13.12.1"
+ktor = "3.6.1"
 nodeGradle = "7.1.0"
 sykepengerGradlePlugins = "20261029.1945"
 tbdLibs = "20261029.1843"
@@ -26,7 +26,7 @@ mockk = "io.mockk:mockk:1.14.11"
 opentelemetry-api = "io.opentelemetry:opentelemetry-api:1.67.0"
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 
-rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026091610031789545782"
+rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026110308421793691732"
 
 tbdLibs-azureTokenClientDefault = { module = "com.github.navikt.tbd-libs:azure-token-client-default", version.ref = "tbdLibs" }
 tbdLibs-naisfulApp = { module = "com.github.navikt.tbd-libs:naisful-app", version.ref = "tbdLibs" }

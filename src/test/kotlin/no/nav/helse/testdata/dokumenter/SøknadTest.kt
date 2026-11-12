@@ -244,4 +244,37 @@ internal class SøknadTest {
             "meldingTilNavDagerFraSykmelding skal være null for ARBEIDSTAKER selv om verdien er satt",
         )
     }
+
+    @Test
+    fun `utenlandsopphold sendes som fravær ved siden av ferie`() {
+        val vedtak =
+            Vedtak(
+                fnr = "11111111111",
+                orgnummer = "orgnummer",
+                sykdomFom = mandag,
+                sykdomTom = fredag,
+                arbeidssituasjon = "ARBEIDSTAKER",
+                søknad =
+                    Søknad(
+                        sykmeldingsgrad = 100,
+                        harAndreInntektskilder = false,
+                        sendtNav = fredag,
+                        ferieperioder = listOf(Periode(mandag, mandag)),
+                        utenlandsperioder = listOf(Periode(mandag.plusDays(2), fredag)),
+                        egenmeldingsdagerFraSykmelding = emptyList(),
+                        inntektFraNyttArbeidsforhold = emptyList(),
+                    ),
+            )
+        val json = søknad(vedtak)!!
+
+        assertValidJson(json)
+        val fravær = objectMapper.readTree(json).path("fravar").values().map { Triple(it.path("type").asString(), it.path("fom").asString(), it.path("tom").asString()) }
+        assertEquals(
+            listOf(
+                Triple("FERIE", "$mandag", "$mandag"),
+                Triple("UTLANDSOPPHOLD", "${mandag.plusDays(2)}", "$fredag"),
+            ),
+            fravær,
+        )
+    }
 }

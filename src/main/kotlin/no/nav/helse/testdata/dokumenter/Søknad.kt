@@ -8,6 +8,7 @@ data class Søknad(
     val sykmeldingsgrad: Int,
     val harAndreInntektskilder: Boolean,
     val ferieperioder: List<Periode> = emptyList(),
+    val utenlandsperioder: List<Periode> = emptyList(),
     val egenmeldingsdagerFraSykmelding: List<LocalDate>?,
     val inntektFraNyttArbeidsforhold: List<InntektFraNyttArbeidsforholdDto>?,
     val faktiskgrad: Int? = null,
@@ -59,7 +60,7 @@ fun søknad(
             "egenmeldingsdagerFraSykmelding": ${søknad.egenmeldingsdagerFraSykmelding?.map { "\"$it\"" }},
             "inntektFraNyttArbeidsforhold": ${søknad.inntektFraNyttArbeidsforhold?.somInntektFraNyttArbeidsforhold()},
             "papirsykmeldinger":[],
-            "fravar":${søknad.ferieperioder.somSøknadsferie()},
+            "fravar":${søknad.ferieperioder.somFravær("FERIE") + søknad.utenlandsperioder.somFravær("UTLANDSOPPHOLD")},
             "andreInntektskilder":[${
             if (søknad.harAndreInntektskilder) {
                 "{\"type\": \"Arbeid\", \"sykmeldt\": true }"
@@ -124,11 +125,11 @@ private fun List<Søknad.InntektFraNyttArbeidsforholdDto>.somInntektFraNyttArbei
             }"""
     }
 
-private fun List<Periode>.somSøknadsferie() =
+private fun List<Periode>.somFravær(type: String) =
     map {
         """
             {
-                "type": "FERIE",
+                "type": "$type",
                 "fom": "${it.fom}",
                 "tom": "${it.tom}"
             }"""

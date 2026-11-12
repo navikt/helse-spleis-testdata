@@ -9,6 +9,7 @@ import {DiverseCard, IKKE_SEND} from "./DiverseCard";
 import {PersonCard} from "./PersonCard";
 import {SøknadCard} from "./SøknadCard";
 import {Ferieperioder} from "./Ferieperioder";
+import { Utenlandsperioder } from "./Utenlandsperioder";
 import {EndringRefusjon} from "./EndringRefusjon";
 import {InntektsmeldingCard} from "./InntektsmeldingCard";
 import {Arbeidsgiverperioder} from "./Arbeidsgiverperioder";
@@ -58,6 +59,10 @@ const createOpprettVedtaksperiodePayload = (
       harAndreInntektskilder: values.søknad.harAndreInntektskilder ?? false,
       ferieperioder:
         values.søknad.ferieperioder?.map(
+          (it: { fom: string; tom: string }) => ({ fom: it.fom, tom: it.tom }),
+        ) ?? [],
+      utenlandsperioder:
+        values.søknad.utenlandsperioder?.map(
           (it: { fom: string; tom: string }) => ({ fom: it.fom, tom: it.tom }),
         ) ?? [],
       egenmeldingsdagerFraSykmelding: values.søknad.egenmeldingsdager,
@@ -321,6 +326,7 @@ export const OpprettDokumenter = React.memo(() => {
             </>
           )}
           {skalSendeSøknad && <Ferieperioder />}
+          {skalSendeSøknad && <Utenlandsperioder />}
           {skalSendeSøknad && <Egenmeldingsdager />}
           {skalSendeSøknad && <InntektFraNyttArbeidsforhold />}
         </VStack>

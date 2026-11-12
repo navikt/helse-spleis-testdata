@@ -11,7 +11,9 @@ import { AddButton } from "../../components/AddButton";
 type PeriodeId = string;
 
 export const Utenlandsperioder = React.memo(() => {
-  const { unregister } = useFormContext();
+  const { unregister, watch } = useFormContext();
+  const sykdomFom = watch("sykdomFom");
+  const sykdomTom = watch("sykdomTom");
 
   const [perioder, setPerioder] = useState<PeriodeId[]>([]);
 
@@ -36,14 +38,14 @@ export const Utenlandsperioder = React.memo(() => {
               data-testid={`utenlandsFom${i}`}
               label="Utenlandsopphold f.o.m."
               name={`søknad.utenlandsperioder.${i}.fom`}
-              defaultValue="2021-07-01"
+              defaultValue={sykdomFom}
               rules={{ required: "Start av utenlandsoppholdet må angis" }}
             />
             <FormDatePicker
               data-testid={`utenlandsTom${i}`}
               label="Utenlandsopphold t.o.m."
               name={`søknad.utenlandsperioder.${i}.tom`}
-              defaultValue="2021-07-10"
+              defaultValue={sykdomTom}
               rules={{ required: "Slutt av utenlandsoppholdet må angis" }}
             />
             <DeleteButton

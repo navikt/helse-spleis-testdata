@@ -472,6 +472,7 @@ describe("OpprettDokumenter", () => {
     await userEvent.click(screen.getByTestId("utenlandsButton"));
     skrivDato("utenlandsFom0", "2021-07-20");
     skrivDato("utenlandsTom0", "2021-07-25");
+    await userEvent.click(screen.getByTestId("utenlandsButton"));
 
     await userEvent.click(screen.getByTestId("endringButton"));
     skrivDato("endringsdato0", "2021-07-17");
@@ -496,7 +497,10 @@ describe("OpprettDokumenter", () => {
               sykmeldingsgrad: "100",
               harAndreInntektskilder: false,
               ferieperioder: [{ fom: "2021-07-02", tom: "2021-07-04" }],
-              utenlandsperioder: [{ fom: "2021-07-20", tom: "2021-07-25" }],
+              utenlandsperioder: [
+                { fom: "2021-07-20", tom: "2021-07-25" },
+                { fom: "2021-07-01", tom: "2021-07-31" },
+              ],
               faktiskgrad: "80",
               sendtNav: "2021-08-01",
               tidligereArbeidsgiverOrgnummer: null,

@@ -55,7 +55,7 @@ fun arbeidsgiveropplysninger(
                 "beregnetInntekt":"${arbeidsgiveropplysninger.inntekt}",
                 "rapportertDato":"${vedtak.sykdomFom.plusDays(1)}",
                 "refusjon":{
-                    "beloepPrMnd":"${arbeidsgiveropplysninger.refusjon.refusjonsbeløp}",
+                    "beloepPrMnd": ${arbeidsgiveropplysninger.refusjon.refusjonsbeløp?.let { "\"$it\"" }},
                     "opphoersdato": ${arbeidsgiveropplysninger.refusjon.opphørRefusjon?.let { "\"$it\"" }}
                 },
                 "endringIRefusjoner": ${arbeidsgiveropplysninger.endringRefusjon.tilJson()},

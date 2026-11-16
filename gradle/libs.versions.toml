@@ -22,7 +22,7 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock-jvm", version.ref = "kto
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 
-mockk = "io.mockk:mockk:1.14.11"
+mockk = "io.mockk:mockk:1.14.12"
 opentelemetry-api = "io.opentelemetry:opentelemetry-api:1.68.0"
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 

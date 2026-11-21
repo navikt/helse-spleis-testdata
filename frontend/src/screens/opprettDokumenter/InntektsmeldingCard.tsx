@@ -233,6 +233,19 @@ export const InntektsmeldingCard = React.memo(() => {
             );
           }}
         />
+        {senderKunInntektsmelding && (
+          <FormSelect
+            label="Årsak til innsending"
+            options={[
+              { value: "Ny", label: "Ny inntektsmelding" },
+              { value: "Endring", label: "Endring av inntektsmelding" },
+            ]}
+            defaultValue="Ny"
+            {...register("inntektsmelding.arsakTilInnsending", {
+              shouldUnregister: true,
+            })}
+          />
+        )}
         <Checkbox
           data-testid="harOpphørAvNaturalytelser"
           label="Har opphør av naturalytelser"

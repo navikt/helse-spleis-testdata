@@ -147,6 +147,7 @@ describe("OpprettDokumenter", () => {
         .at(-1);
       const payload = JSON.parse(innsendtKall?.[1]?.body ?? "{}");
       expect(payload.orgnummer).toBe(forespurtOrgnummer);
+      expect(payload.arbeidsgiveropplysninger.arsakTilInnsending).toBe("Ny");
     });
   });
 
@@ -226,69 +227,86 @@ describe("OpprettDokumenter", () => {
     render(<OpprettDokumenter />, { wrapper });
 
     expect(screen.queryByTestId("vedtaksperiodeId")).toBeNull();
+    expect(screen.queryByLabelText("Årsak til innsending")).toBeNull();
     await userEvent.click(screen.getByLabelText("Send sykmelding"));
     expect(screen.queryByTestId("vedtaksperiodeId")).toBeNull();
+    expect(screen.queryByLabelText("Årsak til innsending")).toBeNull();
   });
 
-  it("sender bare arbeidsgiveropplysninger med oppgitt vedtaksperiode-ID", async () => {
-    render(<OpprettDokumenter />, { wrapper });
+  it.each(["Ny", "Endring"])(
+    "sender bare arbeidsgiveropplysninger med årsak %s og oppgitt vedtaksperiode-ID",
+    async (arsakTilInnsending) => {
+      render(<OpprettDokumenter />, { wrapper });
 
-    const orgnr = "987654321";
-    const vedtaksperiodeId = "f75c33dd-3c89-4305-8de8-472a7e598f82";
-    mockPersonNavn();
-    mockArbeidsforhold(orgnr);
-    mockStandardInntekt(orgnr, "54321");
-    mockOrganisasjonnavn(orgnr);
+      const orgnr = "987654321";
+      const vedtaksperiodeId = "f75c33dd-3c89-4305-8de8-472a7e598f82";
+      mockPersonNavn();
+      mockArbeidsforhold(orgnr);
+      mockStandardInntekt(orgnr, "54321");
+      mockOrganisasjonnavn(orgnr);
 
-    await userEvent.type(screen.getByTestId("fnr"), "01234567890");
-    await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
-    await waitFor(() =>
-      expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
-        "54321",
-      ),
-    );
-    await userEvent.click(screen.getByLabelText("Send sykmelding"));
-    await userEvent.click(screen.getByLabelText("Send søknad"));
-
-    await userEvent.click(screen.getByText("Opprett dokumenter"));
-    await waitFor(() =>
-      expect(screen.getByText("Vedtaksperiode-ID må fylles ut")).toBeVisible(),
-    );
-    await userEvent.click(
-      screen.getByRole("button", { name: "Hvor finner jeg vedtaksperiode-ID?" }),
-    );
-    expect(screen.getByText(/Alt/)).toBeVisible();
-
-    await userEvent.type(
-      screen.getByTestId("vedtaksperiodeId"),
-      vedtaksperiodeId,
-    );
-    mockFetchResponse({ status: 200, text: () => "" });
-    await userEvent.click(screen.getByText("Opprett dokumenter"));
-
-    let innsendteKall: unknown[][] = [];
-    await waitFor(() => {
-      innsendteKall = (fetch as Mock).mock.calls.filter(
-        ([url]) => url === "http://0.0.0.0:8080/vedtaksperiode",
+      await userEvent.type(screen.getByTestId("fnr"), "01234567890");
+      await userEvent.type(screen.getByTestId("orgnummer"), orgnr);
+      await waitFor(() =>
+        expect(screen.getByRole("textbox", { name: /Inntekt/ })).toHaveValue(
+          "54321",
+        ),
       );
-      expect(innsendteKall).toHaveLength(1);
-    });
-    const payload = JSON.parse(
-      (innsendteKall[0][1] as { body: string }).body,
-    );
-    expect(payload.orgnummer).toBe(orgnr);
-    expect(payload.sykmelding).toBeUndefined();
-    expect(payload.søknad).toBeUndefined();
-    expect(payload.medlemskapVerdi).toBeUndefined();
-    expect(payload.forhåndsvurdering).toBeUndefined();
-    expect(payload.arbeidsgiveropplysninger).toMatchObject({
-      inntekt: "54321",
-      vedtaksperiodeId,
-      forespurt: true,
-      arsakTilInnsending: "Ny",
-    });
-    expect(subscribeMock).not.toHaveBeenCalled();
-  });
+      await userEvent.click(screen.getByLabelText("Send sykmelding"));
+      await userEvent.click(screen.getByLabelText("Send søknad"));
+
+      expect(screen.getByLabelText("Årsak til innsending")).toHaveValue("Ny");
+      if (arsakTilInnsending === "Endring") {
+        await userEvent.selectOptions(
+          screen.getByLabelText("Årsak til innsending"),
+          "Endring",
+        );
+      }
+
+      await userEvent.click(screen.getByText("Opprett dokumenter"));
+      await waitFor(() =>
+        expect(
+          screen.getByText("Vedtaksperiode-ID må fylles ut"),
+        ).toBeVisible(),
+      );
+      await userEvent.click(
+        screen.getByRole("button", {
+          name: "Hvor finner jeg vedtaksperiode-ID?",
+        }),
+      );
+      expect(screen.getByText(/Alt/)).toBeVisible();
+
+      await userEvent.type(
+        screen.getByTestId("vedtaksperiodeId"),
+        vedtaksperiodeId,
+      );
+      mockFetchResponse({ status: 200, text: () => "" });
+      await userEvent.click(screen.getByText("Opprett dokumenter"));
+
+      let innsendteKall: unknown[][] = [];
+      await waitFor(() => {
+        innsendteKall = (fetch as Mock).mock.calls.filter(
+          ([url]) => url === "http://0.0.0.0:8080/vedtaksperiode",
+        );
+        expect(innsendteKall).toHaveLength(1);
+      });
+      const payload = JSON.parse(
+        (innsendteKall[0][1] as { body: string }).body,
+      );
+      expect(payload.orgnummer).toBe(orgnr);
+      expect(payload.sykmelding).toBeUndefined();
+      expect(payload.søknad).toBeUndefined();
+      expect(payload.medlemskapVerdi).toBeUndefined();
+      expect(payload.forhåndsvurdering).toBeUndefined();
+      expect(payload.arbeidsgiveropplysninger).toMatchObject({
+        inntekt: "54321",
+        vedtaksperiodeId,
+        forespurt: true,
+        arsakTilInnsending,
+      });
+      expect(subscribeMock).not.toHaveBeenCalled();
+    },
+  );
 
   const fyllUtOgSendInn = async (velgMedlemskap?: () => Promise<void>) => {
     render(<OpprettDokumenter />, { wrapper });

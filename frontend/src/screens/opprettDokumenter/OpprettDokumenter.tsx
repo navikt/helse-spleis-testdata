@@ -220,7 +220,7 @@ export const OpprettDokumenter = React.memo(() => {
       data.inntektsmelding.vedtaksperiodeId.trim(),
       data.orgnummer,
       true,
-      "Ny",
+      data.inntektsmelding.arsakTilInnsending ?? "Ny",
     );
     if (payload == undefined) return;
     setTracelenker([]);

@@ -3,7 +3,7 @@ flyway = "13.12.2"
 ktor = "3.6.1"
 nodeGradle = "7.1.0"
 sykepengerGradlePlugins = "20261029.1945"
-tbdLibs = "20261029.1843"
+tbdLibs = "20261123.1112"
 testcontainers = "2.0.5"
 
 [libraries]

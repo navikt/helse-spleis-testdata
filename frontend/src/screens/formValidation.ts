@@ -70,3 +70,26 @@ export const validateVedtaksperiodeId = (value?: string): boolean | string =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
     value?.trim() ?? "",
   ) || "Vedtaksperiode-ID må være en UUID";
+
+export const validatePeriodeInnenforSøknadsperioden = ({
+  dato,
+  fom,
+  tom,
+  sykdomFom,
+  sykdomTom,
+  feilmeldingUtenfor,
+}: {
+  dato?: string;
+  fom?: string;
+  tom?: string;
+  sykdomFom?: string;
+  sykdomTom?: string;
+  feilmeldingUtenfor: string;
+}): boolean | string => {
+  if (fom && tom && fom > tom) {
+    return "F.o.m. kan ikke være etter t.o.m.";
+  }
+
+  if (!dato || !sykdomFom || !sykdomTom) return true;
+  return (dato >= sykdomFom && dato <= sykdomTom) || feilmeldingUtenfor;
+};

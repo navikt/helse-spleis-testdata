@@ -4,6 +4,7 @@ import {
   validateFødselsnummer,
   validateInntekt,
   validateOrganisasjonsnummer,
+  validatePeriodeInnenforSøknadsperioden,
   validateSykdomsgrad,
   validateVedtaksperiodeId,
 } from "./formValidation";
@@ -145,5 +146,73 @@ describe("validateVedtaksperiodeId", () => {
     expect(validateVedtaksperiodeId("")).toEqual(feilmelding);
     expect(validateVedtaksperiodeId(undefined)).toEqual(feilmelding);
     expect(validateVedtaksperiodeId("f75c33dd-3c89")).toEqual(feilmelding);
+  });
+});
+
+describe("validatePeriodeInnenforSøknadsperioden", () => {
+  const periode = {
+    sykdomFom: "2021-07-01",
+    sykdomTom: "2021-07-31",
+    fom: "2021-07-10",
+    tom: "2021-07-20",
+    feilmeldingUtenfor: "Perioden må være innenfor søknadsperioden",
+  };
+
+  it("avviser datoer før og etter søknadsperioden", () => {
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        dato: "2021-06-30",
+      }),
+    ).toEqual(periode.feilmeldingUtenfor);
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        dato: "2021-08-01",
+      }),
+    ).toEqual(periode.feilmeldingUtenfor);
+  });
+
+  it("godtar første og siste dag i søknadsperioden", () => {
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        dato: "2021-07-01",
+      }),
+    ).toEqual(true);
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        dato: "2021-07-31",
+      }),
+    ).toEqual(true);
+  });
+
+  it("avviser når f.o.m. er etter t.o.m.", () => {
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        fom: "2021-07-21",
+        tom: "2021-07-20",
+        dato: "2021-07-21",
+      }),
+    ).toEqual("F.o.m. kan ikke være etter t.o.m.");
+  });
+
+  it("godtar datoer når søknadsperioden mangler", () => {
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        dato: "2021-06-30",
+        sykdomFom: undefined,
+      }),
+    ).toEqual(true);
+    expect(
+      validatePeriodeInnenforSøknadsperioden({
+        ...periode,
+        dato: "2021-08-01",
+        sykdomTom: "",
+      }),
+    ).toEqual(true);
   });
 });

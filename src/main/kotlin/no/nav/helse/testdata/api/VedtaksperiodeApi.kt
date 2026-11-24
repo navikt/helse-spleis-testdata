@@ -4,10 +4,10 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
-import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.post
 import no.nav.helse.testdata.RapidsMediator
 import no.nav.helse.testdata.dokumenter.Forhåndsvurdering
+import no.nav.helse.testdata.dokumenter.Periode
 import no.nav.helse.testdata.dokumenter.Vedtak
 import no.nav.helse.testdata.dokumenter.arbeidsgiveropplysninger
 import no.nav.helse.testdata.dokumenter.sykmelding
@@ -22,13 +22,16 @@ internal fun Routing.registerVedtaksperiodeApi(mediator: RapidsMediator) {
     post("/vedtaksperiode") {
         val vedtak: Vedtak =
             try {
-                call.receive<Vedtak>().also {
-                    validate(it)
-                }
+                call.receive<Vedtak>()
             } catch (e: Exception) {
                 log.warn("Feil i input, lar seg ikke deserialisere", e)
                 throw e
             }
+
+        valider(vedtak)?.let { feilmelding ->
+            log.warn("Ugyldig input: $feilmelding")
+            return@post call.respond(HttpStatusCode.BadRequest, feilmelding)
+        }
 
         val fnr = vedtak.fnr
 
@@ -119,17 +122,26 @@ internal data class SendteDokumenterResponse(
     val traceUrl: String?,
 )
 
-private suspend fun RoutingContext.validate(
-    vedtak: Vedtak,
-) {
-    if (vedtak.sykdomFom > vedtak.sykdomTom) {
-        call.respond(HttpStatusCode.BadRequest, "FOM må være før TOM")
+internal fun valider(vedtak: Vedtak): String? {
+    if (vedtak.sykdomFom > vedtak.sykdomTom) return "FOM må være før TOM"
+    vedtak.arbeidsgiveropplysninger?.arbeidsgiverperiode?.forEach { (fom, tom) ->
+        if (fom > tom) return "Arbeidsgiverperioder: FOM $fom må være før TOM $tom"
     }
-    vedtak.arbeidsgiveropplysninger?.arbeidsgiverperiode?.map {
-        val (fom, tom) = it
-        if (fom > tom) {
-            call.respond(HttpStatusCode.BadRequest, "Arbeidsgiverperioder: FOM $fom må være før TOM $tom")
-            return
+    val søknad = vedtak.søknad ?: return null
+    // Spleis feiler på søknader med fravær utenfor søknadsperioden
+    return søknad.ferieperioder.validerFravær("Ferieperiode", vedtak)
+        ?: søknad.utenlandsperioder.validerFravær("Utenlandsopphold", vedtak)
+}
+
+private fun List<Periode>.validerFravær(
+    navn: String,
+    vedtak: Vedtak,
+): String? {
+    forEach { (fom, tom) ->
+        if (fom > tom) return "$navn: FOM $fom må være før TOM $tom"
+        if (fom < vedtak.sykdomFom || tom > vedtak.sykdomTom) {
+            return "$navn $fom–$tom må være innenfor søknadsperioden ${vedtak.sykdomFom}–${vedtak.sykdomTom}"
         }
     }
+    return null
 }

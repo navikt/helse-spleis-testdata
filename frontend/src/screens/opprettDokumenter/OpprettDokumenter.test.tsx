@@ -546,6 +546,28 @@ describe("OpprettDokumenter", () => {
     });
   });
 
+  it("avviser utenlandsopphold etter søknadsperioden", async () => {
+    render(<OpprettDokumenter />, { wrapper });
+
+    skrivDato("sykdomFom", "2021-07-01");
+    skrivDato("sykdomTom", "2021-07-31");
+    await userEvent.click(screen.getByTestId("utenlandsButton"));
+    skrivDato("utenlandsFom0", "2021-07-20");
+    skrivDato("utenlandsTom0", "2021-08-01");
+
+    await userEvent.click(screen.getByText("Opprett dokumenter"));
+
+    expect(
+      await screen.findByText(
+        "Utenlandsoppholdet må være innenfor søknadsperioden",
+      ),
+    ).toBeVisible();
+    expect(fetch).not.toHaveBeenCalledWith(
+      "http://0.0.0.0:8080/vedtaksperiode",
+      expect.anything(),
+    );
+  });
+
   it("sletter person", async () => {
     const orgnr = "987654321";
     mockPersonNavn();

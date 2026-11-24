@@ -200,6 +200,71 @@ class AppTest {
     }
 
     @Test
+    fun `godtar ferie og utenlandsopphold innenfor søknadsperioden`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(
+                        data(
+                            søknad = søknadMedFravær(
+                                ferie = """{ "fom": "2020-01-10", "tom": "2020-01-15" }""",
+                                utenlands = """{ "fom": "2020-01-20", "tom": "2020-01-30" }""",
+                            ),
+                        ),
+                    )
+                }
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertTrue(testRapid.inspektør.size > 0)
+        }
+    }
+
+    @Test
+    fun `avviser utenlandsopphold etter søknadsperioden`() {
+        assertAvvist(
+            søknadMedFravær(utenlands = """{ "fom": "2020-01-25", "tom": "2020-01-31" }"""),
+            "Utenlandsopphold 2020-01-25–2020-01-31 må være innenfor søknadsperioden 2020-01-10–2020-01-30",
+        )
+    }
+
+    @Test
+    fun `avviser utenlandsopphold før søknadsperioden`() {
+        assertAvvist(
+            søknadMedFravær(utenlands = """{ "fom": "2020-01-09", "tom": "2020-01-12" }"""),
+            "Utenlandsopphold 2020-01-09–2020-01-12 må være innenfor søknadsperioden 2020-01-10–2020-01-30",
+        )
+    }
+
+    @Test
+    fun `avviser ferie utenfor søknadsperioden`() {
+        assertAvvist(
+            søknadMedFravær(ferie = """{ "fom": "2020-01-05", "tom": "2020-01-12" }"""),
+            "Ferieperiode 2020-01-05–2020-01-12 må være innenfor søknadsperioden 2020-01-10–2020-01-30",
+        )
+    }
+
+    @Test
+    fun `avviser fravær med fom etter tom`() {
+        assertAvvist(
+            søknadMedFravær(ferie = """{ "fom": "2020-01-15", "tom": "2020-01-12" }"""),
+            "Ferieperiode: FOM 2020-01-15 må være før TOM 2020-01-12",
+        )
+    }
+
+    @Test
+    fun `publiserer ingenting når sykdomFom er etter sykdomTom`() {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(data().replace("\"2020-01-10\"", "\"2020-02-10\""))
+                }
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+            assertEquals(0, testRapid.inspektør.size)
+        }
+    }
+
+    @Test
     fun `sender ikke forhåndsvurdering uten søknad eller når den ikke er valgt`() {
         e2e {
             client.post("/vedtaksperiode") {
@@ -272,6 +337,34 @@ class AppTest {
             "refusjon": {},
             "førsteFraværsdag": "2019-12-31",
             "begrunnelseForReduksjonEllerIkkeUtbetalt": ""
+        }
+    """
+
+    private fun assertAvvist(
+        søknad: String,
+        forventetFeilmelding: String,
+    ) {
+        e2e {
+            val response =
+                client.post("/vedtaksperiode") {
+                    header("Content-Type", "application/json")
+                    setBody(data(søknad = søknad))
+                }
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+            assertEquals(forventetFeilmelding, response.bodyAsText())
+            assertEquals(0, testRapid.inspektør.size)
+        }
+    }
+
+    @Language("json")
+    private fun søknadMedFravær(
+        ferie: String? = null,
+        utenlands: String? = null,
+    ) = """
+        {
+            "harAndreInntektskilder": false,
+            "ferieperioder": [${ferie.orEmpty()}],
+            "utenlandsperioder": [${utenlands.orEmpty()}]
         }
     """
 }

@@ -67,7 +67,7 @@ export const DatoFelt = React.forwardRef<HTMLInputElement, DatoFeltProps>(
     }, [verdi]);
 
     return (
-      <DatePicker {...datepickerProps}>
+      <DatePicker {...datepickerProps} fixedWeeks>
         <DatePicker.Input
           {...inputProps}
           label={label}
